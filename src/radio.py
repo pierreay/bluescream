@@ -2,7 +2,7 @@
 
 Global variables:
 
-        Radio: Enumeration of all supported SDRs.
+        RADIO: Enumeration of all supported SDRs.
 
 Classes:
 
@@ -16,7 +16,7 @@ import enum
 from gnuradio import blocks, gr, uhd, iio
 import osmosdr
 
-Radio = enum.Enum("Radio", "USRP USRP_mini USRP_B210 USRP_B210_MIMO HackRF bladeRF PlutoSDR")
+RADIO = enum.Enum("RADIO", "USRP USRP_mini USRP_B210 USRP_B210_MIMO HackRF bladeRF PlutoSDR")
 
 class GNUradio(gr.top_block):
     """GNUradio capture from SDR to file."""
@@ -29,16 +29,16 @@ class GNUradio(gr.top_block):
         self.address = address
         self.antenna = antenna
 
-        if self.radio in (Radio.USRP, Radio.USRP_mini, Radio.USRP_B210):
+        if self.radio in (RADIO.USRP, RADIO.USRP_mini, RADIO.USRP_B210):
             radio_block = uhd.usrp_source(
                 ("addr=" + self.address.encode("ascii"))
-                if self.radio == Radio.USRP else "",
+                if self.radio == RADIO.USRP else "",
                 uhd.stream_args(cpu_format="fc32", channels=[0]))
             radio_block.set_center_freq(frequency)
             radio_block.set_samp_rate(sampling_rate)
             radio_block.set_gain(usrp_gain)
             radio_block.set_antenna(self.antenna.encode("ascii"))
-        elif self.radio == Radio.USRP_B210_MIMO:
+        elif self.radio == RADIO.USRP_B210_MIMO:
             radio_block = uhd.usrp_source(
         	",".join(('', "")),
         	uhd.stream_args(
@@ -56,7 +56,7 @@ class GNUradio(gr.top_block):
             radio_block.set_antenna('RX2', 1)
             radio_block.set_bandwidth(sampling_rate/2, 1)
  
-        elif self.radio == Radio.HackRF or self.radio == Radio.bladeRF:
+        elif self.radio == RADIO.HackRF or self.radio == RADIO.bladeRF:
             mysdr = str(self.radio).split(".")[1].lower() #get "bladerf" or "hackrf"
             radio_block = osmosdr.source(args="numchan=1 "+mysdr+"=0")
             radio_block.set_center_freq(frequency, 0)
@@ -72,7 +72,7 @@ class GNUradio(gr.top_block):
             radio_block.set_antenna('', 0)
             radio_block.set_bandwidth(3e6, 0)
             
-        elif self.radio == Radio.PlutoSDR:
+        elif self.radio == RADIO.PlutoSDR:
             bandwidth = 3e6
             radio_block = iio.pluto_source(self.address.encode("ascii"),
                                            int(frequency), int(sampling_rate),
@@ -86,7 +86,7 @@ class GNUradio(gr.top_block):
         self._file_sink = blocks.file_sink(gr.sizeof_gr_complex, self.outfile)
         self.connect((radio_block, 0), (self._file_sink, 0))
 
-        if self.radio == Radio.USRP_B210_MIMO:
+        if self.radio == RADIO.USRP_B210_MIMO:
             self._file_sink_2 = blocks.file_sink(gr.sizeof_gr_complex,
             self.outfile+"_2")
             self.connect((radio_block, 1), (self._file_sink_2, 0))
@@ -98,7 +98,7 @@ class GNUradio(gr.top_block):
         """
         self._file_sink.open(self.outfile)
         
-        if self.radio == Radio.USRP_B210_MIMO:
+        if self.radio == RADIO.USRP_B210_MIMO:
             self._file_sink_2.open(self.outfile+"_2")
 
     def __enter__(self):
