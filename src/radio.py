@@ -9,6 +9,7 @@ Classes:
 """
 # Core modules.
 import enum
+import time
 
 # External modules.
 from gnuradio import blocks, gr, uhd, iio
@@ -39,47 +40,50 @@ class GNURadio(gr.top_block):
         :raises Exception: If the radio 'type' is not supported.
 
         """
-        l.LOGGER.debug("Initialize the '{}' SDR".format(radio))
-        super().__init__(self, "Top Block")
+        l.LOGGER.info("Initialize the '{}' SDR".format(radio.name))
+        gr.top_block.__init__(self, "Top Block") # 'super().__init__(self, "Top Block")' doens't work.
 
         # Set common parameters.
         self.outfile       = outfile
-        self.radio         = RadioType[radio]
+        self.radio         = radio
         self.address       = address
         self.antenna       = antenna
         self.frequency     = frequency
         self.sampling_rate = sampling_rate
 
         # Create source radio blocks and set per-radio parameters.
-        if self.radio in (RadioType.USRP):
-            rad_addr    = "addr={}".format(self.address)
+        if self.radio == RadioType.USRP:
+            l.LOGGER.debug("Instantiate USRP's GNURadio block")
+            rad_addr    = "addr={}".format(self.address) if self.address else ""
             rad_stream  = uhd.stream_args(cpu_format="fc32", channels=[0])
-            radio_block = uhd.usrp_source(rad_addr, rad_stream)
-            radio_block.set_center_freq(self.frequency)
-            radio_block.set_sample_rate(self.sampling_rate)
-            radio_block.set_antenna(self.antenna)
-            radio_block.set_gain(usrp_gain)
+            self.radio_block = uhd.usrp_source(rad_addr, rad_stream)
+            self.radio_block.set_center_freq(self.frequency)
+            self.radio_block.set_samp_rate(self.sampling_rate)
+            self.radio_block.set_antenna(self.antenna)
+            self.radio_block.set_gain(usrp_gain)
         elif self.radio in (RadioType.HACKRF, RadioType.BLADERF):
+            l.LOGGER.debug("Instantiate HackRF|BladeRF's GNURadio block")
             gr_args = "numchan=1 {}=0".format("hackrf" if self.Radio == RadioType.HACKRF else "bladerf")
-            radio_block = osmosdr.source(args=gr_args)
-            radio_block.set_center_freq(self.frequency, 0)
-            radio_block.set_sample_rate(self.sampling_rate, 0)
-            radio_block.set_bandwidth(self.sampling_rate, 0)
-            radio_block.set_antenna("", 0)
-            radio_block.set_gain_mode(True, 0)
-            radio_block.set_gain(hackrf_gain, 0)
-            radio_block.set_if_gain(hackrf_gain_if, 0)
-            radio_block.set_bb_gain(hackrf_gain_bb, 0)
-            radio_block.set_dc_offset_mode(True, 0)
-            radio_block.set_iq_balance_mode(True, 0)
+            self.radio_block = osmosdr.source(args=gr_args)
+            self.radio_block.set_center_freq(self.frequency, 0)
+            self.radio_block.set_sample_rate(self.sampling_rate, 0)
+            self.radio_block.set_bandwidth(self.sampling_rate, 0)
+            self.radio_block.set_antenna("", 0)
+            self.radio_block.set_gain_mode(True, 0)
+            self.radio_block.set_gain(hackrf_gain, 0)
+            self.radio_block.set_if_gain(hackrf_gain_if, 0)
+            self.radio_block.set_bb_gain(hackrf_gain_bb, 0)
+            self.radio_block.set_dc_offset_mode(True, 0)
+            self.radio_block.set_iq_balance_mode(True, 0)
         elif self.radio == RadioType.PLUTOSDR:
+            l.LOGGER.debug("Instantiate PlutoSDR's GNURadio block")
             uri = self.address.encode("ascii")
-            freq = int(frequency)
-            sr = int(sampling_rate)
+            freq = int(self.frequency)
+            sr = int(self.sampling_rate)
             bw = sr
             bufsize = 0x8000
             gainmode = "manual"
-            radio_block = iio.pluto_source(uri, freq, sr, 1 - 1, bw, bufsize,
+            self.radio_block = iio.pluto_source(uri, freq, sr, 1 - 1, bw, bufsize,
                                            True, True, True, gain_mode,
                                            plutosdr_gain, "", True)
         else:
@@ -87,7 +91,7 @@ class GNURadio(gr.top_block):
 
         # Create sink file blocks and connect them.
         self._file_sink = blocks.file_sink(gr.sizeof_gr_complex, self.outfile)
-        self.connect((radio_block, 0), (self._file_sink, 0))
+        self.connect((self.radio_block, 0), (self._file_sink, 0))
 
     def reset(self):
         """Remove the current trace file and get ready for a new trace."""
