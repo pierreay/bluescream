@@ -1,2 +1,4 @@
 # Experiments files.
 out/*
+# Emacs files.
+**/*.dir-locals.el
