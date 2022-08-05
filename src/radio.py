@@ -100,11 +100,11 @@ class GNURadio(gr.top_block):
     def start(self):
         """Start recording with a delay after."""
         super().start()
-        time.sleep(0.08)
+        time.sleep(0.08) # Add delay otherwise we get zeros from first traces.
 
     def stop(self):
         """Stop recording with a delay before."""
-        time.sleep(0.08)
+        time.sleep(0.03) # Add delay otherwise we don't record the end of the encryptions.
         super().stop()
         super().wait()
 
