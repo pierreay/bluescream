@@ -67,7 +67,7 @@ class GNURadio(gr.top_block):
             l.LOGGER.debug("GNURadio args='{}'".format(gr_args))
             self.radio_block = osmosdr.source(args=gr_args)
             self.radio_block.set_center_freq(self.frequency, 0)
-            self.radio_block.set_sample_rate(self.sampling_rate, 0)
+            self.radio_block.set_sample_rate(self.sampling_rate)
             self.radio_block.set_bandwidth(self.sampling_rate, 0)
             self.radio_block.set_antenna("", 0)
             self.radio_block.set_gain_mode(True, 0)
