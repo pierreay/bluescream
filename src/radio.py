@@ -105,7 +105,11 @@ class GNURadio(gr.top_block):
 
     def stop(self):
         """Stop recording with a delay before."""
-        time.sleep(0.03) # Add delay otherwise we don't record the end of the encryptions.
+        # Add delay otherwise we don't record the end of the encryptions.
+        if self.radio == RadioType.USRP:
+            time.sleep(0.03)
+        else:
+            time.sleep(0.09)
         super().stop()
         super().wait()
 
