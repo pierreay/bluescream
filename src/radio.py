@@ -63,7 +63,8 @@ class GNURadio(gr.top_block):
             self.radio_block.set_gain(usrp_gain)
         elif self.radio in (RadioType.HACKRF, RadioType.BLADERF):
             l.LOGGER.debug("Instantiate HackRF|BladeRF's GNURadio block")
-            gr_args = "numchan=1 {}=0".format("hackrf" if self.Radio == RadioType.HACKRF else "bladerf")
+            gr_args = "numchan=1 {}=0".format("hackrf" if self.radio == RadioType.HACKRF else "bladerf")
+            l.LOGGER.debug("GNURadio args='{}'".format(gr_args))
             self.radio_block = osmosdr.source(args=gr_args)
             self.radio_block.set_center_freq(self.frequency, 0)
             self.radio_block.set_sample_rate(self.sampling_rate, 0)
