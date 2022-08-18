@@ -1,4 +1,3 @@
-# Experiments files.
-out/*
-# Emacs files.
+# Local environment files.
 **/*.dir-locals.el
+**/*.envrc
