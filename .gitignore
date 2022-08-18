@@ -1,2 +1,3 @@
-# Experiments files.
-out/*
+# Local environment files.
+**/*.dir-locals.el
+**/*.envrc
