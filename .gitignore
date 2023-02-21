@@ -1,7 +1,7 @@
 # Local environment files.
 **/*.dir-locals.el
 **/*.envrc
-last.sh
+**/Makefile.emacs
 
 # Pip installation files.
 **/*.egg-info
