@@ -12,6 +12,12 @@ from tqdm import tqdm
 
 # * Misc
 
+def get_nb(indir):
+    """Return the number of traces contained in a dataset."""
+    for i in range(0, sys.maxsize):
+        if not path.exists(path.join(indir, "{}_trace_nf.npy".format(i))):
+            return i-1
+
 def find_bad_entry(arr):
     """Return bad entry (metadata or trace) indexes from a 2D np.array"""
     bad = []
