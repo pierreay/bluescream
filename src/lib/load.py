@@ -106,11 +106,23 @@ def print_dataset_info(input):
         print_trace_info(input[0])
 
 def load_pair_trace(dir, idx):
-    """Load one pair of traces (NF & FF) located in directory at index"""
+    """Load one pair of traces (NF & FF) located in directory DIR at index
+    IDX. Return a tuple composed of NF then FF trace, or None on loading
+    error.
+
+    """
     trace_nf_p = "{}/{}_trace_nf.npy".format(dir, idx)
     trace_ff_p = "{}/{}_trace_rf.npy".format(dir, idx)
-    trace_nf = np.load(trace_nf_p) 
-    trace_ff = np.load(trace_ff_p)
+    trace_nf = None
+    trace_ff = None
+    try:
+        trace_nf = np.load(trace_nf_p)
+    except Exception as e:
+        print(e)
+    try:
+        trace_ff = np.load(trace_ff_p)
+    except Exception as e:
+        print(e)
     return trace_nf, trace_ff
 
 def save_all_traces(dir, nf, ff):
