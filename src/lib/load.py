@@ -112,7 +112,7 @@ def save_pair_trace(dir, idx, nf, ff):
     nf_p = path.join(dir, "{}_trace_nf.npy".format(idx))
     ff_p = path.join(dir, "{}_trace_ff.npy".format(idx))
     np.save(nf_p, nf)
-    np.save(nf_p, ff)
+    np.save(ff_p, ff)
  
 def load_pair_trace(dir, idx):
     """Load one pair of traces (NF & FF) located in directory DIR at index
