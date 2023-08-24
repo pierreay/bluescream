@@ -55,3 +55,13 @@ def get_trace_format(trace):
     else:
         print("Unknown type!")
         return None
+
+def fill_zeros_if_bad(ref, test):
+    """If a bad trace TEST is given (i.e. wrong shape or None), it is remplaced
+    with a zeroed trace of dtype and shape from REF. Return a tuple (FLAG,
+    TEST) where FLAG is 0 if trace was OK and 1 if trace was bad."""
+    ret = 0
+    if test is None or test.shape != ref.shape:
+        test = np.zeros(ref.shape, dtype=ref.dtype)
+        ret = 1
+    return (ret, test)
