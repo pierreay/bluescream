@@ -140,16 +140,32 @@ def save_all_traces(dir, nf, ff):
     np.save(path.join(dir, "traces_nf.npy"), nf)
     np.save(path.join(dir, "traces_ff.npy"), ff)
 
-def load_all_traces(dir):
-    """Load all the traces. Return a numpy array containing all the traces of
-    shape (nb_traces, nb_samples). Use it carefully because it can overflow the
-    memory."""
+def load_all_traces(dir, nb=0):
+    """Load traces contained in DIR. Can be packed or unpacked. Return a 2D
+    np.array of shape (nb_traces, nb_samples). Only load NB traces if specified
+    for unpacked dataset. Beware to not overflow the memory.
+    """
     print("[+] loading traces...")
-    nf_p = path.join(dir, "traces_nf.npy")
-    ff_p = path.join(dir, "traces_ff.npy")
-    assert(path.exists(nf_p) and path.exists(ff_p))
-    print("[+] done!")
-    return np.load(nf_p), np.load(ff_p)
+    if path.exists(path.join(dir, "traces_nf.npy")):
+        packed = True
+        nf_p = path.join(dir, "traces_nf.npy")
+        ff_p = path.join(dir, "traces_ff.npy")
+        assert(path.exists(nf_p) and path.exists(ff_p))
+        print("[+] done!")
+        return np.load(nf_p), np.load(ff_p)
+    elif path.exists(path.join(dir, "0_trace_nf.npy")):
+        import ipdb; ipdb.set_trace()
+        packed = False
+        ref = np.load(path.join(dir, "0_trace_nf.npy"))
+        nb = get_nb(dir) if nb < 1 else nb
+        traces_nf = np.empty((nb, ref.shape[0]), dtype=ref.dtype)
+        traces_ff = np.empty((nb, ref.shape[0]), dtype=ref.dtype)
+        for i in tqdm(range(0, nb), desc="load_all_traces()"):
+            nf_p = path.join(dir, "{}_trace_nf.npy".format(i))
+            ff_p = path.join(dir, "{}_trace_ff.npy".format(i))
+            traces_nf[i] = np.load(nf_p)
+            traces_ff[i] = np.load(ff_p)
+        return traces_nf, traces_ff
 
 def reshape_trimming_zeroes():
     """I don't need it, but in case of future needs...
