@@ -3,6 +3,11 @@ already loaded in memory.
 
 """
 
+# * Constants
+
+FMT_IQ = 0
+FMT_MAGNITUDE = 1
+
 # * Dataset-level
 
 def print_traces_idx_with_ks_n_pt_equal(ks, pt):
@@ -20,3 +25,12 @@ def print_traces_idx_with_ks_n_pt_equal(ks, pt):
             print("subbyte_idx={} subbyte_val={} trace_idx={}".format(subbyte_idx, subbyte_val, sub_i_v[subbyte_idx][subbyte_val]))
 
 # * Trace-level
+def get_trace_format(trace):
+    """Return a constant indicating the format of the trace."""
+    if trace[0].dtype == np.complex64:
+        return FMT_IQ
+    elif trace[0].dtype == np.float32:
+        return FMT_MAGNITUDE
+    else:
+        print("Unknown type!")
+        return None
