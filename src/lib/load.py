@@ -122,8 +122,10 @@ def load_pair_trace(dir, idx):
     error.
 
     """
-    trace_nf_p = "{}/{}_trace_nf.npy".format(dir, idx)
-    trace_ff_p = "{}/{}_trace_rf.npy".format(dir, idx)
+    trace_nf_p = path.join(dir, "{}_trace_nf.npy".format(idx))
+    trace_ff_p = path.join(dir, "{}_trace_rf.npy".format(idx))
+    if not path.exists(trace_ff_p):
+        trace_ff_p = path.join(dir, "{}_trace_ff.npy".format(idx))
     trace_nf = None
     trace_ff = None
     try:
