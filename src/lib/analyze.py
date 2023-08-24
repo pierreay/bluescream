@@ -3,6 +3,8 @@ already loaded in memory.
 
 """
 
+import numpy as np
+
 # * Constants
 
 FMT_IQ = 0
