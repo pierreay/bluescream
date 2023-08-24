@@ -28,7 +28,9 @@ def find_bad_entry(arr):
     return bad
 
 def prune_entry(arr, idx):
-    """Remove entries from 1D np.array ARR having indexes equal to values in list IDX."""
+    """Remove entries from 1D np.array ARR having indexes equal to values in
+    list IDX. WARNING: np.delete is not in-place, it will return a copy of the
+    array, doesn't work well with GB traces."""
     return np.delete(arr, idx, 0)
 
 def prune_entry_all_dataset(ks, pt, nf, ff):
