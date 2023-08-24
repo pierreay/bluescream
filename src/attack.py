@@ -5,6 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 import lib.load as load
+import lib.analyze as analyze
 import lib.filters as filters
 import lib.plot as libplot
 import lib.debug as debug
@@ -270,8 +271,8 @@ def cli(data_path, num_traces, start_point, end_point, plot, save_images, wait, 
     TRACES_NF, TRACES_FF                   = load.load_all_traces(data_path)
     KEYS, PLAINTEXTS, TRACES_NF, TRACES_FF = load.reduce_entry_all_dataset(KEYS, PLAINTEXTS, TRACES_NF, TRACES_FF, num_traces)
     TRACES                                 = load.truncate(TRACES_FF, start_point, end_point)
-    TRACES                                 = load.get_amplitude(TRACES)
-    TRACES                                 = load.normalize_zscore(TRACES)
+    TRACES                                 = analyze.get_amplitude(TRACES)
+    TRACES                                 = analyze.normalize_zscore(TRACES)
     PLAINTEXTS                             = PLAINTEXTS.tolist()
     KEYS                                   = KEYS.tolist()
     print("[+] old generic_load() replacement finished!")

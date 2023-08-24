@@ -143,12 +143,6 @@ def load_all_traces(dir):
     print("[+] done!")
     return np.load(nf_p), np.load(ff_p)
 
-def get_amplitude(traces):
-    """From a 2D np.array of shape (nb_traces, nb_samples) containing IQ
-    samples, return an array with the same shape containing the amplitude of
-    the traces."""
-    return np.abs(traces)
-
 def reshape_trimming_zeroes():
     """I don't need it, but in case of future needs...
     np.trim_zeros:
@@ -184,17 +178,3 @@ def truncate(traces, start=0, end=0):
     if end:
         traces = traces[:,:end-start]
     return traces
-
-def normalize(arr):
-    """Apply min-max feature scaling normalization to a 1D array."""
-    assert(arr.dtype == np.float32)
-    return (arr - np.min(arr)) / (np.max(arr) - np.min(arr))
-
-def normalize_zscore(arr):
-    """Normalize a trace using Z-Score normalization. Taken from load.py from
-    Screaming Channels."""
-    mu = np.average(arr)
-    std = np.std(arr)
-    if std != 0:
-        arr = (arr - mu) / std
-    return arr

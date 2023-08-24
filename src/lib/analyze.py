@@ -25,6 +25,27 @@ def print_traces_idx_with_ks_n_pt_equal(ks, pt):
             print("subbyte_idx={} subbyte_val={} trace_idx={}".format(subbyte_idx, subbyte_val, sub_i_v[subbyte_idx][subbyte_val]))
 
 # * Trace-level
+
+def normalize(arr):
+    """Apply min-max feature scaling normalization to a 1D array."""
+    assert(arr.dtype == np.float32)
+    return (arr - np.min(arr)) / (np.max(arr) - np.min(arr))
+
+def normalize_zscore(arr):
+    """Normalize a trace using Z-Score normalization. Taken from load.py from
+    Screaming Channels."""
+    mu = np.average(arr)
+    std = np.std(arr)
+    if std != 0:
+        arr = (arr - mu) / std
+    return arr
+
+def get_amplitude(traces):
+    """From the TRACES 2D np.array of shape (nb_traces, nb_samples) or the 1D
+    np.array of shape (nb_samples) containing IQ samples, return an array with
+    the same shape containing the amplitude of the traces."""
+    return np.abs(traces)
+
 def get_trace_format(trace):
     """Return a constant indicating the format of the trace."""
     if trace[0].dtype == np.complex64:
