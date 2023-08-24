@@ -136,11 +136,16 @@ def load_pair_trace(dir, idx):
         print(e)
     return trace_nf, trace_ff
 
-def save_all_traces(dir, nf, ff):
+def save_all_traces(dir, nf, ff, packed=True):
     """Save all the traces in DIR. NF is a 2D np.array of shape (nb_traces,
     nb_samples), same for FF."""
-    np.save(path.join(dir, "traces_nf.npy"), nf)
-    np.save(path.join(dir, "traces_ff.npy"), ff)
+    if packed:
+        np.save(path.join(dir, "traces_nf.npy"), nf)
+        np.save(path.join(dir, "traces_ff.npy"), ff)
+    else:
+        for i in range(len(nf)):
+            np.save(path.join(dir, "{}_trace_nf.npy".format(i)), nf[i])
+            np.save(path.join(dir, "{}_trace_ff.npy".format(i)), ff[i])
 
 def load_all_traces(dir, nb=0):
     """Load traces contained in DIR. Can be packed or unpacked. Return a 2D
