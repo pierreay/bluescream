@@ -1,4 +1,4 @@
-"""Load the data stored in datasets. Handle multiple version and format of our
+"""Load or save the data in datasets. Handle multiple version and format of our
 datasets. Keep separate code for keys and plaintexts as format can be
 completely different even if names' patterns are similar.
 
@@ -19,7 +19,8 @@ def get_nb(indir):
             return i-1
 
 def find_bad_entry(arr):
-    """Return bad entry (metadata or trace) indexes from a 2D np.array"""
+    """Return bad entry (metadata or trace) indexes from the 2D np.array ARR,
+    where a bad entry is an entry filled with zeroes."""
     bad = []
     for i in tqdm(range(0, len(arr)), desc="find_bad_entry()"):
         if np.all(np.equal(arr[i], np.zeros((len(arr[0]),)))):
@@ -27,11 +28,11 @@ def find_bad_entry(arr):
     return bad
 
 def prune_entry(arr, idx):
-    """Remove entries from 1D np.array arr having indexes equal to values in list idx"""
+    """Remove entries from 1D np.array ARR having indexes equal to values in list IDX."""
     return np.delete(arr, idx, 0)
 
 def prune_entry_all_dataset(ks, pt, nf, ff):
-    """Remove bad entries for the entire dataset"""
+    """Remove bad entries for the entire dataset."""
     bad = find_bad_entry(ks) + find_bad_entry(pt) + find_bad_entry(nf) + find_bad_entry(ff)
     assert(len(bad) < len(nf)/100)
     return (prune_entry(ks, bad), prune_entry(pt, bad),
