@@ -163,6 +163,7 @@ def load_all_traces(dir, nb=0):
             assert(path.exists(nf_p) and path.exists(ff_p))
             traces_nf[i] = np.load(nf_p)
             traces_ff[i] = np.load(ff_p)
+        print("[+] done!")
         return traces_nf, traces_ff
     else:
         print("[!] Unknown dataset format")
