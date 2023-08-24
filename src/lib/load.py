@@ -106,6 +106,14 @@ def print_dataset_info(input):
         print("dataset.dtype={}".format(input.dtype))
         print_trace_info(input[0])
 
+def save_pair_trace(dir, idx, nf, ff):
+    """Save one pair of traces (NF & FF) located in directory DIR at index
+    IDX."""
+    nf_p = path.join(dir, "{}_trace_nf.npy".format(idx))
+    ff_p = path.join(dir, "{}_trace_ff.npy".format(idx))
+    np.save(nf_p, nf)
+    np.save(nf_p, ff)
+ 
 def load_pair_trace(dir, idx):
     """Load one pair of traces (NF & FF) located in directory DIR at index
     IDX. Return a tuple composed of NF then FF trace, or None on loading
