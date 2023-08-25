@@ -30,10 +30,16 @@ def plot_simple(s):
     plot_time_simple(s)
     plot_spec_simple(s)
 
-def plot_time_compare(s1, s2):
+def plot_time_compare_2(s1, s2):
     assert(s1.shape == s2.shape)
-    plt.plot(s1)
-    plt.plot(s2)
+    plot_time_compare_n(np.array([s1, s2]))
+
+def plot_time_compare_n(arr):
+    """Show a single time-domain plot superposing every traces contained the 2D
+    np.array ARR."""
+    assert(len(arr) < 1000) # To not consume too much memory.
+    for idx in range(len(arr)):
+        plt.plot(arr[idx])
     plt.show()
 
 def plot_spec_compare(s1, s2):
