@@ -12,6 +12,9 @@ from tqdm import tqdm
 
 # * Misc
 
+def get_nb_if_not_set(indir, nb):
+    return nb if nb > 0 else get_nb(indir)
+
 def get_nb(indir):
     """Return the number of traces contained in a dataset."""
     for i in range(0, sys.maxsize):
