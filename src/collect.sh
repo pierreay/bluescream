@@ -93,7 +93,7 @@ function collect_one_set() {
 
     if [[ $KEY_FIXED == 1 ]]; then
         if [[ $i_start == 0 ]]; then
-            ./utils/pair.sh "$BD_ADDR" "$HCI_IFNAME"
+            ./utils/pair.sh "$VICTIM_ADDR" "$ATTACK_HCI"
             cp /tmp/mirage_output_ltk $OUTPUT_WD/k.txt
             # Fix record.py trying to load values from /tmp after rebooting.
             cp /tmp/mirage_output_addr $OUTPUT_WD/.addr.txt
@@ -115,10 +115,10 @@ function collect_one_set() {
         echo "=========== TRACE #$i -- KEY_FIXED=$KEY_FIXED ==========="
         echo
         if [[ $KEY_FIXED == 0 ]]; then
-            timeoutnreboot ./utils/pair.sh "$BD_ADDR" "$HCI_IFNAME"
+            timeoutnreboot ./utils/pair.sh "$VICTIM_ADDR" "$ATTACK_HCI"
             cp /tmp/mirage_output_ltk $OUTPUT_WD/${i}_k.txt
         fi
-        timeoutnreboot python3 ./collect.py record
+        timeoutnreboot python3 ./collect.py record "$VICTIM_ADDR"
         python3 ./collect.py process
         python3 ./collect.py extract
         cp /tmp/${SIG_NF/.npy/.npy_extracted.npy} $OUTPUT_WD/${i}_trace_nf.npy
@@ -133,8 +133,6 @@ function collect_one_set() {
 
 sleep 5         # Be sure fstab mount our partitions.
 export OUTPUT_WD_ROOT=$HOME/storage/screaming_channels_annex/tmp
-export BD_ADDR="F4:9E:F2:6D:37:85"
-export HCI_IFNAME="hci0"
 export SIG_NF_FREQ=127000000
 export SIG_RF_FREQ=2547000000
 export SIG_SR=30000000
