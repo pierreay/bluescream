@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Source the project environment for following variables:
-# - VICTIM_ADDR
-# - ATTACK_HCI
-# - RECORD_SR
+# - DE_VICTIM_ADDR
+# - DE_ATTACK_HCI
+# - DE_RECORD_SR
 source ../.envrc
 
 # * collect_one_set.sh
@@ -99,7 +99,7 @@ function collect_one_set() {
 
     if [[ $KEY_FIXED == 1 ]]; then
         if [[ $i_start == 0 ]]; then
-            ./utils/pair.sh "$VICTIM_ADDR" "$ATTACK_HCI"
+            ./utils/pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI"
             cp /tmp/mirage_output_ltk $OUTPUT_WD/k.txt
             # Fix record.py trying to load values from /tmp after rebooting.
             cp /tmp/mirage_output_addr $OUTPUT_WD/.addr.txt
@@ -121,10 +121,10 @@ function collect_one_set() {
         echo "=========== TRACE #$i -- KEY_FIXED=$KEY_FIXED ==========="
         echo
         if [[ $KEY_FIXED == 0 ]]; then
-            timeoutnreboot ./utils/pair.sh "$VICTIM_ADDR" "$ATTACK_HCI"
+            timeoutnreboot ./utils/pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI"
             cp /tmp/mirage_output_ltk $OUTPUT_WD/${i}_k.txt
         fi
-        timeoutnreboot python3 ./collect.py record "$VICTIM_ADDR"
+        timeoutnreboot python3 ./collect.py record "$DE_VICTIM_ADDR"
         python3 ./collect.py process
         python3 ./collect.py extract
         cp /tmp/${SIG_NF/.npy/.npy_extracted.npy} $OUTPUT_WD/${i}_trace_nf.npy
@@ -141,7 +141,7 @@ sleep 5         # Be sure fstab mount our partitions.
 export OUTPUT_WD_ROOT=$HOME/storage/screaming_channels_annex/tmp
 export SIG_NF_FREQ=127000000
 export SIG_RF_FREQ=2547000000
-export SIG_SR=$RECORD_SR
+export SIG_SR=$DE_RECORD_SR
 export SIG_NF=USRP_0-127.0MHz-30.0Msps_raw.npy
 export SIG_RF=USRP_1-2547.0MHz-30.0Msps_raw.npy
 #export COLLECT_TRAINING_NB=65536
