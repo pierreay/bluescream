@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Source the project environment for following variables:
+# - VICTIM_ADDR
+# - ATTACK_HCI
+# - RECORD_SR
+source ../.envrc
+
 # * collect_one_set.sh
 
 # ** Functions
@@ -135,7 +141,7 @@ sleep 5         # Be sure fstab mount our partitions.
 export OUTPUT_WD_ROOT=$HOME/storage/screaming_channels_annex/tmp
 export SIG_NF_FREQ=127000000
 export SIG_RF_FREQ=2547000000
-export SIG_SR=30000000
+export SIG_SR=$RECORD_SR
 export SIG_NF=USRP_0-127.0MHz-30.0Msps_raw.npy
 export SIG_RF=USRP_1-2547.0MHz-30.0Msps_raw.npy
 #export COLLECT_TRAINING_NB=65536
