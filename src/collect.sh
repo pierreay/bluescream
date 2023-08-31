@@ -3,7 +3,9 @@
 # Source the project environment for following variables:
 # - DE_VICTIM_ADDR
 # - DE_ATTACK_HCI
-# - DE_RECORD_SR
+# - DE_REC_FREQ_NF
+# - DE_REC_FREQ_FF
+# - DE_REC_SAMP_RATE
 source ../.envrc
 
 # * collect_one_set.sh
@@ -124,9 +126,9 @@ function collect_one_set() {
             timeoutnreboot ./utils/pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI"
             cp /tmp/mirage_output_ltk $OUTPUT_WD/${i}_k.txt
         fi
-        timeoutnreboot python3 ./collect.py record "$DE_VICTIM_ADDR" "$DE_FREQ_NF" "$DE_FREQ_FF" "$DE_SAMP_RATE"
-        python3 ./collect.py process "$DE_SAMP_RATE"
-        python3 ./collect.py extract "$DE_SAMP_RATE"
+        timeoutnreboot python3 ./collect.py record "$DE_VICTIM_ADDR" "$DE_REC_FREQ_NF" "$DE_REC_FREQ_FF" "$DE_REC_SAMP_RATE"
+        python3 ./collect.py process "$DE_REC_SAMP_RATE"
+        python3 ./collect.py extract "$DE_REC_SAMP_RATE"
         cp /tmp/${SIG_NF/.npy/.npy_extracted.npy} $OUTPUT_WD/${i}_trace_nf.npy
         cp /tmp/${SIG_RF/.npy/.npy_extracted.npy} $OUTPUT_WD/${i}_trace_rf.npy
         cp /tmp/bt_skd_0 $OUTPUT_WD/${i}_p.txt
