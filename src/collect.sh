@@ -124,9 +124,9 @@ function collect_one_set() {
             timeoutnreboot ./utils/pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI"
             cp /tmp/mirage_output_ltk $OUTPUT_WD/${i}_k.txt
         fi
-        timeoutnreboot python3 ./collect.py record "$DE_VICTIM_ADDR"
-        python3 ./collect.py process
-        python3 ./collect.py extract
+        timeoutnreboot python3 ./collect.py record "$DE_VICTIM_ADDR" "$DE_FREQ_NF" "$DE_FREQ_FF" "$DE_SAMP_RATE"
+        python3 ./collect.py process "$DE_SAMP_RATE"
+        python3 ./collect.py extract "$DE_SAMP_RATE"
         cp /tmp/${SIG_NF/.npy/.npy_extracted.npy} $OUTPUT_WD/${i}_trace_nf.npy
         cp /tmp/${SIG_RF/.npy/.npy_extracted.npy} $OUTPUT_WD/${i}_trace_rf.npy
         cp /tmp/bt_skd_0 $OUTPUT_WD/${i}_p.txt
@@ -139,9 +139,6 @@ function collect_one_set() {
 
 sleep 5         # Be sure fstab mount our partitions.
 export OUTPUT_WD_ROOT=$HOME/storage/screaming_channels_annex/tmp
-export SIG_NF_FREQ=127000000
-export SIG_RF_FREQ=2547000000
-export SIG_SR=$DE_RECORD_SR
 export SIG_NF=USRP_0-127.0MHz-30.0Msps_raw.npy
 export SIG_RF=USRP_1-2547.0MHz-30.0Msps_raw.npy
 #export COLLECT_TRAINING_NB=65536
