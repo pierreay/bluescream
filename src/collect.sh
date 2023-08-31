@@ -114,8 +114,9 @@ function collect_one_set() {
         fi
     fi
 
-    echo $SIG_NF > $OUTPUT_WD/params.txt
-    echo $SIG_RF >> $OUTPUT_WD/params.txt
+    echo "freq_nf=$DE_REC_FREQ_NF"      >  $OUTPUT_WD/params.txt
+    echo "freq_ff=$DE_REC_FREQ_FF"      >> $OUTPUT_WD/params.txt
+    echo "samp_rate=$DE_REC_SAMP_RATE"  >> $OUTPUT_WD/params.txt
 
     for (( i = i_start; i <= $COLLECT_NB; i++ ))
     do
@@ -129,8 +130,8 @@ function collect_one_set() {
         timeoutnreboot python3 ./collect.py record "$DE_VICTIM_ADDR" "$DE_REC_FREQ_NF" "$DE_REC_FREQ_FF" "$DE_REC_SAMP_RATE"
         python3 ./collect.py process "$DE_REC_SAMP_RATE"
         python3 ./collect.py extract "$DE_REC_SAMP_RATE"
-        cp /tmp/${SIG_NF/.npy/.npy_extracted.npy} $OUTPUT_WD/${i}_trace_nf.npy
-        cp /tmp/${SIG_RF/.npy/.npy_extracted.npy} $OUTPUT_WD/${i}_trace_rf.npy
+        cp /tmp/raw_0_0.npy $OUTPUT_WD/${i}_trace_nf.npy
+        cp /tmp/raw_1_0.npy $OUTPUT_WD/${i}_trace_ff.npy
         cp /tmp/bt_skd_0 $OUTPUT_WD/${i}_p.txt
     done
 
@@ -141,8 +142,6 @@ function collect_one_set() {
 
 sleep 5         # Be sure fstab mount our partitions.
 export OUTPUT_WD_ROOT=$HOME/storage/screaming_channels_annex/tmp
-export SIG_NF=USRP_0-127.0MHz-30.0Msps_raw.npy
-export SIG_RF=USRP_1-2547.0MHz-30.0Msps_raw.npy
 #export COLLECT_TRAINING_NB=65536
 export COLLECT_TRAINING_NB=10
 #export COLLECT_ATTACK_NB=2048

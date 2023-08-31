@@ -10,6 +10,11 @@ from os import path
 import numpy as np
 from tqdm import tqdm
 
+# * Global variables
+
+# Format: radio_index ; recording_index
+REC_RAW_FILENAME="raw_{}_{}.npy"
+
 # * Misc
 
 def get_nb_if_not_set(indir, nb):
@@ -110,6 +115,23 @@ def print_dataset_info(input):
         print("dataset.shape={}".format(input.shape))
         print("dataset.dtype={}".format(input.dtype))
         print_trace_info(input[0])
+
+def save_raw_trace(trace, dir, rad_idx, rec_idx):
+    fn = REC_RAW_FILENAME.format(rad_idx, rec_idx)
+    assert(path.exists(dir))
+    fp = path.join(dir, fn)
+    np.save(fp, trace)
+
+def load_raw_trace(dir, rad_idx, rec_idx):
+    fn = REC_RAW_FILENAME.format(rad_idx, rec_idx)
+    fp = path.join(dir, fn)
+    assert(path.exists(fp))
+    try:
+        trace = np.load(fp)
+    except Exception as e:
+        print(e)
+    assert(trace is not None)
+    return trace
 
 def save_pair_trace(dir, idx, nf, ff):
     """Save one pair of traces (NF & FF) located in directory DIR at index
