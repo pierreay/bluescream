@@ -101,7 +101,7 @@ function collect_one_set() {
 
     if [[ $KEY_FIXED == 1 ]]; then
         if [[ $i_start == 0 ]]; then
-            ./utils/pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI"
+            ./utils/mirage_pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI"
             cp /tmp/mirage_output_ltk $OUTPUT_WD/k.txt
             # Fix record.py trying to load values from /tmp after rebooting.
             cp /tmp/mirage_output_addr $OUTPUT_WD/.addr.txt
@@ -124,7 +124,7 @@ function collect_one_set() {
         echo "=========== TRACE #$i -- KEY_FIXED=$KEY_FIXED ==========="
         echo
         if [[ $KEY_FIXED == 0 ]]; then
-            timeoutnreboot ./utils/pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI"
+            timeoutnreboot ./utils/mirage_pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI"
             cp /tmp/mirage_output_ltk $OUTPUT_WD/${i}_k.txt
         fi
         timeoutnreboot python3 ./collect.py record "$DE_VICTIM_ADDR" "$DE_REC_FREQ_NF" "$DE_REC_FREQ_FF" "$DE_REC_SAMP_RATE"
