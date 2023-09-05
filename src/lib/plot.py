@@ -8,6 +8,13 @@ import matplotlib.pyplot as plt
 
 NFFT = 256
 
+# * Matplotlib wrappers
+
+def show_fullscreen():
+    """Show the current plot in fullscreen."""
+    plt.get_current_fig_manager().full_screen_toggle()
+    plt.show()
+
 # * Simple plots used interactively for debugging
 
 def savetmp(filename):
@@ -50,6 +57,50 @@ def plot_spec_compare(s1, s2):
     savetmp("spec2.png")
 
 # * Special plot for analysis
+
+def plot_time_spec_share_nf_ff(nf, ff, samp_rate):
+    """Screaming Channels templating main plot, displaying NF and FF recordings
+    (each one being a 1D np.array). Originaly taken from "plot" subcommand of
+    "collect.py".
+
+    """
+    def plot_init(nsamples, duration, nb = 1):
+        t = np.linspace(0, duration, nsamples)
+        plt.subplots_adjust(hspace = 1)
+        ax_time = plt.subplot(4, 1, nb)
+        return t, ax_time
+    
+    def plot_time(t, data, ax_time, label, title=""):
+        ax_time.plot(t, data, label = label, lw = 0.7)
+        ax_time.legend(loc="upper right")
+        plt.title("Time-Domain [{}]".format(title))
+        plt.xlabel("Time [s]")
+        plt.ylabel("Amplitude [Normalized]")
+        secax = ax_time.secondary_xaxis('top', functions=(lambda x: x - ax_time.get_xlim()[0], lambda x: x))
+        secax.set_xlabel("Time (relative to zoom) [s]")
+        secax.ticklabel_format(scilimits=(0,0))
+        
+    def plot_freq(fs, data, ax_time, nb = 1, triggers = None):
+        ax_specgram = plt.subplot(4, 1, nb, sharex=ax_time)
+        ax_specgram.specgram(data, NFFT=256, Fs=fs)
+        if triggers is not None:
+            for idx in list(range(triggers.nb_composed())):
+                ax_specgram.axhline(y=triggers.bandpass_low[idx], color='b', label = "trg(idx={}).bandpass_low".format(idx), lw = 0.3)
+                ax_specgram.axhline(y=triggers.bandpass_high[idx], color='b', label = "trg(idx={}).bandpass_high".format(idx), lw = 0.3)
+        plt.title("Spectrogram")
+        plt.xlabel("Time [s]")
+        plt.ylabel("Frequency [Hz]")
+        return ax_specgram
+
+    nsamples = len(nf)
+    duration = nsamples / samp_rate
+    t, ax_time = plot_init(nsamples, duration, 1)
+    plot_time(t, nf, ax_time, "NF")
+    plot_freq(samp_rate, nf, ax_time, 2)
+    t, ax_time = plot_init(nsamples, duration, 3)
+    plot_time(t, ff, ax_time, "RF")
+    plot_freq(samp_rate, ff, ax_time, 4)
+    show_fullscreen()
 
 def plot_metadata_balance(ks, pt):
     """Take 2D np.array of KS keys and PT plaintexts, show a boxplot of imbalance"""
