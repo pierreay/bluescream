@@ -8,6 +8,7 @@ import colorlog
 
 # Logger used accross all modules.
 LOGGER = None
+LOGGER_DEFAULT_LEVEL = logging.DEBUG
 
 def log_n_exit(e, str, code, traceback=False):
     """Log a critical error and exit.
@@ -35,31 +36,29 @@ def init(file, level):
 
     """
     global LOGGER
-    try:
-        if file:
-            handler = logging.FileHandler(file)
-            formatter = logging.Formatter("[%(asctime)s] [%(threadName)s] - %(levelname)-5s - %(module)-10s - %(message)s")
-            LOGGER = logging.getLogger(__name__)
+    if LOGGER is None:
+        try:
+            if file:
+                handler = logging.FileHandler(file)
+                formatter = logging.Formatter("[%(asctime)s] [%(threadName)s] - %(levelname)-5s - %(module)-10s - %(message)s")
+                LOGGER = logging.getLogger(__name__)
+            else:
+                handler = colorlog.StreamHandler()
+                format = "%(log_color)s{}%(levelname)-5s - %(module)-10s - %(message)s".format("[%(asctime)s] [%(threadName)s] " if level == "DEBUG" else "")
+                formatter = colorlog.ColoredFormatter(format)
+                LOGGER = colorlog.getLogger(__name__)
+            handler.setFormatter(formatter)
+        except Exception as e:
+            print("ERROR: Can't initialize the logging file/stream.")
+            raise e
         else:
-            handler = colorlog.StreamHandler()
-            format = "%(log_color)s{}%(levelname)-5s - %(module)-10s - %(message)s".format("[%(asctime)s] [%(threadName)s] " if level == "DEBUG" else "")
-            formatter = colorlog.ColoredFormatter(format)
-            LOGGER = colorlog.getLogger(__name__)
-        handler.setFormatter(formatter)
-    except Exception as e:
-        print("ERROR: Can't initialize the logging file/stream.")
-        raise e
-    else:
-        LOGGER.propagate = False # We want a custom handler and don't want its
-                                 # messages also going to the root handler.
-        LOGGER.setLevel(level)
-        LOGGER.addHandler(handler)
-        LOGGER.debug("Start logging")
+            LOGGER.propagate = False # We want a custom handler and don't want its
+                                     # messages also going to the root handler.
+            LOGGER.setLevel(level)
+            LOGGER.addHandler(handler)
 
 def close():
-    """End the logging system.
+    """End the logging system."""
+    pass
 
-    Alert the program end.
-
-    """
-    LOGGER.debug("End logging")
+init(None, LOGGER_DEFAULT_LEVEL)
