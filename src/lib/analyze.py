@@ -53,6 +53,12 @@ def get_amplitude(traces):
     the same shape containing the amplitude of the traces."""
     return np.abs(traces)
 
+def get_phase(traces):
+    """From the TRACES 2D np.array of shape (nb_traces, nb_samples) or the 1D
+    np.array of shape (nb_samples) containing IQ samples, return an array with
+    the same shape containing the phase of the traces."""
+    return np.angle(traces)
+
 def get_trace_format(trace):
     """Return a constant indicating the format of the trace."""
     if trace[0].dtype == np.complex64:

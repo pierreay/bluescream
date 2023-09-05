@@ -24,6 +24,7 @@ def butter_lowpass_filter(data, cutoff, fs, order=5):
     b, a = butter_lowpass(cutoff, fs, order=order)
     y = lfilter(b, a, data)
     return y
+
 def butter_bandpass(lowcut, highcut, fs, order=5):
     nyq = 0.5 * fs
     low = lowcut / nyq
@@ -35,6 +36,7 @@ def butter_bandpass_filter(data, lowcut, highcut, fs, order=5):
     b, a = butter_bandpass(lowcut, highcut, fs, order=order)
     y = lfilter(b, a, data)
     return y
+
 def decimate(s, sr, f):
     """Decimate the S signal (a 1D np.array) of sampling rate SR using the
     decimation factor F. Return a tuple of (S, SR) with both S and SR
