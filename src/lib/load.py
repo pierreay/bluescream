@@ -17,6 +17,10 @@ import lib.log as l
 # Format: radio_index ; recording_index
 REC_RAW_FILENAME="raw_{}_{}.npy"
 
+# Indexes of the radios used to store RAW files.
+REC_RAW_NF_IDX = 0
+REC_RAW_FF_IDX = 1
+
 # * Misc
 
 def get_nb_if_not_set(indir, nb):
@@ -101,6 +105,11 @@ def save_plaintexts(dir, p):
     np.save(path.join(dir, "p.npy"), p)
 
 # * Traces
+
+def is_raw_traces(dir):
+    """Return True if DIR is a folder containing raw traces."""
+    # Test for dir/raw_0_0.npy existance.
+    return path.exists(path.join(dir, REC_RAW_FILENAME.format(0, 0)))
 
 def print_trace_info(s, sr=0, id=""):
     """Print information about a trace/signal S (a 1D nd.array). If the
