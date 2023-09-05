@@ -29,7 +29,12 @@ def print_traces_idx_with_ks_n_pt_equal(ks, pt):
 # * Trace-level
 
 def normalize(arr):
-    """Apply min-max feature scaling normalization to a 1D array."""
+    """Apply min-max feature scaling normalization to a 1D np.array ARR
+    representing the amplitude of a signal."""
+    # Do not normalize I/Q samples (complex numbers). It will center the
+    # amplitude value around 0.5 (min/max between 0 and 1) instead of 0
+    # (min/max between -1 and 1) in time domain and create a strong DC offset
+    # in freq domain.
     assert(arr.dtype == np.float32)
     return (arr - np.min(arr)) / (np.max(arr) - np.min(arr))
 
