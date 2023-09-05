@@ -10,6 +10,8 @@ from os import path
 import numpy as np
 from tqdm import tqdm
 
+import lib.log as l
+
 # * Global variables
 
 # Format: radio_index ; recording_index
@@ -100,11 +102,18 @@ def save_plaintexts(dir, p):
 
 # * Traces
 
-def print_trace_info(input):
-    """Print information about a trace. in should be a 1D nd.array"""
-    print("[+] trace information:")
-    print("trace.shape={}".format(input.shape))
-    print("trace.dtype={}".format(input.dtype))
+def print_trace_info(s, sr=0, id=""):
+    """Print information about a trace/signal S (a 1D nd.array). If the
+    sampling rate SR is provided, display the duration. If ID is provided, use
+    it as an identifier.
+
+    """
+    assert(s.ndim == 1)
+    l.LOGGER.info("trace information: {}".format(id))
+    l.LOGGER.info("trace.shape={}".format(s.shape))
+    l.LOGGER.info("trace.dtype={}".format(s.dtype))
+    if sr:
+        l.LOGGER.info("trace.duration={:.4}s".format(len(s) / sr))
 
 def print_dataset_info(input):
     """Print information about a trace and/or about a dataset. input should be a 1D or 2D nd.array"""
