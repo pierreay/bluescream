@@ -231,6 +231,13 @@ def reshape(arr):
         arr[i] = arr[i][:len_min]
     return arr
 
+def truncate_min(s1, s2):
+    """Truncate two traces S1 and S2 (1D np.array) to the length of the smaller
+    one."""
+    assert(s1.ndim == 1 and s1.ndim == s2.ndim)
+    target_len = len(s1) if len(s1) < len(s2) else len(s2)
+    return s1[:target_len], s2[:target_len]
+
 def truncate(traces, start=0, end=0):
     """Truncate all traces containted in TRACES (2D np.array) according to
     START and END if they are set."""
