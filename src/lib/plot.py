@@ -56,18 +56,31 @@ def plot_spec_compare(s1, s2):
     plt.specgram(s2, NFFT)
     savetmp("spec2.png")
 
+# * Plot components to construct advanced plots
+
+def plot_peaks(peaks, ax, sr):
+    """Plot the vertical lines's indexes contained in PEAKS list on the
+    Matplotlib axis AX representing time-domain using SR sampling rate.
+
+    """
+    i = 0
+    for idx in peaks:
+        i = i + 1
+        ax.axvline(x = idx / sr, color = "b", label = 'peak={}'.format(i), ls = "--", lw = 0.75)
+
 # * Special plot for analysis
 
-def plot_time_spec_share_nf_ff(nf, ff, samp_rate):
+def plot_time_spec_share_nf_ff(nf, ff, samp_rate, peaks=None, triggers=None):
     """Screaming Channels templating main plot, displaying NF and FF recordings
     (each one being a 1D np.array). Originaly taken from "plot" subcommand of
     "collect.py".
 
     """
+    SUBPLOT_NB = 4 if ff is not None else 2
     def plot_init(nsamples, duration, nb = 1):
         t = np.linspace(0, duration, nsamples)
         plt.subplots_adjust(hspace = 1)
-        ax_time = plt.subplot(4, 1, nb)
+        ax_time = plt.subplot(SUBPLOT_NB, 1, nb)
         return t, ax_time
     
     def plot_time(t, data, ax_time, label, title=""):
@@ -81,7 +94,7 @@ def plot_time_spec_share_nf_ff(nf, ff, samp_rate):
         secax.ticklabel_format(scilimits=(0,0))
         
     def plot_freq(fs, data, ax_time, nb = 1, triggers = None):
-        ax_specgram = plt.subplot(4, 1, nb, sharex=ax_time)
+        ax_specgram = plt.subplot(SUBPLOT_NB, 1, nb, sharex=ax_time)
         ax_specgram.specgram(data, NFFT=256, Fs=fs)
         if triggers is not None:
             for idx in list(range(triggers.nb_composed())):
@@ -96,10 +109,19 @@ def plot_time_spec_share_nf_ff(nf, ff, samp_rate):
     duration = nsamples / samp_rate
     t, ax_time = plot_init(nsamples, duration, 1)
     plot_time(t, nf, ax_time, "NF")
-    plot_freq(samp_rate, nf, ax_time, 2)
-    t, ax_time = plot_init(nsamples, duration, 3)
-    plot_time(t, ff, ax_time, "RF")
-    plot_freq(samp_rate, ff, ax_time, 4)
+    if peaks is not None:
+        plot_peaks(peaks, ax_time, samp_rate)
+    if triggers is not None:
+        for idx in list(range(triggers.nb())):
+            trg = triggers.get(idx)
+            plot_time(t, trg.signal, ax_time, "triggers(idx={}, trg.lowpass={:.3e})".format(idx, trg.lowpass))
+    ax_freq = plot_freq(samp_rate, nf, ax_time, 2, triggers)
+    if peaks is not None:
+        plot_peaks(peaks, ax_freq, samp_rate)
+    if ff is not None:
+        t, ax_time = plot_init(nsamples, duration, 3)
+        plot_time(t, ff, ax_time, "RF")
+        plot_freq(samp_rate, ff, ax_time, 4)
     show_fullscreen()
 
 def plot_metadata_balance(ks, pt):
