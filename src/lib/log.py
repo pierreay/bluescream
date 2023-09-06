@@ -8,7 +8,7 @@ import colorlog
 
 # Logger used accross all modules.
 LOGGER = None
-LOGGER_DEFAULT_LEVEL = logging.DEBUG
+LOGGER_DEFAULT_LEVEL = "DEBUG"
 
 def log_n_exit(e, str, code, traceback=False):
     """Log a critical error and exit.
@@ -24,41 +24,25 @@ def log_n_exit(e, str, code, traceback=False):
     LOGGER.critical(str)
     exit(code)
 
-def init(file, level):
+def init(level):
     """Initialize the logging system.
 
-    Initialize the stream type (stderr/file) and the logging format depending
+    Initialize the stream type (stderr) and the logging format depending
     on the later in the global LOGGER variable, alert program start.
 
-    :param file: File name used to log the messages.
     :param level: Logging level [logging.INFO, logging.DEBUG]
-    :raises: Exception raised by logging.FileHandler().
 
     """
     global LOGGER
     if LOGGER is None:
-        try:
-            if file:
-                handler = logging.FileHandler(file)
-                formatter = logging.Formatter("[%(asctime)s] [%(threadName)s] - %(levelname)-5s - %(module)-10s - %(message)s")
-                LOGGER = logging.getLogger(__name__)
-            else:
-                handler = colorlog.StreamHandler()
-                format = "%(log_color)s{}%(levelname)-5s - %(module)-10s - %(message)s".format("[%(asctime)s] [%(threadName)s] " if level == "DEBUG" else "")
-                formatter = colorlog.ColoredFormatter(format)
-                LOGGER = colorlog.getLogger(__name__)
-            handler.setFormatter(formatter)
-        except Exception as e:
-            print("ERROR: Can't initialize the logging file/stream.")
-            raise e
-        else:
-            LOGGER.propagate = False # We want a custom handler and don't want its
-                                     # messages also going to the root handler.
-            LOGGER.setLevel(level)
-            LOGGER.addHandler(handler)
+        handler = colorlog.StreamHandler()
+        format = "%(log_color)s{}%(levelname)-5s - %(message)s".format("[%(asctime)s] [%(threadName)s] [%(module)s] " if level == "DEBUG" else "")
+        formatter = colorlog.ColoredFormatter(format)
+        LOGGER = colorlog.getLogger(__name__)
+        handler.setFormatter(formatter)
+        LOGGER.propagate = False # We want a custom handler and don't want its
+                                 # messages also going to the root handler.
+        LOGGER.setLevel(level)
+        LOGGER.addHandler(handler)
 
-def close():
-    """End the logging system."""
-    pass
-
-init(None, LOGGER_DEFAULT_LEVEL)
+init(LOGGER_DEFAULT_LEVEL)
