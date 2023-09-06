@@ -36,6 +36,7 @@ class Triggers():
 
 class Trigger():
     def __init__(self, s, bpl, bph, lp, sr):
+        assert(s.dtype == np.float32)
         self.bandpass_low = bpl
         self.bandpass_high = bph
         self.lowpass = lp
