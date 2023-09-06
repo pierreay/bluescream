@@ -2,6 +2,7 @@
 
 import numpy as np
 
+import lib.log as l
 import lib.analyze as analyze
 import lib.filters as filters
 
@@ -28,20 +29,23 @@ class Triggers():
 
     def reduce_add(self):
         while self.nb() > 1:
-            print("Triggers.reduce_add().nb()={}".format(self.nb()))
             trigger = self.triggers.pop()
+            l.LOGGER.debug("addition reduction for trigger '{}'".format(trigger.name))
             self.triggers[0].signal += trigger.signal
         self.triggers[0].signal = analyze.normalize(self.triggers[0].signal)
-        print("Triggers.reduce_add().nb()={}".format(self.nb()))
 
 class Trigger():
-    def __init__(self, s, bpl, bph, lp, sr):
+    def __init__(self, s, bpl, bph, lp, sr, name="trigger"):
         assert(s.dtype == np.float32)
         self.bandpass_low = bpl
         self.bandpass_high = bph
         self.lowpass = lp
+        self.name = name
         signal = filters.butter_bandpass_filter(s, bpl, bph, sr)
         signal = np.abs(signal)
         signal = filters.butter_lowpass_filter(signal, lp, sr, 4)
         signal = analyze.normalize(signal)
         self.signal = signal
+
+    def __str__(self):
+        return "name={};bandpass_low={:.2e};bandpass_high={:.2e};lowpass={:.2e}".format(self.name, self.bandpass_low, self.bandpass_high, self.lowpass)
