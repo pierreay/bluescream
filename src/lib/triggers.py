@@ -1,5 +1,8 @@
 """Classes representing trigger signals."""
 
+import numpy as np
+
+import lib.analyze as analyze
 import lib.filters as filters
 
 class Triggers():
