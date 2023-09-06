@@ -45,7 +45,9 @@ function timeoutnreboot() {
         echo
         echo "=========== REBOOT ==========="
         echo
-        sleep 30 && sudo reboot
+        # sleep 30 && sudo reboot
+        echo "=========== REBOOT DISABLED ==========="
+        echo
     fi
 }
 
