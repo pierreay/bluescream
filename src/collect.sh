@@ -21,7 +21,6 @@ function cleanncreate() {
 function resume() {
     i_start=$(( $(ls $OUTPUT_WD/ | grep trace_nf | wc -l) - 1))
     echo "Resume collection at i=$i_start in $OUTPUT_WD"
-    
 }
 
 function quit() {
@@ -62,6 +61,8 @@ function collect_one_set() {
 
     if [[ ! -z $1 ]]; then
         opt=$1
+    else
+        opt=
     fi
 
     if [[ -z "$opt" ]]; then
