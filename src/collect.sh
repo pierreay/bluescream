@@ -128,8 +128,7 @@ function collect_one_set() {
             cp /tmp/mirage_output_ltk $OUTPUT_WD/${i}_k.txt
         fi
         timeoutnreboot python3 ./collect.py record "$DE_VICTIM_ADDR" "$DE_REC_FREQ_NF" "$DE_REC_FREQ_FF" "$DE_REC_SAMP_RATE"
-        python3 ./collect.py process "$DE_REC_SAMP_RATE"
-        python3 ./collect.py extract "$DE_REC_SAMP_RATE"
+        python3 ./collect.py extract "$DE_REC_SAMP_RATE" --no-plot
         cp /tmp/raw_0_0.npy $OUTPUT_WD/${i}_trace_nf.npy
         cp /tmp/raw_1_0.npy $OUTPUT_WD/${i}_trace_ff.npy
         cp /tmp/bt_skd_0 $OUTPUT_WD/${i}_p.txt
