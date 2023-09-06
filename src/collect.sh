@@ -129,7 +129,7 @@ function collect_one_set() {
             cp /tmp/mirage_output_ltk $OUTPUT_WD/${i}_k.txt
         fi
         timeoutnreboot python3 ./collect.py record "$DE_VICTIM_ADDR" "$DE_REC_FREQ_NF" "$DE_REC_FREQ_FF" "$DE_REC_SAMP_RATE"
-        python3 ./collect.py extract "$DE_REC_SAMP_RATE" --no-plot --overwrite
+        python3 ./collect.py extract "$DE_REC_SAMP_RATE" --no-plot --overwrite --window 0.15 --offset 0.04
         cp /tmp/raw_0_0.npy $OUTPUT_WD/${i}_trace_nf.npy
         cp /tmp/raw_1_0.npy $OUTPUT_WD/${i}_trace_ff.npy
         cp /tmp/bt_skd_0 $OUTPUT_WD/${i}_p.txt
@@ -142,10 +142,8 @@ function collect_one_set() {
 
 sleep 5         # Be sure fstab mount our partitions.
 export OUTPUT_WD_ROOT=$HOME/storage/screaming_channels_annex/tmp
-#export COLLECT_TRAINING_NB=65536
-export COLLECT_TRAINING_NB=10
-#export COLLECT_ATTACK_NB=2048
-export COLLECT_ATTACK_NB=5
+export COLLECT_TRAINING_NB=65536
+export COLLECT_ATTACK_NB=2048
 
 # ** Training set collection
 
