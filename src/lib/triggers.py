@@ -1,5 +1,7 @@
 """Classes representing trigger signals."""
 
+import lib.filters as filters
+
 class Triggers():
     def __init__(self):
         self.triggers = []
@@ -30,12 +32,12 @@ class Triggers():
         print("Triggers.reduce_add().nb()={}".format(self.nb()))
 
 class Trigger():
-    def __init__(self, s, bpl, bph, lp):
+    def __init__(self, s, bpl, bph, lp, sr):
         self.bandpass_low = bpl
         self.bandpass_high = bph
         self.lowpass = lp
-        signal = filters.butter_bandpass_filter(s, bpl, bph, SAMP_RATE)
+        signal = filters.butter_bandpass_filter(s, bpl, bph, sr)
         signal = np.abs(signal)
-        signal = filters.butter_lowpass_filter(signal, lp, SAMP_RATE, TRG_LP_ORDER)
+        signal = filters.butter_lowpass_filter(signal, lp, sr, 4)
         signal = analyze.normalize(signal)
         self.signal = signal
