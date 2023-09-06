@@ -35,7 +35,7 @@ def normalize(arr):
     # amplitude value around 0.5 (min/max between 0 and 1) instead of 0
     # (min/max between -1 and 1) in time domain and create a strong DC offset
     # in freq domain.
-    assert(arr.dtype == np.float32)
+    assert(arr.dtype == np.float32 or arr.dtype == np.float64)
     return (arr - np.min(arr)) / (np.max(arr) - np.min(arr))
 
 def normalize_zscore(arr):
