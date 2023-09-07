@@ -24,6 +24,16 @@ def savetmp(filename):
     plt.savefig(path.join("/tmp", filename))
     plt.close()
 
+def plot_loop(arr, func, nb=0):
+    """Iterate over every element of the ARR list or numpy array and apply the
+    FUNC plotting function. Break at NB is positive.
+
+    """
+    for i in range(len(arr)):
+        func(s[i])
+        if nb and i == nb:
+            break
+
 def plot_time_simple(s):
     plt.plot(s)
     plt.show()
