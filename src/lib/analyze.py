@@ -59,6 +59,15 @@ def get_phase(traces):
     the same shape containing the phase of the traces."""
     return np.angle(traces)
 
+def flip_normalized_signal(s):
+    """Flip upside-down a normalized signal S in time-domain contained in a 1D
+    np.array.
+
+    """
+    assert(s.ndim == 1)
+    assert(min(s) == 0 and max(s) == 1)
+    return 1 - s
+
 def get_trace_format(trace):
     """Return a constant indicating the format of the trace."""
     if trace[0].dtype == np.complex64:
