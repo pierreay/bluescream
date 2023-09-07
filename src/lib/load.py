@@ -28,6 +28,8 @@ def get_nb_if_not_set(indir, nb):
 
 def get_nb(indir):
     """Return the number of traces contained in a dataset."""
+    if is_raw_traces(indir):
+        return 1
     for i in range(0, sys.maxsize):
         if not path.exists(path.join(indir, "{}_trace_nf.npy".format(i))):
             return i-1
