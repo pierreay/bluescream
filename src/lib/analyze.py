@@ -92,7 +92,7 @@ def fill_zeros_if_bad(ref, test):
         ret = 1
     return (ret, test)
 
-def find_aes(s, sr, nb_aes, bpl, bph, lp):
+def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0):
     """Find the start (beginning of the key scheduling) of every AES
     computation contained in the signal S of sampling rate SR. The signal must
     contained approximately NB_AES number of AES. BPL, BPH, LP are the bandpass
@@ -112,4 +112,5 @@ def find_aes(s, sr, nb_aes, bpl, bph, lp):
     # divided by the number of AES and that at least 1/4 of the signal is
     # fullfilled with AES computations.
     peaks = signal.find_peaks(trigger.signal, distance=len(trigger.signal) / nb_aes / 4, prominence=0.25)
-    return peaks[0], trigger_l
+    offset_duration = offset * sr
+    return peaks[0] + offset_duration, trigger_l
