@@ -143,9 +143,15 @@ function collect_one_set() {
 # * collect.sh
 
 sleep 5         # Be sure fstab mount our partitions.
-export OUTPUT_WD_ROOT=$HOME/storage/screaming_channels_annex/tmp
-export COLLECT_TRAINING_NB=65536
-export COLLECT_ATTACK_NB=2048
+if [[ -z ${OUTPUT_WD_ROOT+x} ]]; then
+    export OUTPUT_WD_ROOT=$HOME/storage/screaming_channels_annex/tmp
+fi
+if [[ -z ${COLLECT_TRAINING_NB+x} ]]; then
+    export COLLECT_TRAINING_NB=65536
+fi
+if [[ -z ${COLLECT_ATTACK_NB+x} ]]; then
+    export COLLECT_ATTACK_NB=2048
+fi
 
 # ** Training set collection
 
