@@ -4,6 +4,10 @@ already loaded in memory.
 """
 
 import numpy as np
+from scipy import signal
+
+import lib.triggers as triggers
+import lib.analyze as analyze
 
 # * Constants
 
@@ -87,3 +91,25 @@ def fill_zeros_if_bad(ref, test):
         test = np.zeros(ref.shape, dtype=ref.dtype)
         ret = 1
     return (ret, test)
+
+def find_aes(s, sr, nb_aes, bpl, bph, lp):
+    """Find the start (beginning of the key scheduling) of every AES
+    computation contained in the signal S of sampling rate SR. The signal must
+    contained approximately NB_AES number of AES. BPL, BPH, LP are the bandpass
+    and lowpass filters values used to create the trigger signal. Return the
+    list of start indexes and the Triggers object used for the trigger signal.
+
+    """
+    # * Trigger signal.
+    trigger   = triggers.Trigger(s, bpl, bph, lp, sr)
+    trigger_l = triggers.Triggers()
+    trigger_l.add(trigger)
+
+    # * AES indexes finding.
+    # Flip the signal to recover peaks.
+    trigger.signal = analyze.flip_normalized_signal(trigger.signal)
+    # Assume the distances between peaks will be the length of the signal
+    # divided by the number of AES and that at least 1/4 of the signal is
+    # fullfilled with AES computations.
+    peaks = signal.find_peaks(trigger.signal, distance=len(trigger.signal) / nb_aes / 4, prominence=0.25)
+    return peaks[0], trigger_l
