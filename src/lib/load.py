@@ -14,14 +14,21 @@ import lib.log as l
 
 # * Global variables
 
-# Format: radio_index [0 | 1] ; recording_index
+# Format for current recording used in collect.py
+
+# Format: radio_index [0 | 1] ; recording_index [0 .. n]
 REC_RAW_FILENAME="raw_{}_{}.npy"
 # Indexes of the radios used to store RAW files.
 REC_RAW_NF_IDX = 0
 REC_RAW_FF_IDX = 1
 
-# Format: identifier [nf | ff] ; recording_index
-AVG_FILENAME="avg_{}_{}.npy"
+# Format for trace storage used everywhere else.
+
+# Format: recording_index [0 .. n] ; field_identifier [nf | ff]
+DATASET_FILENAME="{}_trace_{}.npy"
+# Identifier of field type.
+DATASET_FIELD_ID_NF = "nf"
+DATASET_FIELD_ID_FF = "ff"
 
 # * Misc
 
