@@ -58,15 +58,8 @@ def plot_spec_compare(s1, s2):
 
 # * Plot components to construct advanced plots
 
-def plot_peaks(peaks, ax, sr):
-    """Plot the vertical lines's indexes contained in PEAKS list on the
-    Matplotlib axis AX representing time-domain using SR sampling rate.
-
-    """
-    i = 0
-    for idx in peaks:
-        i = i + 1
-        ax.axvline(x = idx / sr, color = "b", label = 'peak={}'.format(i), ls = "--", lw = 0.75)
+# This section was created to separe plot_time_spec_share_nf_ff() subfunctions
+# in generic functions that would be located here.
 
 # * Special plot for analysis
 
@@ -105,6 +98,23 @@ def plot_time_spec_share_nf_ff(nf, ff, samp_rate, peaks=None, triggers=None):
         plt.ylabel("Frequency [Hz]")
         return ax_specgram
 
+    def plot_peaks(peaks, ax, sr):
+        """Plot the vertical lines's indexes contained in PEAKS list on the
+        Matplotlib axis AX representing time-domain using SR sampling rate.
+
+        """
+        i = 0
+        for idx in peaks:
+            i = i + 1
+            ax.axvline(x = idx / sr, color = "b", label = 'peak={}'.format(i), ls = "--", lw = 0.75)
+
+    def plot_triggers(triggers, ax, t):
+        for idx in list(range(triggers.nb())):
+            trg = triggers.get(idx)
+            plot_time(t, trg.signal, ax, "triggers(idx={}, trg.lowpass={:.3e})".format(idx, trg.lowpass))
+        if triggers.threshold is not None:
+            ax.axhline(triggers.threshold, label="trigger threshold")
+
     nsamples = len(nf)
     duration = nsamples / samp_rate
     t, ax_time = plot_init(nsamples, duration, 1)
@@ -112,9 +122,7 @@ def plot_time_spec_share_nf_ff(nf, ff, samp_rate, peaks=None, triggers=None):
     if peaks is not None:
         plot_peaks(peaks, ax_time, samp_rate)
     if triggers is not None:
-        for idx in list(range(triggers.nb())):
-            trg = triggers.get(idx)
-            plot_time(t, trg.signal, ax_time, "triggers(idx={}, trg.lowpass={:.3e})".format(idx, trg.lowpass))
+        plot_triggers(triggers, ax_time, t)
     ax_freq = plot_freq(samp_rate, nf, ax_time, 2, triggers)
     if peaks is not None:
         plot_peaks(peaks, ax_freq, samp_rate)
