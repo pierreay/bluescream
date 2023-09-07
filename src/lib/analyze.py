@@ -118,21 +118,25 @@ def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0):
     offset_duration = offset * sr
     return peaks[0] + offset_duration, trigger_l
 
-def find_template(s, starts):
+def find_template(s, starts, idx = -1):
     """Using a set of STARTS indexes as delimiters of S, propose every
     sub-signals to the user and return the choosen signal, or None if there is
-    none.
+    none. If IDX is specified, automatically choose this template index instead
+    of prompting.
 
     """
     # TODO: Could we use analyze.extract() here?
-    for i in range(len(starts) - 1):
-        start     = int(starts[i])
-        stop      = int(starts[i+1])
-        # Use np.copy to get rid of reference to S that can be a big trace only
-        # for a template.
-        candidate = np.copy(s[start:stop])
-        if plot.select(candidate):
-            return candidate
+    if idx == -1:
+        for i in range(len(starts) - 1):
+            start     = int(starts[i])
+            stop      = int(starts[i+1])
+            # Use np.copy to get rid of reference to S that can be a big trace only
+            # for a template.
+            candidate = np.copy(s[start:stop])
+            if plot.select(candidate):
+                return candidate
+    else:
+        return np.copy(s[int(starts[idx]):int(starts[idx+1])])
 
 def extract(s, starts, len):
     """Using a set of STARTS indexes as delimiters of S, extract every
