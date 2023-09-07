@@ -124,6 +124,7 @@ def find_template(s, starts):
     none.
 
     """
+    # TODO: Could we use analyze.extract() here?
     for i in range(len(starts) - 1):
         start     = int(starts[i])
         stop      = int(starts[i+1])
@@ -132,6 +133,14 @@ def find_template(s, starts):
         candidate = np.copy(s[start:stop])
         if plot.select(candidate):
             return candidate
+
+def extract(s, starts, len):
+    """Using a set of STARTS indexes as delimiters of S, extract every
+    sub-signals of length LEN into a 2D numpy array.
+
+    """
+    # PROG: To continue.
+
 def align(template, target, sr):
     """Return the second signal aligned (1D np.array) using cross-correlation
     along the first signal. The shift is filled with zeros shuch that shape is
