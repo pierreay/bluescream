@@ -47,3 +47,8 @@ def decimate(s, sr, f):
         s = signal.decimate(s, f, ftype="fir")
         sr = sr / f
     return s, sr
+
+def remove_dc(s):
+    """Remove the DC component of a signal in time-domain by substracting the
+    mean."""
+    return s - np.mean(s)
