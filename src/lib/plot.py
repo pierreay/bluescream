@@ -110,8 +110,9 @@ def plot_time_spec_share_nf_ff(nf, ff, samp_rate, peaks=None, triggers=None):
         for idx in list(range(triggers.nb())):
             trg = triggers.get(idx)
             plot_time(t, trg.signal, ax, "triggers(idx={}, trg.lowpass={:.3e})".format(idx, trg.lowpass))
-        if triggers.threshold is not None:
-            ax.axhline(triggers.threshold, label="trigger threshold")
+        # Don't use threshold anymore, but keep it here for reference if needed.
+        # if triggers.threshold is not None:
+        #     ax.axhline(triggers.threshold, label="trigger threshold")
 
     nsamples = len(nf)
     duration = nsamples / samp_rate
