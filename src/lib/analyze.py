@@ -138,12 +138,18 @@ def find_template(s, starts, idx = -1):
     else:
         return np.copy(s[int(starts[idx]):int(starts[idx+1])])
 
-def extract(s, starts, len):
-    """Using a set of STARTS indexes as delimiters of S, extract every
-    sub-signals of length LEN into a 2D numpy array.
+def extract(s, starts, length):
+    """Using a set of STARTS indexes as delimiters of a 1D numpy array S,
+    extract every sub-signals of length LENGTH into a 2D numpy array.
 
     """
-    # PROG: To continue.
+    assert(s.ndim == 1)
+    extracted = np.zeros((len(starts), length))
+    for i in range(len(starts)):
+        condition = np.zeros((len(s)))
+        condition[int(starts[i]):int(starts[i] + length)] = 1
+        extracted[i] = np.extract(condition, s)
+    return extracted
 
 def align(template, target, sr):
     """Return the second signal aligned (1D np.array) using cross-correlation
