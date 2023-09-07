@@ -6,6 +6,7 @@ already loaded in memory.
 import numpy as np
 from scipy import signal
 
+import lib.plot as plot
 import lib.triggers as triggers
 import lib.analyze as analyze
 
@@ -114,3 +115,18 @@ def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0):
     peaks = signal.find_peaks(trigger.signal, distance=len(trigger.signal) / nb_aes / 4, prominence=0.25)
     offset_duration = offset * sr
     return peaks[0] + offset_duration, trigger_l
+
+def find_template(s, starts):
+    """Using a set of STARTS indexes as delimiters of S, propose every
+    sub-signals to the user and return the choosen signal, or None if there is
+    none.
+
+    """
+    for i in range(len(starts) - 1):
+        start     = int(starts[i])
+        stop      = int(starts[i+1])
+        # Use np.copy to get rid of reference to S that can be a big trace only
+        # for a template.
+        candidate = np.copy(s[start:stop])
+        if plot.select(candidate):
+            return candidate
