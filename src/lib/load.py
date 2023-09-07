@@ -24,8 +24,10 @@ REC_RAW_FF_IDX = 1
 
 # Format for trace storage used everywhere else.
 
+# Format: field_identifier [nf | ff]
+DATASET_FILENAME_PACK="traces_{}.npy"
 # Format: recording_index [0 .. n] ; field_identifier [nf | ff]
-DATASET_FILENAME="{}_trace_{}.npy"
+DATASET_FILENAME_UNPACK="{}_trace_{}.npy"
 # Identifier of field type.
 DATASET_FIELD_ID_NF = "nf"
 DATASET_FIELD_ID_FF = "ff"
@@ -40,7 +42,7 @@ def get_nb(indir):
     if is_raw_traces(indir):
         return 1
     for i in range(0, sys.maxsize):
-        if not path.exists(path.join(indir, "{}_trace_nf.npy".format(i))):
+        if not path.exists(path.join(indir, DATASET_FILENAME_UNPACK.format(i, DATASET_FIELD_ID_NF))):
             return i-1
 
 def find_bad_entry(arr):
@@ -165,8 +167,8 @@ def load_raw_trace(dir, rad_idx, rec_idx):
 def save_pair_trace(dir, idx, nf, ff):
     """Save one pair of traces (NF & FF) located in directory DIR at index
     IDX."""
-    nf_p = path.join(dir, "{}_trace_nf.npy".format(idx))
-    ff_p = path.join(dir, "{}_trace_ff.npy".format(idx))
+    nf_p = path.join(dir, DATASET_FILENAME_UNPACK.format(idx, DATASET_FIELD_ID_NF))
+    ff_p = path.join(dir, DATASET_FILENAME_UNPACK.format(idx, DATASET_FIELD_ID_FF))
     np.save(nf_p, nf)
     np.save(ff_p, ff)
  
@@ -176,10 +178,8 @@ def load_pair_trace(dir, idx):
     error.
 
     """
-    trace_nf_p = path.join(dir, "{}_trace_nf.npy".format(idx))
-    trace_ff_p = path.join(dir, "{}_trace_rf.npy".format(idx))
-    if not path.exists(trace_ff_p):
-        trace_ff_p = path.join(dir, "{}_trace_ff.npy".format(idx))
+    trace_nf_p = path.join(dir, DATASET_FILENAME_UNPACK.format(idx, DATASET_FIELD_ID_NF))
+    trace_ff_p = path.join(dir, DATASET_FILENAME_UNPACK.format(idx, DATASET_FIELD_ID_FF))
     trace_nf = None
     trace_ff = None
     try:
@@ -197,12 +197,12 @@ def save_all_traces(dir, nf, ff, packed=True):
     nb_samples), same for FF."""
     print("[+] saving traces...")
     if packed:
-        np.save(path.join(dir, "traces_nf.npy"), nf)
-        np.save(path.join(dir, "traces_ff.npy"), ff)
+        np.save(path.join(dir, DATASET_FILENAME_PACK.format(DATASET_FIELD_ID_NF)), nf)
+        np.save(path.join(dir, DATASET_FILENAME_PACK.format(DATASET_FIELD_ID_FF)), ff)
     else:
         for i in tqdm(range(len(nf)), desc="save_all_traces()"):
-            np.save(path.join(dir, "{}_trace_nf.npy".format(i)), nf[i])
-            np.save(path.join(dir, "{}_trace_ff.npy".format(i)), ff[i])
+            np.save(path.join(dir, DATASET_FILENAME_UNPACK.format(i, DATASET_FIELD_ID_NF)), nf[i])
+            np.save(path.join(dir, DATASET_FILENAME_UNPACK.format(i, DATASET_FIELD_ID_FF)), ff[i])
     print("[+] done!")
 
 def load_all_traces(dir, nb=0):
@@ -211,20 +211,20 @@ def load_all_traces(dir, nb=0):
     for unpacked dataset. Beware to not overflow the memory.
     """
     print("[+] loading traces...")
-    if path.exists(path.join(dir, "traces_nf.npy")):    # Packed dataset.
-        nf_p = path.join(dir, "traces_nf.npy")
-        ff_p = path.join(dir, "traces_ff.npy")
+    if path.exists(path.join(dir, DATASET_FILENAME_PACK.format(DATASET_FIELD_ID_NF))):    # Packed dataset.
+        nf_p = path.join(dir, DATASET_FILENAME_PACK.format(DATASET_FIELD_ID_NF))
+        ff_p = path.join(dir, DATASET_FILENAME_PACK.format(DATASET_FIELD_ID_FF))
         assert(path.exists(nf_p) and path.exists(ff_p))
         print("[+] done!")
         return np.load(nf_p), np.load(ff_p)
-    elif path.exists(path.join(dir, "0_trace_nf.npy")): # Unpacked dataste.
-        ref       = np.load(path.join(dir, "0_trace_nf.npy"))
+    elif path.exists(path.join(dir, DATASET_FILENAME_UNPACK.format(0, DATASET_FIELD_ID_NF))): # Unpacked dataste.
+        ref       = np.load(path.join(dir, DATASET_FILENAME_UNPACK.format(0, DATASET_FIELD_ID_NF)))
         nb        = get_nb(dir) if nb < 1 else nb
         traces_nf = np.empty((nb, ref.shape[0]), dtype=ref.dtype)
         traces_ff = np.empty((nb, ref.shape[0]), dtype=ref.dtype)
         for i in tqdm(range(0, nb), desc="load_all_traces()"):
-            nf_p = path.join(dir, "{}_trace_nf.npy".format(i))
-            ff_p = path.join(dir, "{}_trace_ff.npy".format(i))
+            nf_p = path.join(dir, DATASET_FILENAME_UNPACK.format(i, DATASET_FIELD_ID_NF))
+            ff_p = path.join(dir, DATASET_FILENAME_UNPACK.format(i, DATASET_FIELD_ID_FF))
             assert(path.exists(nf_p) and path.exists(ff_p))
             traces_nf[i] = np.load(nf_p)
             traces_ff[i] = np.load(ff_p)
