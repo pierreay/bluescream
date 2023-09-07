@@ -4,9 +4,12 @@ from os import path
 import numpy as np
 import matplotlib.pyplot as plt
 
+import lib.log as l
+
 # * Global variables
 
 NFFT = 256
+USER_SELECT = None
 
 # * Matplotlib wrappers
 
@@ -144,3 +147,25 @@ def plot_metadata_balance(ks, pt):
     plt.xlabel("subbyte")
     plt.ylabel("count")
     plt.show()
+
+# * User interaction
+
+def select(candidate):
+    global USER_SELECT
+    USER_SELECT = False
+    fig, _ = plt.subplots()
+    fig.canvas.mpl_connect('key_press_event', select_input)
+    plt.subplot(2, 1, 1)
+    plt.plot(candidate)
+    plt.subplot(2, 1, 2)
+    plt.specgram(candidate, NFFT=NFFT)
+    l.LOGGER.info("Please, press 'y' to select the current trace or 'q' to skip to the next candidate")
+    plt.show(block=True)
+    # Ask user confirmation, return choice.
+    return USER_SELECT
+
+def select_input(event):
+    global USER_SELECT
+    if event.key == 'y':
+        USER_SELECT = True
+        plt.close()
