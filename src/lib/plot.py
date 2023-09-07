@@ -103,10 +103,8 @@ def plot_time_spec_share_nf_ff(nf, ff, samp_rate, peaks=None, triggers=None):
         Matplotlib axis AX representing time-domain using SR sampling rate.
 
         """
-        i = 0
         for idx in peaks:
-            i = i + 1
-            ax.axvline(x = idx / sr, color = "b", label = 'peak={}'.format(i), ls = "--", lw = 0.75)
+            ax.axvline(x = idx / sr, color = "b", ls = "--", lw = 0.75)
 
     def plot_triggers(triggers, ax, t):
         for idx in list(range(triggers.nb())):
