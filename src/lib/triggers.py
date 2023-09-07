@@ -7,6 +7,10 @@ import lib.analyze as analyze
 import lib.filters as filters
 
 class Triggers():
+    threshold = None
+    threshold_rising = True
+    threshold_offset = 0
+    
     def __init__(self):
         self.triggers = []
         self.bandpass_low = []
