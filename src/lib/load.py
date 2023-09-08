@@ -37,13 +37,16 @@ DATASET_FIELD_ID_FF = "ff"
 def get_nb_if_not_set(indir, nb):
     return nb if nb > 0 else get_nb(indir)
 
-def get_nb(indir):
+def get_nb(dir):
     """Return the number of traces contained in a dataset."""
-    if is_raw_traces(indir):
+    if is_raw_traces(dir):
         return 1
     for i in range(0, sys.maxsize):
-        if not path.exists(path.join(indir, DATASET_FILENAME_UNPACK.format(i, DATASET_FIELD_ID_NF))):
-            return i-1
+        if get_dataset_is_nf_exist(dir) and not path.exists(get_dataset_path_unpack_nf(dir, i)):
+            return i
+        elif get_dataset_is_ff_exist(dir) and not path.exists(get_dataset_path_unpack_ff(dir, i)):
+            return i
+    return -1
 
 def find_bad_entry(arr):
     """Return bad entry (metadata or trace) indexes from the 2D np.array ARR,
@@ -98,7 +101,7 @@ def load_keys(dir):
     if path.exists(path.join(dir, "k.npy")):
         return np.load(path.join(dir, "k.npy"))
     else:
-        print("No loaded key(s)!")
+        l.LOGGER.warning("no loaded key(s)")
         return None
 
 def load_plaintexts(dir):
@@ -106,7 +109,7 @@ def load_plaintexts(dir):
     if path.exists(path.join(dir, "p.npy")):
         return np.load(path.join(dir, "p.npy"))
     else:
-        print("No loaded plaintexts!")
+        l.LOGGER.warning("no loaded plaintext(s)")
         return None
 
 def save_keys(dir, k):
@@ -119,10 +122,69 @@ def save_plaintexts(dir, p):
 
 # * Traces
 
+def get_record_path_raw(dir, radio_idx, i):
+    return path.join(dir, REC_RAW_FILENAME.format(radio_idx, i))
+def get_record_path_raw_nf(dir, i):
+    return path.join(dir, REC_RAW_FILENAME.format(REC_RAW_NF_IDX, i))
+def get_record_path_raw_ff(dir, i):
+    return path.join(dir, REC_RAW_FILENAME.format(REC_RAW_FF_IDX, i))
+def get_dataset_path_pack_nf(dir):
+    return path.join(dir, DATASET_FILENAME_PACK.format(DATASET_FIELD_ID_NF))
+def get_dataset_path_pack_ff(dir):
+    return path.join(dir, DATASET_FILENAME_PACK.format(DATASET_FIELD_ID_FF))
+def get_dataset_path_unpack_nf(dir, i):
+    return path.join(dir, DATASET_FILENAME_UNPACK.format(i, DATASET_FIELD_ID_NF))
+def get_dataset_path_unpack_ff(dir, i):
+    return path.join(dir, DATASET_FILENAME_UNPACK.format(i, DATASET_FIELD_ID_FF))
+
+def get_dataset_shape_type(dir):
+    """Return a tuple composed of the DIR dataset's traces shape and dtype.
+
+    To do so, it loads the first trace found from NF or FF in the dataset of
+    path DIR, and use it as a reference for the others.
+
+    """
+    ref_nf = np_load_if_exist(get_dataset_path_unpack_nf(dir, 0))
+    ref_ff = np_load_if_exist(get_dataset_path_unpack_ff(dir, 0))
+    ref    = ref_nf if ref_nf is not None else ref_ff
+    assert(ref is not None)
+    return ref.shape, ref.dtype
+
+def get_dataset_is_nf_exist(dir):
+    """Return True if NF traces exists in DIR dataset, False otherwise."""
+    nf_raw    = path.exists(get_record_path_raw_nf(dir, 0))
+    nf_pack   = path.exists(get_dataset_path_pack_nf(dir))
+    nf_unpack = path.exists(get_dataset_path_unpack_nf(dir, 0))
+    return nf_raw or nf_pack or nf_unpack
+    
+def get_dataset_is_ff_exist(dir):
+    """Return True if FF traces exists in DIR dataset, False otherwise."""
+    ff_raw    = path.exists(get_record_path_raw_ff(dir, 0))
+    ff_pack   = path.exists(get_dataset_path_pack_ff(dir))
+    ff_unpack = path.exists(get_dataset_path_unpack_ff(dir, 0))
+    return ff_raw or ff_pack or ff_unpack
+
+def np_load_if_exist(fp):
+    """Load the FP numpy array from disk if it exists, otherwise return None."""
+    return None if not path.exists(fp) else np.load(fp)
+
+def is_dataset_packed(dir):
+    """Return True if the dataset is packed, False otherwise."""
+    packed_nf = path.exists(get_dataset_path_pack_nf(dir))
+    packed_ff = path.exists(get_dataset_path_pack_ff(dir))
+    return packed_nf or packed_ff
+
+def is_dataset_unpacked(dir):
+    """Return True if the dataset is unpacked, False otherwise."""
+    unpacked_nf = path.exists(get_dataset_path_unpack_nf(dir, 0))
+    unpacked_ff = path.exists(get_dataset_path_unpack_ff(dir, 0))
+    return unpacked_nf or unpacked_ff
+
 def is_raw_traces(dir):
     """Return True if DIR is a folder containing raw traces."""
-    # Test for dir/raw_0_0.npy existance.
-    return path.exists(path.join(dir, REC_RAW_FILENAME.format(0, 0)))
+    nf_exist = path.exists(get_record_path_raw_nf(dir, 0))
+    ff_exist = path.exists(get_record_path_raw_ff(dir, 0))
+    return nf_exist or ff_exist
 
 def print_trace_info(s, sr=0, id=""):
     """Print information about a trace/signal S (a 1D nd.array). If the
@@ -132,30 +194,27 @@ def print_trace_info(s, sr=0, id=""):
     """
     assert(s.ndim == 1)
     l.LOGGER.info("trace information: {}".format(id))
-    l.LOGGER.info("trace.shape={}".format(s.shape))
-    l.LOGGER.info("trace.dtype={}".format(s.dtype))
+    l.LOGGER.info("shape={}".format(s.shape))
+    l.LOGGER.info("dtype={}".format(s.dtype))
     if sr:
-        l.LOGGER.info("trace.duration={:.4}s".format(len(s) / sr))
+        l.LOGGER.info("duration={:.4}s".format(len(s) / sr))
 
-def print_dataset_info(input):
+def print_dataset_info(input, label=""):
     """Print information about a trace and/or about a dataset. input should be a 1D or 2D nd.array"""
-    print("[+] dataset information:")
+    l.LOGGER.info("dataset information: {}".format(label))
     if input.ndim == 1:
         print_trace_info(input)
     if input.ndim == 2:
-        print("dataset.shape={}".format(input.shape))
-        print("dataset.dtype={}".format(input.dtype))
-        print_trace_info(input[0])
+        l.LOGGER.info("shape={}".format(input.shape))
+        l.LOGGER.info("dtype={}".format(input.dtype))
+        print_trace_info(input[0], id=label + "[0]")
 
 def save_raw_trace(trace, dir, rad_idx, rec_idx):
-    fn = REC_RAW_FILENAME.format(rad_idx, rec_idx)
     assert(path.exists(dir))
-    fp = path.join(dir, fn)
-    np.save(fp, trace)
+    np.save(get_record_path_raw(dir, rad_idx, rec_idx), trace)
 
 def load_raw_trace(dir, rad_idx, rec_idx):
-    fn = REC_RAW_FILENAME.format(rad_idx, rec_idx)
-    fp = path.join(dir, fn)
+    fp = get_record_path_raw(dir, rad_idx, rec_idx)
     assert(path.exists(fp))
     try:
         trace = np.load(fp)
@@ -166,11 +225,11 @@ def load_raw_trace(dir, rad_idx, rec_idx):
 
 def save_pair_trace(dir, idx, nf, ff):
     """Save one pair of traces (NF & FF) located in directory DIR at index
-    IDX."""
-    nf_p = path.join(dir, DATASET_FILENAME_UNPACK.format(idx, DATASET_FIELD_ID_NF))
-    ff_p = path.join(dir, DATASET_FILENAME_UNPACK.format(idx, DATASET_FIELD_ID_FF))
-    np.save(nf_p, nf)
-    np.save(ff_p, ff)
+    IDX. If NF or FF are None, they are ignored."""
+    if nf is not None:
+        np.save(get_dataset_path_unpack_nf(dir, idx), nf)
+    if ff is not None:
+        np.save(get_dataset_path_unpack_ff(dir, idx), ff)
  
 def load_pair_trace(dir, idx):
     """Load one pair of traces (NF & FF) located in directory DIR at index
@@ -178,16 +237,14 @@ def load_pair_trace(dir, idx):
     error.
 
     """
-    trace_nf_p = path.join(dir, DATASET_FILENAME_UNPACK.format(idx, DATASET_FIELD_ID_NF))
-    trace_ff_p = path.join(dir, DATASET_FILENAME_UNPACK.format(idx, DATASET_FIELD_ID_FF))
     trace_nf = None
     trace_ff = None
     try:
-        trace_nf = np.load(trace_nf_p)
+        trace_nf = np.load(get_dataset_path_unpack_nf(dir, idx))
     except Exception as e:
         print(e)
     try:
-        trace_ff = np.load(trace_ff_p)
+        trace_ff = np.load(get_dataset_path_unpack_ff(dir, idx))
     except Exception as e:
         print(e)
     return trace_nf, trace_ff
@@ -195,43 +252,60 @@ def load_pair_trace(dir, idx):
 def save_all_traces(dir, nf, ff, packed=True):
     """Save all the traces in DIR. NF is a 2D np.array of shape (nb_traces,
     nb_samples), same for FF."""
-    print("[+] saving traces...")
+    l.LOGGER.info("saving traces...")
     if packed:
-        np.save(path.join(dir, DATASET_FILENAME_PACK.format(DATASET_FIELD_ID_NF)), nf)
-        np.save(path.join(dir, DATASET_FILENAME_PACK.format(DATASET_FIELD_ID_FF)), ff)
+        np.save(get_dataset_path_pack_nf(dir), nf)
+        np.save(get_dataset_path_pack_ff(dir), ff)
     else:
         for i in tqdm(range(len(nf)), desc="save_all_traces()"):
-            np.save(path.join(dir, DATASET_FILENAME_UNPACK.format(i, DATASET_FIELD_ID_NF)), nf[i])
-            np.save(path.join(dir, DATASET_FILENAME_UNPACK.format(i, DATASET_FIELD_ID_FF)), ff[i])
-    print("[+] done!")
+            np.save(get_dataset_path_unpack_nf(dir, i), nf[i])
+            np.save(get_dataset_path_unpack_ff(dir, i), ff[i])
+    l.LOGGER.info("done!")
 
 def load_all_traces(dir, nb=0):
     """Load traces contained in DIR. Can be packed or unpacked. Return a 2D
     np.array of shape (nb_traces, nb_samples). Only load NB traces if specified
-    for unpacked dataset. Beware to not overflow the memory.
+    for unpacked dataset. Load traces conditionnaly, meaning if NF is present
+    but FF is not, load NF and return None/empty/zeroes for FF. Beware to not
+    overflow the memory.
+
     """
-    print("[+] loading traces...")
-    if path.exists(path.join(dir, DATASET_FILENAME_PACK.format(DATASET_FIELD_ID_NF))):    # Packed dataset.
-        nf_p = path.join(dir, DATASET_FILENAME_PACK.format(DATASET_FIELD_ID_NF))
-        ff_p = path.join(dir, DATASET_FILENAME_PACK.format(DATASET_FIELD_ID_FF))
+    l.LOGGER.info("loading traces...")
+    if is_dataset_packed(dir):
+        nf_p = get_dataset_path_pack_nf(dir)
+        ff_p = get_dataset_path_pack_ff(dir)
         assert(path.exists(nf_p) and path.exists(ff_p))
-        print("[+] done!")
+        l.LOGGER.info("done!")
         return np.load(nf_p), np.load(ff_p)
-    elif path.exists(path.join(dir, DATASET_FILENAME_UNPACK.format(0, DATASET_FIELD_ID_NF))): # Unpacked dataste.
-        ref       = np.load(path.join(dir, DATASET_FILENAME_UNPACK.format(0, DATASET_FIELD_ID_NF)))
-        nb        = get_nb(dir) if nb < 1 else nb
-        traces_nf = np.empty((nb, ref.shape[0]), dtype=ref.dtype)
-        traces_ff = np.empty((nb, ref.shape[0]), dtype=ref.dtype)
-        for i in tqdm(range(0, nb), desc="load_all_traces()"):
-            nf_p = path.join(dir, DATASET_FILENAME_UNPACK.format(i, DATASET_FIELD_ID_NF))
-            ff_p = path.join(dir, DATASET_FILENAME_UNPACK.format(i, DATASET_FIELD_ID_FF))
-            assert(path.exists(nf_p) and path.exists(ff_p))
-            traces_nf[i] = np.load(nf_p)
-            traces_ff[i] = np.load(ff_p)
-        print("[+] done!")
-        return traces_nf, traces_ff
+    elif is_dataset_unpacked(dir):
+        nf, ff = None, None
+        nb = get_nb(dir) if nb < 1 else nb
+        ref_shape, ref_dtype = get_dataset_shape_type(dir)
+        nf_exist = get_dataset_is_nf_exist(dir)
+        ff_exist = get_dataset_is_ff_exist(dir)
+        if nf_exist:
+            nf = np.empty((nb, ref_shape[0]), dtype=ref_dtype)
+            for i in tqdm(range(0, nb), desc="load all nf traces"):
+                nf_p = get_dataset_path_unpack_nf(dir, i)
+                nf[i] = np.load(nf_p)
+        else:
+             l.LOGGER.warning("no loaded nf traces!")
+        if ff_exist:
+            ff = np.empty((nb, ref_shape[0]), dtype=ref_dtype)
+            for i in tqdm(range(0, nb), desc="load all ff traces"):
+                ff_p = get_dataset_path_unpack_ff(dir, i)
+                ff[i] = np.load(ff_p)
+        else:
+            l.LOGGER.warning("no loaded ff traces!")
+        if nf_exist or ff_exist:
+            l.LOGGER.info("done!")
+            return nf, ff
+        else:
+            l.LOGGER.error("no loaded traces!")
+            return None, None
     else:
-        print("[!] Unknown dataset format")
+        l.LOGGER.error("unknown dataset format!")
+        return None, None
 
 def reshape_trimming_zeroes():
     """I don't need it, but in case of future needs...
