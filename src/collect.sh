@@ -143,14 +143,16 @@ function collect_one_set() {
             pair
             if [[ $? == 1 ]]; then
                 ykush_switch
-                break
+                i = $(( $i - 1 ))
+                continue
             fi
             cp /tmp/mirage_output_ltk $OUTPUT_WD/${i}_k.txt
         fi
         record
         if [[ $? == 1 ]]; then
             ykush_switch
-            break
+            i = $(( $i - 1 ))
+            continue
         fi
         python3 ./collect.py extract "$DE_REC_SAMP_RATE" --no-plot --overwrite --window 0.15 --offset 0.04
         cp /tmp/raw_0_0.npy $OUTPUT_WD/${i}_trace_nf.npy
