@@ -50,12 +50,18 @@ function ykush_switch() {
 
 function pair() {
     timeout 20 ./utils/mirage_pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI" | tee /tmp/mirage_pair_output
+    if [[ $? == 127 ]]; then
+        return 1
+    fi
     grep FAIL /tmp/mirage_pair_output >/dev/null 2>&1
     return $(( 1 - $? ))
 }
 
 function record() {
     timeout 20 python3 ./collect.py record "$DE_VICTIM_ADDR" "$DE_REC_FREQ_NF" "$DE_REC_FREQ_FF" "$DE_REC_SAMP_RATE"
+    if [[ $? == 127 ]]; then
+        return 1
+    fi
 }
 
 # ** Script
@@ -142,7 +148,7 @@ function collect_one_set() {
             cp /tmp/mirage_output_ltk $OUTPUT_WD/${i}_k.txt
         fi
         record
-        if [[ $? == 1 || $? == 124 ]]; then
+        if [[ $? == 1 ]]; then
             ykush_switch
             break
         fi
