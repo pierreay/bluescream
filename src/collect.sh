@@ -143,7 +143,7 @@ function collect_one_set() {
             pair
             if [[ $? == 1 ]]; then
                 ykush_reset
-                i = $(( $i - 1 ))
+                i=$(( $i - 1 ))
                 continue
             fi
             cp /tmp/mirage_output_ltk $OUTPUT_WD/${i}_k.txt
@@ -151,7 +151,7 @@ function collect_one_set() {
         record
         if [[ $? == 1 ]]; then
             ykush_reset
-            i = $(( $i - 1 ))
+            i=$(( $i - 1 ))
             continue
         fi
         python3 ./collect.py extract "$DE_REC_SAMP_RATE" --no-plot --overwrite --window 0.15 --offset 0.04
