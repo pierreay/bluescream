@@ -165,27 +165,30 @@ def extract(s, starts, length = 0):
             extracted[i] = np.copy(s[int(starts[i]):int(starts[i] + length)])
         return extracted
 
-def align(template, target, sr):
-    """Return the second signal aligned (1D np.array) using cross-correlation
-    along the first signal. The shift is filled with zeros shuch that shape is
-    not modified.
-
-    +++===+++++++++
-    +++++++===+++++ -> shift > 0 -> shift left target -> shrink template from right or pad target to right
-    ===++++++++++++ -> shift < 0 -> shift right target -> shrink template from left or pad target to left
+def align(template, target, sr, ignore=True):
+    """Return the TARGET signal aligned (1D np.array) using cross-correlation
+    along the TEMPLATE signal, where SR is the sampling rates of signals. The
+    shift is filled with zeros shuch that shape is not modified. If IGNORE is
+    set to false, raise an assertion for high shift values.
 
     """
+    # +++===+++++++++
+    # +++++++===+++++ -> shift > 0 -> shift left target -> shrink template from right or pad target to right
+    # ===++++++++++++ -> shift < 0 -> shift right target -> shrink template from left or pad target to left
+
     lpf_freq     = sr / 4
     template_lpf = filters.butter_lowpass_filter(template, lpf_freq, sr)
     target_lpf   = filters.butter_lowpass_filter(target, lpf_freq, sr)
     corr         = signal.correlate(target_lpf, template_lpf)
     shift        = np.argmax(corr) - (len(template) - 1)
     if shift > 0:
-        assert(shift < len(template/10)) # If shift is too high, inspect.
+        if not ignore:
+            assert shift < len(template/10), "shift is too high, inspect"
         target = target[shift:]
         target = np.append(target, np.zeros(shift))
     elif shift < 0:
-        assert(-shift < len(template/10)) # If shift is too high, inspect.
+        if not ignore:
+            assert -shift < len(template/10), "shift is too high, inspect"
         target = target[:shift]
         target = np.insert(target, 0, np.zeros(-shift))
     return target
