@@ -12,6 +12,11 @@ import lib.filters as filters
 import lib.triggers as triggers
 import lib.analyze as analyze
 
+# Note about implementation:
+# - We often use np.copy when it comes to get a smaller portion of a
+#   signal. This is to get rid of reference to the bigger signal that can be a
+#   big trace, when we only want to extract a small portion.
+
 # * Constants
 
 FMT_IQ = 0
@@ -118,38 +123,47 @@ def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0):
     offset_duration = offset * sr
     return peaks[0] + offset_duration, trigger_l
 
-def find_template(s, starts, idx = -1):
-    """Using a set of STARTS indexes as delimiters of S, propose every
-    sub-signals to the user and return the choosen signal, or None if there is
-    none. If IDX is specified, automatically choose this template index instead
-    of prompting.
+def choose_signal(arr, i = -1):
+    """From the ARR 2D numpy array, propose every sub-signals (1D numpy array)
+    to the user and return a tuple composed of a copy of the choosen signal as
+    well as its index, or None if there is none. If I is specified,
+    automatically choose this template index instead of prompting.
 
     """
-    # TODO: Could we use analyze.extract() here?
-    if idx == -1:
-        for i in range(len(starts) - 1):
-            start     = int(starts[i])
-            stop      = int(starts[i+1])
-            # Use np.copy to get rid of reference to S that can be a big trace only
-            # for a template.
-            candidate = np.copy(s[start:stop])
-            if plot.select(candidate):
-                return candidate
+    if i == -1:
+        for i in range(len(arr)):
+            if plot.select(arr[i]):
+                return np.copy(arr[i]), i
     else:
-        return np.copy(s[int(starts[idx]):int(starts[idx+1])])
+        return np.copy(arr[i]), i
 
-def extract(s, starts, length):
-    """Using a set of STARTS indexes as delimiters of a 1D numpy array S,
-    extract every sub-signals of length LENGTH into a 2D numpy array.
+def extract(s, starts, length = 0):
+    """Exract sub-signals of S delimited by STARTS.
+
+    The extraction use a list of STARTS indexes as delimiters of a 1D numpy
+    array S. Returned sub-signals are copies of the original one.
+
+    If LENGTH is specified, extract every sub-signals using its start index and
+    specified length. Result is a consistent length 2D numpy array of shape
+    (len(starts), length). If LENGTH is not specified, extract every
+    sub-signals using its start index and the next start index as stop
+    index. Result is a Python list of variable length signals.
 
     """
     assert(s.ndim == 1)
-    extracted = np.zeros((len(starts), length))
-    for i in range(len(starts)):
-        condition = np.zeros((len(s)))
-        condition[int(starts[i]):int(starts[i] + length)] = 1
-        extracted[i] = np.extract(condition, s)
-    return extracted
+    if length > 0:
+        extracted = np.zeros((len(starts), length))
+        for i in range(len(starts)):
+            condition = np.zeros((len(s)))
+            condition[int(starts[i]):int(starts[i] + length)] = 1
+            extracted[i] = np.copy(np.extract(condition, s))
+        return extracted
+    else:
+        extracted = [0] * len(starts)
+        for i in range(0, len(starts)):
+            length = starts[i] - starts[i-1] if i == len(starts) - 1 else starts[i+1] - starts[i]
+            extracted[i] = np.copy(s[int(starts[i]):int(starts[i] + length)])
+        return extracted
 
 def align(template, target, sr):
     """Return the second signal aligned (1D np.array) using cross-correlation
