@@ -30,7 +30,7 @@ def plot_loop(arr, func, nb=0):
 
     """
     for i in range(len(arr)):
-        func(s[i])
+        func(arr[i])
         if nb and i == nb:
             break
 
