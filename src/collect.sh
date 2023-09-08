@@ -160,7 +160,7 @@ function collect_one_set() {
         cp /tmp/raw_1_0.npy $OUTPUT_WD/${i}_trace_ff.npy
         cp /tmp/bt_skd_0 $OUTPUT_WD/${i}_p.txt
         echo "saved traces:"
-        ls $OUTPUT_WD/${i}_trace_nf.npy $OUTPUT_WD/${i}_trace_ff.npy $OUTPUT_WD/${i}_p.txt
+        ls $OUTPUT_WD/${i}_trace_nf.npy $OUTPUT_WD/${i}_trace_ff.npy
         echo "saved metadata:"
         ls $OUTPUT_WD/${i}_k.txt $OUTPUT_WD/${i}_p.txt
 
