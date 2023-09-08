@@ -125,17 +125,17 @@ def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0):
 
 def choose_signal(arr, i = -1):
     """From the ARR 2D numpy array, propose every sub-signals (1D numpy array)
-    to the user and return a tuple composed of a copy of the choosen signal as
-    well as its index, or None if there is none. If I is specified,
-    automatically choose this template index instead of prompting.
+    to the user and return a copy of the choosen signal, or None if there is
+    none. If I is specified, automatically choose this template index instead
+    of prompting.
 
     """
     if i == -1:
         for i in range(len(arr)):
             if plot.select(arr[i]):
-                return np.copy(arr[i]), i
+                return np.copy(arr[i])
     else:
-        return np.copy(arr[i]), i
+        return np.copy(arr[i])
 
 def extract(s, starts, length = 0):
     """Exract sub-signals of S delimited by STARTS.
