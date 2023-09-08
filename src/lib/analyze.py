@@ -193,15 +193,17 @@ def align(template, target, sr, ignore=True):
         target = np.insert(target, 0, np.zeros(-shift))
     return target
 
-def align_nb(s, nb, sr):
+def align_nb(s, nb, sr, template):
     s_aligned = [0] * nb
-    s_aligned[0] = s[0]
-    for idx in tqdm(range(1, nb), desc="align_nb()"):
-        s_aligned[idx] = align(s_aligned[0], s[idx], sr)
+    for idx in tqdm(range(0, nb), desc="align"):
+        s_aligned[idx] = align(template, s[idx], sr)
     s_aligned = np.array(s_aligned, dtype=s.dtype)
     return s_aligned
 
-def align_all(s, sr):
-    """Align all the signals contained in the 2D np.array using the first one
-    as template/reference"""
-    return align_nb(s, len(s), sr)
+def align_all(s, sr, template=None):
+    """Align the signals contained in the S 2D np.array of sampling rate
+    SR. Use TEMPLATE signal (1D np.array) as template/reference signal if
+    specified, otherwise use the first signal of the S array.
+
+    """
+    return align_nb(s, len(s), sr, template if template is not None else s[0])
