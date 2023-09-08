@@ -44,13 +44,13 @@ function ykush_reset() {
     echo "=========== YKUSH RESET ==========="
     echo
     sudo ykushcmd -d a
-    sleep 3 # Wait for shutdown.
+    sleep 10 # Wait for shutdown.
     sudo ykushcmd -u a
     sleep 20 # Wait for power-up and booting.
 }
 
 function pair() {
-    timeout 20 ./utils/mirage_pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI" | tee /tmp/mirage_pair_output
+    timeout 30 ./utils/mirage_pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI" | tee /tmp/mirage_pair_output
     if [[ $? -ge 1 ]]; then
         return 1
     fi
@@ -59,7 +59,7 @@ function pair() {
 }
 
 function record() {
-    timeout 20 python3 ./collect.py record "$DE_VICTIM_ADDR" "$DE_REC_FREQ_NF" "$DE_REC_FREQ_FF" "$DE_REC_SAMP_RATE"
+    timeout 30 python3 ./collect.py record "$DE_VICTIM_ADDR" "$DE_REC_FREQ_NF" "$DE_REC_FREQ_FF" "$DE_REC_SAMP_RATE"
     if [[ $? -ge 1 ]]; then
         return 1
     fi
