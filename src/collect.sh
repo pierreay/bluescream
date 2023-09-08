@@ -39,9 +39,9 @@ function display_time() {
     echo "$(($duration / 60)) minutes ; $(($duration % 60)) seconds"
 }
 
-function ykush_switch() {
+function ykush_reset() {
     echo
-    echo "=========== YKUSH SWITCH ==========="
+    echo "=========== YKUSH RESET ==========="
     echo
     sudo ykushcmd -d a
     sudo ykushcmd -u a
@@ -142,7 +142,7 @@ function collect_one_set() {
         if [[ $KEY_FIXED == 0 ]]; then
             pair
             if [[ $? == 1 ]]; then
-                ykush_switch
+                ykush_reset
                 i = $(( $i - 1 ))
                 continue
             fi
@@ -150,7 +150,7 @@ function collect_one_set() {
         fi
         record
         if [[ $? == 1 ]]; then
-            ykush_switch
+            ykush_reset
             i = $(( $i - 1 ))
             continue
         fi
@@ -165,7 +165,7 @@ function collect_one_set() {
 
         if [[ $KEY_FIXED == 0 && $(( ($i+1) % 100 )) == 0 ]]; then
             echo "restart devices to prevent errors..."
-            ykush_switch
+            ykush_reset
         fi
     done
 
