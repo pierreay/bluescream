@@ -51,7 +51,7 @@ function ykush_reset() {
 
 function pair() {
     timeout 20 ./utils/mirage_pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI" | tee /tmp/mirage_pair_output
-    if [[ $? == 127 ]]; then
+    if [[ $? -ge 1 ]]; then
         return 1
     fi
     grep FAIL /tmp/mirage_pair_output >/dev/null 2>&1
@@ -60,7 +60,7 @@ function pair() {
 
 function record() {
     timeout 20 python3 ./collect.py record "$DE_VICTIM_ADDR" "$DE_REC_FREQ_NF" "$DE_REC_FREQ_FF" "$DE_REC_SAMP_RATE"
-    if [[ $? == 127 ]]; then
+    if [[ $? -ge 1 ]]; then
         return 1
     fi
 }
