@@ -39,18 +39,23 @@ function display_time() {
     echo "$(($duration / 60)) minutes ; $(($duration % 60)) seconds"
 }
 
-function timeoutnreboot() {
-    timeout 30 $*
-    ret=$?
-    if [[ $ret == 124 || $ret == 1 ]]; then
-        echo "ret=$ret for $*"
-        echo
-        echo "=========== REBOOT ==========="
-        echo
-        # sleep 30 && sudo reboot
-        echo "=========== REBOOT DISABLED ==========="
-        echo
-    fi
+function ykush_switch() {
+    echo
+    echo "=========== YKUSH SWITCH ==========="
+    echo
+    sudo ykushcmd -d a
+    sudo ykushcmd -u a
+    sleep 20
+}
+
+function pair() {
+    timeout 20 ./utils/mirage_pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI" | tee /tmp/mirage_pair_output
+    grep FAIL /tmp/mirage_pair_output >/dev/null 2>&1
+    return $(( 1 - $? ))
+}
+
+function record() {
+    timeout 20 python3 ./collect.py record "$DE_VICTIM_ADDR" "$DE_REC_FREQ_NF" "$DE_REC_FREQ_FF" "$DE_REC_SAMP_RATE"
 }
 
 # ** Script
@@ -106,7 +111,7 @@ function collect_one_set() {
 
     if [[ $KEY_FIXED == 1 ]]; then
         if [[ $i_start == 0 ]]; then
-            ./utils/mirage_pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI"
+            pair
             cp /tmp/mirage_output_ltk $OUTPUT_WD/k.txt
             # Fix record.py trying to load values from /tmp after rebooting.
             cp /tmp/mirage_output_addr $OUTPUT_WD/.addr.txt
@@ -129,14 +134,31 @@ function collect_one_set() {
         echo "=========== TRACE #$i -- KEY_FIXED=$KEY_FIXED ==========="
         echo
         if [[ $KEY_FIXED == 0 ]]; then
-            timeoutnreboot ./utils/mirage_pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI"
+            pair
+            if [[ $? == 1 ]]; then
+                ykush_switch
+                break
+            fi
             cp /tmp/mirage_output_ltk $OUTPUT_WD/${i}_k.txt
         fi
-        timeoutnreboot python3 ./collect.py record "$DE_VICTIM_ADDR" "$DE_REC_FREQ_NF" "$DE_REC_FREQ_FF" "$DE_REC_SAMP_RATE"
+        record
+        if [[ $? == 1 || $? == 124 ]]; then
+            ykush_switch
+            break
+        fi
         python3 ./collect.py extract "$DE_REC_SAMP_RATE" --no-plot --overwrite --window 0.15 --offset 0.04
         cp /tmp/raw_0_0.npy $OUTPUT_WD/${i}_trace_nf.npy
         cp /tmp/raw_1_0.npy $OUTPUT_WD/${i}_trace_ff.npy
         cp /tmp/bt_skd_0 $OUTPUT_WD/${i}_p.txt
+        echo "saved traces:"
+        ls $OUTPUT_WD/${i}_trace_nf.npy $OUTPUT_WD/${i}_trace_ff.npy $OUTPUT_WD/${i}_p.txt
+        echo "saved metadata:"
+        ls $OUTPUT_WD/${i}_k.txt $OUTPUT_WD/${i}_p.txt
+
+        if [[ $KEY_FIXED == 0 && $(( ($i+1) % 100 )) == 0 ]]; then
+            echo "restart devices to prevent errors..."
+            ykush_switch
+        fi
     done
 
     display_time
@@ -163,7 +185,7 @@ export KEY_FIXED=0
 echo
 echo "=========== Training set ==========="
 echo
-collect_one_set # 2
+collect_one_set # 1
 
 # ** Attack set collection
 
@@ -173,4 +195,4 @@ export KEY_FIXED=1
 echo
 echo "=========== Attack set ==========="
 echo
-collect_one_set # 2
+collect_one_set # 1
