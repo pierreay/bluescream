@@ -44,8 +44,9 @@ function ykush_reset() {
     echo "=========== YKUSH RESET ==========="
     echo
     sudo ykushcmd -d a
+    sleep 3 # Wait for shutdown.
     sudo ykushcmd -u a
-    sleep 20
+    sleep 20 # Wait for power-up and booting.
 }
 
 function pair() {
