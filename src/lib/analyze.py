@@ -207,3 +207,10 @@ def align_all(s, sr, template=None):
 
     """
     return align_nb(s, len(s), sr, template if template is not None else s[0])
+
+def average(arr):
+    """Return the average signal of all signals composing the ARR 2D numpy
+    array."""
+    assert(arr.ndim == 2)
+
+    return np.average(arr, axis=0)
