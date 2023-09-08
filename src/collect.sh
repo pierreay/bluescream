@@ -43,8 +43,10 @@ function ykush_reset() {
     echo
     echo "=========== YKUSH RESET ==========="
     echo
+    echo "power off ykush..."
     sudo ykushcmd -d a
     sleep 10 # Wait for shutdown.
+    echo "power on ykush..."
     sudo ykushcmd -u a
     sleep 20 # Wait for power-up and booting.
 }
