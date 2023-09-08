@@ -6,7 +6,9 @@
 # - DE_REC_FREQ_NF
 # - DE_REC_FREQ_FF
 # - DE_REC_SAMP_RATE
-source ../.envrc
+# Disable sourcing of the environment because it should not allows to modify
+# environment variable from the terminal.
+# source ../.envrc
 
 # * collect_one_set.sh
 
