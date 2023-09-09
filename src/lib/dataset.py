@@ -10,8 +10,9 @@ InputGeneration = Enum('InputGeneration', ['REAL_TIME', 'INIT_TIME'])
 class Dataset():
     """Top-level class representing a dataset."""
     file         = "dataset.pyc"
-    
+
     name         = None
+
     training_set = None
     attack_set   = None
 
@@ -53,16 +54,16 @@ class TrainingSet():
     ks_type = InputType.VARIABLE
 
     name = None
-    nb_trace = 0
     pt_gen = None
     ks_gen = None
 
-    def __init__(self, name, nb_trace, pt_gen, ks_gen):
+    nb_trace = 0
+
+    def __init__(self, name, pt_gen, ks_gen):
         assert(pt_gen in InputGeneration and ks_gen in InputGeneration)
         self.name = name
-        self.nb_trace = name
-        self.pt_gen = name
-        self.ks_gen = name
+        self.pt_gen = pt_gen
+        self.ks_gen = ks_gen
 
     def __str__(self):
         return "name={}".format(self.name)
@@ -74,16 +75,16 @@ class AttackSet():
     ks_type = InputType.VARIABLE
 
     name = None
-    nb_trace = 0
     pt_gen = None
     ks_gen = None
+
+    nb_trace = 0
 
     def __init__(self, name, nb_trace, pt_gen, ks_gen):
         assert(pt_gen in InputGeneration and ks_gen in InputGeneration)
         self.name = name
-        self.nb_trace = name
-        self.pt_gen = name
-        self.ks_gen = name
+        self.pt_gen = pt_gen
+        self.ks_gen = ks_gen
 
     def __str__(self):
         return "name={}".format(self.name)
