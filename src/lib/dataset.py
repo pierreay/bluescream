@@ -1,6 +1,7 @@
 """Classes representing dataset."""
 
-import path
+from os import path
+from enum import Enum
 import pickle
 
 DatasetType = Enum('DatasetType', ['TRAINING', 'ATTACK'])
