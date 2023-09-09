@@ -15,14 +15,14 @@ InputGeneration = Enum('InputGeneration', ['REAL_TIME', 'INIT_TIME'])
 
 class Dataset():
     """Top-level class representing a dataset."""
-    file = "dataset.pyc"
+    FILENAME = "dataset.pyc"
 
-    dir = None
     train_set = None
     attack_set = None
 
-    def __init__(self, name):
+    def __init__(self, name, dir):
         self.name = name
+        self.dir = dir
 
     def __str__(self):
         string = "dataset '{}':\n".format(self.name)
@@ -35,7 +35,7 @@ class Dataset():
 
     @staticmethod
     def get_path(dir):
-        return path.join(dir, Dataset.file)
+        return path.join(dir, Dataset.FILENAME)
 
     @staticmethod
     def is_pickable(dir):
@@ -48,12 +48,20 @@ class Dataset():
         with open(Dataset.get_path(dir), "rb") as f:
             pickled = pickle.load(f)
             assert(type(pickled) == Dataset)
-            pickled.dir = dir
-            return pickled
+            pickled.dir = dir # self.dir
+        if pickled.train_set is not None:
+            pickled.train_set.load_input(pickled.dir)
+        if pickled.attack_set is not None:
+            pickled.attack_set.load_input(pickled.dir)
+        return pickled
 
     def pickle_dump(self, dir):
+        if self.train_set is not None:
+            self.train_set.dump_input(self.dir)
+        if self.attack_set is not None:
+            self.attack_set.dump_input(self.dir)
         with open(Dataset.get_path(dir), "wb") as f:
-            pickle.dump(self, f)
+             pickle.dump(self, f)
 
     def add_set(self, subset):
         assert(subset.subtype in SubsetType)
@@ -90,6 +98,22 @@ class Subset():
             self.dir = "attack"
             self.pt_type = InputType.VARIABLE
             self.ks_type = InputType.FIXED
+
+    def load_input(self, dir):
+        fp = path.join(dir, self.dir)
+        if path.exists(fp):
+            self.pt = load.load_plaintexts(fp)
+            self.ks = load.load_keys(fp)
+
+    def dump_input(self, dir):
+        fp = path.join(dir, self.dir)
+        assert(path.exists(fp))
+        if self.pt is not None:
+            load.save_plaintexts(fp, self.pt)
+            self.pt = None
+        if self.ks is not None:
+            load.save_keys(fp, self.ks)
+            self.ks = None
 
     def init_input(self):
         assert(self.input_gen in InputGeneration)
