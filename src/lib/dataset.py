@@ -29,16 +29,18 @@ class Dataset():
         return string
 
     @staticmethod
-    def is_pickable(path):
-        return path.exists(path.join(path, Dataset.file))
+    def is_pickable(dir):
+        return path.exists(path.join(dir, Dataset.file))
 
     @staticmethod
-    def pickle_load(path):
-        with open(path.join(path, Dataset.file), "rb") as f:
+    def pickle_load(dir):
+        if not path.exists(path.join(dir, Dataset.file)):
+            return None
+        with open(path.join(dir, Dataset.file), "rb") as f:
             return pickle.load(f)
 
-    def pickle_dump(self, path):
-        with open(path.join(path, Dataset.file), "wb") as f:
+    def pickle_dump(self, dir):
+        with open(path.join(dir, Dataset.file), "wb") as f:
             pickle.dump(self, f)
 
     def add_set(self, set, type):
