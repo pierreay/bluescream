@@ -2,6 +2,7 @@
 
 from os import path
 from enum import Enum
+import numpy as np
 import pickle
 
 import lib.input_generators as input_generators
@@ -16,6 +17,7 @@ class Dataset():
     """Top-level class representing a dataset."""
     file = "dataset.pyc"
 
+    dir = None
     train_set = None
     attack_set = None
 
@@ -23,11 +25,12 @@ class Dataset():
         self.name = name
 
     def __str__(self):
-        string = "name={}".format(self.name)
+        string = "dataset '{}':\n".format(self.name)
+        string += "- dir: {}\n".format(self.dir)
         if self.train_set is not None:
-            string = "{}\ntrain_set:\n{}".format(string, str(self.train_set))
+            string += str(self.train_set)
         if self.attack_set is not None:
-            string = "{}\nattack_set:\n{}".format(string, str(self.attack_set))
+            string += str(self.attack_set)
         return string
 
     @staticmethod
@@ -43,7 +46,10 @@ class Dataset():
         if not path.exists(Dataset.get_path(dir)):
             return None
         with open(Dataset.get_path(dir), "rb") as f:
-            return pickle.load(f)
+            pickled = pickle.load(f)
+            assert(type(pickled) == Dataset)
+            pickled.dir = dir
+            return pickled
 
     def pickle_dump(self, dir):
         with open(Dataset.get_path(dir), "wb") as f:
@@ -58,23 +64,71 @@ class Dataset():
     
 class Subset():
     """Train or attack subset."""
-    nb_trace = 0
+    nb_trace_current = 0
+    nb_trace_wanted = 0
 
-    def __init__(self, name, subtype, pt_gen, ks_gen):
+    def __init__(self, name, subtype, input_gen, nb_trace_wanted = 0):
         assert(subtype in SubsetType) 
-        assert(pt_gen in InputGeneration and ks_gen in InputGeneration)
+        assert(input_gen in InputGeneration)
         self.name = name
         self.subtype = subtype
-        self.pt_gen = pt_gen
-        self.ks_gen = ks_gen
+        self.input_gen = input_gen
+        self.nb_trace_wanted = nb_trace_wanted
+        if input_gen == InputGeneration.INIT_TIME and nb_trace_wanted < 1:
+            l.LOGGER.error("initialization of plaintexts and keys at init time using {} traces is not possible!".format(nb_trace_wanted))
+            raise Exception("initilization of subset failed!")
+        self.init_subset_type()
+        self.init_input()
+
+    def init_subset_type(self):
+        assert(self.subtype in SubsetType)
         if self.subtype == SubsetType.TRAIN:
             self.dir = "train"
             self.pt_type = InputType.VARIABLE
             self.ks_type = InputType.VARIABLE
         elif self.subtype == SubsetType.ATTACK:
             self.dir = "attack"
-            self.pt_type = InputType.FIXED
-            self.ks_type = InputType.VARIABLE
+            self.pt_type = InputType.VARIABLE
+            self.ks_type = InputType.FIXED
+
+    def init_input(self):
+        assert(self.input_gen in InputGeneration)
+        assert(self.pt_type in InputType and self.ks_type in InputType)
+        self.pt = []
+        self.ks = []
+        if self.input_gen == InputGeneration.INIT_TIME:
+            if self.subtype == SubsetType.TRAIN:
+                generator = input_generators.balanced_generator
+            elif self.subtype == SubsetType.ATTACK:
+                generator = input_generators.unrestricted_generator
+            if self.pt_type == InputType.VARIABLE and self.ks_type == InputType.FIXED:
+                self.ks = [generator(length=16).__next__()]
+                for plaintext in generator(length=16, bunches=256):
+                    if len(self.pt) == self.nb_trace_wanted:
+                        break
+                    self.pt.append(plaintext)
+                assert(len(self.pt) == self.nb_trace_wanted)
+                assert(len(self.ks) == 1)
+            elif self.pt_type == InputType.VARIABLE and self.ks_type == InputType.VARIABLE:
+                for key in generator(length=16):
+                    for plaintext in generator(length=16):
+                        if len(self.pt) == self.nb_trace_wanted:
+                            break
+                        self.ks.append(key)
+                        self.pt.append(plaintext)
+                    if len(self.pt) == self.nb_trace_wanted:
+                        break
+                assert(len(self.pt) == len(self.ks))
+                assert(len(self.pt) == self.nb_trace_wanted)
+        self.pt = np.asarray(self.pt)
+        self.ks = np.asarray(self.ks)
 
     def __str__(self):
-        return "name={}".format(self.name)
+        string = "subset '{}':\n".format(self.name)
+        if self.ks is not None:
+            assert(type(self.ks) == np.ndarray)
+            string += "- keys shape is {}\n".format(self.ks.shape)
+        if self.pt is not None:
+            assert(type(self.pt) == np.ndarray)
+            string += "- plaintexts shape is {}\n".format(self.pt.shape)
+        return string
