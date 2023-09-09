@@ -48,7 +48,7 @@ class Dataset():
         if type == DatasetType.TRAINING:
             self.training_set = set
         elif type == DatasetType.ATTACK:
-            self.training_set = set
+            self.attack_set = set
     
 class TrainingSet():
     """Training dataset."""
@@ -83,7 +83,7 @@ class AttackSet():
 
     nb_trace = 0
 
-    def __init__(self, name, nb_trace, pt_gen, ks_gen):
+    def __init__(self, name, pt_gen, ks_gen):
         assert(pt_gen in InputGeneration and ks_gen in InputGeneration)
         self.name = name
         self.pt_gen = pt_gen
