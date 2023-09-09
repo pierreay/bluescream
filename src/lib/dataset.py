@@ -1,7 +1,8 @@
 """Classes representing dataset."""
 
-DatasetType   = Enum('DatasetType'  , ['TRAINING', 'ATTACK'])
-InputType     = Enum('InputType'    , ['FIXED',    'VARIABLE'])
+DatasetType = Enum('DatasetType', ['TRAINING', 'ATTACK'])
+InputType = Enum('InputType', ['FIXED', 'VARIABLE'])
+InputGeneration = Enum('InputGeneration', ['REAL_TIME', 'INIT_TIME'])
 
 class Dataset():
     """Top-level class representing a dataset."""
@@ -33,11 +34,18 @@ class TrainingSet():
 
     name = None
     nb_trace = 0
+    pt_gen = None
+    ks_gen = None
+    
     pt_type = InputType.VARIABLE
     ks_type = InputType.VARIABLE
 
-    def __init__(self, name):
+    def __init__(self, name, nb_trace, pt_gen, ks_gen):
+        assert(pt_gen in InputGeneration and ks_gen in InputGeneration)
         self.name = name
+        self.nb_trace = name
+        self.pt_gen = name
+        self.ks_gen = name
 
     def __str__(self):
         return "name={}".format(self.name)
@@ -47,11 +55,18 @@ class AttackSet():
 
     name = None
     nb_trace = 0
+    pt_gen = None
+    ks_gen = None
+    
     pt_type = InputType.FIXED
     ks_type = InputType.VARIABLE
 
-    def __init__(self, name):
+    def __init__(self, name, nb_trace, pt_gen, ks_gen):
+        assert(pt_gen in InputGeneration and ks_gen in InputGeneration)
         self.name = name
+        self.nb_trace = name
+        self.pt_gen = name
+        self.ks_gen = name
 
     def __str__(self):
         return "name={}".format(self.name)
