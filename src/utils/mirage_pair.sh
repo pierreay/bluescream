@@ -1,23 +1,25 @@
 #!/bin/bash
 
 set -e
+source ./lib/misc.sh
 
 help() {
     cat << EOF
-Usage: mirage_pair.sh BD_ADDR HCI_IFNAME
-Pair with the BLE device at address BD_ADDR using the HCI dongle of interface HCI_IFNAME.
+Usage: mirage_pair.sh BD_ADDR [HCI_IFNAME]
+Pair with the BLE device at address BD_ADDR.
+If specified, it uses the HCI dongle of interface HCI_IFNAME, otherwise, the first one found.
 EOF
 }
 
-if [[ $# -lt 2 ]]; then
+if [[ $# -lt 1 ]]; then
     help
     exit 1
 fi
 
 bd_addr=$1
-echo "bd_addr=$1"
-hci_ifname=$2
-echo "hci_ifname=$2"
+hci_ifname=$(select_hci $2)
+echo "bd_addr=$bd_addr"
+echo "hci_ifname=$hci_ifname"
 
 # Pair.
 sudo -E mirage "ble_connect|ble_pair" ble_connect1.INTERFACE=$hci_ifname ble_connect1.TARGET=$bd_addr ble_connect1.CONNECTION_TYPE=random | tee /tmp/mirage_output

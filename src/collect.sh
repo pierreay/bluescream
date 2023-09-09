@@ -52,7 +52,7 @@ function ykush_reset() {
 }
 
 function pair() {
-    timeout 30 ./utils/mirage_pair.sh "$DE_VICTIM_ADDR" "$DE_ATTACK_HCI" | tee /tmp/mirage_pair_output
+    timeout 30 ./utils/mirage_pair.sh "$DE_VICTIM_ADDR" | tee /tmp/mirage_pair_output
     if [[ $? -ge 1 ]]; then
         return 1
     fi
