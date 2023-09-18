@@ -1,5 +1,6 @@
 """Classes representing dataset."""
 
+import os
 from os import path
 from enum import Enum
 import numpy as np
@@ -57,35 +58,38 @@ class Dataset():
             pickled.attack_set.load_trace(pickled.dir)
         return pickled
 
-    def pickle_dump(self, dir):
+    def pickle_dump(self):
         if self.train_set is not None:
+            os.makedirs(path.join(self.dir, self.train_set.dir), exist_ok=True)
             self.train_set.dump_input(self.dir)
-            self.train_set.dump_trace(self.dir)
         if self.attack_set is not None:
+            os.makedirs(path.join(self.dir, self.attack_set.dir), exist_ok=True)
             self.attack_set.dump_input(self.dir)
-            self.attack_set.dump_trace(self.dir)
-        with open(Dataset.get_path(dir), "wb") as f:
+        with open(Dataset.get_path(self.dir), "wb") as f:
              pickle.dump(self, f)
 
-    def add_set(self, subset):
-        assert(subset.subtype in SubsetType)
-        if subset.subtype == SubsetType.TRAIN:
+    def add_subset(self, name, subtype, input_gen, nb_trace_wanted=0):
+        assert(subtype in SubsetType)
+        subset = Subset(self, name, subtype, input_gen, nb_trace_wanted)
+        if subtype == SubsetType.TRAIN:
             self.train_set = subset
-        elif subset.subtype == SubsetType.ATTACK:
+        elif subtype == SubsetType.ATTACK:
             self.attack_set = subset
     
 class Subset():
     """Train or attack subset."""
-    nb_trace_current = 0
-    nb_trace_wanted = 0
-
-    def __init__(self, name, subtype, input_gen, nb_trace_wanted = 0):
+    def __init__(self, dataset, name, subtype, input_gen, nb_trace_wanted = 0):
         assert(subtype in SubsetType) 
         assert(input_gen in InputGeneration)
+        self.dataset = dataset
         self.name = name
         self.subtype = subtype
         self.input_gen = input_gen
+        self.nb_trace_current = 0
         self.nb_trace_wanted = nb_trace_wanted
+        self.trace_dirty = False
+        self.nf = None
+        self.ff = None
         if input_gen == InputGeneration.INIT_TIME and nb_trace_wanted < 1:
             l.LOGGER.error("initialization of plaintexts and keys at init time using {} traces is not possible!".format(nb_trace_wanted))
             raise Exception("initilization of subset failed!")
