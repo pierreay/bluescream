@@ -18,16 +18,17 @@ class Dataset():
     """Top-level class representing a dataset."""
     FILENAME = "dataset.pyc"
 
-    train_set = None
-    attack_set = None
-
-    def __init__(self, name, dir):
+    def __init__(self, name, dir, samp_rate):
         self.name = name
         self.dir = dir
+        self.samp_rate = samp_rate
+        self.train_set = None
+        self.attack_set = None
 
     def __str__(self):
         string = "dataset '{}':\n".format(self.name)
         string += "- dir: {}\n".format(self.dir)
+        string += "- samp_rate: {:.2e}\n".format(self.samp_rate)
         if self.train_set is not None:
             string += str(self.train_set)
         if self.attack_set is not None:
