@@ -52,10 +52,8 @@ class Dataset():
             pickled.dir = dir # self.dir
         if pickled.train_set is not None:
             pickled.train_set.load_input(pickled.dir)
-            pickled.train_set.load_trace(pickled.dir)
         if pickled.attack_set is not None:
             pickled.attack_set.load_input(pickled.dir)
-            pickled.attack_set.load_trace(pickled.dir)
         return pickled
 
     def pickle_dump(self):
@@ -107,11 +105,20 @@ class Subset():
             self.pt_type = InputType.VARIABLE
             self.ks_type = InputType.FIXED
 
-    def load_trace(self, dir):
-        pass
+    def load_trace(self, idx=0):
+        """IDX can be 0 for all traces, an INT for a specific trace index, or a
+        RANGE for a range of traces. If using a RANGE, please use range(0, x)
+        with x > 1.
 
-    def dump_trace(self, dir):
-        pass
+        """
+        fp = path.join(self.dataset.dir, self.dir)
+        assert(path.exists(fp))
+        if idx == 0:
+            self.nf, self.ff = load.load_all_traces(fp)
+        elif isinstance(idx, int):
+            self.nf, self.ff = load.load_pair_trace(fp, idx)
+        elif isinstance(idx, range):
+            self.nf, self.ff = load.load_all_traces(fp, idx.stop)
 
     def load_input(self, dir):
         fp = path.join(dir, self.dir)
@@ -163,6 +170,12 @@ class Subset():
 
     def __str__(self):
         string = "subset '{}':\n".format(self.name)
+        if self.nf is not None:
+            assert(type(self.nf) == np.ndarray)
+            string += "- near-field trace shape is {}\n".format(self.nf.shape)
+        if self.ff is not None:
+            assert(type(self.ff) == np.ndarray)
+            string += "- far-field trace shape is {}\n".format(self.ff.shape)
         if self.ks is not None:
             assert(type(self.ks) == np.ndarray)
             string += "- keys shape is {}\n".format(self.ks.shape)
