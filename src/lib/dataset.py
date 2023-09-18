@@ -50,7 +50,7 @@ class Dataset():
         with open(Dataset.get_path(dir), "rb") as f:
             pickled = pickle.load(f)
             assert(type(pickled) == Dataset)
-            pickled.dir = dir # self.dir
+            pickled.dir = dir # Update Dataset.dir (self.dir) when pickling.
         if pickled.train_set is not None:
             pickled.train_set.load_input(pickled.dir)
         if pickled.attack_set is not None:
@@ -128,29 +128,26 @@ class Subset():
         with x > 1.
 
         """
-        fp = path.join(self.dataset.dir, self.dir)
-        assert(path.exists(fp))
+        assert(path.exists(self.get_path()))
         if idx == 0:
-            self.nf, self.ff = load.load_all_traces(fp)
+            self.nf, self.ff = load.load_all_traces(self.get_path())
         elif isinstance(idx, int):
-            self.nf, self.ff = load.load_pair_trace(fp, idx)
+            self.nf, self.ff = load.load_pair_trace(self.get_path(), idx)
         elif isinstance(idx, range):
-            self.nf, self.ff = load.load_all_traces(fp, idx.stop)
+            self.nf, self.ff = load.load_all_traces(self.get_path(), idx.stop)
 
     def load_input(self, dir):
-        fp = path.join(dir, self.dir)
-        if path.exists(fp):
-            self.pt = load.load_plaintexts(fp)
-            self.ks = load.load_keys(fp)
+        if path.exists(self.get_path()):
+            self.pt = load.load_plaintexts(self.get_path())
+            self.ks = load.load_keys(self.get_path())
 
     def dump_input(self, dir):
-        fp = path.join(dir, self.dir)
-        assert(path.exists(fp))
+        assert(path.exists(self.get_path()))
         if self.pt is not None:
-            load.save_plaintexts(fp, self.pt)
+            load.save_plaintexts(self.get_path(), self.pt)
             self.pt = None
         if self.ks is not None:
-            load.save_keys(fp, self.ks)
+            load.save_keys(self.get_path(), self.ks)
             self.ks = None
 
     def init_input(self):
@@ -185,8 +182,17 @@ class Subset():
         self.pt = np.asarray(self.pt)
         self.ks = np.asarray(self.ks)
 
+    def get_path(self):
+        """Return the full path of the subset. Must be dynamic since the full
+        path of the dataset can change since its creation when pickling it.
+
+        """
+        return path.join(self.dataset.dir, self.dir)
+
     def __str__(self):
         string = "subset '{}':\n".format(self.name)
+        string += "- dir: {}\n".format(self.dir)
+        string += "- get_path(): {}\n".format(self.get_path())
         if self.nf is not None:
             assert(type(self.nf) == np.ndarray)
             string += "- near-field trace shape is {}\n".format(self.nf.shape)
