@@ -51,15 +51,19 @@ class Dataset():
             pickled.dir = dir # self.dir
         if pickled.train_set is not None:
             pickled.train_set.load_input(pickled.dir)
+            pickled.train_set.load_trace(pickled.dir)
         if pickled.attack_set is not None:
             pickled.attack_set.load_input(pickled.dir)
+            pickled.attack_set.load_trace(pickled.dir)
         return pickled
 
     def pickle_dump(self, dir):
         if self.train_set is not None:
             self.train_set.dump_input(self.dir)
+            self.train_set.dump_trace(self.dir)
         if self.attack_set is not None:
             self.attack_set.dump_input(self.dir)
+            self.attack_set.dump_trace(self.dir)
         with open(Dataset.get_path(dir), "wb") as f:
              pickle.dump(self, f)
 
@@ -98,6 +102,12 @@ class Subset():
             self.dir = "attack"
             self.pt_type = InputType.VARIABLE
             self.ks_type = InputType.FIXED
+
+    def load_trace(self, dir):
+        pass
+
+    def dump_trace(self, dir):
+        pass
 
     def load_input(self, dir):
         fp = path.join(dir, self.dir)
