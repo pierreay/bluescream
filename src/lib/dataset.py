@@ -74,6 +74,22 @@ class Dataset():
             self.train_set = subset
         elif subtype == SubsetType.ATTACK:
             self.attack_set = subset
+
+    def get_subset(self, id):
+        """Return a subset. ID can be a string representing the name of the
+        subset, or a SubsetType representing the type of the subset.
+
+        """
+        if isinstance(id, str):
+            if id == self.train_set.name:
+                return self.train_set
+            elif id == self.attack_set.name:
+                return self.attack_set
+        elif id in SubsetType:
+            if id == SubsetType.TRAIN:
+                return self.train_set
+            elif id == SubsetType.ATTACK:
+                return self.attack_set
     
 class Subset():
     """Train or attack subset."""
