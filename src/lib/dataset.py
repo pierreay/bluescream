@@ -21,6 +21,7 @@ class Dataset():
     def __init__(self, name, dir, samp_rate):
         self.name = name
         self.dir = dir
+        self.dirsave = dir
         self.samp_rate = samp_rate
         self.train_set = None
         self.attack_set = None
@@ -28,6 +29,7 @@ class Dataset():
     def __str__(self):
         string = "dataset '{}':\n".format(self.name)
         string += "- dir: {}\n".format(self.dir)
+        string += "- dirsave: {}\n".format(self.dirsave)
         string += "- samp_rate: {:.2e}\n".format(self.samp_rate)
         if self.train_set is not None:
             string += str(self.train_set)
@@ -50,21 +52,42 @@ class Dataset():
         with open(Dataset.get_path(dir), "rb") as f:
             pickled = pickle.load(f)
             assert(type(pickled) == Dataset)
-            pickled.dir = dir # Update Dataset.dir (self.dir) when pickling.
+            pickled.dir = dir     # Update Dataset.dir (self.dir) when pickling.
+            pickled.dirsave = dir # Update Dataset.dirsave (self.dirsave) when pickling.
         if pickled.train_set is not None:
             pickled.train_set.load_input(pickled.dir)
         if pickled.attack_set is not None:
             pickled.attack_set.load_input(pickled.dir)
         return pickled
 
-    def pickle_dump(self):
+    def set_dirsave(self, dirsave):
+        """Set saving directory of current Dataset and create subdirectories. for
+        registered Subset accordingly."""
+        assert(path.exists(dirsave))
+        self.dirsave = dirsave
+        self.create_dirsave()
+
+    def create_dirsave(self):
+        """Create directories for registered Subset accordingly in the saving
+        directory."""
+        assert(path.exists(self.dirsave))
         if self.train_set is not None:
-            os.makedirs(path.join(self.dir, self.train_set.dir), exist_ok=True)
-            self.train_set.dump_input(self.dir)
+            os.makedirs(path.join(self.dirsave, self.train_set.dir), exist_ok=True)
         if self.attack_set is not None:
-            os.makedirs(path.join(self.dir, self.attack_set.dir), exist_ok=True)
-            self.attack_set.dump_input(self.dir)
-        with open(Dataset.get_path(self.dir), "wb") as f:
+            os.makedirs(path.join(self.dirsave, self.attack_set.dir), exist_ok=True)
+
+    def pickle_dump(self, force=False):
+        if force == False and self.dir == self.dirsave:
+            l.LOGGER.warning("save dataset to loaded directory")
+            confirm = input("press [enter] to continue")
+        self.create_dirsave()
+        if self.train_set is not None:
+            self.train_set.dump_input(self.dirsave)
+            self.train_set.unload_trace()
+        if self.attack_set is not None:
+            self.attack_set.dump_input(self.dirsave)
+            self.attack_set.unload_trace()
+        with open(Dataset.get_path(self.dirsave), "wb") as f:
              pickle.dump(self, f)
 
     def add_subset(self, name, subtype, input_gen, nb_trace_wanted=0):
