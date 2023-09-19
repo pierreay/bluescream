@@ -46,6 +46,9 @@ def get_nb(dir):
             return i
         elif get_dataset_is_ff_exist(dir) and not path.exists(get_dataset_path_unpack_ff(dir, i)):
             return i
+        elif not get_dataset_is_nf_exist(dir) and not get_dataset_is_ff_exist(dir):
+            break
+        assert(i < 1e5) # Infinite loop?
     return -1
 
 def find_bad_entry(arr):
