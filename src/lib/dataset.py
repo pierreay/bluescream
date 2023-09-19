@@ -122,19 +122,23 @@ class Subset():
             self.pt_type = InputType.VARIABLE
             self.ks_type = InputType.FIXED
 
-    def load_trace(self, idx=0):
-        """IDX can be 0 for all traces, an INT for a specific trace index, or a
+    def load_trace(self, idx=-1):
+        """IDX can be -1 for all traces, an INT for a specific trace index, or a
         RANGE for a range of traces. If using a RANGE, please use range(0, x)
         with x > 1.
 
+        For scripting conveniance, return references to the loaded trace(s)
+        pair (self.nf and self.ff).
+
         """
         assert(path.exists(self.get_path()))
-        if idx == 0:
+        if isinstance(idx, int) and idx == -1:
             self.nf, self.ff = load.load_all_traces(self.get_path())
         elif isinstance(idx, int):
             self.nf, self.ff = load.load_pair_trace(self.get_path(), idx)
         elif isinstance(idx, range):
             self.nf, self.ff = load.load_all_traces(self.get_path(), idx.stop)
+        return self.nf, self.ff
 
     def load_input(self, dir):
         if path.exists(self.get_path()):
