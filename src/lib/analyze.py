@@ -135,6 +135,7 @@ def choose_signal(arr, i = -1):
     if i == -1:
         for i in range(len(arr)):
             if plot.select(arr[i]):
+                l.LOGGER.info("select signal index {}".format(i))
                 return np.copy(arr[i])
     else:
         return np.copy(arr[i])
