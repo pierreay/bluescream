@@ -152,7 +152,7 @@ def extract(s, starts, length = 0):
     """
     assert(s.ndim == 1)
     if length > 0:
-        extracted = np.zeros((len(starts), length))
+        extracted = np.zeros((len(starts), length), dtype=s.dtype)
         for i in range(len(starts)):
             condition = np.zeros((len(s)))
             condition[int(starts[i]):int(starts[i] + length)] = 1
