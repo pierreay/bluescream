@@ -27,10 +27,8 @@ def log_n_exit(e, str, code, traceback=False):
 def init(level):
     """Initialize the logging system.
 
-    Initialize the stream type (stderr) and the logging format depending
-    on the later in the global LOGGER variable, alert program start.
-
-    :param level: Logging level [logging.INFO, logging.DEBUG]
+    Initialize the stream type (stderr) and the logging format depending on the
+    later in the global LOGGER variable, alert program start.
 
     """
     global LOGGER
