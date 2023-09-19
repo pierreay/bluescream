@@ -225,10 +225,11 @@ def is_dataset_packed(dir):
     packed_ff = path.exists(get_dataset_path_pack_ff(dir))
     return packed_nf or packed_ff
 
-def is_dataset_unpacked(dir):
-    """Return True if the dataset is unpacked, False otherwise."""
-    unpacked_nf = path.exists(get_dataset_path_unpack_nf(dir, 0))
-    unpacked_ff = path.exists(get_dataset_path_unpack_ff(dir, 0))
+def is_dataset_unpacked(dir, idx=0):
+    """Return True if the dataset is unpacked, False otherwise. If IDX is
+    specified, then check for a specific trace index."""
+    unpacked_nf = path.exists(get_dataset_path_unpack_nf(dir, idx))
+    unpacked_ff = path.exists(get_dataset_path_unpack_ff(dir, idx))
     return unpacked_nf or unpacked_ff
 
 def is_raw_traces(dir):

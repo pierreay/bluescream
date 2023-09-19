@@ -179,6 +179,10 @@ class Subset():
                                  self.ff if ff is True else None)
         self.unload_trace()
 
+    def get_save_trace_exist(self, idx=-1):
+        idx = idx if idx > -1 else self.load_trace_idx
+        return load.is_dataset_unpacked(self.get_path(save=True), idx)
+
     def load_input(self):
         if path.exists(self.get_path()):
             self.pt = load.load_plaintexts(self.get_path())
