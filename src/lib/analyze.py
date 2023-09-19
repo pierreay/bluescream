@@ -109,6 +109,7 @@ def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0):
     list of start indexes and the Triggers object used for the trigger signal.
 
     """
+    assert(isinstance(s, np.ndarray))
     # * Trigger signal.
     trigger   = triggers.Trigger(s, bpl, bph, lp, sr)
     trigger_l = triggers.Triggers()
