@@ -192,6 +192,10 @@ class Subset():
             load.save_keys(self.get_path(save=True), self.ks)
             self.ks = None
 
+    def prune_input(self, save=False):
+        self.ks = load.prune_entry(self.ks, range(load.get_nb(self.get_path(save=save)), len(self.ks)))
+        self.pt = load.prune_entry(self.pt, range(load.get_nb(self.get_path(save=save)), len(self.pt)))
+
     def init_input(self):
         assert(self.input_gen in InputGeneration)
         assert(self.pt_type in InputType and self.ks_type in InputType)
