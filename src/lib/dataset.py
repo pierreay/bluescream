@@ -199,14 +199,15 @@ class Subset():
         string += "- get_path(): {}\n".format(self.get_path())
         if self.nf is not None:
             assert(type(self.nf) == np.ndarray)
-            string += "- near-field trace shape is {}\n".format(self.nf.shape)
+            string += "- loaded near-field trace shape is {}\n".format(self.nf.shape)
         if self.ff is not None:
             assert(type(self.ff) == np.ndarray)
-            string += "- far-field trace shape is {}\n".format(self.ff.shape)
+            string += "- loaded far-field trace shape is {}\n".format(self.ff.shape)
         if self.ks is not None:
             assert(type(self.ks) == np.ndarray)
-            string += "- keys shape is {}\n".format(self.ks.shape)
+            string += "- loaded keys shape is {}\n".format(self.ks.shape)
         if self.pt is not None:
             assert(type(self.pt) == np.ndarray)
-            string += "- plaintexts shape is {}\n".format(self.pt.shape)
+            string += "- loaded plaintexts shape is {}\n".format(self.pt.shape)
+        string += "- on-disk number of traces is {}\n".format(load.get_nb(self.get_path()))
         return string
