@@ -90,11 +90,11 @@ class Dataset():
                 return self.train_set
             elif id == SubsetType.ATTACK:
                 return self.attack_set
-    
+
 class Subset():
     """Train or attack subset."""
     def __init__(self, dataset, name, subtype, input_gen, nb_trace_wanted = 0):
-        assert(subtype in SubsetType) 
+        assert(subtype in SubsetType)
         assert(input_gen in InputGeneration)
         self.dataset = dataset
         self.name = name
@@ -183,6 +183,11 @@ class Subset():
                         break
                 assert(len(self.pt) == len(self.ks))
                 assert(len(self.pt) == self.nb_trace_wanted)
+        # Load inputs from already existing stored on-disk.
+        elif load.is_key_fixed(self.get_path()) is not None:
+            self.ks = np.array(load.load_raw_input(self.get_path(), load.DATASET_RAW_INPUT_KEY_PACK,       load.get_nb(self.get_path()), fixed = load.is_key_fixed(self.get_path()), hex=True))
+            self.pt = np.array(load.load_raw_input(self.get_path(), load.DATASET_RAW_INPUT_PLAINTEXT_PACK, load.get_nb(self.get_path()), fixed = False,                    hex=False))
+
         self.pt = np.asarray(self.pt)
         self.ks = np.asarray(self.ks)
 

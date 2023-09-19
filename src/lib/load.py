@@ -32,6 +32,14 @@ DATASET_FILENAME_UNPACK="{}_trace_{}.npy"
 DATASET_FIELD_ID_NF = "nf"
 DATASET_FIELD_ID_FF = "ff"
 
+DATASET_RAW_INPUT_KEY_PACK="k.txt"
+DATASET_RAW_INPUT_KEY_UNPACK="{}_k.txt"
+DATASET_RAW_INPUT_PLAINTEXT_PACK="p.txt"
+DATASET_RAW_INPUT_PLAINTEXT_UNPACK="{}_p.txt"
+DATASET_RAW_INPUT_FORMAT="{}_{}"
+DATASET_NPY_INPUT_KEY="k.npy"
+DATASET_NPY_INPUT_PLAINTEXT="p.npy"
+
 # * Misc
 
 def get_nb_if_not_set(indir, nb):
@@ -85,12 +93,12 @@ def reduce_entry_all_dataset(ks, pt, nf, ff, nb=0):
 def is_key_fixed(dir):
     """Return True if key is fixed inside dataset pointed by dir"""
     assert(path.exists(dir))
-    if path.exists(path.join(dir, "k.txt")):
+    if path.exists(path.join(dir, DATASET_RAW_INPUT_KEY_PACK)):
         return True
-    elif path.exists(path.join(dir, "k_0.txt")):
+    elif path.exists(path.join(dir, DATASET_RAW_INPUT_KEY_UNPACK.format(0))):
         return False
-    elif path.exists(path.join(dir, "k.npy")):
-        k = np.load(path.join(dir, "k.npy"))
+    elif path.exists(path.join(dir, DATASET_NPY_INPUT_KEY)):
+        k = np.load(path.join(dir, DATASET_NPY_INPUT_KEY))
         if k.shape == (1, 16):
             return True
         elif k.shape >= (1, 16):
@@ -98,30 +106,70 @@ def is_key_fixed(dir):
     else:
         print("Unknown key mode!")
         return None
+
+def load_raw_input(data_path, filename, number, fixed=False, hex=True):
+    """Extract plaintexts and keys from a RAW collected dataset (hexadecimal in
+    .txt) and store them in .npy files containing integers.
+
+    DATA_PATH is the path of a directory containing the raw traces and
+    metadatas (plaintexts and keys).
+
+    Example:
+    k = np.array(load_raw_input(indir, DATASET_RAW_INPUT_KEY_PACK,       get_nb(indir), fixed = load.is_key_fixed(indir), hex=True))
+    p = np.array(load_raw_input(indir, DATASET_RAW_INPUT_PLAINTEXT_PACK, get_nb(indir), fixed = False,                    hex=False))
+    np.save("{}/k.npy".format(outdir), k)
+    np.save("{}/p.npy".format(outdir), p)
+
+    """    
+    assert(number > 0)
+    l.LOGGER.info("load all {}".format(filename))
+    if fixed == True:
+        filepath = path.join(data_path, filename)
+        with open(filepath, "r") as f:
+            data = f.readline()[:-1]
+    elif fixed == False:
+        data = ''
+        for i in tqdm(range(0, number)):
+            filename_i = DATASET_RAW_INPUT_FORMAT.format(i, filename)
+            filepath = path.join(data_path, filename_i)
+            with open(filepath, "r") as f:
+                tmp = f.readline()
+                if hex and len(tmp) != 33:
+                    l.LOGGER.info("i={} tmp={} -> bad key, replace with zeros".format(i, tmp))
+                    tmp = "00000000000000000000000000000000"
+                if not hex:
+                    tmp = "{0:0{1}x}".format(int(tmp), 32)
+                data += "\n" + tmp
+                if data[len(data)-1] == '\n':
+                    data = data[0:len(data)-1]
+    if data[0] == "\n":
+        data = data[1:]
+    return [[int(c) for c in bytearray.fromhex(line)]
+            for line in data.split('\n')]
             
 def load_keys(dir):
     """Return a numpy array containing the keys of shape (nb_traces, 16)"""
-    if path.exists(path.join(dir, "k.npy")):
-        return np.load(path.join(dir, "k.npy"))
+    if path.exists(path.join(dir, DATASET_NPY_INPUT_KEY)):
+        return np.load(path.join(dir, DATASET_NPY_INPUT_KEY))
     else:
         l.LOGGER.warning("no loaded key(s)")
         return None
 
 def load_plaintexts(dir):
     """Return a numpy array containing the plaintexts of shape (nb_traces, 16)"""
-    if path.exists(path.join(dir, "p.npy")):
-        return np.load(path.join(dir, "p.npy"))
+    if path.exists(path.join(dir, DATASET_NPY_INPUT_PLAINTEXT)):
+        return np.load(path.join(dir, DATASET_NPY_INPUT_PLAINTEXT))
     else:
         l.LOGGER.warning("no loaded plaintext(s)")
         return None
 
 def save_keys(dir, k):
     """Save the K keys in DIR"""
-    np.save(path.join(dir, "k.npy"), k)
+    np.save(path.join(dir, DATASET_NPY_INPUT_KEY), k)
 
 def save_plaintexts(dir, p):
     """Save the P plaintexts in DIR"""
-    np.save(path.join(dir, "p.npy"), p)
+    np.save(path.join(dir, DATASET_NPY_INPUT_PLAINTEXT), p)
 
 # * Traces
 
