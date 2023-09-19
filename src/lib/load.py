@@ -293,11 +293,11 @@ def load_pair_trace(dir, idx):
     try:
         trace_nf = np.load(get_dataset_path_unpack_nf(dir, idx))
     except Exception as e:
-        print(e)
+        l.LOGGER.warn(e)
     try:
         trace_ff = np.load(get_dataset_path_unpack_ff(dir, idx))
     except Exception as e:
-        print(e)
+        l.LOGGER.warn(e)
     return trace_nf, trace_ff
 
 def save_all_traces(dir, nf, ff, packed=True):
