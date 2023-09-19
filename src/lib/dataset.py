@@ -254,5 +254,7 @@ class Subset():
         if self.pt is not None:
             assert(type(self.pt) == np.ndarray)
             string += "- loaded plaintexts shape is {}\n".format(self.pt.shape)
+        if self.load_trace_idx is not None:
+            string += "- loaded trace idx: {}\n".format(self.load_trace_idx)
         string += "- on-disk number of traces is {}\n".format(load.get_nb(self.get_path()))
         return string
