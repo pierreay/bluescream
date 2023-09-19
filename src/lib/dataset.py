@@ -161,7 +161,23 @@ class Subset():
             self.nf, self.ff = load.load_pair_trace(self.get_path(), idx)
         elif isinstance(idx, range):
             self.nf, self.ff = load.load_all_traces(self.get_path(), idx.stop)
+        self.load_trace_idx = idx
         return self.nf, self.ff
+
+    def unload_trace(self):
+        """Delete and forget references about any loaded trace(s) from disk."""
+        self.load_trace_idx = None
+        del self.nf
+        self.nf = None
+        del self.ff
+        self.ff = None
+
+    def save_trace(self, nf=True, ff=True):
+        if isinstance(self.load_trace_idx, int) and self.load_trace_idx > -1:
+            load.save_pair_trace(self.get_path(save=True), self.load_trace_idx,
+                                 self.nf if nf is True else None,
+                                 self.ff if ff is True else None)
+        self.unload_trace()
 
     def load_input(self, dir):
         if path.exists(self.get_path()):
