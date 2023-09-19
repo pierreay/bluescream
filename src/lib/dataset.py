@@ -55,9 +55,9 @@ class Dataset():
             pickled.dir = dir     # Update Dataset.dir (self.dir) when pickling.
             pickled.dirsave = dir # Update Dataset.dirsave (self.dirsave) when pickling.
         if pickled.train_set is not None:
-            pickled.train_set.load_input(pickled.dir)
+            pickled.train_set.load_input()
         if pickled.attack_set is not None:
-            pickled.attack_set.load_input(pickled.dir)
+            pickled.attack_set.load_input()
         return pickled
 
     def set_dirsave(self, dirsave):
@@ -82,10 +82,10 @@ class Dataset():
             confirm = input("press [enter] to continue")
         self.create_dirsave()
         if self.train_set is not None:
-            self.train_set.dump_input(self.dirsave)
+            self.train_set.dump_input()
             self.train_set.unload_trace()
         if self.attack_set is not None:
-            self.attack_set.dump_input(self.dirsave)
+            self.attack_set.dump_input()
             self.attack_set.unload_trace()
         with open(Dataset.get_path(self.dirsave), "wb") as f:
              pickle.dump(self, f)
@@ -178,12 +178,12 @@ class Subset():
                                  self.ff if ff is True else None)
         self.unload_trace()
 
-    def load_input(self, dir):
+    def load_input(self):
         if path.exists(self.get_path()):
             self.pt = load.load_plaintexts(self.get_path())
             self.ks = load.load_keys(self.get_path())
 
-    def dump_input(self, dir):
+    def dump_input(self):
         assert(path.exists(self.get_path()))
         if self.pt is not None:
             load.save_plaintexts(self.get_path(save=True), self.pt)
