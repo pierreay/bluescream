@@ -233,6 +233,9 @@ class Subset():
         self.pt = np.asarray(self.pt)
         self.ks = np.asarray(self.ks)
 
+    def get_nb_trace_ondisk(self):
+        return load.get_nb(self.get_path())
+
     def get_path(self, save=False):
         """Return the full path of the subset. Must be dynamic since the full
         path of the dataset can change since its creation when pickling it.
@@ -259,5 +262,5 @@ class Subset():
             string += "- loaded plaintexts shape is {}\n".format(self.pt.shape)
         if self.load_trace_idx is not None:
             string += "- loaded trace idx: {}\n".format(self.load_trace_idx)
-        string += "- on-disk number of traces is {}\n".format(load.get_nb(self.get_path()))
+        string += "- on-disk number of traces is {}\n".format(self.get_nb_trace_ondisk())
         return string
