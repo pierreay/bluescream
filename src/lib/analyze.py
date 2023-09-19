@@ -195,20 +195,24 @@ def align(template, target, sr, ignore=True):
         target = np.insert(target, 0, np.zeros(-shift))
     return target
 
-def align_nb(s, nb, sr, template):
+def align_nb(s, nb, sr, template, tqdm_log=True):
     s_aligned = [0] * nb
-    for idx in tqdm(range(0, nb), desc="align"):
+    if tqdm_log:
+        lrange = tqdm(range(0, nb), desc="align")
+    else:
+        lrange = list(range(0, nb))
+    for idx in lrange:
         s_aligned[idx] = align(template, s[idx], sr)
     s_aligned = np.array(s_aligned, dtype=s.dtype)
     return s_aligned
 
-def align_all(s, sr, template=None):
+def align_all(s, sr, template=None, tqdm_log=True):
     """Align the signals contained in the S 2D np.array of sampling rate
     SR. Use TEMPLATE signal (1D np.array) as template/reference signal if
     specified, otherwise use the first signal of the S array.
 
     """
-    return align_nb(s, len(s), sr, template if template is not None else s[0])
+    return align_nb(s, len(s), sr, template if template is not None else s[0], tqdm_log)
 
 def average(arr):
     """Return the average signal of all signals composing the ARR 2D numpy
@@ -241,7 +245,7 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
     assert np.shape(starts[starts <= 0]) == (0,), "starts should not contained negative indexes"
     check_nb = len(starts) < (1.1 * nb_aes) and len(starts) > (0.9 * nb_aes)
     if check_nb:
-        l.LOGGER.info("number of detected aes: {}".format(len(starts)))
+        l.LOGGER.debug("number of detected aes: {}".format(len(starts)))
     else:
         l.LOGGER.error("number of detected aes seems to be aberrant: {}".format(len(starts)))
 
@@ -255,6 +259,6 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
 
     # * Extract all AES and average them.
     extracted = analyze.extract(arr, starts, len(template_s))
-    aligned   = analyze.align_all(extracted, sr, template_s)
+    aligned   = analyze.align_all(extracted, sr, template_s, False)
     averaged  = analyze.average(aligned)
     return averaged
