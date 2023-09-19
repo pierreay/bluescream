@@ -235,7 +235,7 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
 
     SR is the sampling rate of ARR.
     NB_AES is the number of AES executions in the trace ARR.
-    TEMPLATE is the index of the automatic template selection.
+    TEMPLATE can be an index for the interactive template selection or a template signal.
     If PLOT is set to True, plot triggers and start indexes.
     Return the averaged trace (np.ndarray), None on error.
 
@@ -254,12 +254,15 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
         plot.plot_time_spec_share_nf_ff(arr, None, sr, peaks=starts, triggers=trigger)
 
     # * Select one extraction as template.
-    extracted  = analyze.extract(arr, starts)
-    template_s = analyze.choose_signal(extracted, template)
+    if isinstance(template, int):
+        extracted  = analyze.extract(arr, starts)
+        template_s = analyze.choose_signal(extracted, template)
+    elif isinstance(template, np.ndarray):
+        template_s = template
     assert(template_s is not None)
 
     # * Extract all AES and average them.
     extracted = analyze.extract(arr, starts, len(template_s))
     aligned   = analyze.align_all(extracted, sr, template_s, False)
     averaged  = analyze.average(aligned)
-    return averaged
+    return averaged, template_s

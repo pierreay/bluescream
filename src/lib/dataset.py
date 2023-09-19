@@ -127,6 +127,7 @@ class Subset():
         self.trace_dirty = False
         self.nf = None
         self.ff = None
+        self.template = None
         if input_gen == InputGeneration.INIT_TIME and nb_trace_wanted < 1:
             l.LOGGER.error("initialization of plaintexts and keys at init time using {} traces is not possible!".format(nb_trace_wanted))
             raise Exception("initilization of subset failed!")
@@ -262,5 +263,7 @@ class Subset():
             string += "- loaded plaintexts shape is {}\n".format(self.pt.shape)
         if self.load_trace_idx is not None:
             string += "- loaded trace idx: {}\n".format(self.load_trace_idx)
+        if self.template is not None:
+            string += "- template shape: {}\n".format(self.template.shape)
         string += "- on-disk number of traces is {}\n".format(self.get_nb_trace_ondisk())
         return string
