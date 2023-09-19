@@ -2,13 +2,15 @@
 
 # Core modules.
 import logging
+import os
 
 # External modules.
 import colorlog
 
 # Logger used accross all modules.
 LOGGER = None
-LOGGER_DEFAULT_LEVEL = "DEBUG"
+OS_LOGLEVEL = os.getenv("DE_OS_LOGLEVEL")
+LOGGER_DEFAULT_LEVEL = "DEBUG" if OS_LOGLEVEL is None else OS_LOGLEVEL
 
 def log_n_exit(e, str, code, traceback=False):
     """Log a critical error and exit.
