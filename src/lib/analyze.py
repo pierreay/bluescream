@@ -7,6 +7,7 @@ import numpy as np
 from scipy import signal
 from tqdm import tqdm
 
+import lib.log as l
 import lib.plot as plot
 import lib.filters as filters
 import lib.triggers as triggers
@@ -214,3 +215,45 @@ def average(arr):
     assert(arr.ndim == 2)
 
     return np.average(arr, axis=0)
+
+def average_aes(arr, sr, nb_aes, template, plot_enable):
+    """Average multiple AES execution contained in trace ARR into a single
+    trace. To average multiple AES runs inside one trace, this command will
+    perform:
+
+    1. AES detection
+    2. Templating selection
+    3. Extraction
+    4. Alignment
+    5. Averaging
+
+    SR is the sampling rate of ARR.
+    NB_AES is the number of AES executions in the trace ARR.
+    TEMPLATE is the index of the automatic template selection.
+    If PLOT is set to True, plot triggers and start indexes.
+    Return the averaged trace (np.ndarray), None on error.
+
+    """
+    # * Find AES.
+    arr = analyze.get_amplitude(arr)
+    starts, trigger = analyze.find_aes(arr, sr, 8.8e6, 9.5e6, nb_aes, 1e4, -0.5e-4)
+    assert np.shape(starts[starts <= 0]) == (0,), "starts should not contained negative indexes"
+    check_nb = len(starts) < (1.1 * nb_aes) and len(starts) > (0.9 * nb_aes)
+    if check_nb:
+        l.LOGGER.info("number of detected aes: {}".format(len(starts)))
+    else:
+        l.LOGGER.error("number of detected aes seems to be aberrant: {}".format(len(starts)))
+
+    if plot_enable:
+        plot.plot_time_spec_share_nf_ff(arr, None, sr, peaks=starts, triggers=trigger)
+
+    # * Select one extraction as template.
+    extracted  = analyze.extract(arr, starts)
+    template_s = analyze.choose_signal(extracted, template)
+    assert(template_s is not None)
+
+    # * Extract all AES and average them.
+    extracted = analyze.extract(arr, starts, len(template_s))
+    aligned   = analyze.align_all(extracted, sr, template_s)
+    averaged  = analyze.average(aligned)
+    return averaged
