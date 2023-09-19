@@ -123,7 +123,6 @@ class Subset():
         self.name = name
         self.subtype = subtype
         self.input_gen = input_gen
-        self.nb_trace_current = 0
         self.nb_trace_wanted = nb_trace_wanted
         self.trace_dirty = False
         self.nf = None
