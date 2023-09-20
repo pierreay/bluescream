@@ -144,6 +144,7 @@ class Subset():
         self.nf = None
         self.ff = None
         self.template = None
+        self.bad_entries = []
         if input_gen == InputGeneration.INIT_TIME and nb_trace_wanted < 1:
             l.LOGGER.error("initialization of plaintexts and keys at init time using {} traces is not possible!".format(nb_trace_wanted))
             raise Exception("initilization of subset failed!")
@@ -286,4 +287,5 @@ class Subset():
         if self.template is not None:
             string += "- template shape: {}\n".format(self.template.shape)
         string += "- on-disk number of traces is {}\n".format(self.get_nb_trace_ondisk())
+        string += "- bad entries are {}\n".format(self.bad_entries)
         return string
