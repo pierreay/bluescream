@@ -251,16 +251,6 @@ def print_trace_info(s, sr=0, id=""):
     if sr:
         l.LOGGER.info("duration={:.4}s".format(len(s) / sr))
 
-def print_dataset_info(input, label=""):
-    """Print information about a trace and/or about a dataset. input should be a 1D or 2D nd.array"""
-    l.LOGGER.info("dataset information: {}".format(label))
-    if input.ndim == 1:
-        print_trace_info(input)
-    if input.ndim == 2:
-        l.LOGGER.info("shape={}".format(input.shape))
-        l.LOGGER.info("dtype={}".format(input.dtype))
-        print_trace_info(input[0], id=label + "[0]")
-
 def save_raw_trace(trace, dir, rad_idx, rec_idx):
     assert(path.exists(dir))
     np.save(get_record_path_raw(dir, rad_idx, rec_idx), trace)
