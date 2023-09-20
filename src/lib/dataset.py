@@ -25,6 +25,8 @@ class Dataset():
         self.samp_rate = samp_rate
         self.train_set = None
         self.attack_set = None
+        self.dirty = False
+        self.dirty_idx = 0
 
     def __str__(self):
         string = "dataset '{}':\n".format(self.name)
@@ -76,6 +78,21 @@ class Dataset():
         if self.attack_set is not None:
             os.makedirs(path.join(self.dirsave, self.attack_set.dir), exist_ok=True)
 
+    def get_savedir_dirty(self):
+        if path.exists(path.join(self.dirsave, Dataset.FILENAME)):
+            dset = Dataset.pickle_load(self.dirsave)
+            return dset.dirty
+        return False
+
+    def get_savedir_dirty_idx(self):
+        dset = Dataset.pickle_load(self.dirsave)
+        return dset.dirty_idx
+
+    def get_savedir_template(self, subset):
+        dset = Dataset.pickle_load(self.dirsave)
+        sset = dset.get_subset(subset)
+        return sset.template
+
     def pickle_dump(self, force=False):
         if force == False and self.dir == self.dirsave:
             l.LOGGER.warning("save dataset to loaded directory")
@@ -124,7 +141,6 @@ class Subset():
         self.subtype = subtype
         self.input_gen = input_gen
         self.nb_trace_wanted = nb_trace_wanted
-        self.trace_dirty = False
         self.nf = None
         self.ff = None
         self.template = None
