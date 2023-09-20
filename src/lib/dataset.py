@@ -214,8 +214,8 @@ class Subset():
             self.ks = None
 
     def prune_input(self, save=False):
-        self.ks = load.prune_entry(self.ks, range(load.get_nb(self.get_path(save=save)), len(self.ks)))
-        self.pt = load.prune_entry(self.pt, range(load.get_nb(self.get_path(save=save)), len(self.pt)))
+        self.ks = load.prune_entry(self.ks, range(self.get_nb_trace_ondisk(save=save), len(self.ks)))
+        self.pt = load.prune_entry(self.pt, range(self.get_nb_trace_ondisk(save=save), len(self.pt)))
 
     def init_input(self):
         assert(self.input_gen in InputGeneration)
@@ -248,14 +248,14 @@ class Subset():
                 assert(len(self.pt) == self.nb_trace_wanted)
         # Load inputs from already existing stored on-disk.
         elif load.is_key_fixed(self.get_path()) is not None:
-            self.ks = np.array(load.load_raw_input(self.get_path(), load.DATASET_RAW_INPUT_KEY_PACK,       load.get_nb(self.get_path()), fixed = load.is_key_fixed(self.get_path()), hex=True))
-            self.pt = np.array(load.load_raw_input(self.get_path(), load.DATASET_RAW_INPUT_PLAINTEXT_PACK, load.get_nb(self.get_path()), fixed = False,                    hex=False))
+            self.ks = np.array(load.load_raw_input(self.get_path(), load.DATASET_RAW_INPUT_KEY_PACK,       self.get_nb_trace_ondisk(), fixed = load.is_key_fixed(self.get_path()), hex=True))
+            self.pt = np.array(load.load_raw_input(self.get_path(), load.DATASET_RAW_INPUT_PLAINTEXT_PACK, self.get_nb_trace_ondisk(), fixed = False,                              hex=False))
 
         self.pt = np.asarray(self.pt)
         self.ks = np.asarray(self.ks)
 
-    def get_nb_trace_ondisk(self):
-        return load.get_nb(self.get_path())
+    def get_nb_trace_ondisk(self, save=False):
+        return load.get_nb(self.get_path(save))
 
     def get_path(self, save=False):
         """Return the full path of the subset. Must be dynamic since the full
