@@ -39,7 +39,13 @@ def plot_time_simple(s):
     plt.show()
 
 def plot_spec_simple(s):
-    plt.specgram(s, NFFT)
+    """Show signals' spectrogram on different windows."""
+    s = [s] if isinstance(s, np.ndarray) and s.ndim == 1 else s
+    assert(len(s) < 15)
+    for i in range(len(s)):
+        plt.figure()
+        plt.specgram(s[i], NFFT)
+        plt.title("idx={}".format(i))
     plt.show()
 
 def save_spec_simple(s, i=0):
@@ -61,13 +67,6 @@ def plot_time_compare_n(arr):
     for idx in range(len(arr)):
         plt.plot(arr[idx])
     plt.show()
-
-def plot_spec_compare(s1, s2):
-    assert(s1.shape == s2.shape)
-    plt.specgram(s1, NFFT)
-    savetmp("spec1.png")
-    plt.specgram(s2, NFFT)
-    savetmp("spec2.png")
 
 # * Plot components to construct advanced plots
 
