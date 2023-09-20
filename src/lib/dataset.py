@@ -33,6 +33,10 @@ class Dataset():
         string += "- dir: {}\n".format(self.dir)
         string += "- dirsave: {}\n".format(self.dirsave)
         string += "- samp_rate: {:.2e}\n".format(self.samp_rate)
+        string += "- dirty: {}\n".format(self.dirty)
+        string += "- dirty_idx: {}\n".format(self.dirty_idx)
+        string += "- dirty_savedir: {}\n".format(self.get_savedir_dirty())
+        string += "- dirty_idx_savedir: {}\n".format(self.get_savedir_dirty_idx())
         if self.train_set is not None:
             string += str(self.train_set)
         if self.attack_set is not None:
