@@ -145,6 +145,7 @@ class Subset():
         self.subtype = subtype
         self.input_gen = input_gen
         self.nb_trace_wanted = nb_trace_wanted
+        self.load_trace_idx = None
         self.nf = None
         self.ff = None
         self.template = None
