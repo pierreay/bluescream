@@ -94,12 +94,10 @@ def get_trace_format(trace):
 def fill_zeros_if_bad(ref, test):
     """If a bad trace TEST is given (i.e. wrong shape or None), it is remplaced
     with a zeroed trace of dtype and shape from REF. Return a tuple (FLAG,
-    TEST) where FLAG is 0 if trace was OK and 1 if trace was bad."""
-    ret = 0
+    TEST) where FLAG is False if trace was OK and True if trace was bad."""
     if test is None or test.shape != ref.shape:
-        test = np.zeros(ref.shape, dtype=ref.dtype)
-        ret = 1
-    return (ret, test)
+        return True, np.zeros(ref.shape, dtype=ref.dtype)
+    return False, test
 
 def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0):
     """Find the start (beginning of the key scheduling) of every AES
@@ -237,9 +235,10 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
     NB_AES is the number of AES executions in the trace ARR.
     TEMPLATE can be an index for the interactive template selection or a template signal.
     If PLOT is set to True, plot triggers and start indexes.
-    Return the averaged trace (np.ndarray), None on error.
+    Return a tuple of the averaged trace (np.ndarray) (or None on error) and the template.
 
     """
+    error = 0
     # * Find AES.
     arr = analyze.get_amplitude(arr)
     starts, trigger = analyze.find_aes(arr, sr, 8.8e6, 9.5e6, nb_aes, 1e4, -0.5e-4)
@@ -249,9 +248,12 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
         l.LOGGER.debug("number of detected aes: {}".format(len(starts)))
     else:
         l.LOGGER.error("number of detected aes seems to be aberrant: {}".format(len(starts)))
+        error = 1
 
     if plot_enable:
         plot.plot_time_spec_share_nf_ff(arr, None, sr, peaks=starts, triggers=trigger)
+    if error:
+        return None, template
 
     # * Select one extraction as template.
     if isinstance(template, int):
