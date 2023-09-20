@@ -93,15 +93,15 @@ class Dataset():
         sset = dset.get_subset(subset)
         return sset.template
 
-    def pickle_dump(self, force=False):
+    def pickle_dump(self, force=False, unload=True):
         if force == False and self.dir == self.dirsave:
             l.LOGGER.warning("save dataset to loaded directory")
             confirm = input("press [enter] to continue")
         self.create_dirsave()
-        if self.train_set is not None:
+        if self.train_set is not None and unload is True:
             self.train_set.dump_input()
             self.train_set.unload_trace()
-        if self.attack_set is not None:
+        if self.attack_set is not None and unload is True:
             self.attack_set.dump_input()
             self.attack_set.unload_trace()
         with open(Dataset.get_path(self.dirsave), "wb") as f:
