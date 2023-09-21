@@ -152,6 +152,8 @@ function collect_one_set() {
                 continue
             fi
             cp /tmp/mirage_output_ltk $OUTPUT_WD/${i}_k.txt
+            echo "saved ks:"
+            ls $OUTPUT_WD/${i}_k.txt
         fi
         record
         if [[ $? == 1 ]]; then
@@ -165,8 +167,8 @@ function collect_one_set() {
         cp /tmp/bt_skd_0 $OUTPUT_WD/${i}_p.txt
         echo "saved traces:"
         ls $OUTPUT_WD/${i}_trace_nf.npy $OUTPUT_WD/${i}_trace_ff.npy
-        echo "saved metadata:"
-        ls $OUTPUT_WD/${i}_k.txt $OUTPUT_WD/${i}_p.txt
+        echo "saved pt:"
+        ls $OUTPUT_WD/${i}_p.txt
 
         if [[ $KEY_FIXED == 0 && $(( ($i+1) % 100 )) == 0 ]]; then
             echo "restart devices to prevent errors..."
