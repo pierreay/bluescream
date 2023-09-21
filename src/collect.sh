@@ -179,7 +179,7 @@ function collect_one_set() {
 
 sleep 5         # Be sure fstab mount our partitions.
 if [[ -z ${OUTPUT_WD_ROOT+x} ]]; then
-    export OUTPUT_WD_ROOT=$HOME/storage/screaming_channels_annex/tmp
+    export OUTPUT_WD_ROOT=$HOME/storage/screaming_channels_dataset/raw
 fi
 if [[ -z ${COLLECT_TRAINING_NB+x} ]]; then
     export COLLECT_TRAINING_NB=65536
