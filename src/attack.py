@@ -34,7 +34,6 @@ import binascii
 from binascii import unhexlify
 import math
 import statsmodels.api as sm
-from sklearn.feature_selection import mutual_info_classif
 
 # Configuration that applies to all attacks; set by the script entry point (cli()).
 # Plus other global variables
