@@ -51,11 +51,12 @@ def normalize(arr):
     assert(arr.dtype == np.float32 or arr.dtype == np.float64)
     return (arr - np.min(arr)) / (np.max(arr) - np.min(arr))
 
-def normalize_zscore(arr):
+def normalize_zscore(arr, set=False):
     """Normalize a trace using Z-Score normalization. Taken from load.py from
-    Screaming Channels."""
-    mu = np.average(arr)
-    std = np.std(arr)
+    Screaming Channels. If SET is set to TRUE, apply normalization on the
+    entire set instead of on each trace individually."""
+    mu = np.average(arr) if set is False else np.average(arr, axis=0)
+    std = np.std(arr) if set is False else np.std(arr, axis=0)
     if std != 0:
         arr = (arr - mu) / std
     return arr

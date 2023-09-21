@@ -10,130 +10,6 @@ import lib.filters as filters
 import lib.plot as libplot
 import lib.debug as debug
 
-# * load.py
-
-# Load all plaintexts and key(s) from the respective files
-def load_all(data_path, filename, number=0, fixed=False, hex=True):
-    if fixed == True:
-        filepath = path.join(data_path, filename)
-        with open(filepath, "r") as f:
-            data = f.readline()[:-1]
-    elif fixed == False:
-        data = ''
-        for i in list(range(0, number)):
-            filename_i = "{}_{}".format(i, filename)
-            filepath = path.join(data_path, filename_i)
-            with open(filepath, "r") as f:
-                tmp = f.readline()
-                if not hex:
-                    tmp = "{0:0{1}x}".format(int(tmp), 32)
-                data += "\n" + tmp
-                if data[len(data)-1] == '\n':
-                    data = data[0:len(data)-1]
-    if data[0] == "\n":
-        data = data[1:]
-    return [[int(c) for c in bytearray.fromhex(line)]
-            for line in data.split('\n')]
-
-# Per-trace pre-processing:
-# 1. z-score normalization
-def pre_process(trace, norm):
-    if norm:
-        mu = np.average(trace)
-        std = np.std(trace)
-        if std != 0:
-            trace = (trace - mu) / std
-    return trace
- 
-# Smart loading of the traces from files
-# 1. Discard empty traces (errors occurred during collection)
-# 1. Apply pre-processing techniques
-# 2. Keep all the traces in a batch or average them (if they were collected with
-#    the keep-all option. 
-def generic_load(data_path,name,number,wstart=0,wend=0, average=True,
-        norm=False, norm2=False, mimo=""):
-    """
-    Function that loads plainext, key(s), and (raw) traces.
-    """
-
-    empty = 0
-    if path.exists(path.join(data_path, "k.txt")):
-        fixed_key = True
-        fixed_plaintext = False
-    else:
-        fixed_key = False
-        fixed_plaintext = False
-    k = load_all(data_path, "k.txt", number, fixed = fixed_key, hex=True)
-    #print(k)
-    p = load_all(data_path, "p.txt", number, fixed = False,     hex=False)
-    #print(p)
-    #exit(0)
-    
-    plaintexts = []
-    keys = []
-    traces = []
-
-    if mimo != "":
-        name = name + "_" + mimo
- 
-    for i in range(number):
-        # read average or raw traces from file
-        raw_traces = np.load(
-                path.join(data_path, 'avg_%s_%d.npy' % (name, i))
-        )
-
-        if np.shape(raw_traces) == () or not raw_traces.any():
-            # print "empty trace", empty
-            empty += 1
-            continue
-
-        # if average, transform into array with one element
-        # if len(np.shape(raw_traces)) == 1:
-        raw_traces = [raw_traces]
-
-        if wend != 0:
-            raw_traces = np.asarray(raw_traces)[:,wstart:wend]
-
-        if average:
-            # if raw_traces[0].all() == 0:
-                # continue
-            # print type(raw_traces)
-            avg = np.average(raw_traces, axis=0)
-            avg = pre_process(avg, norm)
-            traces.append(avg)
-            if fixed_plaintext:
-                plaintexts.append(p[0])
-            else:
-                plaintexts.append(p[i])
-            if fixed_key:
-                keys.append(k[0])
-            else:
-                keys.append(k[i])
-        else:
-            # iterate over traces
-            for trace in raw_traces:
-                if trace.all() == 0:
-                    continue
-                trace = pre_process(trace, norm)
-                traces.append(trace)
-                plaintexts.append(p[i])
-                if fixed_key:
-                    keys.append(k[0])
-                else:
-                    keys.append(k[i])
-    
-    traces = np.asarray(traces)
-
-    # Apply z-score normalization on the set
-    if norm2:
-        mu = np.average(traces, axis=0)
-        std = np.std(traces, axis=0)
-        traces = (traces - mu) / std
-
-    return fixed_key, plaintexts, keys, traces
-
-# * attack.py
-
 SMALL_SIZE = 8*4
 MEDIUM_SIZE = 10*4
 BIGGER_SIZE = 12*4
@@ -256,9 +132,7 @@ def cli(data_path, num_traces, start_point, end_point, plot, save_images, wait, 
     KEYFILE = path.join(data_path, 'key_%s.txt' % name)
     DATAPATH = data_path
 
-    # Old generic load function used in Screaming Channels:
-    #FIXED_KEY, PLAINTEXTS, KEYS, TRACES = generic_load(data_path, name, num_traces, start_point, end_point, average, norm, norm2, mimo)
-    # Where:
+    # The original generic_load() function used in Screaming Channels implies that:
     # - FIXED_KEY should be a bool.
     # - PLAINTEXTS and KEYS should be a list of list of int read from hex
     #   reprensentation using bit stream order (from left to right).
@@ -272,10 +146,10 @@ def cli(data_path, num_traces, start_point, end_point, plot, save_images, wait, 
     KEYS, PLAINTEXTS, TRACES_NF, TRACES_FF = load.reduce_entry_all_dataset(KEYS, PLAINTEXTS, TRACES_NF, TRACES_FF, num_traces)
     TRACES                                 = load.truncate(TRACES_FF, start_point, end_point)
     TRACES                                 = analyze.get_amplitude(TRACES)
-    TRACES                                 = analyze.normalize_zscore(TRACES)
+    if norm or norm2:
+        TRACES = analyze.normalize_zscore(TRACES, norm2)
     PLAINTEXTS                             = PLAINTEXTS.tolist()
     KEYS                                   = KEYS.tolist()
-    print("[+] old generic_load() replacement finished!")
     assert(isinstance(PLAINTEXTS, list))
     assert(isinstance(KEYS, list))
     assert(isinstance(TRACES, np.ndarray))
@@ -289,7 +163,7 @@ def cli(data_path, num_traces, start_point, end_point, plot, save_images, wait, 
     KEYS = np.asarray(KEYS)
     CIPHERTEXTS = np.asarray(CIPHERTEXTS)
 
-# ** CCS18 UTILS (from ChipWhisper)
+# * CCS18 UTILS (from ChipWhisper)
 
 def cov(x, y):
     # Find the covariance between two 1D lists (x and y).
@@ -343,7 +217,7 @@ def print_result(bestguess,knownkey,pge):
     print("")
     print("NUMBER OF CORRECT BYTES: %d"%tot)
 
-# ** CHES20 UTILS
+# * CHES20 UTILS
 
 # Compute the leak variable starting from the plaintext and key.
 # Set CLASSES to list of all possibles values of leak variable.
@@ -1048,9 +922,9 @@ def bruteforce(bit_bound_end):
         bins, bit_bound_start, bit_bound_end)
 
 
-# ** CHES20 ATTACKS
+# * CHES20 ATTACKS
 
-# *** Profiled template creation
+# ** Profiled template creation
 @cli.command()
 @click.option("--variable", default="hw_sbox_out", show_default=True,
               help="Variable to attack (hw_sbox_out, hw_p_xor_k, sbox_out, p_xor_k, p, hd)")
@@ -1103,7 +977,7 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
 
     profile_exec(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir, template_dir)
 
-# *** Profiled correlation and template attacks
+# ** Profiled correlation and template attacks
 
 @cli.command()
 @click.option("--variable", default="hw_sbox_out", show_default=True,
@@ -1163,9 +1037,9 @@ def attack(variable, pois_algo, num_pois, poi_spacing, template_dir,
         bruteforce(BIT_BOUND_END)
 
 
-# ** CCS18 ATTACKS, but with new load and new bruteforce
+# * CCS18 ATTACKS, but with new load and new bruteforce
 
-# *** Template Radio Analysis (TRA)
+# ** Template Radio Analysis (TRA)
 
 @cli.command()
 @click.argument("template_dir", type=click.Path(file_okay=False, writable=True))
@@ -1366,7 +1240,7 @@ def tra_attack(template_dir):
     if BRUTEFORCE and not (bestguess == KEYS[0]).all():
         bruteforce(BIT_BOUND_END)
 
-# *** Correlation Radio Analysis (CRA)
+# ** Correlation Radio Analysis (CRA)
 
 @cli.command()
 def cra():
