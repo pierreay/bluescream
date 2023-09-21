@@ -14,7 +14,7 @@ import lib.log as l
 
 # * Global variables
 
-# Format for current recording used in collect.py
+# Format for current recording used in radio.py
 
 # Format: radio_index [0 | 1] ; recording_index [0 .. n]
 REC_RAW_FILENAME="raw_{}_{}.npy"

@@ -61,7 +61,7 @@ function pair() {
 }
 
 function record() {
-    timeout 30 python3 ./collect.py record "$DE_VICTIM_ADDR" "$DE_REC_FREQ_NF" "$DE_REC_FREQ_FF" "$DE_REC_SAMP_RATE"
+    timeout 30 python3 ./radio.py record "$DE_VICTIM_ADDR" "$DE_REC_FREQ_NF" "$DE_REC_FREQ_FF" "$DE_REC_SAMP_RATE"
     if [[ $? -ge 1 ]]; then
         return 1
     fi
@@ -157,7 +157,7 @@ function collect_one_set() {
             i=$(( $i - 1 ))
             continue
         fi
-        python3 ./collect.py extract "$DE_REC_SAMP_RATE" --no-plot --overwrite --window 0.15 --offset 0.04
+        python3 ./radio.py extract "$DE_REC_SAMP_RATE" --no-plot --overwrite --window 0.15 --offset 0.04
         cp /tmp/raw_0_0.npy $OUTPUT_WD/${i}_trace_nf.npy
         cp /tmp/raw_1_0.npy $OUTPUT_WD/${i}_trace_ff.npy
         cp /tmp/bt_skd_0 $OUTPUT_WD/${i}_p.txt

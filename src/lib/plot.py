@@ -78,7 +78,7 @@ def plot_time_compare_n(arr):
 def plot_time_spec_share_nf_ff(nf, ff, samp_rate, peaks=None, triggers=None):
     """Screaming Channels templating main plot, displaying NF and FF recordings
     (each one being a 1D np.array). Originaly taken from "plot" subcommand of
-    "collect.py".
+    "radio.py".
 
     """
     SUBPLOT_NB = 4 if ff is not None else 2
