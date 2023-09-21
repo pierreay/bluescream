@@ -45,13 +45,17 @@ function ykush_reset() {
     echo
     echo "=========== YKUSH RESET ==========="
     echo
-    echo "power off ykush..."
-    sudo ykushcmd -d a
-    sleep 10 # Wait for shutdown.
-    echo "power on ykush..."
-    sudo ykushcmd -u a
+    if [[ $FW_MODE == "train" ]]; then
+        echo "power off ykush..."
+        sudo ykushcmd -d a
+        sleep 10 # Wait for shutdown.
+        echo "power on ykush..."
+        sudo ykushcmd -u a
+    else
+        echo "disabled for attack mode, otherwise pairing is lost..."
+    fi
     sleep 20 # Wait for power-up and booting.
-}
+    }
 
 function pair() {
     timeout 30 ./utils/mirage_pair.sh "$DE_VICTIM_ADDR" | tee /tmp/mirage_pair_output
