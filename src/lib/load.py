@@ -120,6 +120,9 @@ def load_raw_input(data_path, filename, number, fixed=False, hex=True):
     np.save("{}/k.npy".format(outdir), k)
     np.save("{}/p.npy".format(outdir), p)
 
+    History: This is a modified, improved and adapted version of the
+    load.py/load_all() function of the original Screaming Channels poc.
+
     """    
     assert(number > 0)
     l.LOGGER.info("load all {}".format(filename))
