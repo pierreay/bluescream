@@ -105,12 +105,14 @@ class Dataset():
             l.LOGGER.warning("save dataset to loaded directory")
             confirm = input("press [enter] to continue")
         self.create_dirsave()
-        if self.train_set is not None and unload is True:
-            self.train_set.dump_input()
-            self.train_set.unload_trace()
-        if self.attack_set is not None and unload is True:
-            self.attack_set.dump_input()
-            self.attack_set.unload_trace()
+        if self.train_set is not None:
+            self.train_set.dump_input(unload=unload)
+            if unload is True:
+                self.train_set.unload_trace()
+        if self.attack_set is not None:
+            self.attack_set.dump_input(unload=unload)
+            if unload is True:
+                self.attack_set.unload_trace()
         with open(self.get_path(save=True), "wb") as f:
              pickle.dump(self, f)
 
@@ -223,14 +225,18 @@ class Subset():
             self.pt = load.load_plaintexts(self.get_path())
             self.ks = load.load_keys(self.get_path())
 
-    def dump_input(self):
+    def dump_input(self, unload=True):
         assert(path.exists(self.get_path()))
         if self.pt is not None:
             load.save_plaintexts(self.get_path(save=True), self.pt)
-            self.pt = None
+            if unload is True:
+                del self.pt
+                self.pt = None
         if self.ks is not None:
             load.save_keys(self.get_path(save=True), self.ks)
-            self.ks = None
+            if unload is True:
+                del self.ks
+                self.ks = None
 
     def prune_input(self, save=False):
         self.ks = load.prune_entry(self.ks, range(self.get_nb_trace_ondisk(save=save), len(self.ks)))
