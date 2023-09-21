@@ -14,3 +14,7 @@ function select_hci() {
 function find_hci() {
     hciconfig | head -n 1 | cut -f 1 -d ":"
 }
+
+function find_nrf_com() {
+     nrfjprog --com | cut - -d " " -f 5
+}

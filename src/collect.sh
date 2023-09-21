@@ -1,5 +1,7 @@
 #!/bin/bash
 
+source ./lib/misc.sh
+
 # Source the project environment for following variables:
 # - DE_VICTIM_ADDR
 # - DE_ATTACK_HCI
@@ -9,6 +11,19 @@
 # Disable sourcing of the environment because it should not allows to modify
 # environment variable from the terminal.
 # source ../.envrc
+
+# * Firmware
+
+# Usage: firmware_set_mode [train | attack]
+function firmware_set_mode() {
+    script=/tmp/script.minicom
+    cat << EOF > $script
+send mode_$1
+! killall -9 minicom
+EOF
+    minicom -D $(find_nrf_com) -S $script >/dev/null 2>&1 &
+    sleep 1
+}
 
 # * Subset
 
@@ -196,6 +211,7 @@ export KEY_FIXED=0
 echo
 echo "=========== Training set ==========="
 echo
+firmware_set_mode train
 collect_one_set # 1
 
 # ** Attack subset
@@ -206,4 +222,5 @@ export KEY_FIXED=1
 echo
 echo "=========== Attack set ==========="
 echo
+firmware_set_mode attack
 collect_one_set # 1
