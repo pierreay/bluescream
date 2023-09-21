@@ -200,7 +200,8 @@ export KEY_FIXED=0
 echo
 echo "=========== Training set ==========="
 echo
-firmware_set_mode train
+export FW_MODE=train
+firmware_set_mode $FW_MODE >/dev/null 2>&1
 collect_one_set # 1
 
 # ** Attack subset
@@ -211,5 +212,6 @@ export KEY_FIXED=1
 echo
 echo "=========== Attack set ==========="
 echo
-firmware_set_mode attack
+export FW_MODE=attack
+firmware_set_mode $FW_MODE >/dev/null 2>&1
 collect_one_set # 1
