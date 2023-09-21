@@ -94,7 +94,7 @@ def extract(samp_rate, plot, overwrite, window, offset):
     # * Trigger(s) configuration.
     trg_bp_low          = [9.0e6, 4.5e6]
     trg_bp_high         = [9.4e6, 6.8e6]
-    trg_lp              = 1e3
+    trg_lp              = 0.75e3
     trg_peak_prominence = 3/4
     l.LOGGER.debug("peak search prominence={}".format(trg_peak_prominence))
 
