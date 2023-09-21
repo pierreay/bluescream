@@ -161,7 +161,11 @@ function collect_one_set() {
             i=$(( $i - 1 ))
             continue
         fi
-        python3 ./radio.py extract "$DE_REC_SAMP_RATE" --no-plot --overwrite --window 0.15 --offset 0.04
+        if [[ $FW_MODE == "train" ]]; then
+            ./radio.py extract $DE_REC_SAMP_RATE --window 0.2 --offset 0.00 --no-plot --overwrite
+        elif [[ $FW_MODE == "attack" ]]; then
+            ./radio.py extract $DE_REC_SAMP_RATE --window 0.01 --offset 0.00 --no-plot --overwrite
+        fi
         cp /tmp/raw_0_0.npy $OUTPUT_WD/${i}_trace_nf.npy
         cp /tmp/raw_1_0.npy $OUTPUT_WD/${i}_trace_ff.npy
         cp /tmp/bt_skd_0 $OUTPUT_WD/${i}_p.txt
