@@ -377,7 +377,10 @@ def estimate_rf_pf(fold):
     global RF, PF
     for bnum in range(NUM_KEY_BYTES):
         for i in range(len(TRACES[0])):
-            r,p = pearsonr(TRACES_TEST[:, i], MEANS_TEST[bnum][:, i])
+            x = TRACES_TEST[:, i]
+            y = MEANS_TEST[bnum][:, i]
+            assert not analyze.is_nan(x) and not analyze.is_nan(y), "no NAN should be contained in pearsonr() args! try to {de,in}crease num_traces variable"
+            r, p = pearsonr(x, y)
             RF[bnum][fold][i] = r
             PF[bnum][fold][i] = p
 

@@ -269,3 +269,8 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
     aligned   = analyze.align_all(extracted, sr, template_s, False)
     averaged  = analyze.average(aligned)
     return averaged, template_s
+
+def is_nan(arr):
+    """Return True if at least one NAN (not a number) is contained in ARR."""
+    test = np.isnan(arr)
+    return len(test[test == True]) >= 1
