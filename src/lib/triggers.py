@@ -48,4 +48,8 @@ class Trigger():
         self.signal = signal
 
     def __str__(self):
-        return "name={};bandpass_low={:.2e};bandpass_high={:.2e};lowpass={:.2e}".format(self.name, self.bandpass_low, self.bandpass_high, self.lowpass)
+        string = "name={}\n".format(self.name)
+        string += "- bandpass_low={:.2e}\n".format(self.bandpass_low)
+        string += "- bandpass_high={:.2e}\n".format(self.bandpass_high)
+        string += "- lowpass={:.2e}".format(self.lowpass)
+        return string
