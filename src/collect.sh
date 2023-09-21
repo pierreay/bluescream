@@ -10,7 +10,7 @@
 # environment variable from the terminal.
 # source ../.envrc
 
-# * collect_one_set.sh
+# * Subset
 
 # ** Functions
 
@@ -175,7 +175,7 @@ function collect_one_set() {
     display_time
 }
 
-# * collect.sh
+# * Dataset
 
 sleep 5         # Be sure fstab mount our partitions.
 if [[ -z ${OUTPUT_WD_ROOT+x} ]]; then
@@ -188,7 +188,7 @@ if [[ -z ${COLLECT_ATTACK_NB+x} ]]; then
     export COLLECT_ATTACK_NB=2048
 fi
 
-# ** Training set collection
+# ** Training subset
 
 export COLLECT_NB="$COLLECT_TRAINING_NB"
 export OUTPUT_WD="$OUTPUT_WD_ROOT/train"
@@ -198,7 +198,7 @@ echo "=========== Training set ==========="
 echo
 collect_one_set # 1
 
-# ** Attack set collection
+# ** Attack subset
 
 export COLLECT_NB="$COLLECT_ATTACK_NB"
 export OUTPUT_WD="$OUTPUT_WD_ROOT/attack"
