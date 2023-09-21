@@ -135,8 +135,8 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop):
     dset, sset = load_dataset_or_quit(indir, subset, outdir=outdir)
     # * Fetch template from previously saved dataset in case of resuming.
     if dset.get_savedir_dirty():
-        sset.template = dset.get_savedir_template(subset)
-        start = dset.get_savedir_dirty_idx()
+        dset.resume_from_savedir(subset)
+        start = dset.dirty_idx
         l.LOGGER.info("resume at trace {} using template from previous processing".format(start))
         l.LOGGER.debug("template shape={}".format(sset.template.shape))
     # Load traces one by one since traces containing multiple AES executions

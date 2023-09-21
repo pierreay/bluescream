@@ -27,6 +27,7 @@ class Dataset():
         self.attack_set = None
         self.dirty = False
         self.dirty_idx = 0
+        self.run_resumed = False
 
     def __str__(self):
         string = "dataset '{}':\n".format(self.name)
@@ -36,8 +37,7 @@ class Dataset():
         string += "- dirty: {}\n".format(self.dirty)
         string += "- dirty_idx: {}\n".format(self.dirty_idx)
         string += "- dirty_savedir: {}\n".format(self.get_savedir_dirty())
-        if self.get_savedir_dirty():
-            string += "- dirty_idx_savedir: {}\n".format(self.get_savedir_dirty_idx())
+        string += "- run_resumed: {}\n".format(self.run_resumed)
         if self.train_set is not None:
             string += str(self.train_set)
         if self.attack_set is not None:
@@ -65,10 +65,12 @@ class Dataset():
             pickled.train_set.load_input()
         if pickled.attack_set is not None:
             pickled.attack_set.load_input()
+        pickled.run_resumed = False
         return pickled
 
     def get_path(self, save=False):
         return Dataset.get_path_static(self.dir if save is False else self.dirsave)
+
     def set_dirsave(self, dirsave):
         """Set saving directory of current Dataset and create subdirectories. for
         registered Subset accordingly."""
@@ -91,14 +93,17 @@ class Dataset():
             return dset.dirty
         return False
 
-    def get_savedir_dirty_idx(self):
-        dset = Dataset.pickle_load(self.dirsave)
-        return dset.dirty_idx
-
-    def get_savedir_template(self, subset):
-        dset = Dataset.pickle_load(self.dirsave)
-        sset = dset.get_subset(subset)
-        return sset.template
+    def resume_from_savedir(self, subset=None):
+        assert(Dataset.is_pickable(self.dirsave))
+        dset_dirsave = Dataset.pickle_load(self.dirsave)
+        self.run_resumed = True
+        self.dirty = dset_dirsave.dirty
+        self.dirty_idx = dset_dirsave.dirty_idx
+        if subset is not None:
+            sset = self.get_subset(subset)
+            sset_dirsave = dset_dirsave.get_subset(subset)
+            sset.template = sset_dirsave.template
+            sset.bad_entries = sset_dirsave.bad_entries
 
     def pickle_dump(self, force=False, unload=True):
         if force == False and self.dir == self.dirsave:
