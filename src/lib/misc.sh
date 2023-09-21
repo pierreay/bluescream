@@ -27,5 +27,5 @@ send mode_$1
 ! killall -9 minicom
 EOF
     minicom -D $(find_nrf_com) -S $script >/dev/null 2>&1 &
-    sleep 1
+    sleep 3
 }
