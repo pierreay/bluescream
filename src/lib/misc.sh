@@ -19,7 +19,7 @@ function find_nrf_com() {
      nrfjprog --com | cut - -d " " -f 5
 }
 
-# Usage: firmware_set_mode [train | attack]
+# Usage: firmware_set_mode [train | attack] >/dev/null 2>&1
 function firmware_set_mode() {
     script=/tmp/script.minicom
     cat << EOF > $script
