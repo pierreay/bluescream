@@ -85,8 +85,15 @@ def reduce_entry_all_dataset(ks, pt, nf, ff, nb=0):
     """Remove entries above NB for the entire dataset, hence containing NB
     entries. Set to 0 for maximum traces."""
     nb = len(ks) if nb == 0 else nb
-    return (prune_entry(ks, range(nb, len(ks))), prune_entry(pt, range(nb, len(ks))),
-            prune_entry(nf, range(nb, len(ks))), prune_entry(ff, range(nb, len(ks))))
+    if ks is not None:
+        ks = prune_entry(ks, range(nb, len(ks)))
+    if pt is not None:
+        pt = prune_entry(pt, range(nb, len(pt)))
+    if nf is not None:
+        nf = prune_entry(nf, range(nb, len(nf)))
+    if ff is not None:
+        ff = prune_entry(ff, range(nb, len(ff)))
+    return ks, pt, nf, ff
 
 # * Metadata
 
