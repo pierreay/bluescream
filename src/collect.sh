@@ -12,19 +12,6 @@ source ./lib/misc.sh
 # environment variable from the terminal.
 # source ../.envrc
 
-# * Firmware
-
-# Usage: firmware_set_mode [train | attack]
-function firmware_set_mode() {
-    script=/tmp/script.minicom
-    cat << EOF > $script
-send mode_$1
-! killall -9 minicom
-EOF
-    minicom -D $(find_nrf_com) -S $script >/dev/null 2>&1 &
-    sleep 1
-}
-
 # * Subset
 
 # ** Functions

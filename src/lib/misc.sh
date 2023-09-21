@@ -18,3 +18,14 @@ function find_hci() {
 function find_nrf_com() {
      nrfjprog --com | cut - -d " " -f 5
 }
+
+# Usage: firmware_set_mode [train | attack]
+function firmware_set_mode() {
+    script=/tmp/script.minicom
+    cat << EOF > $script
+send mode_$1
+! killall -9 minicom
+EOF
+    minicom -D $(find_nrf_com) -S $script >/dev/null 2>&1 &
+    sleep 1
+}
