@@ -45,18 +45,18 @@ class Dataset():
         return string
 
     @staticmethod
-    def get_path(dir):
+    def get_path_static(dir):
         return path.join(dir, Dataset.FILENAME)
 
     @staticmethod
     def is_pickable(dir):
-        return path.exists(Dataset.get_path(dir))
+        return path.exists(Dataset.get_path_static(dir))
 
     @staticmethod
     def pickle_load(dir):
-        if not path.exists(Dataset.get_path(dir)):
+        if not Dataset.is_pickable(dir):
             return None
-        with open(Dataset.get_path(dir), "rb") as f:
+        with open(Dataset.get_path_static(dir), "rb") as f:
             pickled = pickle.load(f)
             assert(type(pickled) == Dataset)
             pickled.dir = dir     # Update Dataset.dir (self.dir) when pickling.
@@ -67,6 +67,8 @@ class Dataset():
             pickled.attack_set.load_input()
         return pickled
 
+    def get_path(self, save=False):
+        return Dataset.get_path_static(self.dir if save is False else self.dirsave)
     def set_dirsave(self, dirsave):
         """Set saving directory of current Dataset and create subdirectories. for
         registered Subset accordingly."""
@@ -109,7 +111,7 @@ class Dataset():
         if self.attack_set is not None and unload is True:
             self.attack_set.dump_input()
             self.attack_set.unload_trace()
-        with open(Dataset.get_path(self.dirsave), "wb") as f:
+        with open(self.get_path(save=True), "wb") as f:
              pickle.dump(self, f)
 
     def add_subset(self, name, subtype, input_gen, nb_trace_wanted=0):
@@ -284,7 +286,7 @@ class Subset():
     def __str__(self):
         string = "subset '{}':\n".format(self.name)
         string += "- dir: {}\n".format(self.dir)
-        string += "- get_path(): {}\n".format(self.get_path())
+        string += "- get_path(save=False): {}\n".format(self.get_path(save=False))
         string += "- get_path(save=True): {}\n".format(self.get_path(save=True))
         if self.nf is not None:
             assert(type(self.nf) == np.ndarray)

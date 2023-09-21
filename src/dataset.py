@@ -61,7 +61,7 @@ def init(outdir, samp_rate, input_gen_init, nb_trace_wanted_train, nb_trace_want
         dset.add_subset("train", dataset.SubsetType.TRAIN, input_gen, nb_trace_wanted=nb_trace_wanted_train)
         dset.add_subset("attack", dataset.SubsetType.ATTACK, input_gen, nb_trace_wanted=nb_trace_wanted_attack)
         dset.pickle_dump(force=True)
-        l.LOGGER.info("save dataset in {}".format(dataset.Dataset.get_path(outdir)))
+        l.LOGGER.info("save dataset in {}".format(dset.get_path(save=True)))
     else:
         l.LOGGER.error("{} doesn't exists!".format(indir))
         return 1
