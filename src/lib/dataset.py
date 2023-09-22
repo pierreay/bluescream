@@ -151,7 +151,7 @@ class Dataset():
             elif id == SubsetType.ATTACK:
                 return self.attack_set
 
-    def get_profile():
+    def get_profile(self):
         # Can be None.
         return self.profile
 
@@ -356,7 +356,7 @@ class Profile():
 
     # Store useful information about the profile, to be used for comparing profiles,
     # or for profiled correlation and template attacks.
-    def save():
+    def save(self):
         assert(path.exists(self.dataset.dir))
         os.makedirs(self.get_path(), exist_ok=True)
         np.save(path.join(self.get_path(), Profile.POIS_FN), self.POIS)
@@ -368,7 +368,7 @@ class Profile():
         np.save(path.join(self.get_path(), Profile.PROFILE_MEAN_TRACE_FN), self.PROFILE_MEAN_TRACE)
 
     # Load the profile, for comparison or for attacks.
-    def load():
+    def load(self):
         self.POIS               = np.load(path.join(self.get_path(), Profile.POIS_FN), POIS)
         self.PROFILE_RS         = np.load(path.join(self.get_path(), Profile.PROFILE_RS_FN), PROFILE_RS)
         self.PROFILE_RZS        = np.load(path.join(self.get_path(), Profile.PROFILE_RZS_FN), PROFILE_RZS)
@@ -378,11 +378,11 @@ class Profile():
         self.PROFILE_MEAN_TRACE = np.load(path.join(self.get_path(), Profile.PROFILE_MEAN_TRACE_FN), PROFILE_MEAN_TRACE)
    
     def __str__(self):
-        string = "profile '{}':\n".format(self.name)
+        string = "profile:\n"
         string += "- dir: {}\n".format(self.dir)
         string += "- get_path(): {}\n".format(self.get_path())
         if self.POIS is not None:
             string += "- pois shape: {}\n".format(self.POIS.shape)
-        if self.PROFILE_MEANS_TRACE is not None:
-            string += "- profile trace shape: {}\n".format(self.PROFILE_MEANS_TRACE.shape)
+        if self.PROFILE_MEAN_TRACE is not None:
+            string += "- profile trace shape: {}\n".format(self.PROFILE_MEAN_TRACE.shape)
         return string

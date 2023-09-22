@@ -38,6 +38,7 @@ import statsmodels.api as sm
 
 # Configuration that applies to all attacks; set by the script entry point (cli()).
 # Plus other global variables
+DATASET_PATH = None
 DATASET = None
 SUBSET = None
 NUM_TRACES = None
@@ -90,14 +91,14 @@ def load_data(subset):
     # - TRACES should be a 2D np.array of shape (num_traces, num_samples) of dtype=float32 (magnitude).
     # - TRACES should be normalized with zcore if --norm is given.
     # - TRACES should be truncated according to start_point and end_point.
-    DATASET = dataset.Dataset.pickle_load(dataset_path)
+    DATASET = dataset.Dataset.pickle_load(DATASET_PATH)
     assert(DATASET)
-    DATASET.load_trace()
     SUBSET = DATASET.get_subset(subset)
+    SUBSET.load_trace()
     PROFILE = DATASET.get_profile()
     PLAINTEXTS                  = SUBSET.pt
     KEYS                        = SUBSET.ks
-    FIXED_KEY                   = load.is_key_fixed(DATASET.get_path())
+    FIXED_KEY                   = load.is_key_fixed(SUBSET.get_path())
     TRACES                      = SUBSET.ff
     KEYS, PLAINTEXTS, _, TRACES = load.reduce_entry_all_dataset(KEYS, PLAINTEXTS, None, TRACES, NUM_TRACES)
     PLAINTEXTS                  = PLAINTEXTS.tolist()
@@ -156,7 +157,7 @@ def cli(dataset_path, num_traces, start_point, end_point, plot, save_images, wai
     apply to all attacks; see the individual attacks' documentation for
     attack-specific options.
     """
-    global SAVE_IMAGES, PLOT, GWAIT, NUM_KEY_BYTES, BRUTEFORCE, BIT_BOUND_END, NUM_TRACES, START_POINT, END_POINT, NORM, NORM2
+    global SAVE_IMAGES, PLOT, GWAIT, NUM_KEY_BYTES, BRUTEFORCE, BIT_BOUND_END, NUM_TRACES, START_POINT, END_POINT, NORM, NORM2, DATASET_PATH
     SAVE_IMAGES = save_images
     PLOT = plot
     GWAIT = wait
@@ -170,6 +171,7 @@ def cli(dataset_path, num_traces, start_point, end_point, plot, save_images, wai
     END_POINT = end_point
     NORM = norm
     NORM2 = norm2
+    DATASET_PATH = dataset_path
 
 # * CCS18 UTILS (from ChipWhisper)
 
@@ -639,7 +641,7 @@ def build_profile(variable, template_dir='.'):
 # the measured traces, compare it with the profile estimated for each possible
 # value of the leak variable, and then store it as a profile
 def fit(lr_type, variable):
-    global PROFILE_BETAS, PROFILE.PROFILE_MEANS_FIT, PROFILE.PROFILE_MEANS
+    global PROFILE_BETAS, PROFILE
     num_pois = len(PROFILE.POIS[0])
 
     if lr_type:
@@ -940,6 +942,7 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
         PROFILE.save()
 
     profile_exec(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir)
+    DATASET.pickle_dump(force=True) # Include profile inside DATASET pickled file.
 
 # ** Profiled correlation and template attacks
 
