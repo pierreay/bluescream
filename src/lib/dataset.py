@@ -25,6 +25,7 @@ class Dataset():
         self.samp_rate = samp_rate
         self.train_set = None
         self.attack_set = None
+        self.profile = None
         self.dirty = False
         self.dirty_idx = 0
         self.run_resumed = False
@@ -42,6 +43,8 @@ class Dataset():
             string += str(self.train_set)
         if self.attack_set is not None:
             string += str(self.attack_set)
+        if self.profile is not None:
+            string += str(self.profile)
         return string
 
     @staticmethod
@@ -129,6 +132,9 @@ class Dataset():
         elif subtype == SubsetType.ATTACK:
             self.attack_set = subset
 
+    def add_profile(self):
+        self.profile = Profile(self)
+
     def get_subset(self, id):
         """Return a subset. ID can be a string representing the name of the
         subset, or a SubsetType representing the type of the subset.
@@ -144,6 +150,10 @@ class Dataset():
                 return self.train_set
             elif id == SubsetType.ATTACK:
                 return self.attack_set
+
+    def get_profile():
+        # Can be None.
+        return self.profile
 
 class Subset():
     """Train or attack subset."""
