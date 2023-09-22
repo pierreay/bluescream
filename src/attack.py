@@ -38,6 +38,13 @@ import statsmodels.api as sm
 
 # Configuration that applies to all attacks; set by the script entry point (cli()).
 # Plus other global variables
+DATASET = None
+SUBSET = None
+NUM_TRACES = None
+START_POINT = None
+END_POINT = None
+NORM = None
+NORM2 = None
 PLOT = None
 SAVE_IMAGES = None
 NUM_KEY_BYTES = None
@@ -49,7 +56,6 @@ CIPHERTEXTS = None
 FIXED_KEY = None
 FIXED_PLAINTEXT = None
 TRACES = None
-KEYFILE = None
 VARIABLES = None
 VARIABLE_FUNC = None
 CLASSES = None
@@ -71,9 +77,48 @@ TRACES_TEST = None
 TRACES_PROFILE = None
 LOG_PROBA = None
 
+def load_data(subset):
+    """Load the data (keys, plaintexts, traces) into global variables. Must be
+    called at the beginning of each @cli.command().
+
+    """
+    global DATASET, SUBSET, PLAINTEXTS, KEYS, FIXED_KEY, TRACES, CIPHERTEXTS, NUM_TRACES, START_POINT, END_POINT, NORM, NORM2
+    # The original generic_load() function used in Screaming Channels implies that:
+    # - FIXED_KEY should be a bool.
+    # - PLAINTEXTS and KEYS should be a list of list of int read from hex
+    #   reprensentation using bit stream order (from left to right).
+    # - TRACES should be a 2D np.array of shape (num_traces, num_samples) of dtype=float32 (magnitude).
+    # - TRACES should be normalized with zcore if --norm is given.
+    # - TRACES should be truncated according to start_point and end_point.
+    DATASET = dataset.Dataset.pickle_load(dataset_path)
+    assert(DATASET)
+    DATASET.load_trace()
+    SUBSET = DATASET.get_subset(subset)
+    PROFILE = DATASET.get_profile()
+    PLAINTEXTS                  = SUBSET.pt
+    KEYS                        = SUBSET.ks
+    FIXED_KEY                   = load.is_key_fixed(DATASET.get_path())
+    TRACES                      = SUBSET.ff
+    KEYS, PLAINTEXTS, _, TRACES = load.reduce_entry_all_dataset(KEYS, PLAINTEXTS, None, TRACES, NUM_TRACES)
+    PLAINTEXTS                  = PLAINTEXTS.tolist()
+    KEYS                        = KEYS.tolist()
+    TRACES                      = load.truncate(TRACES, START_POINT, END_POINT)
+    TRACES                      = analyze.get_amplitude(TRACES)
+    if NORM or NORM2:
+        TRACES = analyze.normalize_zscore(TRACES, NORM2)
+    assert(isinstance(PLAINTEXTS, list))
+    assert(isinstance(KEYS, list))
+    assert(isinstance(TRACES, np.ndarray))
+    assert(TRACES.dtype == np.float32)
+    assert(FIXED_KEY == False or FIXED_KEY == True)
+    CIPHERTEXTS = list(map(aes, PLAINTEXTS, KEYS))
+    PLAINTEXTS = np.asarray(PLAINTEXTS)
+    KEYS = np.asarray(KEYS)
+    CIPHERTEXTS = np.asarray(CIPHERTEXTS)
+
 @click.group()
-@click.option("--data-path", type=click.Path(exists=True, file_okay=False),
-              help="Directory where the traces are stored.")
+@click.option("--dataset-path", type=click.Path(exists=True, file_okay=False),
+              help="Directory containing a dataset.")
 @click.option("--name", default="",
               help="Identifier of the experiment (obsolete; only for compatibility).")
 @click.option("--num-traces", default=0, show_default=True,
@@ -102,7 +147,7 @@ LOG_PROBA = None
               help="Normalize each trace set: traces = (traces-avg(traces))/std(traces).")
 @click.option("--mimo", default="",
               help="Choose ch1, ch2, eg, or mr")
-def cli(data_path, num_traces, start_point, end_point, plot, save_images, wait, num_key_bytes,
+def cli(dataset_path, num_traces, start_point, end_point, plot, save_images, wait, num_key_bytes,
         bruteforce, bit_bound_end, name, average, norm, norm2, mimo):
     """
     Run an attack against previously collected traces.
@@ -111,8 +156,7 @@ def cli(data_path, num_traces, start_point, end_point, plot, save_images, wait, 
     apply to all attacks; see the individual attacks' documentation for
     attack-specific options.
     """
-    global PLOT, GWAIT, NUM_KEY_BYTES, BRUTEFORCE, BIT_BOUND_END, PLAINTEXTS, TRACES, KEYFILE, DATAPATH
-    global KEYS, FIXED_KEY, SAVE_IMAGES, CIPHERTEXTS
+    global SAVE_IMAGES, PLOT, GWAIT, NUM_KEY_BYTES, BRUTEFORCE, BIT_BOUND_END, NUM_TRACES, START_POINT, END_POINT, NORM, NORM2
     SAVE_IMAGES = save_images
     PLOT = plot
     GWAIT = wait
@@ -121,39 +165,11 @@ def cli(data_path, num_traces, start_point, end_point, plot, save_images, wait, 
         raise Exception("Bruteforce not available for num_key_bytes != 16")
     BRUTEFORCE = bruteforce
     BIT_BOUND_END = bit_bound_end
-    KEYFILE = path.join(data_path, 'key_%s.txt' % name)
-    DATAPATH = data_path
-
-    # The original generic_load() function used in Screaming Channels implies that:
-    # - FIXED_KEY should be a bool.
-    # - PLAINTEXTS and KEYS should be a list of list of int read from hex
-    #   reprensentation using bit stream order (from left to right).
-    # - TRACES should be a 2D np.array of shape (num_traces, num_samples) of dtype=float32 (magnitude).
-    # - TRACES should be normalized with zcore if --norm is given.
-    # - TRACES should be truncated according to start_point and end_point.
-    PLAINTEXTS                             = load.load_plaintexts(data_path)
-    KEYS                                   = load.load_keys(data_path)
-    FIXED_KEY                              = load.is_key_fixed(data_path)
-    TRACES_NF, TRACES_FF                   = load.load_all_traces(data_path)
-    KEYS, PLAINTEXTS, TRACES_NF, TRACES_FF = load.reduce_entry_all_dataset(KEYS, PLAINTEXTS, TRACES_NF, TRACES_FF, num_traces)
-    TRACES                                 = load.truncate(TRACES_FF, start_point, end_point)
-    TRACES                                 = analyze.get_amplitude(TRACES)
-    if norm or norm2:
-        TRACES = analyze.normalize_zscore(TRACES, norm2)
-    PLAINTEXTS                             = PLAINTEXTS.tolist()
-    KEYS                                   = KEYS.tolist()
-    assert(isinstance(PLAINTEXTS, list))
-    assert(isinstance(KEYS, list))
-    assert(isinstance(TRACES, np.ndarray))
-    assert(TRACES.dtype == np.float32)
-    assert(FIXED_KEY == False or FIXED_KEY == True)
-    
-    CIPHERTEXTS = list(map(aes, PLAINTEXTS, KEYS))
-
-    variable_func = None
-    PLAINTEXTS = np.asarray(PLAINTEXTS)
-    KEYS = np.asarray(KEYS)
-    CIPHERTEXTS = np.asarray(CIPHERTEXTS)
+    NUM_TRACES = num_traces
+    START_POINT = start_point
+    END_POINT = end_point
+    NORM = norm
+    NORM2 = norm2
 
 # * CCS18 UTILS (from ChipWhisper)
 
@@ -490,8 +506,6 @@ def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='.'):
         plt.subplots_adjust(hspace = 1) 
 
         plt.subplot(num_plots, 1, 1)
-        #plt.title("average trace (%s, %d traces)"%(DATAPATH,len(TRACES)))
-        #plt.title("average trace (%d traces)"%(len(TRACES)))
         plt.xlabel("samples")
         plt.ylabel("normalized\namplitude")
         plt.plot(np.average(TRACES, axis=0))
@@ -596,8 +610,6 @@ def build_profile(variable, template_dir='.'):
             for spine in list(plt.gca().spines.values()):
                     spine.set_visible(False)
 
-            #plt.title("Profiles (%s, %d traces, %s variable, %d classes, poi %d)"%(DATAPATH,
-            #    len(TRACES), variable, len(CLASSES), i))
             plt.title("Profile")
             plt.xlabel(variable)
             plt.ylabel("normalized amplitude")
@@ -898,29 +910,23 @@ def bruteforce(bit_bound_end):
               help="Minimum number of points between two points of interest.")
 @click.option("--pois-dir", default="", type=click.Path(file_okay=False, writable=True),
               help="Reduce the trace using the POIS in this folder")
-@click.argument("template_dir", type=click.Path(file_okay=False, writable=True))
-def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir, template_dir):
+def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir):
     """
     Build a template using a chosen technique.
 
     The template directory is where we store multiple files comprising the
     template; beware that existing files will be overwritten!
     """
-    global TRACES
+    global TRACES, PROFILE, DATASET
+    load_data(dataset.SubsetType.TRAIN)
+    DATASET.add_profile()
+    PROFILE = DATASET.get_profile()
 
     if pois_dir != "":
         pois = np.load(os.path.join(pois_dir, dataset.Profile.POIS_FN))
         TRACES = TRACES[:,np.sort(pois.flatten())]
 
-    try:
-        os.makedirs(template_dir)
-    except OSError:
-        # Checking the directory before attempting to create it leads to race
-        # conditions.
-        if not path.isdir(template_dir):
-            raise
-        
-    def profile_exec(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir, template_dir):
+    def profile_exec(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir):
         # Set VARIABLES.
         compute_variables(variable)
         # Set SETS.
@@ -928,12 +934,12 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
         # Set MEANS, VARS, STDS, PROFILE.PROFILE_MEAN_TRACE.
         estimate()
         # Set POIS.
-        find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir)
-        build_profile(variable, template_dir)
+        find_pois(pois_algo, k_fold, num_pois, poi_spacing)
+        build_profile(variable)
         fit(lr_type, variable)
-        # NEXT: Save the profile here.
+        PROFILE.save()
 
-    profile_exec(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir, template_dir)
+    profile_exec(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir)
 
 # ** Profiled correlation and template attacks
 
@@ -965,11 +971,12 @@ def attack(variable, pois_algo, num_pois, poi_spacing, template_dir,
     The template directory is where we store multiple files comprising the
     template.
     """
+    global PROFILE
+    load_data(dataset.SubsetType.ATTACK)
+    PROFILE.load()
     
     if not FIXED_KEY and variable != "hw_p" and variable != "p":
         raise Exception("This set DOES NOT use a FIXED KEY")
-
-    # NEXT: Load the profile here.
     
     if PLOT:
         plt.plot(PROFILE.POIS[:,0], np.average(TRACES, axis=0)[PROFILE.POIS[:,0]], '*')
@@ -1016,6 +1023,7 @@ def tra_create(template_dir, num_pois, poi_spacing):
     The template directory is where we store multiple files comprising the
     template; beware that existing files will be overwritten!
     """
+    load_data(dataset.SubsetType.TRAIN)
     try:
         os.makedirs(template_dir)
     except OSError:
@@ -1120,6 +1128,7 @@ def tra_attack(template_dir):
     location of a previously created template with compatible settings (e.g.
     same trace length).
     """
+    load_data(dataset.SubsetType.ATTACK)
     if GWAIT:
         print("Loading complete")
         input("Press any key to start")
@@ -1211,6 +1220,7 @@ def cra():
     power consumption of the SubBytes step in the first round of AES, using a
     Hamming-weight model.
     """
+    load_data(dataset.SubsetType.ATTACK)
     global LOG_PROBA
     LOG_PROBA = [[0 for r in range(256)] for bnum in range(NUM_KEY_BYTES)]
     
