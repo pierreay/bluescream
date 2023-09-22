@@ -338,10 +338,10 @@ class Profile():
     PROFILE_COVS_FN       = "PROFILE_COVS.npy"
     PROFILE_MEAN_TRACE_FN = "PROFILE_MEAN_TRACE.npy"
     
-    def __init__(self, dataset, subset):
-        self.dir = "profile"  # Fixed subdirectory.
-        self.dataset = datase # Parent.
-        self.subset = subset  # Parent.
+    def __init__(self, dataset):
+        self.dir = "profile"   # Fixed subdirectory.
+        self.dataset = dataset # Parent. Don't need to save the subset as the
+                               # subset is always train for a profile.
         # Profile data.
         self.POIS = None
         self.RS = None
@@ -352,16 +352,13 @@ class Profile():
         self.PROFILE_MEAN_TRACE = None
 
     def get_path(self, save=False):
-        """Return the full path of the subset. Must be dynamic since the full
-        path of the dataset can change since its creation when pickling it.
-
-        """
-        return path.join(self.dataset.dir if not save else self.dataset.dirsave, self.dir)
+        return path.join(self.dataset.dir, self.dir)
 
     # Store useful information about the profile, to be used for comparing profiles,
     # or for profiled correlation and template attacks.
     def save():
-        assert(path.exists(self.get_path()))
+        assert(path.exists(self.dataset.dir))
+        os.makedirs(self.get_path(), exist_ok=True)
         np.save(path.join(self.get_path(), Profile.POIS_FN), self.POIS)
         np.save(path.join(self.get_path(), Profile.RS_FN), self.RS)
         np.save(path.join(self.get_path(), Profile.RZS_FN), self.RZS)
@@ -379,3 +376,13 @@ class Profile():
         self.PROFILE_COVS       = np.load(path.join(self.get_path(), Profile.PROFILE_COVS_FN), PROFILE_COVS)
         self.PROFILE_STDS       = np.load(path.join(self.get_path(), Profile.PROFILE_STDS_FN), PROFILE_STDS)
         self.PROFILE_MEAN_TRACE = np.load(path.join(self.get_path(), Profile.PROFILE_MEAN_TRACE_FN), PROFILE_MEAN_TRACE)
+   
+    def __str__(self):
+        string = "profile '{}':\n".format(self.name)
+        string += "- dir: {}\n".format(self.dir)
+        string += "- get_path(): {}\n".format(self.get_path())
+        if self.POIS is not None:
+            string += "- pois shape: {}\n".format(self.POIS.shape)
+        if self.PROFILE_MEANS_TRACE is not None:
+            string += "- profile trace shape: {}\n".format(self.PROFILE_MEANS_TRACE.shape)
+        return string
