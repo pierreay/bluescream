@@ -4,6 +4,7 @@ import click
 import numpy as np
 from matplotlib import pyplot as plt
 
+import lib.dataset as dataset
 import lib.load as load
 import lib.analyze as analyze
 import lib.filters as filters
@@ -63,19 +64,11 @@ TTESTS = None
 PTTESTS = None
 CORRS = None
 SOADS = None
-RS = None
-RZS = None
+PROFILE = None
 PS = None
-POIS = None
 TRACES_REDUCED = None
 TRACES_TEST = None
 TRACES_PROFILE = None
-PROFILE_RS = None
-PROFILE_RZS = None
-PROFILE_MEANS = None
-PROFILE_COVS = None
-PROFILE_STDS = None
-PROFILE_MEAN_TRACE = None
 LOG_PROBA = None
 
 @click.group()
@@ -294,9 +287,8 @@ def classify():
 # subbytes, and the average trace for all traces
 def estimate():
     global MEANS, VARS, STDS
-    global PROFILE_MEAN_TRACE
 
-    PROFILE_MEAN_TRACE = np.average(TRACES, axis=0)
+    PROFILE.PROFILE_MEAN_TRACE = np.average(TRACES, axis=0)
     MEANS = np.zeros((NUM_KEY_BYTES, len(CLASSES), len(TRACES[0])))
     VARS = np.zeros((NUM_KEY_BYTES, len(CLASSES), len(TRACES[0])))
     STDS = np.zeros((NUM_KEY_BYTES, len(CLASSES), len(TRACES[0])))
@@ -386,22 +378,21 @@ def estimate_rf_pf(fold):
 
 # Average the results from k different choices of the test set among the k-folds
 def average_folds():
-    global RS, PS
-    RS = np.average(RF, axis=1)
+    global PS
+    PROFILE.RS = np.average(RF, axis=1)
     PS = np.average(PF, axis=1)
 
 # Compute rz as a measure of the significance of the result
 def compute_rzs():
-    global RZS
-    RZS = 0.5*np.log((1+RS)/(1-RS))
-    RZS = RZS * math.sqrt(len(TRACES)-3)
+    PROFILE.RZS = 0.5*np.log((1+PROFILE.RS)/(1-PROFILE.RS))
+    PROFILE.RZS = PROFILE.RZS * math.sqrt(len(TRACES)-3)
  
 # Estimate the k-fold r-test
 def estimate_r(k_fold):
-    global RS, RZS, PS
+    global PS
     global RF, PF
-    # RS = np.zeros((NUM_KEY_BYTES, len(TRACES[0])))
-    # RZS = np.zeros((NUM_KEY_BYTES, len(TRACES[0])))
+    # PROFILE.RS = np.zeros((NUM_KEY_BYTES, len(TRACES[0])))
+    # PROFILE.RZS = np.zeros((NUM_KEY_BYTES, len(TRACES[0])))
     PS = np.zeros((NUM_KEY_BYTES, len(TRACES[0])))
 
     RF = np.zeros((NUM_KEY_BYTES, k_fold, len(TRACES[0])))
@@ -443,13 +434,11 @@ def estimate_corr():
 # To find POIS, k-fold ro-test, t-test, signal to noise ratio (SNR), sum of
 # absolute differences (SOAD) can be used.
 def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='.'):
-    global POIS
     global SNRS, SOADS
-    global RZS, RS
     
-    RZS = np.zeros((NUM_KEY_BYTES, len(TRACES[0])))
-    RS = np.zeros((NUM_KEY_BYTES, len(TRACES[0])))
-    POIS = np.zeros((NUM_KEY_BYTES, num_pois), dtype=int)
+    PROFILE.RZS = np.zeros((NUM_KEY_BYTES, len(TRACES[0])))
+    PROFILE.RS = np.zeros((NUM_KEY_BYTES, len(TRACES[0])))
+    PROFILE.POIS = np.zeros((NUM_KEY_BYTES, num_pois), dtype=int)
 
     informative = np.zeros((NUM_KEY_BYTES, len(TRACES[0])))
     num_plots = 2
@@ -473,7 +462,7 @@ def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='.'):
         num_plots = 3
     elif pois_algo == "r":
         estimate_r(k_fold)
-        informative = RS
+        informative = PROFILE.RS
         num_plots = 4
         title = "%d-folded ro-test: r computed with PCC"%k_fold
         name = "r"
@@ -490,7 +479,7 @@ def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='.'):
         temp = np.array(informative[bnum])
         for i in range(num_pois):
             poi = np.argmax(temp)
-            POIS[bnum][i] = poi
+            PROFILE.POIS[bnum][i] = poi
             
             pmin = max(0, poi - poi_spacing)
             pmax = min(poi + poi_spacing, len(temp))
@@ -514,14 +503,14 @@ def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='.'):
         for i, snr in enumerate(informative):
             plt.plot(snr, label="subkey %d"%i)
         for bnum in range(NUM_KEY_BYTES):
-            plt.plot(POIS[bnum], informative[bnum][POIS[bnum]], '*')
+            plt.plot(PROFILE.POIS[bnum], informative[bnum][PROFILE.POIS[bnum]], '*')
 
         if pois_algo == "r":
             plt.subplot(num_plots, 1, 3)
             plt.title("%d-folded r-test: r_z = 0.5*ln((1+r)/(1-r)) / (1/sqrt(Ntrace-3))"%k_fold)
             plt.xlabel("samples")
             plt.ylabel("r_z")
-            for i, rz in enumerate(RZS):
+            for i, rz in enumerate(PROFILE.RZS):
                 plt.plot(rz)
             plt.axhline(y=5, label="5", color='green')
             plt.axhline(y=-5, label="-5", color='green')
@@ -575,34 +564,32 @@ def reduce_traces(num_pois, window=0):
     TRACES_REDUCED = np.zeros((NUM_KEY_BYTES, len(TRACES), num_pois))
     for bnum in range(NUM_KEY_BYTES):
         for i, trace in enumerate(TRACES):
-            # TRACES_REDUCED[bnum][i] = trace[POIS[bnum,0:num_pois]]
+            # TRACES_REDUCED[bnum][i] = trace[PROFILE.POIS[bnum,0:num_pois]]
             # find a good reference for the average
             for poi in range(num_pois):
-                start = POIS[bnum][poi]-window
-                end = POIS[bnum][poi]+window+1   
+                start = PROFILE.POIS[bnum][poi]-window
+                end = PROFILE.POIS[bnum][poi]+window+1   
                 TRACES_REDUCED[bnum][i][poi] = np.average(trace[start:end])
 
 # Estimate means, std, and covariance for each possible class
 def build_profile(variable, template_dir='.'):
-    global PROFILE_MEANS, PROFILE_COVS, PROFILE_STDS
-
-    num_pois = len(POIS[0])
+    num_pois = len(PROFILE.POIS[0])
     num_classes = len(CLASSES)
 
-    PROFILE_MEANS = np.zeros((NUM_KEY_BYTES, num_classes, num_pois))
-    PROFILE_STDS = np.zeros((NUM_KEY_BYTES, num_classes, num_pois))
-    PROFILE_COVS = np.zeros((NUM_KEY_BYTES, num_classes, num_pois, num_pois))
+    PROFILE.PROFILE_MEANS = np.zeros((NUM_KEY_BYTES, num_classes, num_pois))
+    PROFILE.PROFILE_STDS = np.zeros((NUM_KEY_BYTES, num_classes, num_pois))
+    PROFILE.PROFILE_COVS = np.zeros((NUM_KEY_BYTES, num_classes, num_pois, num_pois))
 
     for bnum in range(NUM_KEY_BYTES):
         for cla in CLASSES:
             for i in range(num_pois):
-                PROFILE_MEANS[bnum][cla][i] = MEANS[bnum][cla][POIS[bnum][i]]
-                PROFILE_STDS[bnum][cla][i] = STDS[bnum][cla][POIS[bnum][i]]
+                PROFILE.PROFILE_MEANS[bnum][cla][i] = MEANS[bnum][cla][PROFILE.POIS[bnum][i]]
+                PROFILE.PROFILE_STDS[bnum][cla][i] = STDS[bnum][cla][PROFILE.POIS[bnum][i]]
                 for j in range(num_pois):	
                     if(len(SETS[bnum][cla])>0):	
-                        PROFILE_COVS[bnum][cla][i][j] = cov(
-                                SETS[bnum][cla][:, POIS[bnum][i]],
-                                SETS[bnum][cla][:, POIS[bnum][j]])
+                        PROFILE.PROFILE_COVS[bnum][cla][i][j] = cov(
+                                SETS[bnum][cla][:, PROFILE.POIS[bnum][i]],
+                                SETS[bnum][cla][:, PROFILE.POIS[bnum][j]])
   
     if PLOT or SAVE_IMAGES:
         for i in range(num_pois):
@@ -617,15 +604,15 @@ def build_profile(variable, template_dir='.'):
  
             #for bnum in range(0,NUM_KEY_BYTES):
             #    for cla in range(0,256):
-            #        plt.errorbar(cla, PROFILE_MEANS[bnum][hw[cla], i],
-            #                yerr=PROFILE_STDS[bnum][hw[cla], i],
+            #        plt.errorbar(cla, PROFILE.PROFILE_MEANS[bnum][hw[cla], i],
+            #                yerr=PROFILE.PROFILE_STDS[bnum][hw[cla], i],
             #                fmt='--o',
             #                label="subkey %d"%bnum)
 
             for bnum in range(0,NUM_KEY_BYTES):
                 plt.errorbar(CLASSES,
-                             PROFILE_MEANS[bnum][:, i],
-                             yerr=PROFILE_STDS[bnum][:, i],
+                             PROFILE.PROFILE_MEANS[bnum][:, i],
+                             yerr=PROFILE.PROFILE_STDS[bnum][:, i],
                              fmt='--o',
                              label="subkey %d"%bnum)
             plt.legend(loc='upper right')
@@ -640,8 +627,8 @@ def build_profile(variable, template_dir='.'):
 # the measured traces, compare it with the profile estimated for each possible
 # value of the leak variable, and then store it as a profile
 def fit(lr_type, variable):
-    global PROFILE_BETAS, PROFILE_MEANS_FIT, PROFILE_MEANS
-    num_pois = len(POIS[0])
+    global PROFILE_BETAS, PROFILE.PROFILE_MEANS_FIT, PROFILE.PROFILE_MEANS
+    num_pois = len(PROFILE.POIS[0])
 
     if lr_type:
         if lr_type == "linear":
@@ -658,7 +645,7 @@ def fit(lr_type, variable):
         models = list(map(leak_func, VARIABLES[bnum]))
         models = sm.add_constant(models, prepend=False)
         for i in range(num_pois):
-            measures = TRACES[:, POIS[bnum][i]]
+            measures = TRACES[:, PROFILE.POIS[bnum][i]]
             params = sm.OLS(measures, models).fit().params
             PROFILE_BETAS[bnum][:, i] = params
 
@@ -706,8 +693,8 @@ def fit(lr_type, variable):
                          'r-',
                           label="fit")
             plt.errorbar(CLASSES,
-                         PROFILE_MEANS[0][:, i],
-                         yerr=PROFILE_STDS[bnum][:, i],
+                         PROFILE.PROFILE_MEANS[0][:, i],
+                         yerr=PROFILE.PROFILE_STDS[bnum][:, i],
                          fmt='g*',
                          label="profile")
             plt.legend(loc='upper right')
@@ -716,47 +703,16 @@ def fit(lr_type, variable):
     print("")
     print("Correlation between fit and profile")
     for bnum in range(NUM_KEY_BYTES):
-         #print np.corrcoef(PROFILE_MEANS[bnum][:, 0],
+         #print np.corrcoef(PROFILE.PROFILE_MEANS[bnum][:, 0],
          #       PROFILE_MEANS_FIT[bnum][:, 0])[0, 1]
-         r,p = pearsonr(PROFILE_MEANS[bnum][:, 0], PROFILE_MEANS_FIT[bnum][:, 0])
+         r,p = pearsonr(PROFILE.PROFILE_MEANS[bnum][:, 0], PROFILE_MEANS_FIT[bnum][:, 0])
          print(r, -10*np.log10(p))
 
-    PROFILE_MEANS = PROFILE_MEANS_FIT
-    PROFILE_COVS = None
-    
-# Store useful information about the profile, to be used for comparing profiles,
-# or for profiled correlation and template attacks
-def save_profile(template_dir):
-    np.save(path.join(template_dir, "POIS.npy"), POIS)
-    np.save(path.join(template_dir, "PROFILE_RS.npy"), RS)
-    np.save(path.join(template_dir, "PROFILE_RZS.npy"), RZS)
-    np.save(path.join(template_dir, "PROFILE_MEANS.npy"), PROFILE_MEANS)
-    np.save(path.join(template_dir, "PROFILE_STDS.npy"), PROFILE_STDS)
-    np.save(path.join(template_dir, "PROFILE_COVS.npy"), PROFILE_COVS)
-    np.save(path.join(template_dir, "PROFILE_MEAN_TRACE.npy"),
-            PROFILE_MEAN_TRACE)
-
-# Load the profile, for comparison or for attacks
-def load_profile(template_dir):
-    global PROFILE_MEANS, PROFILE_COVS, POIS, PROFILE_MEAN_TRACE
-    global PROFILE_RS, PROFILE_RZS, PROFILE_STDS
-    POIS = np.load(path.join(template_dir, "POIS.npy"), POIS)
-    PROFILE_RS = np.load(path.join(template_dir, "PROFILE_RS.npy"),
-            PROFILE_RS)
-    PROFILE_RZS = np.load(path.join(template_dir, "PROFILE_RZS.npy"),
-            PROFILE_RZS)
-    PROFILE_MEANS = np.load(path.join(template_dir, "PROFILE_MEANS.npy"),
-            PROFILE_MEANS)
-    PROFILE_COVS = np.load(path.join(template_dir, "PROFILE_COVS.npy"),
-            PROFILE_COVS)
-    PROFILE_STDS = np.load(path.join(template_dir, "PROFILE_STDS.npy"),
-            PROFILE_STDS)
-    PROFILE_MEAN_TRACE = np.load(path.join(template_dir,
-        "PROFILE_MEAN_TRACE.npy"), PROFILE_MEAN_TRACE)
+    PROFILE.PROFILE_MEANS = PROFILE_MEANS_FIT
+    PROFILE.PROFILE_COVS = None
 
 # Run a template attack or a profiled correlation attack
 def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
-    # global PROFILE_MEANS, PROFILE_COVS, POIS
     global LOG_PROBA
  
     LOG_PROBA = [[0 for r in range(256)] for bnum in range(NUM_KEY_BYTES)]
@@ -770,14 +726,14 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
     ranking_type = "pearson"
     if attack_algo == "pdf":
 
-        if num_pois > len(PROFILE_COVS[0][0][0]):
-            print("Error, there are only %d pois available"%len(PROFILE_COVS[0][0][0]))
+        if num_pois > len(PROFILE.PROFILE_COVS[0][0][0]):
+            print("Error, there are only %d pois available"%len(PROFILE.PROFILE_COVS[0][0][0]))
 
         for bnum in range(0, NUM_KEY_BYTES):
             if pooled_cov:
-                covs = np.average(PROFILE_COVS[bnum,:,0:num_pois,0:num_pois], axis = 0)
+                covs = np.average(PROFILE.PROFILE_COVS[bnum,:,0:num_pois,0:num_pois], axis = 0)
             else:
-                covs = PROFILE_COVS[bnum][:,0:num_pois,0:num_pois]
+                covs = PROFILE.PROFILE_COVS[bnum][:,0:num_pois,0:num_pois]
 
             print("Subkey %2d"%bnum)
             # Running total of log P_k
@@ -796,7 +752,7 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
                     else:
                         cov = covs[cla]
                     
-                    rv = multivariate_normal(PROFILE_MEANS[bnum][cla][0:num_pois], cov)
+                    rv = multivariate_normal(PROFILE.PROFILE_MEANS[bnum][cla][0:num_pois], cov)
                     p_kj = rv.pdf(TRACES_REDUCED[bnum][j][0:num_pois])
 
                     # Add it to running total
@@ -821,10 +777,10 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
     
     elif attack_algo == "pcc":
        
-        assert len(POIS[0]) >= num_pois, "Requested number of POIs (%d) higher than available (%d)"%(num_pois, len(POIS[0]))
+        assert len(PROFILE.POIS[0]) >= num_pois, "Requested number of POIs (%d) higher than available (%d)"%(num_pois, len(PROFILE.POIS[0]))
 
         if average_bytes:
-            PROFILE_MEANS_AVG = np.average(PROFILE_MEANS, axis=0)
+            PROFILE_MEANS_AVG = np.average(PROFILE.PROFILE_MEANS, axis=0)
         for bnum in range(0, NUM_KEY_BYTES):
             cpaoutput = [0]*256
             maxcpa = [0]*256
@@ -837,7 +793,7 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
                     leaks = np.asarray([PROFILE_MEANS_AVG[clas[j]] for j in
                         range(len(TRACES))])
                 else:
-                    leaks = np.asarray([PROFILE_MEANS[bnum][clas[j]] for j in
+                    leaks = np.asarray([PROFILE.PROFILE_MEANS[bnum][clas[j]] for j in
                         range(len(TRACES))])
                 
                 # Combine POIs as proposed in 
@@ -953,7 +909,7 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
     global TRACES
 
     if pois_dir != "":
-        pois = np.load(os.path.join(pois_dir,"POIS.npy"))
+        pois = np.load(os.path.join(pois_dir, dataset.Profile.POIS_FN))
         TRACES = TRACES[:,np.sort(pois.flatten())]
 
     try:
@@ -969,13 +925,13 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
         compute_variables(variable)
         # Set SETS.
         classify()
-        # Set MEANS, VARS, STDS, PROFILE_MEAN_TRACE.
+        # Set MEANS, VARS, STDS, PROFILE.PROFILE_MEAN_TRACE.
         estimate()
         # Set POIS.
         find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir)
         build_profile(variable, template_dir)
         fit(lr_type, variable)
-        save_profile(template_dir)
+        # NEXT: Save the profile here.
 
     profile_exec(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir, template_dir)
 
@@ -1012,19 +968,19 @@ def attack(variable, pois_algo, num_pois, poi_spacing, template_dir,
     
     if not FIXED_KEY and variable != "hw_p" and variable != "p":
         raise Exception("This set DOES NOT use a FIXED KEY")
- 
-    load_profile(template_dir)
+
+    # NEXT: Load the profile here.
     
     if PLOT:
-        plt.plot(POIS[:,0], np.average(TRACES, axis=0)[POIS[:,0]], '*')
+        plt.plot(PROFILE.POIS[:,0], np.average(TRACES, axis=0)[PROFILE.POIS[:,0]], '*')
         plt.plot(np.average(TRACES, axis=0))
-        plt.plot(PROFILE_MEAN_TRACE, 'r')
+        plt.plot(PROFILE.PROFILE_MEAN_TRACE, 'r')
         plt.show()
 
     compute_variables(variable)
     
     if num_pois == 0:
-        num_pois = len(POIS[0])
+        num_pois = len(PROFILE.POIS[0])
 
     if pois_algo != "":
         classify()

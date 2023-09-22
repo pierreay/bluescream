@@ -318,3 +318,54 @@ class Subset():
         string += "- on-disk number of traces is {}\n".format(self.get_nb_trace_ondisk())
         string += "- bad entries are {}\n".format(self.bad_entries)
         return string
+
+class Profile():
+    POIS_FN               = "POIS.npy"
+    RS_FN                 = "PROFILE_RS.npy"
+    RZS_FN                = "PROFILE_RZS.npy"
+    PROFILE_MEANS_FN      = "PROFILE_MEANS.npy"
+    PROFILE_STDS_FN       = "PROFILE_STDS.npy"
+    PROFILE_COVS_FN       = "PROFILE_COVS.npy"
+    PROFILE_MEAN_TRACE_FN = "PROFILE_MEAN_TRACE.npy"
+    
+    def __init__(self, dataset, subset):
+        self.dir = "profile"  # Fixed subdirectory.
+        self.dataset = datase # Parent.
+        self.subset = subset  # Parent.
+        # Profile data.
+        self.POIS = None
+        self.RS = None
+        self.RZS = None
+        self.PROFILE_MEANS = None
+        self.PROFILE_STDS = None
+        self.PROFILE_COVS = None
+        self.PROFILE_MEAN_TRACE = None
+
+    def get_path(self, save=False):
+        """Return the full path of the subset. Must be dynamic since the full
+        path of the dataset can change since its creation when pickling it.
+
+        """
+        return path.join(self.dataset.dir if not save else self.dataset.dirsave, self.dir)
+
+    # Store useful information about the profile, to be used for comparing profiles,
+    # or for profiled correlation and template attacks.
+    def save():
+        assert(path.exists(self.get_path()))
+        np.save(path.join(self.get_path(), Profile.POIS_FN), self.POIS)
+        np.save(path.join(self.get_path(), Profile.RS_FN), self.RS)
+        np.save(path.join(self.get_path(), Profile.RZS_FN), self.RZS)
+        np.save(path.join(self.get_path(), Profile.PROFILE_MEANS_FN), self.PROFILE_MEANS)
+        np.save(path.join(self.get_path(), Profile.PROFILE_STDS_FN), self.PROFILE_STDS)
+        np.save(path.join(self.get_path(), Profile.PROFILE_COVS_FN), self.PROFILE_COVS)
+        np.save(path.join(self.get_path(), Profile.PROFILE_MEAN_TRACE_FN), self.PROFILE_MEAN_TRACE)
+
+    # Load the profile, for comparison or for attacks.
+    def load():
+        self.POIS               = np.load(path.join(self.get_path(), Profile.POIS_FN), POIS)
+        self.PROFILE_RS         = np.load(path.join(self.get_path(), Profile.PROFILE_RS_FN), PROFILE_RS)
+        self.PROFILE_RZS        = np.load(path.join(self.get_path(), Profile.PROFILE_RZS_FN), PROFILE_RZS)
+        self.PROFILE_MEANS      = np.load(path.join(self.get_path(), Profile.PROFILE_MEANS_FN), PROFILE_MEANS)
+        self.PROFILE_COVS       = np.load(path.join(self.get_path(), Profile.PROFILE_COVS_FN), PROFILE_COVS)
+        self.PROFILE_STDS       = np.load(path.join(self.get_path(), Profile.PROFILE_STDS_FN), PROFILE_STDS)
+        self.PROFILE_MEAN_TRACE = np.load(path.join(self.get_path(), Profile.PROFILE_MEAN_TRACE_FN), PROFILE_MEAN_TRACE)
