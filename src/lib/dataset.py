@@ -69,6 +69,7 @@ class Dataset():
         if pickled.attack_set is not None:
             pickled.attack_set.load_input()
         pickled.run_resumed = False
+        l.LOGGER.info("dataset loaded from {}".format(Dataset.get_path_static(dir)))
         return pickled
 
     def get_path(self, save=False):
@@ -123,6 +124,7 @@ class Dataset():
                 self.attack_set.unload_trace()
         with open(self.get_path(save=True), "wb") as f:
              pickle.dump(self, f)
+             l.LOGGER.info("dataset saved in {}".format(self.get_path(save=True)))
 
     def add_subset(self, name, subtype, input_gen, nb_trace_wanted=0):
         assert(subtype in SubsetType)
