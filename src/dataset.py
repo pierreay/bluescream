@@ -160,5 +160,14 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop):
     sset.prune_input(save=True)
     save_dataset_and_quit(dset)
 
+@cli.command()
+@click.argument("indir", type=click.Path())
+@click.argument("outdir", type=click.Path())
+@click.option("--plot/--no-plot", default=True, help="Plot a summary of the processing.")
+@click.option("--stop", default=1, help="Range of traces to process in the subset of the dataset. Set to -1 for maximum.")
+def fitoprofile(indir, outdir, plot, stop):
+    """TODO: Write a desc."""
+    pass
+
 if __name__ == "__main__":
     cli()
