@@ -9,6 +9,7 @@ import pickle
 import lib.input_generators as input_generators
 import lib.load as load
 import lib.log as l
+import lib.plot as libplot
 
 SubsetType = Enum('SubsetType', ['TRAIN', 'ATTACK'])
 InputType = Enum('InputType', ['FIXED', 'VARIABLE'])
@@ -378,6 +379,9 @@ class Profile():
         self.PROFILE_COVS       = np.load(path.join(self.get_path(), Profile.PROFILE_COVS_FN), PROFILE_COVS)
         self.PROFILE_STDS       = np.load(path.join(self.get_path(), Profile.PROFILE_STDS_FN), PROFILE_STDS)
         self.PROFILE_MEAN_TRACE = np.load(path.join(self.get_path(), Profile.PROFILE_MEAN_TRACE_FN), PROFILE_MEAN_TRACE)
+
+    def plot(self):
+        libplot.plot_simple(self.PROFILE_MEAN_TRACE)
    
     def __str__(self):
         string = "profile:\n"
