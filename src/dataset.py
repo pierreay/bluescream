@@ -169,7 +169,7 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop):
 @click.argument("subset", type=str)
 @click.option("--plot/--no-plot", default=True, help="Plot a summary of the processing.")
 @click.option("--offset", default=0, help="Number of samples to addition to the detected AES.")
-@click.option("--length", default=1000, help="Number of samples of the window to extract.")
+@click.option("--length", default=10000, help="Number of samples of the window to extract.")
 @click.option("--stop", default=1, help="Range of traces to process in the subset of the dataset. Set to -1 for maximum.")
 @click.option("--force/--no-force", default=False, help="Force a restart of the processing even if resuming is detected.")
 def extralign(indir, outdir, subset, plot, offset, length, stop, force):
@@ -195,9 +195,13 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
             dset.dirty_idx = i
             sset.load_trace(i)
             assert(sset.ff is not None)
-            # TODO extracting and align
+            # TODO: extracting and align. Currently, extralign_aes is able to
+            # detect and extract one AES. The problem is that we have to align
+            # all traces of the dataset, not all the AES of one trace. Hence,
+            # we should change the loop and the loading mechanism.
+            template = -1
+            sset.ff, sset.template = analyze.extralign_aes(sset.ff, dset.samp_rate, template if sset.template is None else sset.template, length, plot)
             import ipdb; ipdb.set_trace()
-            #sset.ff, sset.template = analyze.average_aes(sset.ff, dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot)
             check, sset.ff = analyze.fill_zeros_if_bad(sset.template, sset.ff)
             if check is True:
                 l.LOGGER.warning("error during averaging aes, trace {} filled with zeroes!".format(i))

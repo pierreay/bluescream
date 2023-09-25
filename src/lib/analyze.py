@@ -278,6 +278,40 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
     averaged  = analyze.average(aligned)
     return averaged, template_s
 
+def extralign_aes(arr, sr, template, length, plot_enable):
+    """TODO: From average_aes()"""
+    error = 0
+    # * Find AES.
+    arr = analyze.get_amplitude(arr)
+    starts, trigger = analyze.find_aes(arr, sr, 1e6, 10e6, 1, lp=1e5, offset=-1.5e-4, flip=False)
+    assert np.shape(starts[starts <= 0]) == (0,), "starts should not contained negative indexes"
+    check_nb = len(starts) == 1
+    if check_nb:
+        l.LOGGER.debug("number of detected aes: {}".format(len(starts)))
+    else:
+        l.LOGGER.error("number of detected aes seems to be aberrant: {}".format(len(starts)))
+        error = 1
+
+    if plot_enable:
+        libplot.plot_time_spec_share_nf_ff(arr, None, sr, peaks=starts, triggers=trigger)
+    if error:
+        return None, template
+
+    # * Select one extraction as template.
+    import ipdb; ipdb.set_trace()
+    if isinstance(template, int):
+        extracted  = analyze.extract(arr, starts, length=length)
+        template_s = analyze.choose_signal(extracted, template)
+    elif isinstance(template, np.ndarray):
+        template_s = template
+    assert(template_s is not None)
+
+    # * Extract all AES and average them.
+    extracted = analyze.extract(arr, starts, len(template_s))
+    aligned   = analyze.align_all(extracted, sr, template_s, False)
+    averaged  = analyze.average(aligned)
+    return averaged, template_s
+
 def is_nan(arr):
     """Return True if at least one NAN (not a number) is contained in ARR."""
     test = np.isnan(arr)
