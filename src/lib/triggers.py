@@ -34,6 +34,13 @@ class Triggers():
             self.triggers[0].signal += trigger.signal
         self.triggers[0].signal = analyze.normalize(self.triggers[0].signal)
 
+    def __str__(self):
+        string = "triggers :\n".format()
+        string += "- nb: {}\n".format(self.nb())
+        for i in range(self.nb()):
+            string += str(self.get(i))
+        return string
+
 class Trigger():
     def __init__(self, s, bpl, bph, lp, sr, name="trigger"):
         assert(s.dtype == np.float32)
