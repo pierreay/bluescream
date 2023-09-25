@@ -57,7 +57,7 @@ class Dataset():
         return path.exists(Dataset.get_path_static(dir))
 
     @staticmethod
-    def pickle_load(dir):
+    def pickle_load(dir, log=True):
         if not Dataset.is_pickable(dir):
             return None
         with open(Dataset.get_path_static(dir), "rb") as f:
@@ -70,7 +70,8 @@ class Dataset():
         if pickled.attack_set is not None:
             pickled.attack_set.load_input()
         pickled.run_resumed = False
-        l.LOGGER.info("dataset loaded from {}".format(Dataset.get_path_static(dir)))
+        if log is True:
+            l.LOGGER.info("dataset loaded from {}".format(Dataset.get_path_static(dir)))
         return pickled
 
     def get_path(self, save=False):
@@ -94,7 +95,7 @@ class Dataset():
 
     def get_savedir_dirty(self):
         if path.exists(path.join(self.dirsave, Dataset.FILENAME)):
-            dset = Dataset.pickle_load(self.dirsave)
+            dset = Dataset.pickle_load(self.dirsave, log=False)
             return dset.dirty
         return False
 
