@@ -942,6 +942,8 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
         PROFILE.save()
 
     profile_exec(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir)
+    PROFILE.POINT_START = START_POINT
+    PROFILE.POINT_END   = END_POINT
     DATASET.pickle_dump(force=True) # Include profile inside DATASET pickled file.
 
 # ** Profiled correlation and template attacks

@@ -354,6 +354,8 @@ class Profile():
         self.PROFILE_STDS = None
         self.PROFILE_COVS = None
         self.PROFILE_MEAN_TRACE = None
+        self.POINT_START = None # Starting point used in original trace.
+        self.POINT_END   = None # Ending point used in original trace.
 
     def get_path(self, save=False):
         return path.join(self.dataset.dir, self.dir)
@@ -392,4 +394,8 @@ class Profile():
             string += "- pois shape: {}\n".format(self.POIS.shape)
         if self.PROFILE_MEAN_TRACE is not None:
             string += "- profile trace shape: {}\n".format(self.PROFILE_MEAN_TRACE.shape)
+        if self.POINT_START:
+            string += "- profile start point: {}\n".format(self.POINT_START)
+        if self.POINT_END:
+            string += "- profile end point: {}\n".format(self.POINT_END)
         return string
