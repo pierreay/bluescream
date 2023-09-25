@@ -241,7 +241,8 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
 
     SR is the sampling rate of ARR.
     NB_AES is the number of AES executions in the trace ARR.
-    TEMPLATE can be an index for the interactive template selection or a template signal.
+    TEMPLATE can be set to -1 for interactive template selection, to an index
+    for the automatic template selection, or a template signal.
     If PLOT is set to True, plot triggers and start indexes.
     Return a tuple of the averaged trace (np.ndarray) (or None on error) and the template.
 
