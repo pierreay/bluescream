@@ -166,6 +166,52 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop):
 @cli.command()
 @click.argument("indir", type=click.Path())
 @click.argument("outdir", type=click.Path())
+@click.argument("subset", type=str)
+@click.option("--plot/--no-plot", default=True, help="Plot a summary of the processing.")
+@click.option("--offset", default=0, help="Number of samples to addition to the detected AES.")
+@click.option("--length", default=1000, help="Number of samples of the window to extract.")
+@click.option("--stop", default=1, help="Range of traces to process in the subset of the dataset. Set to -1 for maximum.")
+@click.option("--force/--no-force", default=False, help="Force a restart of the processing even if resuming is detected.")
+def extralign(indir, outdir, subset, plot, offset, length, stop, force):
+    """Extract roughly the AES from RAW FF traces and align them.
+
+    INDIR corresponds to the input dataset directory.
+    OUTDIR corresponds to the output dataset directory.
+    SUBSET corresponds to the subset's name that will be proceed.
+
+    """
+    start = 0
+    # * Load input dataset and selected subset.
+    dset, sset = load_dataset_or_quit(indir, subset, outdir=outdir)
+    # * Resume from previously saved dataset if needed.
+    if force is False and dset.get_savedir_dirty():
+        dset.resume_from_savedir(subset)
+        start = dset.dirty_idx
+        l.LOGGER.info("resume at trace {} using template from previous processing".format(start))
+    with logging_redirect_tqdm(loggers=[l.LOGGER]):
+        if stop == -1:
+            stop = sset.get_nb_trace_ondisk()
+        for i in tqdm(range(start, stop), desc="extralign"):
+            dset.dirty_idx = i
+            sset.load_trace(i)
+            assert(sset.ff is not None)
+            # TODO extracting and align
+            import ipdb; ipdb.set_trace()
+            #sset.ff, sset.template = analyze.average_aes(sset.ff, dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot)
+            check, sset.ff = analyze.fill_zeros_if_bad(sset.template, sset.ff)
+            if check is True:
+                l.LOGGER.warning("error during averaging aes, trace {} filled with zeroes!".format(i))
+                sset.bad_entries.append(i)
+            if plot:
+                libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate)
+            sset.save_trace(nf=False)
+            dset.pickle_dump(unload=False)
+    sset.prune_input(save=True)
+    save_dataset_and_quit(dset)
+    
+@cli.command()
+@click.argument("indir", type=click.Path())
+@click.argument("outdir", type=click.Path())
 @click.option("--plot/--no-plot", default=True, help="Plot a summary of the processing.")
 @click.option("--stop", default=1, help="Range of traces to process in the subset of the dataset. Set to -1 for maximum.")
 def fitoprofile(indir, outdir, plot, stop):
