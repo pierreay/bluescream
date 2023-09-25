@@ -169,31 +169,73 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop):
 @click.option("--plot/--no-plot", default=True, help="Plot a summary of the processing.")
 @click.option("--stop", default=1, help="Range of traces to process in the subset of the dataset. Set to -1 for maximum.")
 def fitoprofile(indir, outdir, plot, stop):
-    """TODO: Write a desc."""
+    """TODO: Write a desc or delete command.
+
+    Process dataset source attack subset and align them against dataset dest
+    training subset.
+
+    """
     start = 0
-    # * Load input dataset and selected subset.
-    dset, sset = load_dataset_or_quit(indir, dataset.SubsetType.ATTACK, outdir=outdir)
+    dset_src, sset_src = load_dataset_or_quit(indir,  dataset.SubsetType.ATTACK, outdir=outdir)
+    dset_dst, sset_dst = load_dataset_or_quit(outdir, dataset.SubsetType.TRAIN)
+    # * Check prerequisites.
+    assert(dset_src.attack_set.get_nb_trace_ondisk() > 1)
+    assert(dset_dst.train_set.template is not None)
+    assert(dset_dst.profile is not None)
+    # Profile should be computed.
     # * Fetch template from previously saved dataset in case of resuming.
     # if dset.get_savedir_dirty():
     #     dset.resume_from_savedir(subset)
     #     start = dset.dirty_idx
     #     l.LOGGER.info("resume at trace {} using template from previous processing".format(start))
     #     l.LOGGER.debug("template shape={}".format(sset.template.shape))
+    # * Search for 2nd round of AES' stop in template.
+    nsamp_aes_template = 2000
+    # if plot is True:
+    #     libplot.plot_time_spec_share_nf_ff(dset_dst.train_set.template, None, dset_dst.samp_rate, peaks=[nsamp_aes_template]) # Check that nsamp_aes_template is correct.
     with logging_redirect_tqdm(loggers=[l.LOGGER]):
         if stop == -1:
-            stop = sset.get_nb_trace_ondisk()
+            stop = sset_src.get_nb_trace_ondisk()
         for i in tqdm(range(start, stop), desc="fitoprofile"):
             # dset.dirty_idx = i
-            sset.load_trace(i)
-            assert(sset.ff is not None)
-            # TODO
-            # import ipdb; ipdb.set_trace()
+            # * Get working trace.
+            sset_src.load_trace(i)
+            assert(sset_src.ff is not None)
+            ff = analyze.get_amplitude(sset_src.ff)
+            #libplot.plot_spec_simple(ff)
+            assert(ff.dtype == dset_dst.train_set.template.dtype)
+            # * Cut working trace according to nsamp_aes_template.
+            triggerl = triggers.Triggers()
+            triggerl.add(triggers.Trigger(ff, 1e6, 13e6, 1e4, dset_src.samp_rate))
+            trigger = triggerl.get(0).signal
+            peaks = signal.find_peaks(trigger, distance=len(trigger) / 2, prominence=0.25)
+            #libplot.plot_time_spec_share_nf_ff(ff, None, dset_dst.samp_rate, peaks=peaks[0], triggers=triggerl)
+            end_of_aes = int(peaks[0][0])
+            ff = ff[peaks[0][0] - nsamp_aes_template:peaks[0][0]]
+            libplot.plot_simple(ff)
+            # TODO: The idea from here was to use:
+            # https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.peak_widths.html#scipy.signal.peak_widths
+            # https://docs.scipy.org/doc/scipy/reference/generated/scipy.signal.peak_prominences.html
+            # To find precesily where the AES stopped. Surely better way. But
+            # move on bruteforce the alignement after manual selection in
+            # attack.py
+            continue
+            starts, trigger = analyze.find_aes(ff, dset_src.samp_rate, 8.8e6, 9.5e6, 1, 1e4, -0.5e-4, flip=False, plot=False)
+            template = dset_dst.train_set.template[0:2000]
+            starts = starts
+            # libplot.plot_time_spec_share_nf_ff(ff, None, dset_dst.samp_rate, peaks=[starts, starts + len(template)])
+            extracted  = analyze.extract(ff, starts, len(template))
+            # libplot.plot_simple(extracted)
+            # libplot.plot_simple(dset_dst.train_set.template)
+            
+            aligned = analyze.align(template, extracted[0], dset_src.samp_rate, log=True)
+            # libplot.plot_spec_simple([template, aligned])
             # check, sset.ff = analyze.fill_zeros_if_bad(sset.template, sset.ff)
             # if check is True:
             #     l.LOGGER.warning("error during averaging aes, trace {} filled with zeroes!".format(i))
             #     sset.bad_entries.append(i)
-            if plot:
-                libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate)
+            # if plot:
+            #     libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset_src.samp_rate)
             # sset.save_trace(nf=False)
             # dset.pickle_dump(unload=False)
     # sset.prune_input(save=True)
