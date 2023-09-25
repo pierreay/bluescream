@@ -18,15 +18,18 @@ import lib.filters as filters
 import lib.triggers as triggers
 import lib.dataset as dataset
 
-def load_dataset_or_quit(indir, subset, outdir=None):
+def load_dataset_or_quit(indir, subset=None, outdir=None):
     dset = dataset.Dataset.pickle_load(indir)
+    sset = None
     if dset is None:
         l.LOGGER.error("dataset doesn't exists!")
         exit(-1)
     if outdir is not None:
         dset.set_dirsave(outdir)
+    if subset is not None:
+        sset = dset.get_subset(subset)
     dset.dirty = True
-    return dset, dset.get_subset(subset)
+    return dset, sset
 
 def save_dataset_and_quit(dset):
     # Disable setting dirty to False, otherwise, after a completeed averaging,
