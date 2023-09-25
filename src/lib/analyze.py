@@ -100,7 +100,7 @@ def fill_zeros_if_bad(ref, test):
         return True, np.zeros(ref.shape, dtype=ref.dtype)
     return False, test
 
-def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0):
+def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0, flip=True, plot=False):
     """Find the start (beginning of the key scheduling) of every AES
     computation contained in the signal S of sampling rate SR. The signal must
     contained approximately NB_AES number of AES. BPL, BPH, LP are the bandpass
@@ -115,14 +115,18 @@ def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0):
     trigger_l.add(trigger)
 
     # * AES indexes finding.
-    # Flip the signal to recover peaks.
-    trigger.signal = analyze.flip_normalized_signal(trigger.signal)
+    # Flip the signal if needed to recover peaks.
+    if flip is True:
+        trigger.signal = analyze.flip_normalized_signal(trigger.signal)
     # Assume the distances between peaks will be the length of the signal
     # divided by the number of AES and that at least 1/4 of the signal is
     # fullfilled with AES computations.
     peaks = signal.find_peaks(trigger.signal, distance=len(trigger.signal) / nb_aes / 4, prominence=0.25)
     offset_duration = offset * sr
-    return peaks[0] + offset_duration, trigger_l
+    peaks = peaks[0] + offset_duration
+    if plot is True:
+        libplot.plot_time_spec_share_nf_ff(s, None, sr, peaks=peaks, triggers=trigger_l)
+    return peaks, trigger_l
 
 def choose_signal(arr, i = -1):
     """From the ARR 2D numpy array, propose every sub-signals (1D numpy array)
