@@ -171,7 +171,7 @@ def extract(s, starts, length = 0):
             extracted[i] = np.copy(s[int(starts[i]):int(starts[i] + length)])
         return extracted
 
-def align(template, target, sr, ignore=True):
+def align(template, target, sr, ignore=True, log=False):
     """Return the TARGET signal aligned (1D np.array) using cross-correlation
     along the TEMPLATE signal, where SR is the sampling rates of signals. The
     shift is filled with zeros shuch that shape is not modified. If IGNORE is
@@ -188,6 +188,8 @@ def align(template, target, sr, ignore=True):
     target_lpf   = filters.butter_lowpass_filter(target, lpf_freq, sr)
     corr         = signal.correlate(target_lpf, template_lpf)
     shift        = np.argmax(corr) - (len(template) - 1)
+    if log:
+        l.LOGGER.debug("shift to maximize cross correlation is {}".format(shift))
     if shift > 0:
         if not ignore:
             assert shift < len(template/10), "shift is too high, inspect"
