@@ -8,7 +8,7 @@ from scipy import signal
 from tqdm import tqdm
 
 import lib.log as l
-import lib.plot as plot
+import lib.plot as libplot
 import lib.filters as filters
 import lib.triggers as triggers
 import lib.analyze as analyze
@@ -133,7 +133,7 @@ def choose_signal(arr, i = -1):
     """
     if i == -1:
         for i in range(len(arr)):
-            if plot.select(arr[i]):
+            if libplot.select(arr[i]):
                 l.LOGGER.info("select signal index {}".format(i))
                 return np.copy(arr[i])
     else:
@@ -252,7 +252,7 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
         error = 1
 
     if plot_enable:
-        plot.plot_time_spec_share_nf_ff(arr, None, sr, peaks=starts, triggers=trigger)
+        libplot.plot_time_spec_share_nf_ff(arr, None, sr, peaks=starts, triggers=trigger)
     if error:
         return None, template
 
