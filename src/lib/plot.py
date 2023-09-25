@@ -35,7 +35,13 @@ def plot_loop(arr, func, nb=0):
             break
 
 def plot_time_simple(s):
-    plt.plot(s)
+    """Show signals' in time-domain on different windows."""
+    s = [s] if isinstance(s, np.ndarray) and s.ndim == 1 else s
+    assert(len(s) < 15)
+    for i in range(len(s)):
+        plt.figure()
+        plt.plot(s[i])
+        plt.title("idx={}".format(i))
     plt.show()
 
 def plot_spec_simple(s):
