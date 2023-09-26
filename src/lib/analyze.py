@@ -126,6 +126,7 @@ def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0, flip=True, plot=Fa
     peaks = peaks[0] + offset_duration
     if plot is True:
         libplot.plot_time_spec_share_nf_ff(s, None, sr, peaks=peaks, triggers=trigger_l)
+    assert np.shape(peaks[peaks <= 0]) == (0,), "peaks indexes can't be negative, consider to increase offset or remove negatives values"
     return peaks, trigger_l
 
 def choose_signal(arr, i = -1):
@@ -251,7 +252,6 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
     # * Find AES.
     arr = analyze.get_amplitude(arr)
     starts, trigger = analyze.find_aes(arr, sr, 8.8e6, 9.5e6, nb_aes, 1e4, -0.5e-4)
-    assert np.shape(starts[starts <= 0]) == (0,), "starts should not contained negative indexes"
     check_nb = len(starts) < (1.1 * nb_aes) and len(starts) > (0.9 * nb_aes)
     if check_nb:
         l.LOGGER.debug("number of detected aes: {}".format(len(starts)))

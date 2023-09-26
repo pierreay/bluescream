@@ -216,7 +216,6 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
             # * Find AES.
             sset.ff = analyze.get_amplitude(sset.ff)
             starts, trigger = analyze.find_aes(sset.ff, dset.samp_rate, 1e6, 10e6, 1, lp=1e5, offset=-1.5e-4, flip=False)
-            assert np.shape(starts[starts <= 0]) == (0,), "starts should not contained negative indexes"
             check_nb = len(starts) == 1
             if check_nb:
                 l.LOGGER.debug("number of detected aes: {}".format(len(starts)))
