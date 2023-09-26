@@ -180,6 +180,19 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
     SUBSET corresponds to the subset's name that will be proceed.
 
     """
+    # SPECIFICIATIONS:
+    # test for resuming template
+    # resume from dirty idx
+    # for trace 0:
+    #     load trace 0
+    #     extract aes
+    #     interactively valid it as a template
+    #     save dataset dest
+    # for each trace after 1:
+    #     load trace i
+    #     extract aes
+    #     align with template
+    #     save dataest    
     start = 0
     # * Load input dataset and selected subset.
     dset, sset = load_dataset_or_quit(indir, subset, outdir=outdir)
