@@ -179,7 +179,7 @@ def cov(x, y):
     # Find the covariance between two 1D lists (x and y).
     # Note that var(x) = cov(x, x)
     return np.cov(x, y)[0][1]
- 
+
 hw = [bin(n).count("1") for n in range(256)]
 
 sbox=(
@@ -207,11 +207,11 @@ def print_result(bestguess,knownkey,pge):
     print("Best Key Guess: ", end=' ')
     for b in bestguess: print(" %02x "%b, end=' ')
     print("")
-    
+
     print("Known Key:      ", end=' ')
     for b in knownkey: print(" %02x "%b, end=' ')
     print("")
-    
+
     print("PGE:            ", end=' ')
     for b in pge: print("%03d "%b, end=' ')
     print("")
@@ -310,7 +310,7 @@ def estimate():
     MEANS = np.zeros((NUM_KEY_BYTES, len(CLASSES), len(TRACES[0])))
     VARS = np.zeros((NUM_KEY_BYTES, len(CLASSES), len(TRACES[0])))
     STDS = np.zeros((NUM_KEY_BYTES, len(CLASSES), len(TRACES[0])))
-    
+
     for bnum in range(NUM_KEY_BYTES):
         for cla in CLASSES:
             MEANS[bnum][cla] = np.average(SETS[bnum][cla], axis=0)
@@ -332,7 +332,7 @@ def estimate_ttest():
     for bnum in range(NUM_KEY_BYTES):
         TTESTS[bnum], PTTESTS[bnum] = ttest_ind(SETS[bnum][1],
                 SETS[bnum][0], axis=0, equal_var=False)
-    
+
     tmax = np.max(np.absolute(TTESTS[0]))
     p = PTTESTS[0][np.argmax(np.absolute(TTESTS[0]))]
     print("tmax", tmax, "p", p, "p < 0.00001", p < 0.00001)
@@ -345,10 +345,10 @@ def split(fold, k_fold):
     Ntraces = len(TRACES)
     Ntest = Ntraces / k_fold
     Nprofiling = Ntraces - Ntest
- 
-    test_range = [i for i in range(0,Ntraces) if i >= fold*Ntest 
+
+    test_range = [i for i in range(0,Ntraces) if i >= fold*Ntest
             and i < fold*Ntest + Ntest]
-    profiling_range = [i for i in range(0,Ntraces) if i < fold*Ntest 
+    profiling_range = [i for i in range(0,Ntraces) if i < fold*Ntest
             or i >= fold*Ntest + Ntest]
 
     TRACES_TEST = TRACES[test_range]
@@ -404,7 +404,7 @@ def average_folds():
 def compute_rzs():
     PROFILE.RZS = 0.5*np.log((1+PROFILE.RS)/(1-PROFILE.RS))
     PROFILE.RZS = PROFILE.RZS * math.sqrt(len(TRACES)-3)
- 
+
 # Estimate the k-fold r-test
 def estimate_r(k_fold):
     global PS
@@ -427,7 +427,7 @@ def estimate_r(k_fold):
 def soad():
     global SOADS
     SOADS = np.zeros((NUM_KEY_BYTES, len(TRACES[0])))
-    for bnum in range(NUM_KEY_BYTES):    
+    for bnum in range(NUM_KEY_BYTES):
         for i in CLASSES:
             for j in range(i):
                 SOADS[bnum] += np.abs(MEANS[bnum][i] - MEANS[bnum][j])
@@ -453,7 +453,7 @@ def estimate_corr():
 # absolute differences (SOAD) can be used.
 def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='.'):
     global SNRS, SOADS
-    
+
     PROFILE.RZS = np.zeros((NUM_KEY_BYTES, len(TRACES[0])))
     PROFILE.RS = np.zeros((NUM_KEY_BYTES, len(TRACES[0])))
     PROFILE.POIS = np.zeros((NUM_KEY_BYTES, num_pois), dtype=int)
@@ -498,20 +498,20 @@ def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='.'):
         for i in range(num_pois):
             poi = np.argmax(temp)
             PROFILE.POIS[bnum][i] = poi
-            
+
             pmin = max(0, poi - poi_spacing)
             pmax = min(poi + poi_spacing, len(temp))
             for j in range(pmin, pmax):
                 temp[j] = 0
-    
+
     if PLOT or SAVE_IMAGES:
-        plt.subplots_adjust(hspace = 1) 
+        plt.subplots_adjust(hspace = 1)
 
         plt.subplot(num_plots, 1, 1)
         plt.xlabel("samples")
         plt.ylabel("normalized\namplitude")
         plt.plot(np.average(TRACES, axis=0))
-        
+
         plt.subplot(num_plots, 1, 2)
         #plt.title(title)
         plt.xlabel("samples")
@@ -531,7 +531,7 @@ def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='.'):
             plt.axhline(y=5, label="5", color='green')
             plt.axhline(y=-5, label="-5", color='green')
             plt.legend(loc='upper right')
- 
+
             plt.subplot(num_plots, 1, 4)
             plt.title("%d-folded ro-test: p computed with PCC"%k_fold)
             plt.xlabel("samples")
@@ -541,7 +541,7 @@ def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='.'):
             plt.axhline(y=-np.log10(0.05), label="0.05", color='orange')
             plt.axhline(y=-np.log10(0.01), label="0.01", color='green')
             plt.legend(loc='upper right')
-        
+
         elif pois_algo == "t":
             plt.subplot(num_plots, 1, 3)
             plt.title("p")
@@ -552,7 +552,7 @@ def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='.'):
             plt.axhline(y=-np.log10(0.05), label="0.05", color='orange')
             plt.axhline(y=-np.log10(0.01), label="0.01", color='green')
             plt.legend(loc='upper right')
-        
+
         elif pois_algo == "corr":
             plt.subplot(num_plots, 1, 3)
             plt.title("p")
@@ -563,7 +563,7 @@ def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='.'):
             plt.axhline(y=-np.log10(0.05), label="0.05", color='orange')
             plt.axhline(y=-np.log10(0.01), label="0.01", color='green')
             plt.legend(loc='upper right')
- 
+
         plt.legend()
         if PLOT:
             plt.show()
@@ -576,7 +576,7 @@ def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='.'):
 # small window areound the peak
 def reduce_traces(num_pois, window=0):
     global TRACES_REDUCED
-    
+
     TRACES_REDUCED = np.zeros((NUM_KEY_BYTES, len(TRACES), num_pois))
     for bnum in range(NUM_KEY_BYTES):
         for i, trace in enumerate(TRACES):
@@ -584,7 +584,7 @@ def reduce_traces(num_pois, window=0):
             # find a good reference for the average
             for poi in range(num_pois):
                 start = PROFILE.POIS[bnum][poi]-window
-                end = PROFILE.POIS[bnum][poi]+window+1   
+                end = PROFILE.POIS[bnum][poi]+window+1
                 TRACES_REDUCED[bnum][i][poi] = np.average(trace[start:end])
 
 # Estimate means, std, and covariance for each possible class
@@ -601,12 +601,12 @@ def build_profile(variable, template_dir='.'):
             for i in range(num_pois):
                 PROFILE.MEANS[bnum][cla][i] = MEANS[bnum][cla][PROFILE.POIS[bnum][i]]
                 PROFILE.STDS[bnum][cla][i] = STDS[bnum][cla][PROFILE.POIS[bnum][i]]
-                for j in range(num_pois):	
-                    if(len(SETS[bnum][cla])>0):	
+                for j in range(num_pois):
+                    if(len(SETS[bnum][cla])>0):
                         PROFILE.COVS[bnum][cla][i][j] = cov(
                                 SETS[bnum][cla][:, PROFILE.POIS[bnum][i]],
                                 SETS[bnum][cla][:, PROFILE.POIS[bnum][j]])
-  
+
     if PLOT or SAVE_IMAGES:
         for i in range(num_pois):
             for spine in list(plt.gca().spines.values()):
@@ -615,7 +615,7 @@ def build_profile(variable, template_dir='.'):
             plt.title("Profile")
             plt.xlabel(variable)
             plt.ylabel("normalized amplitude")
- 
+
             #for bnum in range(0,NUM_KEY_BYTES):
             #    for cla in range(0,256):
             #        plt.errorbar(cla, PROFILE.MEANS[bnum][hw[cla], i],
@@ -689,7 +689,7 @@ def fit(lr_type, variable):
         for i in range(num_pois):
             plt.xlabel(variable)
             plt.ylabel("normalized amplitude")
- 
+
             for bnum in range(0,NUM_KEY_BYTES):
                 plt.errorbar(CLASSES,
                              PROFILE_MEANS_FIT[bnum][:, i],
@@ -697,7 +697,7 @@ def fit(lr_type, variable):
                              label="subkey %d"%bnum)
             plt.legend(loc='upper right')
             plt.show()
- 
+
             plt.xlabel(variable)
             plt.ylabel("normalized amplitude")
             plt.title("profile vs. fit")
@@ -728,13 +728,13 @@ def fit(lr_type, variable):
 # Run a template attack or a profiled correlation attack
 def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
     global LOG_PROBA
- 
+
     LOG_PROBA = [[0 for r in range(256)] for bnum in range(NUM_KEY_BYTES)]
 
     scores = []
     bestguess = [0]*16
     pge = [256]*16
-    
+
     print("")
 
     ranking_type = "pearson"
@@ -765,7 +765,7 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
                         cov = covs
                     else:
                         cov = covs[cla]
-                    
+
                     rv = multivariate_normal(PROFILE.MEANS[bnum][cla][0:num_pois], cov)
                     p_kj = rv.pdf(TRACES_REDUCED[bnum][j][0:num_pois])
 
@@ -775,7 +775,7 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
                         # print "inf"
                         continue
                     P_k_tmp[k] += x
-                
+
                 P_k += P_k_tmp
 
                 if j % 100 == 0:
@@ -788,9 +788,9 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
                 pge[bnum] = list(P_k.argsort()[::-1]).index(KEYS[0][bnum])
             print("PGE ", pge[bnum])
             scores.append(P_k)
-    
+
     elif attack_algo == "pcc":
-       
+
         assert len(PROFILE.POIS[0]) >= num_pois, "Requested number of POIs (%d) higher than available (%d)"%(num_pois, len(PROFILE.POIS[0]))
 
         if average_bytes:
@@ -800,7 +800,7 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
             maxcpa = [0]*256
             print("Subkey %2d"%bnum)
             for kguess in range(256):
-                
+
                 clas = [VARIABLE_FUNC(PLAINTEXTS[j][bnum], kguess) for j in
                         range(len(TRACES))]
                 if average_bytes:
@@ -809,8 +809,8 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
                 else:
                     leaks = np.asarray([PROFILE.MEANS[bnum][clas[j]] for j in
                         range(len(TRACES))])
-                
-                # Combine POIs as proposed in 
+
+                # Combine POIs as proposed in
                 # https://pastel.archives-ouvertes.fr/pastel-00850528/document
                 maxcpa[kguess] = 1
                 for i in range(num_pois):
@@ -818,17 +818,17 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
                     maxcpa[kguess] *= r
 
                 LOG_PROBA[bnum][kguess] = r
-    
+
             bestguess[bnum] = np.argmax(maxcpa)
-    
+
             cparefs = np.argsort(maxcpa)[::-1]
-    
+
             #Find PGE
             pge[bnum] = list(cparefs).index(KEYS[0][bnum])
 
     else:
         raise Exception("Attack type not supported: %s"%attack_type)
- 
+
     if FIXED_PLAINTEXT:
         known = PLAINTEXTS[0]
     else:
@@ -841,14 +841,14 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
 def aes(pt, key):
     from Crypto.Cipher import AES
 
-    #_pt = ''.join([chr(c) for c in pt])	
-    _pt = b''.join([b.to_bytes(1,"little") for b in pt])	
-    #_key = ''.join([chr(c) for c in key])	
-    _key = b''.join([b.to_bytes(1,"little") for b in key])	
-    cipher = AES.new(_key, AES.MODE_ECB)	
-    _ct = cipher.encrypt(_pt)	
+    #_pt = ''.join([chr(c) for c in pt])
+    _pt = b''.join([b.to_bytes(1,"little") for b in pt])
+    #_key = ''.join([chr(c) for c in key])
+    _key = b''.join([b.to_bytes(1,"little") for b in key])
+    cipher = AES.new(_key, AES.MODE_ECB)
+    _ct = cipher.encrypt(_pt)
     ct = [c for c in _ct]
-    
+
     return ct
 
 # Wrapper to call the Histogram Enumeration Library for key-enumeration
@@ -857,32 +857,32 @@ def bruteforce(bit_bound_end):
     print("Starting key enumeration using HEL")
     import ctypes
     from Crypto.Cipher import AES
- 
+
     from python_hel import hel
-   
+
     pt1 = np.array(PLAINTEXTS[0], dtype=ctypes.c_ubyte).tolist()
     pt2 = np.array(PLAINTEXTS[1], dtype=ctypes.c_ubyte).tolist()
- 
+
     print("Assuming that we know two plaintext/ciphertext pairs")
-    #_key = ''.join([chr(c) for c in KEYS[0]])	
-    __key = KEYS[0].tolist()	
-    _key = b''.join([b.to_bytes(1,"little") for b in __key])	
-    #_pt1 = ''.join([chr(c) for c in pt1])	
-    _pt1 = b''.join([b.to_bytes(1,"little") for b in pt1])	
-    #_pt2 = ''.join([chr(c) for c in pt2])	
-    _pt2 = b''.join([b.to_bytes(1,"little") for b in pt2])	
- 
- 
+    #_key = ''.join([chr(c) for c in KEYS[0]])
+    __key = KEYS[0].tolist()
+    _key = b''.join([b.to_bytes(1,"little") for b in __key])
+    #_pt1 = ''.join([chr(c) for c in pt1])
+    _pt1 = b''.join([b.to_bytes(1,"little") for b in pt1])
+    #_pt2 = ''.join([chr(c) for c in pt2])
+    _pt2 = b''.join([b.to_bytes(1,"little") for b in pt2])
+
+
     cipher = AES.new(_key, AES.MODE_ECB)
- 
+
     _ct1 = cipher.encrypt(_pt1)
     _ct2 = cipher.encrypt(_pt2)
-    
-    #ct1 = [ord(c) for c in _ct1]	
-    ct1 = [c for c in _ct1] 
+
+    #ct1 = [ord(c) for c in _ct1]
+    ct1 = [c for c in _ct1]
     ct1 = np.array(ct1, dtype=ctypes.c_ubyte)
-    #ct2 = [ord(c) for c in _ct2]	
-    ct2 = [c for c in _ct2] 
+    #ct2 = [ord(c) for c in _ct2]
+    ct2 = [c for c in _ct2]
     ct2 = np.array(ct2, dtype=ctypes.c_ubyte)
 
     merge = 2
@@ -1040,14 +1040,14 @@ def tra_create(template_dir, num_pois, poi_spacing):
     if GWAIT:
         print("Loading complete")
         input("Press any key to start\n")
- 
+
     if PLOT:
         plt.plot(np.average(TRACES,axis=0),'b')
         plt.show()
 
-    tempKey = KEYS 
-    fixed_key = FIXED_KEY 
- 
+    tempKey = KEYS
+    fixed_key = FIXED_KEY
+
     for knum in range(NUM_KEY_BYTES):
         if(fixed_key):
             tempSbox = [sbox[PLAINTEXTS[i][knum] ^ tempKey[0][knum]] for i in range(len(TRACES))]
@@ -1055,11 +1055,11 @@ def tra_create(template_dir, num_pois, poi_spacing):
             tempSbox = [sbox[PLAINTEXTS[i][knum] ^ tempKey[i][knum]] for i in range(len(TRACES))]
 
         tempHW = [hw[s] for s in tempSbox]
-        
+
         # Sort traces by HW
         # Make 9 blank lists - one for each Hamming weight
         tempTracesHW = [[] for _ in range(9)]
-        
+
         # Fill them up
         for i, trace in enumerate(TRACES):
             HW = tempHW[i]
@@ -1082,7 +1082,7 @@ def tra_create(template_dir, num_pois, poi_spacing):
         for i in range(9):
             for j in range(i):
                 tempSumDiff += np.abs(tempMeans[i] - tempMeans[j])
-        
+
         if PLOT:
             plt.plot(tempSumDiff,label="subkey %d"%knum)
             plt.legend()
@@ -1093,7 +1093,7 @@ def tra_create(template_dir, num_pois, poi_spacing):
             # Find the max
             nextPOI = tempSumDiff.argmax()
             POIs.append(nextPOI)
-            
+
             # Make sure we don't pick a nearby value
             poiMin = max(0, nextPOI - poi_spacing)
             poiMax = min(nextPOI + poi_spacing, len(tempSumDiff))
@@ -1121,7 +1121,7 @@ def tra_create(template_dir, num_pois, poi_spacing):
 
     if PLOT:
         plt.show()
-    
+
 @cli.command()
 @click.argument("template_dir", type=click.Path(exists=True, file_okay=False))
 def tra_attack(template_dir):
@@ -1137,13 +1137,13 @@ def tra_attack(template_dir):
     if GWAIT:
         print("Loading complete")
         input("Press any key to start")
-        
+
     if PLOT:
         plt.plot(np.average(TRACES,axis=0),'b')
         plt.show()
-    
-    atkKey = KEYS[0] 
-    
+
+    atkKey = KEYS[0]
+
     scores = []
     bestguess = [0]*16
     pge = [256]*16
@@ -1160,22 +1160,22 @@ def tra_attack(template_dir):
         # Ring buffer for keeping track of the last N best guesses
         window = [None] * 10
         window_index = 0
-        
+
         # Running total of log P_k
         P_k = np.zeros(256)
         for j, trace in enumerate(TRACES):
             # Grab key points and put them in a small matrix
             a = [trace[poi] for poi in POIs]
-            
+
             # Test each key
             for k in range(256):
                 # Find HW coming out of sbox
                 HW = hw[sbox[PLAINTEXTS[j][knum] ^ k]]
-            
+
                 # Find p_{k,j}
                 rv = multivariate_normal(meanMatrix[HW], covMatrix[HW])
                 p_kj = rv.pdf(a)
-           
+
                 # Add it to running total
                 P_k[k] += np.log(p_kj)
 
@@ -1192,7 +1192,7 @@ def tra_attack(template_dir):
                     # else:
                         # print '%02x'%g,
                 print("")
-            
+
             if all(k == atkKey[knum] for k in window) or (j == len(TRACES)-1 and guessed == atkKey[knum]):
                 print("subkey %2d found with %4d traces" % (knum, j))
                 tot += 1
@@ -1205,7 +1205,7 @@ def tra_attack(template_dir):
         bestguess[knum] = P_k.argsort()[-1]
         pge[knum] = list(P_k.argsort()[::-1]).index(atkKey[knum])
         scores.append(P_k)
-   
+
     print_result(bestguess, atkKey, pge)
     # if BRUTEFORCE:
         # brute_force_bitflip(bestguess, atkKey)
@@ -1228,11 +1228,11 @@ def cra():
     load_data(dataset.SubsetType.ATTACK)
     global LOG_PROBA
     LOG_PROBA = [[0 for r in range(256)] for bnum in range(NUM_KEY_BYTES)]
-    
+
     if GWAIT:
         print("Loading complete")
         input("Press any key to start")
- 
+
     if PLOT:
         for t in TRACES:
             plt.plot(t,linewidth=0.5)
@@ -1251,11 +1251,11 @@ def cra():
                 tempSumDiff += np.abs(TRACES[i] - TRACES[j])
         plt.plot(tempSumDiff)
         plt.show()
-    
-    knownkey = KEYS[0] 
+
+    knownkey = KEYS[0]
     numtraces = np.shape(TRACES)[0]-1
     numpoint = np.shape(TRACES)[1]
-    
+
     bestguess = [0]*16
     pge = [256]*16
 
@@ -1271,38 +1271,38 @@ def cra():
             sumnum = np.zeros(numpoint)
             sumden1 = np.zeros(numpoint)
             sumden2 = np.zeros(numpoint)
-    
+
             hyp = np.zeros(numtraces)
             for tnum in range(numtraces):
                 hyp[tnum] = hw[intermediate(PLAINTEXTS[tnum][bnum], kguess)]
 
             #Mean of hypothesis
             meanh = np.mean(hyp, dtype=np.float64)
-    
+
             #Mean of all points in trace
             meant = np.mean(TRACES, axis=0, dtype=np.float64)
-    
+
             for tnum in range(numtraces):
                 hdiff = (hyp[tnum] - meanh)
                 tdiff = TRACES[tnum, :] - meant
-    
+
                 sumnum = sumnum + (hdiff*tdiff)
-                sumden1 = sumden1 + hdiff*hdiff 
+                sumden1 = sumden1 + hdiff*hdiff
                 sumden2 = sumden2 + tdiff*tdiff
-    
+
             cpaoutput[kguess] = sumnum / np.sqrt(sumden1 * sumden2)
             maxcpa[kguess] = max(abs(cpaoutput[kguess]))
             LOG_PROBA[bnum][kguess] = maxcpa[kguess]
             print(maxcpa[kguess])
-    
+
         bestguess[bnum] = np.argmax(maxcpa)
-    
+
         cparefs = np.argsort(maxcpa)[::-1]
-    
+
         #Find PGE
         pge[bnum] = list(cparefs).index(knownkey[bnum])
         stored_cpas.append(maxcpa)
-    
+
     print_result(bestguess, knownkey, pge)
     # if BRUTEFORCE:
         # brute_force(stored_cpas, knownkey)
