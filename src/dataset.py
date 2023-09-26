@@ -222,8 +222,10 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
                 l.LOGGER.debug("number of detected aes: {}".format(len(starts)))
             else:
                 l.LOGGER.error("number of detected aes is aberrant: {}".format(len(starts)))
-                libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate, peaks=starts, triggers=trigger)
-                raise Exception("aes detection failed!")
+                # If plot is ON, we are debugging/configuring or processing trace #1, hence don't continue.
+                if plot:
+                    libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate, peaks=starts, triggers=trigger)
+                    raise Exception("aes detection failed!")
             if plot:
                 libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate, peaks=starts, triggers=trigger)
             # * If trace 0, interactively valid the extraction as the template for further traces.
@@ -233,12 +235,15 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
                 if sset.template is None:
                     raise Exception("no choosen template signal")
             # * Align current trace against the template.
-            extracted = analyze.extract(sset.ff, starts, len(sset.template))
-            aligned   = analyze.align(sset.template, extracted[0], dset.samp_rate, ignore=False, log=False)
+            if len(starts) == 1: # Only process if find_aes returned correctly, otherwise, set a bad trace.
+                extracted = analyze.extract(sset.ff, starts, len(sset.template))
+                aligned   = analyze.align(sset.template, extracted[0], dset.samp_rate, ignore=False, log=False)
+            else:
+                aligned = None
             # * Check the trace is valid.
             check, sset.ff = analyze.fill_zeros_if_bad(sset.template, aligned)
             if check is True:
-                l.LOGGER.warning("error during averaging aes, trace {} filled with zeroes!".format(i))
+                l.LOGGER.warning("error during processing, trace {} filled with zeroes!".format(i))
                 sset.bad_entries.append(i)
             # * Save dataset for resuming if not finishing the loop.
             sset.save_trace(nf=False)
