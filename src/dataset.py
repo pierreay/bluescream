@@ -207,11 +207,40 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
             # * Load trace and save current processing step in dataset.
             dset.dirty_idx = i
             sset.load_trace(i, nf=False, ff=True, check=True)
+            import ipdb; ipdb.set_trace()
+            # TODO: INCLUDE code from analyze.py here, to refactor.
             # * Extract the AES.
             # * If trace 0, interactively valid it as a template.
             # * Else, align it against the template.
+            error = 0
+            # * Find AES.
+            sset.ff = analyze.get_amplitude(sset.ff)
+            starts, trigger = analyze.find_aes(sset.ff, dset.samp_rate, 1e6, 10e6, 1, lp=1e5, offset=-1.5e-4, flip=False)
+            assert np.shape(starts[starts <= 0]) == (0,), "starts should not contained negative indexes"
+            check_nb = len(starts) == 1
+            if check_nb:
+                l.LOGGER.debug("number of detected aes: {}".format(len(starts)))
+            else:
+                l.LOGGER.error("number of detected aes seems to be aberrant: {}".format(len(starts)))
+                error = 1
+            if plot:
+                libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate, peaks=starts, triggers=trigger)
+            if error:
+                return None, sset.template
+            # * Select one extraction as template.
             import ipdb; ipdb.set_trace()
-            sset.ff, sset.template = analyze.extralign_aes(sset.ff, dset.samp_rate, sset.template, length, plot)
+            if isinstance(sset.template, int):
+                extracted  = analyze.extract(sset.ff, starts, length=length)
+                template_s = analyze.choose_signal(extracted, sset.template)
+            elif isinstance(sset.template, np.ndsset.ffay):
+                template_s = sset.template
+            assert(template_s is not None)
+            # * Extract all AES and average them.
+            extracted = analyze.extract(sset.ff, starts, len(template_s))
+            aligned   = analyze.align_all(extracted, dset.samp_rate, template_s, False)
+            averaged  = analyze.average(aligned)
+            return averaged, template_s
+            # TODO: End of refactoring from here.
             # * Check the trace is valid.
             check, sset.ff = analyze.fill_zeros_if_bad(sset.template, sset.ff)
             if check is True:
