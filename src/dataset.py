@@ -183,15 +183,13 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
     # SPECIFICIATIONS:
     # test for resuming template
     # resume from dirty idx
-    # for trace 0:
-    #     load trace 0
-    #     extract aes
-    #     interactively valid it as a template
-    #     save dataset dest
-    # for each trace after 1:
+    # for each trace:
     #     load trace i
     #     extract aes
-    #     align with template
+    #     if trace 0:
+    #       interactively valid it as a template
+    #     else:
+    #       align against template
     #     save dataest    
     start = 0
     # * Load input dataset and selected subset.
@@ -201,25 +199,28 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
         dset.resume_from_savedir(subset)
         start = dset.dirty_idx
         l.LOGGER.info("resume at trace {} using template from previous processing".format(start))
+        l.LOGGER.debug("template shape={}".format(sset.template.shape))
+    if stop == -1:
+        stop = sset.get_nb_trace_ondisk()
     with logging_redirect_tqdm(loggers=[l.LOGGER]):
-        if stop == -1:
-            stop = sset.get_nb_trace_ondisk()
         for i in tqdm(range(start, stop), desc="extralign"):
+            # * Load trace and save current processing step in dataset.
             dset.dirty_idx = i
             sset.load_trace(i, nf=False, ff=True, check=True)
-            # TODO: extracting and align. Currently, extralign_aes is able to
-            # detect and extract one AES. The problem is that we have to align
-            # all traces of the dataset, not all the AES of one trace. Hence,
-            # we should change the loop and the loading mechanism.
-            template = -1
-            sset.ff, sset.template = analyze.extralign_aes(sset.ff, dset.samp_rate, template if sset.template is None else sset.template, length, plot)
+            # * Extract the AES.
+            # * If trace 0, interactively valid it as a template.
+            # * Else, align it against the template.
             import ipdb; ipdb.set_trace()
+            sset.ff, sset.template = analyze.extralign_aes(sset.ff, dset.samp_rate, sset.template, length, plot)
+            # * Check the trace is valid.
             check, sset.ff = analyze.fill_zeros_if_bad(sset.template, sset.ff)
             if check is True:
                 l.LOGGER.warning("error during averaging aes, trace {} filled with zeroes!".format(i))
                 sset.bad_entries.append(i)
+            # * Plot if needed for debugging or configuration.
             if plot:
                 libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate)
+            # * Save dataset for resuming if not finishing the loop.
             sset.save_trace(nf=False)
             dset.pickle_dump(unload=False)
     sset.prune_input(save=True)
