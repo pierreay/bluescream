@@ -203,11 +203,11 @@ class Subset():
         """
         assert(path.exists(self.get_path()))
         if isinstance(idx, int) and idx == -1:
-            self.nf, self.ff = load.load_all_traces(self.get_path(), nf=nf, ff=ff)
+            self.nf, self.ff = load.load_all_traces(self.get_path(), nf_wanted=nf, ff_wanted=ff)
         elif isinstance(idx, int):
             self.nf, self.ff = load.load_pair_trace(self.get_path(), idx, nf=nf, ff=ff)
         elif isinstance(idx, range):
-            self.nf, self.ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf=nf, ff=ff)
+            self.nf, self.ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf_wanted=nf, ff_wanted=ff)
         self.load_trace_idx = idx
         if check is True:
             if nf is True and self.nf is None:

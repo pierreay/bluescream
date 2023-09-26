@@ -326,7 +326,7 @@ def save_all_traces(dir, nf, ff, packed=True, start=0, stop=0):
                 np.save(get_dataset_path_unpack_ff(dir, i), ff[i - start])
     l.LOGGER.info("done!")
 
-def load_all_traces(dir, start=0, stop=0, nf=True, ff=True):
+def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True):
     """Load traces contained in DIR. Can be packed or unpacked. Return a 2D
     np.array of shape (nb_traces, nb_samples). START and STOP can be specified
     to load a specific range of file from the disk for an unpacked
@@ -350,14 +350,14 @@ def load_all_traces(dir, start=0, stop=0, nf=True, ff=True):
         ref_shape, ref_dtype = get_dataset_shape_type(dir)
         nf_exist = get_dataset_is_nf_exist(dir)
         ff_exist = get_dataset_is_ff_exist(dir)
-        if nf_exist:
+        if nf_wanted is True and nf_exist is True:
             nf = np.empty((nb, ref_shape[0]), dtype=ref_dtype)
             for i in tqdm(range(start, stop), desc="load all nf traces"):
                 nf_p = get_dataset_path_unpack_nf(dir, i)
                 nf[i - start] = np.load(nf_p)
         else:
              l.LOGGER.warning("no loaded nf traces!")
-        if ff_exist:
+        if ff_wanted is True and ff_exist is True:
             ff = np.empty((nb, ref_shape[0]), dtype=ref_dtype)
             for i in tqdm(range(start, stop), desc="load all ff traces"):
                 ff_p = get_dataset_path_unpack_ff(dir, i)
