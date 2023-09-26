@@ -977,6 +977,7 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
     """
     global PROFILE
     load_data(dataset.SubsetType.ATTACK)
+    assert(PROFILE)
     PROFILE.load()
     
     if not FIXED_KEY and variable != "hw_p" and variable != "p":
