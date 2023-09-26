@@ -83,7 +83,7 @@ def load_data(subset):
     called at the beginning of each @cli.command().
 
     """
-    global DATASET, SUBSET, PLAINTEXTS, KEYS, FIXED_KEY, TRACES, CIPHERTEXTS, NUM_TRACES, START_POINT, END_POINT, NORM, NORM2
+    global DATASET, SUBSET, PROFILE, PLAINTEXTS, KEYS, FIXED_KEY, TRACES, CIPHERTEXTS, NUM_TRACES, START_POINT, END_POINT, NORM, NORM2
     # The original generic_load() function used in Screaming Channels implies that:
     # - FIXED_KEY should be a bool.
     # - PLAINTEXTS and KEYS should be a list of list of int read from hex
