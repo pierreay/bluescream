@@ -126,7 +126,9 @@ def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0, flip=True, plot=Fa
     peaks = peaks[0] + offset_duration
     if plot is True:
         libplot.plot_time_spec_share_nf_ff(s, None, sr, peaks=peaks, triggers=trigger_l)
-    assert np.shape(peaks[peaks <= 0]) == (0,), "peaks indexes can't be negative, consider to increase offset or remove negatives values"
+    if np.shape(peaks[peaks <= 0]) != (0,):
+        l.LOGGER.warning("discard detected aes turned negatives because of the offset")
+        peaks = peaks[peaks >= 0]
     return peaks, trigger_l
 
 def choose_signal(arr, i = -1):
