@@ -191,7 +191,7 @@ class Subset():
             self.pt_type = InputType.VARIABLE
             self.ks_type = InputType.FIXED
 
-    def load_trace(self, idx=-1, nf=True, ff=True):
+    def load_trace(self, idx=-1, nf=True, ff=True, check=False):
         """IDX can be -1 for all traces, an INT for a specific trace index, or
         a RANGE for a range of traces. If using a RANGE, please use range(0, x)
         with x > 1. NF and FF can be set to False to not load them in an
@@ -209,6 +209,11 @@ class Subset():
         elif isinstance(idx, range):
             self.nf, self.ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf=nf, ff=ff)
         self.load_trace_idx = idx
+        if check is True:
+            if nf is True and self.nf is None:
+                raise Exception("can't load nf trace")
+            if ff is True and self.ff is None:
+                raise Exception("can't load ff trace")
         return self.nf, self.ff
 
     def unload_trace(self):
