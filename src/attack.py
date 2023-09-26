@@ -957,7 +957,6 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
               help="Number of points of interest.")
 @click.option("--poi-spacing", default=5, show_default=True,
               help="Minimum number of points between two points of interest.")
-@click.argument("template_dir", type=click.Path(file_okay=False, writable=True))
 @click.option("--attack-algo", default="pcc", show_default=True,
               help="Algo used to rank the guesses (pdf, pcc)")
 @click.option("--k-fold", default=2, show_default=True,
@@ -968,7 +967,7 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
               help="Pooled covariance for template attacks.")
 @click.option("--window", default=0, show_default=True,
               help="Average poi-window to poi+window samples.")
-def attack(variable, pois_algo, num_pois, poi_spacing, template_dir,
+def attack(variable, pois_algo, num_pois, poi_spacing,
         attack_algo, k_fold, average_bytes, pooled_cov, window):
     """
     Template attack or profiled correlation attack.
