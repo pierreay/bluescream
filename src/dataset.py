@@ -174,7 +174,7 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop):
 @click.argument("indir", type=click.Path())
 @click.argument("outdir", type=click.Path())
 @click.argument("subset", type=str)
-@click.option("--plot/--no-plot", default=True, help="Plot a summary of the processing.")
+@click.option("--plot/--no-plot", default=True, help="Plot AES finding and template validation.")
 @click.option("--offset", default=0, help="Number of samples to addition to the detected AES.")
 @click.option("--length", default=10000, help="Number of samples of the window to extract.")
 @click.option("--stop", default=1, help="Range of traces to process in the subset of the dataset. Set to -1 for maximum.")
@@ -214,12 +214,10 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
             # * Load trace and save current processing step in dataset.
             dset.dirty_idx = i
             sset.load_trace(i, nf=False, ff=True, check=True)
-            import ipdb; ipdb.set_trace()
-            # TODO: INCLUDE code from analyze.py here, to refactor.
             # * Find AES and check for error.
             sset.ff = analyze.get_amplitude(sset.ff)
             starts, trigger = analyze.find_aes(sset.ff, dset.samp_rate, 1e6, 10e6, 1, lp=1e5, offset=-1.5e-4, flip=False)
-            # TODO: Refactor all of the following insde the find_aes function?
+            # XXX: Refactor all of the following insde the find_aes function?
             if len(starts) == 1:
                 l.LOGGER.debug("number of detected aes: {}".format(len(starts)))
             else:
@@ -228,34 +226,25 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
                 raise Exception("aes detection failed!")
             if plot:
                 libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate, peaks=starts, triggers=trigger)
-            # * TODO: Extract the AES.
-            # * If trace 0, interactively valid it as a template.
-            # * Else, align it against the template.
-            # * Select one extraction as template.
-            import ipdb; ipdb.set_trace()
-            if isinstance(sset.template, int):
-                extracted  = analyze.extract(sset.ff, starts, length=length)
-                template_s = analyze.choose_signal(extracted, sset.template)
-            elif isinstance(sset.template, np.ndsset.ffay):
-                template_s = sset.template
-            assert(template_s is not None)
-            # * Extract all AES and average them.
-            extracted = analyze.extract(sset.ff, starts, len(template_s))
-            aligned   = analyze.align_all(extracted, dset.samp_rate, template_s, False)
-            averaged  = analyze.average(aligned)
-            return averaged, template_s
-            # TODO: End of refactoring from here.
+            # * If trace 0, interactively valid the extraction as the template for further traces.
+            if i == 0:
+                extracted     = analyze.extract(sset.ff, starts, length=length)
+                sset.template = analyze.choose_signal(extracted, -1 if plot is True else 0)
+                if sset.template is None:
+                    raise Exception("no choosen template signal")
+            # * Align current trace against the template.
+            extracted = analyze.extract(sset.ff, starts, len(sset.template))
+            aligned   = analyze.align(sset.template, extracted[0], dset.samp_rate, ignore=False, log=True)
             # * Check the trace is valid.
-            check, sset.ff = analyze.fill_zeros_if_bad(sset.template, sset.ff)
+            check, sset.ff = analyze.fill_zeros_if_bad(sset.template, aligned)
             if check is True:
                 l.LOGGER.warning("error during averaging aes, trace {} filled with zeroes!".format(i))
                 sset.bad_entries.append(i)
-            # * Plot if needed for debugging or configuration.
-            if plot:
-                libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate)
             # * Save dataset for resuming if not finishing the loop.
             sset.save_trace(nf=False)
             dset.pickle_dump(unload=False)
+            # * Disable plot for remainaing traces.
+            plot = False
     sset.prune_input(save=True)
     save_dataset_and_quit(dset)
     
