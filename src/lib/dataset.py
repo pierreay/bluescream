@@ -341,13 +341,13 @@ class Subset():
         return string
 
 class Profile():
-    POIS_FN               = "POIS.npy"
-    RS_FN                 = "PROFILE_RS.npy"
-    RZS_FN                = "PROFILE_RZS.npy"
-    PROFILE_MEANS_FN      = "PROFILE_MEANS.npy"
-    PROFILE_STDS_FN       = "PROFILE_STDS.npy"
-    PROFILE_COVS_FN       = "PROFILE_COVS.npy"
-    PROFILE_MEAN_TRACE_FN = "PROFILE_MEAN_TRACE.npy"
+    POIS_FN       = "POIS.npy"
+    RS_FN         = "PROFILE_RS.npy"
+    RZS_FN        = "PROFILE_RZS.npy"
+    MEANS_FN      = "PROFILE_MEANS.npy"
+    STDS_FN       = "PROFILE_STDS.npy"
+    COVS_FN       = "PROFILE_COVS.npy"
+    MEAN_TRACE_FN = "PROFILE_MEAN_TRACE.npy"
     
     def __init__(self, dataset):
         self.dir = "profile"   # Fixed subdirectory.
@@ -357,10 +357,10 @@ class Profile():
         self.POIS = None
         self.RS = None
         self.RZS = None
-        self.PROFILE_MEANS = None
-        self.PROFILE_STDS = None
-        self.PROFILE_COVS = None
-        self.PROFILE_MEAN_TRACE = None
+        self.MEANS = None
+        self.STDS = None
+        self.COVS = None
+        self.MEAN_TRACE = None
         self.POINT_START = None # Starting point used in original trace.
         self.POINT_END   = None # Ending point used in original trace.
 
@@ -375,23 +375,23 @@ class Profile():
         np.save(path.join(self.get_path(), Profile.POIS_FN), self.POIS)
         np.save(path.join(self.get_path(), Profile.RS_FN), self.RS)
         np.save(path.join(self.get_path(), Profile.RZS_FN), self.RZS)
-        np.save(path.join(self.get_path(), Profile.PROFILE_MEANS_FN), self.PROFILE_MEANS)
-        np.save(path.join(self.get_path(), Profile.PROFILE_STDS_FN), self.PROFILE_STDS)
-        np.save(path.join(self.get_path(), Profile.PROFILE_COVS_FN), self.PROFILE_COVS)
-        np.save(path.join(self.get_path(), Profile.PROFILE_MEAN_TRACE_FN), self.PROFILE_MEAN_TRACE)
+        np.save(path.join(self.get_path(), Profile.MEANS_FN), self.MEANS)
+        np.save(path.join(self.get_path(), Profile.STDS_FN), self.STDS)
+        np.save(path.join(self.get_path(), Profile.COVS_FN), self.COVS)
+        np.save(path.join(self.get_path(), Profile.MEAN_TRACE_FN), self.MEAN_TRACE)
 
     # Load the profile, for comparison or for attacks.
     def load(self):
-        self.POIS               = np.load(path.join(self.get_path(), Profile.POIS_FN), POIS)
-        self.PROFILE_RS         = np.load(path.join(self.get_path(), Profile.PROFILE_RS_FN), PROFILE_RS)
-        self.PROFILE_RZS        = np.load(path.join(self.get_path(), Profile.PROFILE_RZS_FN), PROFILE_RZS)
-        self.PROFILE_MEANS      = np.load(path.join(self.get_path(), Profile.PROFILE_MEANS_FN), PROFILE_MEANS)
-        self.PROFILE_COVS       = np.load(path.join(self.get_path(), Profile.PROFILE_COVS_FN), PROFILE_COVS)
-        self.PROFILE_STDS       = np.load(path.join(self.get_path(), Profile.PROFILE_STDS_FN), PROFILE_STDS)
-        self.PROFILE_MEAN_TRACE = np.load(path.join(self.get_path(), Profile.PROFILE_MEAN_TRACE_FN), PROFILE_MEAN_TRACE)
+        self.POIS       = np.load(path.join(self.get_path(), Profile.POIS_FN))
+        self.RS         = np.load(path.join(self.get_path(), Profile.RS_FN))
+        self.RZS        = np.load(path.join(self.get_path(), Profile.RZS_FN))
+        self.MEANS      = np.load(path.join(self.get_path(), Profile.MEANS_FN))
+        self.COVS       = np.load(path.join(self.get_path(), Profile.COVS_FN))
+        self.STDS       = np.load(path.join(self.get_path(), Profile.STDS_FN))
+        self.MEAN_TRACE = np.load(path.join(self.get_path(), Profile.MEAN_TRACE_FN))
 
     def plot(self):
-        libplot.plot_simple(self.PROFILE_MEAN_TRACE)
+        libplot.plot_simple(self.MEAN_TRACE)
    
     def __str__(self):
         string = "profile:\n"
@@ -399,8 +399,8 @@ class Profile():
         string += "- get_path(): {}\n".format(self.get_path())
         if self.POIS is not None:
             string += "- pois shape: {}\n".format(self.POIS.shape)
-        if self.PROFILE_MEAN_TRACE is not None:
-            string += "- profile trace shape: {}\n".format(self.PROFILE_MEAN_TRACE.shape)
+        if self.MEAN_TRACE is not None:
+            string += "- profile trace shape: {}\n".format(self.MEAN_TRACE.shape)
         if self.POINT_START:
             string += "- profile start point: {}\n".format(self.POINT_START)
         if self.POINT_END:

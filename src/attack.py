@@ -306,7 +306,7 @@ def classify():
 def estimate():
     global MEANS, VARS, STDS
 
-    PROFILE.PROFILE_MEAN_TRACE = np.average(TRACES, axis=0)
+    PROFILE.MEAN_TRACE = np.average(TRACES, axis=0)
     MEANS = np.zeros((NUM_KEY_BYTES, len(CLASSES), len(TRACES[0])))
     VARS = np.zeros((NUM_KEY_BYTES, len(CLASSES), len(TRACES[0])))
     STDS = np.zeros((NUM_KEY_BYTES, len(CLASSES), len(TRACES[0])))
@@ -592,18 +592,18 @@ def build_profile(variable, template_dir='.'):
     num_pois = len(PROFILE.POIS[0])
     num_classes = len(CLASSES)
 
-    PROFILE.PROFILE_MEANS = np.zeros((NUM_KEY_BYTES, num_classes, num_pois))
-    PROFILE.PROFILE_STDS = np.zeros((NUM_KEY_BYTES, num_classes, num_pois))
-    PROFILE.PROFILE_COVS = np.zeros((NUM_KEY_BYTES, num_classes, num_pois, num_pois))
+    PROFILE.MEANS = np.zeros((NUM_KEY_BYTES, num_classes, num_pois))
+    PROFILE.STDS = np.zeros((NUM_KEY_BYTES, num_classes, num_pois))
+    PROFILE.COVS = np.zeros((NUM_KEY_BYTES, num_classes, num_pois, num_pois))
 
     for bnum in range(NUM_KEY_BYTES):
         for cla in CLASSES:
             for i in range(num_pois):
-                PROFILE.PROFILE_MEANS[bnum][cla][i] = MEANS[bnum][cla][PROFILE.POIS[bnum][i]]
-                PROFILE.PROFILE_STDS[bnum][cla][i] = STDS[bnum][cla][PROFILE.POIS[bnum][i]]
+                PROFILE.MEANS[bnum][cla][i] = MEANS[bnum][cla][PROFILE.POIS[bnum][i]]
+                PROFILE.STDS[bnum][cla][i] = STDS[bnum][cla][PROFILE.POIS[bnum][i]]
                 for j in range(num_pois):	
                     if(len(SETS[bnum][cla])>0):	
-                        PROFILE.PROFILE_COVS[bnum][cla][i][j] = cov(
+                        PROFILE.COVS[bnum][cla][i][j] = cov(
                                 SETS[bnum][cla][:, PROFILE.POIS[bnum][i]],
                                 SETS[bnum][cla][:, PROFILE.POIS[bnum][j]])
   
@@ -618,15 +618,15 @@ def build_profile(variable, template_dir='.'):
  
             #for bnum in range(0,NUM_KEY_BYTES):
             #    for cla in range(0,256):
-            #        plt.errorbar(cla, PROFILE.PROFILE_MEANS[bnum][hw[cla], i],
-            #                yerr=PROFILE.PROFILE_STDS[bnum][hw[cla], i],
+            #        plt.errorbar(cla, PROFILE.MEANS[bnum][hw[cla], i],
+            #                yerr=PROFILE.STDS[bnum][hw[cla], i],
             #                fmt='--o',
             #                label="subkey %d"%bnum)
 
             for bnum in range(0,NUM_KEY_BYTES):
                 plt.errorbar(CLASSES,
-                             PROFILE.PROFILE_MEANS[bnum][:, i],
-                             yerr=PROFILE.PROFILE_STDS[bnum][:, i],
+                             PROFILE.MEANS[bnum][:, i],
+                             yerr=PROFILE.STDS[bnum][:, i],
                              fmt='--o',
                              label="subkey %d"%bnum)
             plt.legend(loc='upper right')
@@ -707,8 +707,8 @@ def fit(lr_type, variable):
                          'r-',
                           label="fit")
             plt.errorbar(CLASSES,
-                         PROFILE.PROFILE_MEANS[0][:, i],
-                         yerr=PROFILE.PROFILE_STDS[bnum][:, i],
+                         PROFILE.MEANS[0][:, i],
+                         yerr=PROFILE.STDS[bnum][:, i],
                          fmt='g*',
                          label="profile")
             plt.legend(loc='upper right')
@@ -717,13 +717,13 @@ def fit(lr_type, variable):
     print("")
     print("Correlation between fit and profile")
     for bnum in range(NUM_KEY_BYTES):
-         #print np.corrcoef(PROFILE.PROFILE_MEANS[bnum][:, 0],
+         #print np.corrcoef(PROFILE.MEANS[bnum][:, 0],
          #       PROFILE_MEANS_FIT[bnum][:, 0])[0, 1]
-         r,p = pearsonr(PROFILE.PROFILE_MEANS[bnum][:, 0], PROFILE_MEANS_FIT[bnum][:, 0])
+         r,p = pearsonr(PROFILE.MEANS[bnum][:, 0], PROFILE_MEANS_FIT[bnum][:, 0])
          print(r, -10*np.log10(p))
 
-    PROFILE.PROFILE_MEANS = PROFILE_MEANS_FIT
-    PROFILE.PROFILE_COVS = None
+    PROFILE.MEANS = PROFILE_MEANS_FIT
+    PROFILE.COVS = None
 
 # Run a template attack or a profiled correlation attack
 def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
@@ -740,14 +740,14 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
     ranking_type = "pearson"
     if attack_algo == "pdf":
 
-        if num_pois > len(PROFILE.PROFILE_COVS[0][0][0]):
-            print("Error, there are only %d pois available"%len(PROFILE.PROFILE_COVS[0][0][0]))
+        if num_pois > len(PROFILE.COVS[0][0][0]):
+            print("Error, there are only %d pois available"%len(PROFILE.COVS[0][0][0]))
 
         for bnum in range(0, NUM_KEY_BYTES):
             if pooled_cov:
-                covs = np.average(PROFILE.PROFILE_COVS[bnum,:,0:num_pois,0:num_pois], axis = 0)
+                covs = np.average(PROFILE.COVS[bnum,:,0:num_pois,0:num_pois], axis = 0)
             else:
-                covs = PROFILE.PROFILE_COVS[bnum][:,0:num_pois,0:num_pois]
+                covs = PROFILE.COVS[bnum][:,0:num_pois,0:num_pois]
 
             print("Subkey %2d"%bnum)
             # Running total of log P_k
@@ -766,7 +766,7 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
                     else:
                         cov = covs[cla]
                     
-                    rv = multivariate_normal(PROFILE.PROFILE_MEANS[bnum][cla][0:num_pois], cov)
+                    rv = multivariate_normal(PROFILE.MEANS[bnum][cla][0:num_pois], cov)
                     p_kj = rv.pdf(TRACES_REDUCED[bnum][j][0:num_pois])
 
                     # Add it to running total
@@ -794,7 +794,7 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
         assert len(PROFILE.POIS[0]) >= num_pois, "Requested number of POIs (%d) higher than available (%d)"%(num_pois, len(PROFILE.POIS[0]))
 
         if average_bytes:
-            PROFILE_MEANS_AVG = np.average(PROFILE.PROFILE_MEANS, axis=0)
+            PROFILE_MEANS_AVG = np.average(PROFILE.MEANS, axis=0)
         for bnum in range(0, NUM_KEY_BYTES):
             cpaoutput = [0]*256
             maxcpa = [0]*256
@@ -807,7 +807,7 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
                     leaks = np.asarray([PROFILE_MEANS_AVG[clas[j]] for j in
                         range(len(TRACES))])
                 else:
-                    leaks = np.asarray([PROFILE.PROFILE_MEANS[bnum][clas[j]] for j in
+                    leaks = np.asarray([PROFILE.MEANS[bnum][clas[j]] for j in
                         range(len(TRACES))])
                 
                 # Combine POIs as proposed in 
@@ -986,7 +986,7 @@ def attack(variable, pois_algo, num_pois, poi_spacing, template_dir,
     if PLOT:
         plt.plot(PROFILE.POIS[:,0], np.average(TRACES, axis=0)[PROFILE.POIS[:,0]], '*')
         plt.plot(np.average(TRACES, axis=0))
-        plt.plot(PROFILE.PROFILE_MEAN_TRACE, 'r')
+        plt.plot(PROFILE.MEAN_TRACE, 'r')
         plt.show()
 
     compute_variables(variable)
