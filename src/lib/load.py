@@ -294,11 +294,11 @@ def load_pair_trace(dir, idx, nf=True, ff=True):
     trace_nf = None
     trace_ff = None
     try:
-        trace_nf = np.load(get_dataset_path_unpack_nf(dir, idx))
+        trace_nf = None if nf is False else np.load(get_dataset_path_unpack_nf(dir, idx))
     except Exception as e:
         l.LOGGER.warn(e)
     try:
-        trace_ff = np.load(get_dataset_path_unpack_ff(dir, idx))
+        trace_ff = None if ff is False else np.load(get_dataset_path_unpack_ff(dir, idx))
     except Exception as e:
         l.LOGGER.warn(e)
     return trace_nf, trace_ff
