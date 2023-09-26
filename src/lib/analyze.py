@@ -193,6 +193,7 @@ def align(template, target, sr, ignore=True, log=False):
     shift        = np.argmax(corr) - (len(template) - 1)
     if log:
         l.LOGGER.debug("shift to maximize cross correlation is {}".format(shift))
+    # Shouldn't we use analyze.shift here?
     if shift > 0:
         if not ignore:
             assert shift < len(template/10), "shift is too high, inspect"
@@ -284,3 +285,23 @@ def is_nan(arr):
     """Return True if at least one NAN (not a number) is contained in ARR."""
     test = np.isnan(arr)
     return len(test[test == True]) >= 1
+
+def shift(xs, n):
+    """Shift a signal XS from the N offset.
+
+    Shift a signal XS to left (negative N) or right (positive N). Empty parts
+    of the signal are completed using np.zeros of same dtype as XS.
+
+    Source:
+    https://stackoverflow.com/questions/30399534/shift-elements-in-a-numpy-array
+
+    """
+    assert xs.ndim == 1
+    e = np.empty_like(xs)
+    if n >= 0:
+        e[:n] = np.zeros(n, dtype=xs.dtype)
+        e[n:] = xs[:-n]
+    else:
+        e[n:] = np.zeros(n, dtype=xs.dtype)
+        e[:n] = xs[-n:]
+    return e
