@@ -210,7 +210,7 @@ echo "=========== Training set ==========="
 echo
 export FW_MODE=train
 firmware_set_mode $FW_MODE >/dev/null 2>&1
-collect_one_set # 1
+collect_one_set 2
 
 # ** Attack subset
 
@@ -222,4 +222,4 @@ echo "=========== Attack set ==========="
 echo
 export FW_MODE=attack
 firmware_set_mode $FW_MODE >/dev/null 2>&1
-collect_one_set # 1
+collect_one_set 2
