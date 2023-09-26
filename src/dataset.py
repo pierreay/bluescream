@@ -206,8 +206,7 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
             stop = sset.get_nb_trace_ondisk()
         for i in tqdm(range(start, stop), desc="extralign"):
             dset.dirty_idx = i
-            sset.load_trace(i)
-            assert(sset.ff is not None)
+            sset.load_trace(i, nf=False, ff=True, check=True)
             # TODO: extracting and align. Currently, extralign_aes is able to
             # detect and extract one AES. The problem is that we have to align
             # all traces of the dataset, not all the AES of one trace. Hence,
