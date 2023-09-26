@@ -166,7 +166,7 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop):
             if plot:
                 libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate)
             sset.save_trace(nf=False)
-            dset.pickle_dump(unload=False)
+            dset.pickle_dump(unload=False, log=False)
     sset.prune_input(save=True)
     save_dataset_and_quit(dset)
 
@@ -242,7 +242,7 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
                 sset.bad_entries.append(i)
             # * Save dataset for resuming if not finishing the loop.
             sset.save_trace(nf=False)
-            dset.pickle_dump(unload=False)
+            dset.pickle_dump(unload=False, log=False)
             # * Disable plot for remainaing traces.
             plot = False
     sset.prune_input(save=True)

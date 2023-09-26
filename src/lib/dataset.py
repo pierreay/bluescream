@@ -111,7 +111,7 @@ class Dataset():
             sset.template = sset_dirsave.template
             sset.bad_entries = sset_dirsave.bad_entries
 
-    def pickle_dump(self, force=False, unload=True):
+    def pickle_dump(self, force=False, unload=True, log=True):
         if force == False and self.dir == self.dirsave:
             l.LOGGER.warning("save dataset to loaded directory")
             confirm = input("press [enter] to continue")
@@ -126,7 +126,8 @@ class Dataset():
                 self.attack_set.unload_trace()
         with open(self.get_path(save=True), "wb") as f:
              pickle.dump(self, f)
-             l.LOGGER.info("dataset saved in {}".format(self.get_path(save=True)))
+             if log is True:
+                 l.LOGGER.info("dataset saved in {}".format(self.get_path(save=True)))
 
     def add_subset(self, name, subtype, input_gen, nb_trace_wanted=0):
         assert(subtype in SubsetType)
