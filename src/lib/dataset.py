@@ -393,7 +393,14 @@ class Profile():
     def plot(self, delim=False):
         libplot.plot_simple(self.MEAN_TRACE)
         if delim is True:
-            libplot.plot_time_spec_share_nf_ff(self.dataset.train_set.ff[0], None, self.dataset.samp_rate, peaks=[self.POINT_START, self.POINT_END])
+            # Hacky part to find if dataset.train_set.ff is an array of traces
+            # or a single trace. It also implies that PROFILE has been built
+            # against FF and not NF.
+            ff = self.dataset.train_set.ff
+            if ff is None:
+                self.dataset.train_set.load_trace(0, nf=False, ff=True, check=True)
+                ff = [self.dataset.train_set.ff]
+            libplot.plot_time_spec_share_nf_ff(ff[0], None, self.dataset.samp_rate, peaks=[self.POINT_START, self.POINT_END])
    
     def __str__(self):
         string = "profile:\n"
