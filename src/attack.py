@@ -94,7 +94,7 @@ def load_data(subset):
     DATASET = dataset.Dataset.pickle_load(DATASET_PATH)
     assert(DATASET)
     SUBSET = DATASET.get_subset(subset)
-    SUBSET.load_trace()
+    SUBSET.load_trace(range(0, NUM_TRACES), nf=False, ff=True)
     PROFILE = DATASET.get_profile()
     PLAINTEXTS                  = SUBSET.pt
     KEYS                        = SUBSET.ks
