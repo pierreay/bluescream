@@ -209,23 +209,21 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
             sset.load_trace(i, nf=False, ff=True, check=True)
             import ipdb; ipdb.set_trace()
             # TODO: INCLUDE code from analyze.py here, to refactor.
-            # * Extract the AES.
-            # * If trace 0, interactively valid it as a template.
-            # * Else, align it against the template.
-            error = 0
-            # * Find AES.
+            # * Find AES and check for error.
             sset.ff = analyze.get_amplitude(sset.ff)
             starts, trigger = analyze.find_aes(sset.ff, dset.samp_rate, 1e6, 10e6, 1, lp=1e5, offset=-1.5e-4, flip=False)
-            check_nb = len(starts) == 1
-            if check_nb:
+            # TODO: Refactor all of the following insde the find_aes function?
+            if len(starts) == 1:
                 l.LOGGER.debug("number of detected aes: {}".format(len(starts)))
             else:
-                l.LOGGER.error("number of detected aes seems to be aberrant: {}".format(len(starts)))
-                error = 1
+                l.LOGGER.error("number of detected aes is aberrant: {}".format(len(starts)))
+                libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate, peaks=starts, triggers=trigger)
+                raise Exception("aes detection failed!")
             if plot:
                 libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate, peaks=starts, triggers=trigger)
-            if error:
-                return None, sset.template
+            # * TODO: Extract the AES.
+            # * If trace 0, interactively valid it as a template.
+            # * Else, align it against the template.
             # * Select one extraction as template.
             import ipdb; ipdb.set_trace()
             if isinstance(sset.template, int):
