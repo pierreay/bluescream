@@ -390,8 +390,10 @@ class Profile():
         self.STDS       = np.load(path.join(self.get_path(), Profile.STDS_FN))
         self.MEAN_TRACE = np.load(path.join(self.get_path(), Profile.MEAN_TRACE_FN))
 
-    def plot(self):
+    def plot(self, delim=False):
         libplot.plot_simple(self.MEAN_TRACE)
+        if delim is True:
+            libplot.plot_time_spec_share_nf_ff(self.dataset.train_set.ff[0], None, self.dataset.samp_rate, peaks=[self.POINT_START, self.POINT_END])
    
     def __str__(self):
         string = "profile:\n"
