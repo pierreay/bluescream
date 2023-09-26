@@ -1,5 +1,12 @@
 #!/usr/bin/python3
 
+# FIXME: Information lost between subset for several processing.
+# 
+# When using two different processing commands, e.g. average for training
+# subset and extralign for attack subset, then we lost information stored
+# during the processing of the first subset, like the template and the bad
+# entries.
+
 from os import path
 import numpy as np
 from matplotlib import pyplot as plt
