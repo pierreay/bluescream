@@ -234,7 +234,7 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
                     raise Exception("no choosen template signal")
             # * Align current trace against the template.
             extracted = analyze.extract(sset.ff, starts, len(sset.template))
-            aligned   = analyze.align(sset.template, extracted[0], dset.samp_rate, ignore=False, log=True)
+            aligned   = analyze.align(sset.template, extracted[0], dset.samp_rate, ignore=False, log=False)
             # * Check the trace is valid.
             check, sset.ff = analyze.fill_zeros_if_bad(sset.template, aligned)
             if check is True:
