@@ -191,10 +191,11 @@ class Subset():
             self.pt_type = InputType.VARIABLE
             self.ks_type = InputType.FIXED
 
-    def load_trace(self, idx=-1):
-        """IDX can be -1 for all traces, an INT for a specific trace index, or a
-        RANGE for a range of traces. If using a RANGE, please use range(0, x)
-        with x > 1.
+    def load_trace(self, idx=-1, nf=True, ff=True):
+        """IDX can be -1 for all traces, an INT for a specific trace index, or
+        a RANGE for a range of traces. If using a RANGE, please use range(0, x)
+        with x > 1. NF and FF can be set to False to not load them in an
+        unpacked dataset.
 
         For scripting conveniance, return references to the loaded trace(s)
         pair (self.nf and self.ff).
@@ -202,11 +203,11 @@ class Subset():
         """
         assert(path.exists(self.get_path()))
         if isinstance(idx, int) and idx == -1:
-            self.nf, self.ff = load.load_all_traces(self.get_path())
+            self.nf, self.ff = load.load_all_traces(self.get_path(), nf=nf, ff=ff)
         elif isinstance(idx, int):
-            self.nf, self.ff = load.load_pair_trace(self.get_path(), idx)
+            self.nf, self.ff = load.load_pair_trace(self.get_path(), idx, nf=nf, ff=ff)
         elif isinstance(idx, range):
-            self.nf, self.ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop)
+            self.nf, self.ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf=nf, ff=ff)
         self.load_trace_idx = idx
         return self.nf, self.ff
 

@@ -278,16 +278,17 @@ def load_raw_trace(dir, rad_idx, rec_idx):
 
 def save_pair_trace(dir, idx, nf, ff):
     """Save one pair of traces (NF & FF) located in directory DIR at index
-    IDX. If NF or FF are None, they are ignored."""
+    IDX. If NF or FF are None, they are ignored. """
     if nf is not None:
         np.save(get_dataset_path_unpack_nf(dir, idx), nf)
     if ff is not None:
         np.save(get_dataset_path_unpack_ff(dir, idx), ff)
  
-def load_pair_trace(dir, idx):
+def load_pair_trace(dir, idx, nf=True, ff=True):
     """Load one pair of traces (NF & FF) located in directory DIR at index
     IDX. Return a tuple composed of NF then FF trace, or None on loading
-    error.
+    error. NF and FF can be set to False to not load them in an unpacked
+    dataset.
 
     """
     trace_nf = None
@@ -325,13 +326,14 @@ def save_all_traces(dir, nf, ff, packed=True, start=0, stop=0):
                 np.save(get_dataset_path_unpack_ff(dir, i), ff[i - start])
     l.LOGGER.info("done!")
 
-def load_all_traces(dir, start=0, stop=0):
+def load_all_traces(dir, start=0, stop=0, nf=True, ff=True):
     """Load traces contained in DIR. Can be packed or unpacked. Return a 2D
     np.array of shape (nb_traces, nb_samples). START and STOP can be specified
     to load a specific range of file from the disk for an unpacked
     dataset. This function load traces conditionnaly, it returns
     None/empty/zeroes if traces doesn't exists. Beware to not overflow the
-    memory.
+    memory. NF and FF can be set to False to not load them in an unpacked
+    dataset.
 
     """
     l.LOGGER.info("loading traces...")
