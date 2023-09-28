@@ -967,8 +967,10 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
               help="Pooled covariance for template attacks.")
 @click.option("--window", default=0, show_default=True,
               help="Average poi-window to poi+window samples.")
+@clic.option("--align/--no-align", default=Falsse, show_default=True,
+             help="Align the attack traces with the profile before to attack.")
 def attack(variable, pois_algo, num_pois, poi_spacing,
-        attack_algo, k_fold, average_bytes, pooled_cov, window):
+           attack_algo, k_fold, average_bytes, pooled_cov, window, align):
     """
     Template attack or profiled correlation attack.
 
@@ -980,12 +982,16 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
     assert(PROFILE)
     PROFILE.load()
     
+
     if PLOT:
         PROFILE.plot(delim=True)
         libplot.plot_time_spec_share_nf_ff(DATASET.attack_set.ff[0], None, DATASET.samp_rate, peaks=[START_POINT, END_POINT])
+
+    if align:
+        TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
+
     if not FIXED_KEY and variable != "hw_p" and variable != "p":
         raise Exception("This set DOES NOT use a FIXED KEY")
-    
     if PLOT:
         plt.plot(PROFILE.POIS[:,0], np.average(TRACES, axis=0)[PROFILE.POIS[:,0]], '*')
         plt.plot(np.average(TRACES, axis=0))
