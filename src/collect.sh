@@ -16,15 +16,16 @@ source ./lib/misc.sh
 
 # ** Functions
 
-function cleanncreate() {
+function clean() {
     rm -rf $OUTPUT_WD
-    mkdir -p $OUTPUT_WD
-    echo "Clean and create $OUTPUT_WD"
+    echo "Clean $OUTPUT_WD"
 }
 
 function resume() {
-    i_start=$(( $(ls $OUTPUT_WD/ | grep trace_nf | wc -l) - 1))
-    echo "Resume collection at i=$i_start in $OUTPUT_WD"
+    if [[ -d $OUTPUT_WD ]]; then
+        i_start=$(( $(ls $OUTPUT_WD/ | grep trace_nf | wc -l) - 1))
+        echo "Resume collection at i=$i_start in $OUTPUT_WD"
+    fi
 }
 
 function quit() {
@@ -94,7 +95,7 @@ function collect_one_set() {
         do
             case $opt in
                 ${opts[0]})
-                    cleanncreate
+                    clean
                     break
                     ;;
                 ${opts[1]})
@@ -109,7 +110,7 @@ function collect_one_set() {
         done
     else
         if [[ $opt == 1 ]]; then
-            cleanncreate
+            clean
         elif [[ $opt == 2 ]]; then
             resume
         else
@@ -123,6 +124,10 @@ function collect_one_set() {
     trap display_time_quit INT
 
     # * Collecting.
+
+    # Make sure output directory is created (/attack or /train) or do nothing
+    # if resuming.
+    mkdir -p $OUTPUT_WD
 
     if [[ $KEY_FIXED == 1 ]]; then
         if [[ $i_start == 0 ]]; then
