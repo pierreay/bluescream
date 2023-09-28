@@ -254,7 +254,10 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
     error = 0
     # * Find AES.
     arr = analyze.get_amplitude(arr)
-    starts, trigger = analyze.find_aes(arr, sr, 8.8e6, 9.5e6, nb_aes, 1e4, -0.5e-4)
+    # First version of find_aes used for training set:
+    # starts, trigger = analyze.find_aes(arr, sr, 8.8e6, 9.5e6, nb_aes, 1e4, -0.5e-4, flip=True)
+    # Second version of find_aes used for attack set:
+    starts, trigger = analyze.find_aes(arr, sr, 8.1e6, 8.5e6, nb_aes, 1e4, -0.5e-4, flip=False)
     check_nb = len(starts) < (1.1 * nb_aes) and len(starts) > (0.9 * nb_aes)
     if check_nb:
         l.LOGGER.debug("number of detected aes: {}".format(len(starts)))
