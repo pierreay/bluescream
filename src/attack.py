@@ -980,6 +980,9 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
     assert(PROFILE)
     PROFILE.load()
     
+    if PLOT:
+        PROFILE.plot(delim=True)
+        libplot.plot_time_spec_share_nf_ff(DATASET.attack_set.ff[0], None, DATASET.samp_rate, peaks=[START_POINT, END_POINT])
     if not FIXED_KEY and variable != "hw_p" and variable != "p":
         raise Exception("This set DOES NOT use a FIXED KEY")
     
