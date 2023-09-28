@@ -967,7 +967,7 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
               help="Pooled covariance for template attacks.")
 @click.option("--window", default=0, show_default=True,
               help="Average poi-window to poi+window samples.")
-@clic.option("--align/--no-align", default=Falsse, show_default=True,
+@click.option("--align/--no-align", default=False, show_default=True,
              help="Align the attack traces with the profile before to attack.")
 def attack(variable, pois_algo, num_pois, poi_spacing,
            attack_algo, k_fold, average_bytes, pooled_cov, window, align):
@@ -977,7 +977,7 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
     The template directory is where we store multiple files comprising the
     template.
     """
-    global PROFILE
+    global PROFILE, TRACES
     load_data(dataset.SubsetType.ATTACK)
     assert(PROFILE)
     PROFILE.load()
