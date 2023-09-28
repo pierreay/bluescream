@@ -36,7 +36,7 @@ def init(level):
     global LOGGER
     if LOGGER is None:
         handler = colorlog.StreamHandler()
-        format = "%(log_color)s{}%(levelname)-5s - %(message)s".format("[%(asctime)s] [%(threadName)s] [%(module)s] " if level == "DEBUG" else "")
+        format = "%(log_color)s{}%(levelname)-5s - %(message)s".format("[%(asctime)s] [%(processName)s] [%(threadName)s] [%(module)s] " if level == "DEBUG" else "")
         formatter = colorlog.ColoredFormatter(format)
         LOGGER = colorlog.getLogger(__name__)
         handler.setFormatter(formatter)
