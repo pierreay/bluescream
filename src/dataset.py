@@ -127,7 +127,8 @@ def debug(indir, outdir):
 @click.option("--plot/--no-plot", default=True, help="Plot a summary of the processing.")
 @click.option("--template", default=-1, help="Specify template signal index to use. -1 means prompting.")
 @click.option("--stop", default=1, help="Range of traces to process in the subset of the dataset. Set to -1 for maximum.")
-def average(indir, outdir, subset, nb_aes, plot, template, stop):
+@click.option("--force/--no-force", default=False, help="Force a restart of the processing even if resuming is detected.")
+def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
     """Average multiple AES executions.
 
     INDIR corresponds to a directory containing a dataset with traces
@@ -144,7 +145,7 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop):
     # * Load input dataset and selected subset.
     dset, sset = load_dataset_or_quit(indir, subset, outdir=outdir)
     # * Fetch template from previously saved dataset in case of resuming.
-    if dset.get_savedir_dirty():
+    if force is False and dset.get_savedir_dirty():
         dset.resume_from_savedir(subset)
         start = dset.dirty_idx
         l.LOGGER.info("resume at trace {} using template from previous processing".format(start))
