@@ -7,6 +7,8 @@
 # during the processing of the first subset, like the template and the bad
 # entries.
 
+from multiprocessing import Process, Queue
+import os
 from os import path
 import numpy as np
 from matplotlib import pyplot as plt
@@ -105,6 +107,29 @@ def query(indir, train, attack, pt_gen_init, ks_gen_init):
     if ks_gen_init:
         exit(subset.ks_gen == dataset.InputGeneration.INIT_TIME)
 
+def average_fn(q, dset, sset, i, stop, nb_aes, template, plot):
+    """Main function for processes used in the average command/function."""
+    l.LOGGER.debug("start average_fn for trace #{}".format(i))
+    # * If process start with trace out of bound, return.
+    if i >= stop:
+        q.put((None, None, i))
+        return 0
+    # * Load the to process trace.
+    sset.load_trace(i, nf=False, ff=True, check=True)
+    # * Get the average of all AES and the template.
+    sset.ff, sset.template = analyze.average_aes(sset.ff, dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot)
+    # * Check the trace is valid.
+    check, sset.ff = analyze.fill_zeros_if_bad(sset.template, sset.ff)
+    if check is True:
+        l.LOGGER.warning("error during averaging aes, trace {} filled with zeroes!".format(i))
+    # * Plot the averaged trace if wanted.
+    if plot:
+        libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate)
+    # * Save the processed trace.
+    sset.save_trace(nf=False)
+    q.put((sset.template, check, i))
+    l.LOGGER.debug("end average_fn for trace #{}".format(i))
+
 @cli.command()
 @click.argument("indir", type=click.Path())
 @click.option("--outdir", type=click.Path(), default=None, help="If specified, set the outdir/savedir of the dataset.")
@@ -155,25 +180,45 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
     # Load traces one by one since traces containing multiple AES executions
     # can be large (> 30 MB).
     with logging_redirect_tqdm(loggers=[l.LOGGER]):
-        for i in tqdm(range(start, stop), desc="average"):
-            # * Load trace and save current processing step in dataset.
-            dset.dirty_idx = i
-            sset.load_trace(i, nf=False, ff=True, check=True)
-            # * Get the average of all AES and the template.
-            sset.ff, sset.template = analyze.average_aes(sset.ff, dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot)
-            # * Check the trace is valid.
-            check, sset.ff = analyze.fill_zeros_if_bad(sset.template, sset.ff)
-            if check is True:
-                l.LOGGER.warning("error during averaging aes, trace {} filled with zeroes!".format(i))
-                sset.bad_entries.append(i)
-            # * Plot the averaged trace if wanted.
-            if plot:
-                libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate)
-            # * Save dataset for resuming if not finishing the loop.
-            sset.save_trace(nf=False)
-            dset.pickle_dump(unload=False, log=False)
-            # * Disable plot for remainaing traces.
-            plot = False
+        with tqdm(total=stop, desc="average") as pbar:
+            i = start
+            while i < stop:
+                # * Load trace and save current processing step in dataset.
+                dset.dirty_idx = i
+
+                # PROG: Process start. First trace is always progressed sequentially.
+                q = Queue()
+                if i == 0:
+                    average_fn(q, dset, sset, i, stop, nb_aes, template, plot)
+                    sset.template, check, _ = q.get()
+                    if check is True:
+                        sset.bad_entries.append(i)
+                    i = i + 1
+                    pbar.update(1)
+                else:
+                    ps = [None] * (os.cpu_count() - 1)
+                    for pidx in range(len(ps)):
+                        ps[pidx] = Process(target=average_fn, args=(q, dset, sset, i + pidx, stop, nb_aes, template, plot,))
+                    for pidx in range(len(ps)):
+                        l.LOGGER.debug("start process pidx={}".format(pidx))
+                        ps[pidx].start()
+                    for pidx in range(len(ps)):
+                        l.LOGGER.debug("get from process pidx={}".format(pidx))
+                        _, check, pidx_get = q.get()
+                        if check is True:
+                            sset.bad_entries.append(i + pidx_get)
+                    for pidx in range(len(ps)):
+                        ps[pidx].join()
+                        l.LOGGER.debug("end process pidx={}".format(pidx))
+                    i = i + len(ps)
+                    pbar.update(len(ps))
+                # PROG: Process end.
+
+                # * Save dataset for resuming if not finishing the loop.
+                dset.pickle_dump(unload=False, log=False)
+                # * Disable plot for remainaing traces.
+                plot = False
+    dset.dirty_idx = stop # Can be less than stop because of "i = i + len(ps)".
     sset.prune_input(save=True)
     save_dataset_and_quit(dset)
 
