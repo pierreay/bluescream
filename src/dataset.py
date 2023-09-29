@@ -48,8 +48,11 @@ def save_dataset_and_quit(dset):
     exit(0)
 
 @click.group(context_settings={'show_default': True})
-def cli():
+@click.option("--log/--no-log", default=True, help="Enable or disable logging.")
+@click.option("--loglevel", default="DEBUG", help="Set the logging level.")
+def cli(log, loglevel):
     """Dataset processing utility."""
+    # PROG: Implement log and loglevel options.
     pass
 
 @cli.command()
