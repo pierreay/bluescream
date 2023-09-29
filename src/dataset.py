@@ -186,7 +186,7 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
                 # * Load trace and save current processing step in dataset.
                 dset.dirty_idx = i
 
-                # PROG: Process start. First trace is always progressed sequentially.
+                # * Process start. First trace is always progressed sequentially.
                 q = Queue()
                 if i == 0:
                     average_fn(q, dset, sset, i, stop, nb_aes, template, plot)
@@ -212,7 +212,6 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
                         l.LOGGER.debug("end process pidx={}".format(pidx))
                     i = i + len(ps)
                     pbar.update(len(ps))
-                # PROG: Process end.
 
                 # * Save dataset for resuming if not finishing the loop.
                 dset.pickle_dump(unload=False, log=False)
