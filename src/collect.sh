@@ -1,5 +1,6 @@
 #!/bin/bash
 
+source ./lib/log.sh 
 source ./lib/misc.sh
 
 # Source the project environment for following variables:
@@ -20,13 +21,16 @@ function clean() {
     if [[ -d $OUTPUT_WD ]]; then
         rm -rf $OUTPUT_WD/*
         log_info "Clean $OUTPUT_WD"
+    else
+        log_error "$OUTPUT_WD is not set!"
+        exit 0
     fi
 }
 
 function resume() {
     if [[ -d $OUTPUT_WD ]]; then
         i_start=$(( $(ls $OUTPUT_WD/ | grep trace_nf | wc -l) - 1))
-        echo "Resume collection at i=$i_start in $OUTPUT_WD"
+        log_info "Resume collection at i=$i_start in $OUTPUT_WD"
     fi
 }
 
@@ -41,21 +45,21 @@ function display_time_quit() {
 
 function display_time() {
     duration=$SECONDS
-    echo "$(($duration / 60)) minutes ; $(($duration % 60)) seconds"
+    log_info "$(($duration / 60)) minutes ; $(($duration % 60)) seconds"
 }
 
 function ykush_reset() {
-    echo
-    echo "=========== YKUSH RESET ==========="
-    echo
+    log_info
+    log_info "=========== YKUSH RESET ==========="
+    log_info
     if [[ $FW_MODE == "train" ]]; then
-        echo "power off ykush..."
+        log_info "power off ykush..."
         sudo ykushcmd -d a
         sleep 10 # Wait for shutdown.
-        echo "power on ykush..."
+        log_info "power on ykush..."
         sudo ykushcmd -u a
     else
-        echo "disabled for attack mode, otherwise pairing is lost..."
+        log_info "disabled for attack mode, otherwise pairing is lost..."
     fi
     sleep 20 # Wait for power-up and booting.
     }
@@ -107,7 +111,7 @@ function collect_one_set() {
                 ${opts[2]})
                     quit
                     ;;
-                *) echo "Invalid option: $REPLY";;
+                *) log_error "Invalid option: $REPLY";;
             esac
         done
     else
@@ -146,15 +150,15 @@ function collect_one_set() {
         fi
     fi
 
-    echo "freq_nf=$DE_REC_FREQ_NF"      >  $OUTPUT_WD/params.txt
-    echo "freq_ff=$DE_REC_FREQ_FF"      >> $OUTPUT_WD/params.txt
-    echo "samp_rate=$DE_REC_SAMP_RATE"  >> $OUTPUT_WD/params.txt
+    log_info "freq_nf=$DE_REC_FREQ_NF"      >  $OUTPUT_WD/params.txt
+    log_info "freq_ff=$DE_REC_FREQ_FF"      >> $OUTPUT_WD/params.txt
+    log_info "samp_rate=$DE_REC_SAMP_RATE"  >> $OUTPUT_WD/params.txt
 
     for (( i = i_start; i <= $COLLECT_NB; i++ ))
     do
-        echo
-        echo "=========== TRACE #$i -- KEY_FIXED=$KEY_FIXED ==========="
-        echo
+        log_info
+        log_info "=========== TRACE #$i -- KEY_FIXED=$KEY_FIXED ==========="
+        log_info
         if [[ $KEY_FIXED == 0 ]]; then
             pair
             if [[ $? == 1 ]]; then
@@ -163,7 +167,7 @@ function collect_one_set() {
                 continue
             fi
             cp /tmp/mirage_output_ltk $OUTPUT_WD/${i}_k.txt
-            echo "saved ks:"
+            log_info "saved ks:"
             ls $OUTPUT_WD/${i}_k.txt
         fi
         record
@@ -180,13 +184,13 @@ function collect_one_set() {
         cp /tmp/raw_0_0.npy $OUTPUT_WD/${i}_trace_nf.npy
         cp /tmp/raw_1_0.npy $OUTPUT_WD/${i}_trace_ff.npy
         cp /tmp/bt_skd_0 $OUTPUT_WD/${i}_p.txt
-        echo "saved traces:"
+        log_info "saved traces:"
         ls $OUTPUT_WD/${i}_trace_nf.npy $OUTPUT_WD/${i}_trace_ff.npy
-        echo "saved pt:"
+        log_info "saved pt:"
         ls $OUTPUT_WD/${i}_p.txt
 
         if [[ $KEY_FIXED == 0 && $(( ($i+1) % 100 )) == 0 ]]; then
-            echo "restart devices to prevent errors..."
+            log_warn "restart devices to prevent errors..."
             ykush_reset
         fi
     done
@@ -212,9 +216,9 @@ fi
 export COLLECT_NB="$COLLECT_TRAINING_NB"
 export OUTPUT_WD="$OUTPUT_WD_ROOT/train"
 export KEY_FIXED=0
-echo
-echo "=========== Training set ==========="
-echo
+log_info
+log_info "=========== Training set ==========="
+log_info
 export FW_MODE=train
 firmware_set_mode $FW_MODE >/dev/null 2>&1
 collect_one_set 2
@@ -224,9 +228,9 @@ collect_one_set 2
 export COLLECT_NB="$COLLECT_ATTACK_NB"
 export OUTPUT_WD="$OUTPUT_WD_ROOT/attack"
 export KEY_FIXED=1
-echo
-echo "=========== Attack set ==========="
-echo
 export FW_MODE=attack
+log_info
+log_info "=========== Attack set ==========="
+log_info
 firmware_set_mode $FW_MODE >/dev/null 2>&1
 collect_one_set 2
