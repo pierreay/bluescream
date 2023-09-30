@@ -17,8 +17,10 @@ source ./lib/misc.sh
 # ** Functions
 
 function clean() {
-    rm -rf $OUTPUT_WD
-    echo "Clean $OUTPUT_WD"
+    if [[ -d $OUTPUT_WD ]]; then
+        rm -rf $OUTPUT_WD/*
+        log_info "Clean $OUTPUT_WD"
+    fi
 }
 
 function resume() {
