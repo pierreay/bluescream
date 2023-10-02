@@ -9,8 +9,7 @@ import colorlog
 
 # Logger used accross all modules.
 LOGGER = None
-OS_LOGLEVEL = os.getenv("DE_OS_LOGLEVEL")
-LOGGER_DEFAULT_LEVEL = "DEBUG" if OS_LOGLEVEL is None else OS_LOGLEVEL
+LOGGER_DEFAULT_LEVEL = "DEBUG"
 
 def log_n_exit(e, str, code, traceback=False):
     """Log a critical error and exit.
