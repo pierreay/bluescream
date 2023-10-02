@@ -52,8 +52,7 @@ def save_dataset_and_quit(dset):
 @click.option("--loglevel", default="DEBUG", help="Set the logging level.")
 def cli(log, loglevel):
     """Dataset processing utility."""
-    # PROG: Implement log and loglevel options.
-    pass
+    l.configure(log, loglevel)
 
 @cli.command()
 @click.argument("outdir", type=click.Path())
