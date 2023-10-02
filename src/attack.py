@@ -4,6 +4,7 @@ import click
 import numpy as np
 from matplotlib import pyplot as plt
 
+import lib.log as l
 import lib.dataset as dataset
 import lib.load as load
 import lib.analyze as analyze
@@ -148,8 +149,10 @@ def load_data(subset):
               help="Normalize each trace set: traces = (traces-avg(traces))/std(traces).")
 @click.option("--mimo", default="",
               help="Choose ch1, ch2, eg, or mr")
+@click.option("--loglevel", default="DEBUG", help="Logging level.")
+@click.option("--log/--no-log", default=True, help="Enable or disable logging.")
 def cli(dataset_path, num_traces, start_point, end_point, plot, save_images, wait, num_key_bytes,
-        bruteforce, bit_bound_end, name, average, norm, norm2, mimo):
+        bruteforce, bit_bound_end, name, average, norm, norm2, mimo, loglevel, log):
     """
     Run an attack against previously collected traces.
 
@@ -158,6 +161,7 @@ def cli(dataset_path, num_traces, start_point, end_point, plot, save_images, wai
     attack-specific options.
     """
     global SAVE_IMAGES, PLOT, GWAIT, NUM_KEY_BYTES, BRUTEFORCE, BIT_BOUND_END, NUM_TRACES, START_POINT, END_POINT, NORM, NORM2, DATASET_PATH
+    l.configure(log, loglevel)
     SAVE_IMAGES = save_images
     PLOT = plot
     GWAIT = wait
