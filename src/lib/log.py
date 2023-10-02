@@ -25,6 +25,12 @@ def log_n_exit(e, str, code, traceback=False):
     LOGGER.critical(str)
     exit(code)
 
+def set_level(level):
+    LOGGER.setLevel(level)
+
+def disable():
+    set_level(logging.CRITICAL + 1)
+
 def init(level):
     """Initialize the logging system.
 
