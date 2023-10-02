@@ -7,9 +7,17 @@ import os
 # External modules.
 import colorlog
 
+# * Objects
+
 # Logger used accross all modules.
 LOGGER = None
+
+# * Constants
+
+# Default logging level.
 LOGGER_DEFAULT_LEVEL = "DEBUG"
+
+# * Functions
 
 def log_n_exit(e, str, code, traceback=False):
     """Log a critical error and exit.
@@ -26,9 +34,14 @@ def log_n_exit(e, str, code, traceback=False):
     exit(code)
 
 def set_level(level):
+    """Set the logger of the logging system to LEVEL (string or logging
+    levels).
+
+    """
     LOGGER.setLevel(level)
 
 def disable():
+    """Disable the logging messages."""
     set_level(logging.CRITICAL + 1)
 
 def init(level):
@@ -50,4 +63,11 @@ def init(level):
         LOGGER.setLevel(level)
         LOGGER.addHandler(handler)
 
+def configure(enable=True, level=LOGGER_DEFAULT_LEVEL):
+    """Configure the logging system after init()."""
+    set_level(level)
+    if enable is False:
+        disable()
+
+# Initialized at import time.
 init(LOGGER_DEFAULT_LEVEL)
