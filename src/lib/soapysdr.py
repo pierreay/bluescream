@@ -33,6 +33,12 @@ class MySoapySDRs():
             sdr.close()
 
     def record(self, N):
+        """Perform a recording of N samples.
+
+        Spawn a thread for each radio and start recording. Block until all
+        recordings finished and all threads join.
+
+        """
         l.LOGGER.debug("MySoapySDRs.record(N={}).enter".format(N))
         thr = [None] * len(self.sdrs)
         for sdr in self.sdrs:
