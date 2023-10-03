@@ -98,8 +98,8 @@ class MySoapySDR():
 
     def accept(self):
         if self.enabled:
-             l.LOGGER.debug("MySoapySDR(idx={}).accept()".format(self.idx))
-             self.rx_signal = np.concatenate((self.rx_signal, self.rx_signal_candidate))
+            l.LOGGER.debug("MySoapySDR(idx={}).accept()".format(self.idx))
+            self.rx_signal = np.concatenate((self.rx_signal, self.rx_signal_candidate))
 
     def save(self, dir, abs = False):
         if self.enabled:
