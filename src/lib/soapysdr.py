@@ -101,7 +101,7 @@ class MySoapySDR():
             l.LOGGER.debug("MySoapySDR(idx={}).accept()".format(self.idx))
             self.rx_signal = np.concatenate((self.rx_signal, self.rx_signal_candidate))
 
-    def save(self, dir, abs = False):
+    def save(self, dir):
         if self.enabled:
-            l.LOGGER.debug("MySoapySDR(idx={}).save(dir={},abs={})".format(self.idx, dir, abs))
-            load.save_raw_trace(self.rx_signal if not abs else np.abs(self.rx_signal), dir, self.idx, 0)
+            l.LOGGER.debug("MySoapySDR(idx={}).save(dir={})".format(self.idx, dir))
+            load.save_raw_trace(self.rx_signal, dir, self.idx, 0)
