@@ -12,6 +12,7 @@ from tqdm import tqdm
 
 import lib.log as l
 import lib.plot as libplot
+from lib.soapysdr import MySoapySDR
 
 # * Global variables
 
@@ -264,13 +265,13 @@ def print_trace_info(s, sr=0, id=""):
 
 def save_raw_trace(trace, dir, rad_idx, rec_idx):
     assert(path.exists(dir))
-    np.save(get_record_path_raw(dir, rad_idx, rec_idx), trace)
+    MySoapySDR.numpy_save(get_record_path_raw(dir, rad_idx, rec_idx), trace)
 
 def load_raw_trace(dir, rad_idx, rec_idx):
     fp = get_record_path_raw(dir, rad_idx, rec_idx)
     assert(path.exists(fp))
     try:
-        trace = np.load(fp)
+        trace = MySoapySDR.numpy_load(fp)
     except Exception as e:
         print(e)
     assert(trace is not None)

@@ -53,6 +53,59 @@ class MySoapySDRs():
             sdr.save(dir)
 
 class MySoapySDR():
+    # * Custom dtype
+    # It is used to match the CS16 type of SoapySDR, allowing to save disk
+    # space but requires conversion happening in this module, since Numpy can
+    # only work with np.complex64 using float32.
+    DTYPE = np.dtype([('real', np.int16), ('imag', np.int16)])
+
+    @staticmethod
+    def numpy_save(file, arr):
+        """Stub for numpy.save handling our custom dtype.
+
+        Save to disk the trace stored in ARR using our custom dtype. ARR.dtype
+        can be np.complex64 (will be converted) or MySoapySDR.DTYPE (will be
+        saved as it).
+
+        """
+        assert(arr.dtype == np.complex64 or arr.dtype == MySoapySDR.DTYPE)
+        if arr.dtype == np.complex64:
+            arr = MySoapySDR.complex64_to_dtype(arr)
+        arr.tofile(file)
+
+    @staticmethod
+    def numpy_load(file):
+        """Stub for numpy.load handling our custom dtype.
+
+        The loaded FILE has to be in the MySoapySDR.DTYPE format, which will be
+        converted into np.complex64 for processing.
+
+        """
+        return MySoapySDR.dtype_to_complex64(np.fromfile(file, dtype=MySoapySDR.DTYPE))
+
+    @staticmethod
+    def dtype_to_complex64(arr):
+        """Convert an array from our custom DTYPE to a standard np.complex64
+        (composed of 2 np.float32)."""
+        assert(arr.dtype == MySoapySDR.DTYPE)
+        # Don't need to check any boundaries here since casting from np.int16
+        # to np.float32 is safe.
+        return arr.view(np.int16).astype(np.float32).view(np.complex64)
+
+    @staticmethod
+    def complex64_to_dtype(arr):
+        """Convert an array from a standard np.complex64 (composed of 2
+        np.float32) to our custom DTYPE."""
+        assert(arr.dtype == np.complex64)
+        # Check that no value contained in arr is superior to maximum or
+        # inferior to minimum of np.int16 (-2^15 or +2^15), since casting from
+        # np.float32 to np.int16 is not safe.
+        assert(arr[arr.real < np.iinfo(np.int16).min].shape == (0,))
+        assert(arr[arr.real > np.iinfo(np.int16).max].shape == (0,))
+        assert(arr[arr.imag < np.iinfo(np.int16).min].shape == (0,))
+        assert(arr[arr.imag > np.iinfo(np.int16).max].shape == (0,))
+        return arr.view(np.float32).astype(np.int16).view(MySoapySDR.DTYPE)
+
     def __init__(self, fs, freq, idx = 0, enabled = True):
         l.LOGGER.debug("MySoapySDR.__init__(fs={},freq={},idx={})".format(fs, freq, idx))
         self.fs = fs
@@ -70,9 +123,14 @@ class MySoapySDR():
     def open(self):
         if self.enabled:
             l.LOGGER.debug("MySoapySDR(idx={}).open()".format(self.idx))
-            self.rx_stream = self.sdr.setupStream(SoapySDR.SOAPY_SDR_RX, SoapySDR.SOAPY_SDR_CF32)
+            # From SoapySDR/include/SoapySDR/Device.h:
+            # - "CF32" - complex float32 (8 bytes per element)
+            # - "CS16" - complex int16   (4 bytes per element)
+            # From SoapyUHD/SoapyUHDDevice.cpp/getNativeStreamFormat():
+            # UHD and the hardware use "CS16" format in the underlying transport layer.
+            self.rx_stream = self.sdr.setupStream(SoapySDR.SOAPY_SDR_RX, SoapySDR.SOAPY_SDR_CS16)
             self.sdr.activateStream(self.rx_stream)
-            self.rx_signal = np.array([0], np.complex64)
+            self.rx_signal = np.array([0], MySoapySDR.DTYPE)
 
     def close(self):
         if self.enabled:
@@ -86,8 +144,8 @@ class MySoapySDR():
             l.LOGGER.debug("MySoapySDR(idx={}).record(N={:e}).enter".format(self.idx, N))
             N = int(N) # Required when N is specified using scientific notation.
             rx_buff_len = pow(2, 24)
-            rx_buff = np.array([0] * rx_buff_len, np.complex64)
-            self.rx_signal_candidate = np.array([0], np.complex64)
+            rx_buff = np.array([0] * rx_buff_len, MySoapySDR.DTYPE)
+            self.rx_signal_candidate = np.array([0], MySoapySDR.DTYPE)
             while len(self.rx_signal_candidate) < N:
                 sr = self.sdr.readStream(self.rx_stream, [rx_buff], rx_buff_len, timeoutUs=10000000)
                 if sr.ret == rx_buff_len and sr.flags == 1 << 2:
