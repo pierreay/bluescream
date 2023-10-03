@@ -55,6 +55,8 @@ def normalize_zscore(arr, set=False):
     """Normalize a trace using Z-Score normalization. Taken from load.py from
     Screaming Channels. If SET is set to TRUE, apply normalization on the
     entire set instead of on each trace individually."""
+    # Do not normalize I/Q samples (complex numbers).
+    assert(arr.dtype == np.float32 or arr.dtype == np.float64)
     mu = np.average(arr) if set is False else np.average(arr, axis=0)
     std = np.std(arr) if set is False else np.std(arr, axis=0)
     if std != 0:
