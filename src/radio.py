@@ -27,7 +27,8 @@ def cli():
 @click.argument("samp_rate", type=int)
 @click.option("--duration", type=float, default=0.5, help="Duration of the recording.")
 @click.option("--radio/--no-radio", default=True, help="Enable or disable the radio recording.")
-def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio):
+@click.option("--nf/--no-nf", default=False, help="Enable or disable near-field (NF) recording (index = 0).")
+def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf):
     """Record RAW traces to /tmp.
 
     BD_ADDR is the Bluetooth address of the target device to connect to.
@@ -53,11 +54,14 @@ def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio):
                      "record_duration": duration
                      }
 
-    rad1 = soapysdr.MySoapySDR(samp_rate, freq_nf, load.REC_RAW_NF_IDX, radio)
-    rad2 = soapysdr.MySoapySDR(samp_rate, freq_ff, load.REC_RAW_FF_IDX, radio)
     rad = soapysdr.MySoapySDRs()
-    rad.register(rad1)
-    rad.register(rad2)
+    # Only instance near-field radio if NF is enabled.
+    if nf is True:
+        rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, load.REC_RAW_NF_IDX, radio)
+        rad.register(rad_nf)
+    # Always instanciate FF radio.
+    rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, load.REC_RAW_FF_IDX, radio)
+    rad.register(rad_ff)
     rad.open()
 
     with device.Device.create(device_config, baud=115200, ser=bd_addr) as dev:
@@ -147,7 +151,8 @@ def extract(samp_rate, plot, overwrite, window, offset):
 @click.argument("samp_rate", type=int)
 @click.option("--amplitude/--no-amplitude", default=False, help="Get the amplitude of the traces.")
 @click.option("--phase/--no-phase", default=False, help="Get the phase of the traces.")
-def plot(samp_rate, amplitude, phase):
+@click.option("--nf/--no-nf", default=False, help="Enable or disable near-field (NF) recording (index = 0).")
+def plot(samp_rate, amplitude, phase, nf):
     """Plot RAW traces from /tmp.
 
     SAMP_RATE is the sampling rate used for both recording.
@@ -156,18 +161,23 @@ def plot(samp_rate, amplitude, phase):
     dataset.py/debug.
 
     """
-    nf = load.load_raw_trace("/tmp", load.REC_RAW_NF_IDX, 0)
-    ff = load.load_raw_trace("/tmp", load.REC_RAW_FF_IDX, 0)
-    load.print_trace_info(nf, samp_rate, "nf")
-    load.print_trace_info(ff, samp_rate, "ff")
-    nf, ff = load.truncate_min(nf, ff)
+    nf_arr = None
+    ff_arr = load.load_raw_trace("/tmp", load.REC_RAW_FF_IDX, 0)
+    if nf is True:
+        nf_arr         = load.load_raw_trace("/tmp", load.REC_RAW_NF_IDX, 0)
+        nf_arr, ff_arr = load.truncate_min(nf_arr, ff_arr)
     if amplitude:
-        nf = analyze.get_amplitude(nf)
-        ff = analyze.get_amplitude(ff)
+        if nf_arr is not None:
+            nf_arr = analyze.get_amplitude(nf_arr)
+        ff_arr = analyze.get_amplitude(ff_arr)
     elif phase:
-        nf = analyze.get_phase(nf)
-        ff = analyze.get_phase(ff)
-    libplot.plot_time_spec_share_nf_ff(nf, ff, samp_rate)
+        if nf_arr is not None:
+            nf_arr = analyze.get_phase(nf_arr)
+        ff_arr = analyze.get_phase(ff_arr)
+    if nf_arr is not None:
+        libplot.plot_time_spec_share_nf_ff(nf_arr, ff_arr, samp_rate)
+    else:
+        libplot.plot_time_spec_share_nf_ff(ff_arr, None, samp_rate)
 
 if __name__ == "__main__":
     cli()
