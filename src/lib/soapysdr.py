@@ -41,11 +41,11 @@ class MySoapySDRs():
         """
         l.LOGGER.debug("MySoapySDRs.record(N={}).enter".format(N))
         thr = [None] * len(self.sdrs)
+        for idx, sdr in enumerate(self.sdrs):
+            thr[idx] = Thread(target=sdr.record, args=(N,))
+            thr[idx].start()
         for sdr in self.sdrs:
-            thr[sdr.idx] = Thread(target=sdr.record, args=(N,))
-            thr[sdr.idx].start()
-        for sdr in self.sdrs:
-            thr[sdr.idx].join()
+            thr[idx].join()
         l.LOGGER.debug("MySoapySDRs.record(N={}).exit".format(N))
 
     def accept(self):
