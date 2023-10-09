@@ -407,19 +407,18 @@ def reshape(arr):
     return arr
 
 def truncate_min(arr):
-    """Truncate all the traces (1D np.array) contained in ARR (list) to the
-    length of the smaller one. Usefull to create a 2D np.array. Return the new
-    array ARR with truncated traces.
+    """Truncate traces to minimum of the array in place.
 
-    TODO: Check if this function work in place or not.
+    Truncate all the traces (1D np.array) contained in ARR (list) to the length
+    of the smaller one. Usefull to create a 2D np.array. Return the new array
+    ARR with truncated traces.
 
     """
     target_len = sys.maxsize
     for s in arr:
         target_len = len(s) if len(s) < target_len else target_len
-    for s in arr:
-        s = s[:target_len]
-    return arr
+    for idx, s in enumerate(arr):
+        arr[idx] = s[:target_len]
 
 def truncate(traces, start=0, end=0):
     """Truncate all traces containted in TRACES (2D np.array) according to

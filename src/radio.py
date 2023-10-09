@@ -175,7 +175,7 @@ def plot(samp_rate, amplitude, phase, nf_id, ff_id):
         l.LOGGER.error("we need at least one trace index to continue!")
         exit(1)
     # Truncate the traces to the exact size for plotting using synchronized axis.
-    s_arr = load.truncate_min(s_arr)
+    load.truncate_min(s_arr)
     # Get only one component of the IQ if needed.
     component_func = analyze.get_amplitude if amplitude else None
     component_func = analyze.get_phase if phase else component_func
