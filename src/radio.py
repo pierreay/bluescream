@@ -87,17 +87,21 @@ def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
 
 @cli.command()
 @click.argument("samp_rate", type=int)
+@click.argument("id_ref", type=int)
 @click.option("--plot/--no-plot", default=True, help="Plot a summary of the processing.")
 @click.option("--overwrite/--no-overwrite", default=False, help="Overwrite the original RAW traces with extracted window.")
 @click.option("--window", type=float, default=0.1, help="Extracted window in seconds, automatically compute if nothing specified.")
 @click.option("--offset", type=float, default=0, help="Offset applied to extracted window in seconds.")
-def extract(samp_rate, plot, overwrite, window, offset):
+@click.option("--id", type=int, multiple=True, help="Radio indexes on which apply trace extraction (in addition to ID_REF). Can be specified multiple time.")
+def extract(samp_rate, id_ref, plot, overwrite, window, offset, id):
     """Extract RAW traces from /tmp.
 
     Extract a rough window around interesting signals from just-recorded RAW
-    traces.
+    traces. It uses one raw trace as reference to find the interesting signal
+    and extract the rough window for all specified raw traces.
 
     SAMP_RATE is the sampling rate used for both recording.
+    ID_REF is the radio index to use for extraction reference.
 
     """
     # * Trigger(s) configuration.
@@ -108,8 +112,7 @@ def extract(samp_rate, plot, overwrite, window, offset):
     l.LOGGER.debug("peak search prominence={}".format(trg_peak_prominence))
 
     # * Loading.
-    nf = analyze.get_amplitude(load.load_raw_trace("/tmp", load.REC_RAW_NF_IDX, 0))
-    nf = analyze.normalize(nf)
+    sig_raw_ref = analyze.normalize(analyze.get_amplitude(load.load_raw_trace("/tmp", id_ref, 0)))
 
     # * Triggering.
     assert(len(trg_bp_low) == len(trg_bp_high))
@@ -117,7 +120,7 @@ def extract(samp_rate, plot, overwrite, window, offset):
     # ** Trigger signals.
     nf_triggers = triggers.Triggers()
     for idx in list(range(TRG_NB)):
-        nf_triggers.add(triggers.Trigger(nf, trg_bp_low[idx], trg_bp_high[idx], trg_lp, samp_rate))
+        nf_triggers.add(triggers.Trigger(sig_raw_ref, trg_bp_low[idx], trg_bp_high[idx], trg_lp, samp_rate))
         l.LOGGER.debug(nf_triggers.get(idx))
     nf_triggers.reduce_add()
     # ** Trigger indexes.
@@ -126,31 +129,25 @@ def extract(samp_rate, plot, overwrite, window, offset):
 
     # * Results.
     if plot:
-        libplot.plot_time_spec_sync_axis([nf], samp_rate=samp_rate, peaks=peaks[0], triggers=nf_triggers)
+        libplot.plot_time_spec_sync_axis([sig_raw_ref], samp_rate=samp_rate, peaks=peaks[0], triggers=nf_triggers)
     if len(peaks[0]) != 1:
         l.LOGGER.error("signal locating confusion: multiple peaks detected")
+        # TODO: Don't exit but set a bad trace instead.
         exit(1)
     else:
-        l.LOGGER.info("peak position={:.2f}%".format((peaks[0][0] / len(nf)) * 100))
+        l.LOGGER.info("peak position={:.2f}%".format((peaks[0][0] / len(sig_raw_ref)) * 100))
 
     # * Extraction.
-    nf = load.load_raw_trace("/tmp", load.REC_RAW_NF_IDX, 0)
-    ff = load.load_raw_trace("/tmp", load.REC_RAW_FF_IDX, 0)
-    nf, ff = load.truncate_min([nf, ff])
-    peak = peaks[0][0]
-    bl = int(peak + (offset * samp_rate) - (window / 2) * samp_rate)
-    bl = bl if bl > 0 else 0
-    bh = int(peak + (offset * samp_rate) + (window / 2) * samp_rate)
-    bh = bh if bh < len(nf) else len(nf)
-    l.LOGGER.debug("window={}:{}".format(bl, bh))
-    nf = nf[bl:bh]
-    ff = ff[bl:bh]
     if overwrite:
-        l.LOGGER.info("overwrite extracted signal in /tmp")
-        load.save_raw_trace(nf, "/tmp", load.REC_RAW_NF_IDX, 0)
-        load.save_raw_trace(ff, "/tmp", load.REC_RAW_FF_IDX, 0)
+        peak = peaks[0][0]
+        id = tuple(set(id + (id_ref,))) # Add id_ref and only get unique values of radio indexes.
+        for idx in id:
+            sig_raw = load.load_raw_trace("/tmp", idx, 0)
+            sig_raw = analyze.extract_time_window(sig_raw, samp_rate, peak, window, offset=offset)
+            l.LOGGER.info("overwrite extracted signal #{} in /tmp".format(idx))
+            load.save_raw_trace(sig_raw, "/tmp", idx, 0)
     else:
-        l.LOGGER.debug("ignore extraction overwrite")
+        l.LOGGER.info("ignore overwrite for extracted signal(s)")
 
 @cli.command()
 @click.argument("samp_rate", type=int)
