@@ -148,6 +148,22 @@ def choose_signal(arr, i = -1):
     else:
         return np.copy(arr[i])
 
+def extract_time_window(s, sr, center, length, offset=0):
+    """Extract a time window from a signal S.
+
+    The sample rate of the signal is SR. The window will be extracted using
+    CENTER (index) as center index of the window in the signal and LENGTH
+    (seconds) as the duration of the window, optionally applying the offset
+    OFFSET (seconds) to the CENTER index. The function will return the
+    extracted signal.
+
+    """
+    bl = int(center + (offset * sr) - (length / 2) * sr)
+    bl = bl if bl > 0 else 0
+    bh = int(center + (offset * sr) + (length / 2) * sr)
+    bh = bh if bh < len(s) else len(s)
+    return s[bl:bh]
+
 def extract(s, starts, length = 0):
     """Exract sub-signals of S delimited by STARTS.
 
