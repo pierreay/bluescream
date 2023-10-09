@@ -28,7 +28,7 @@ def cli():
 @click.option("--duration", type=float, default=0.5, help="Duration of the recording.")
 @click.option("--radio/--no-radio", default=True, help="Enable or disable the radio recording (allows instrumentation only).")
 @click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
-@click.option("--ff-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
+@click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
 def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
     """Record RAW traces to /tmp.
 
@@ -154,33 +154,36 @@ def extract(samp_rate, plot, overwrite, window, offset):
 @click.argument("samp_rate", type=int)
 @click.option("--amplitude/--no-amplitude", default=False, help="Get the amplitude of the traces.")
 @click.option("--phase/--no-phase", default=False, help="Get the phase of the traces.")
-@click.option("--nf/--no-nf", default=False, help="Enable or disable near-field (NF) recording (index = 0).")
-def plot(samp_rate, amplitude, phase, nf):
+@click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
+@click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
+def plot(samp_rate, amplitude, phase, nf_id, ff_id):
     """Plot RAW traces from /tmp.
 
     SAMP_RATE is the sampling rate used for both recording.
 
-    Idea: this function could be now turn into a debug function, just like
-    dataset.py/debug.
-
     """
+    s_arr = []
     nf_arr = None
-    ff_arr = load.load_raw_trace("/tmp", load.REC_RAW_FF_IDX, 0)
-    if nf is True:
-        nf_arr         = load.load_raw_trace("/tmp", load.REC_RAW_NF_IDX, 0)
-        nf_arr, ff_arr = load.truncate_min(nf_arr, ff_arr)
-    if amplitude:
-        if nf_arr is not None:
-            nf_arr = analyze.get_amplitude(nf_arr)
-        ff_arr = analyze.get_amplitude(ff_arr)
-    elif phase:
-        if nf_arr is not None:
-            nf_arr = analyze.get_phase(nf_arr)
-        ff_arr = analyze.get_phase(ff_arr)
-    if nf_arr is not None:
-        libplot.plot_time_spec_share_nf_ff(nf_arr, ff_arr, samp_rate)
-    else:
-        libplot.plot_time_spec_share_nf_ff(ff_arr, None, samp_rate)
+    ff_arr = None
+    # Load the traces and quit with an error if nothing is choosen.
+    if nf_id != -1:
+        nf_arr = load.load_raw_trace("/tmp", nf_id, 0)
+        s_arr.append(nf_arr)
+    if ff_id != -1:
+        ff_arr = load.load_raw_trace("/tmp", ff_id, 0)
+        s_arr.append(ff_arr)
+    if nf_arr is None and ff_arr is None:
+        l.LOGGER.error("we need at least one trace index to continue!")
+        exit(1)
+    # Truncate the traces to the exact size for plotting using synchronized axis.
+    s_arr = load.truncate_min(s_arr)
+    # Get only one component of the IQ if needed.
+    component_func = analyze.get_amplitude if amplitude else None
+    component_func = analyze.get_phase if phase else component_func
+    if component_func is not None:
+        s_arr = component_func(s_arr)
+    # Plot the result.
+    libplot.plot_time_spec_sync_axis(s_arr, samp_rate)
 
 if __name__ == "__main__":
     cli()
