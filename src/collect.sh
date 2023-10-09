@@ -3,16 +3,6 @@
 source ./lib/log.sh 
 source ./lib/misc.sh
 
-# Source the project environment for following variables:
-# - DE_VICTIM_ADDR
-# - DE_ATTACK_HCI
-# - DE_REC_FREQ_NF
-# - DE_REC_FREQ_FF
-# - DE_REC_SAMP_RATE
-# Disable sourcing of the environment because it should not allows to modify
-# environment variable from the terminal.
-# source ../.envrc
-
 # * Subset
 
 # ** Functions
@@ -65,7 +55,7 @@ function ykush_reset() {
     }
 
 function pair() {
-    timeout 30 ./utils/mirage_pair.sh "$DE_VICTIM_ADDR" | tee /tmp/mirage_pair_output
+    timeout 30 ./utils/mirage_pair.sh "$ENVRC_VICTIM_ADDR" | tee /tmp/mirage_pair_output
     if [[ $? -ge 1 ]]; then
         return 1
     fi
@@ -74,7 +64,7 @@ function pair() {
 }
 
 function record() {
-    timeout 30 python3 ./radio.py record "$DE_VICTIM_ADDR" "$DE_REC_FREQ_NF" "$DE_REC_FREQ_FF" "$DE_REC_SAMP_RATE"
+    timeout 30 python3 ./radio.py record "$ENVRC_VICTIM_ADDR" "$ENVRC_NF_FREQ" "$ENVRC_FF_FREQ" "$ENVRC_SAMP_RATE" --duration="$ENVRC_DURATION"
     if [[ $? -ge 1 ]]; then
         return 1
     fi
@@ -150,9 +140,9 @@ function collect_one_set() {
         fi
     fi
 
-    log_info "freq_nf=$DE_REC_FREQ_NF"      >  $OUTPUT_WD/params.txt
-    log_info "freq_ff=$DE_REC_FREQ_FF"      >> $OUTPUT_WD/params.txt
-    log_info "samp_rate=$DE_REC_SAMP_RATE"  >> $OUTPUT_WD/params.txt
+    log_info "freq_nf=$ENVRC_NF_FREQ"      >  $OUTPUT_WD/params.txt
+    log_info "freq_ff=$ENVRC_FF_FREQ"      >> $OUTPUT_WD/params.txt
+    log_info "samp_rate=$ENVRC_SAMP_RATE"  >> $OUTPUT_WD/params.txt
 
     for (( i = i_start; i <= $COLLECT_NB; i++ ))
     do
@@ -177,9 +167,9 @@ function collect_one_set() {
             continue
         fi
         if [[ $FW_MODE == "train" ]]; then
-            ./radio.py extract $DE_REC_SAMP_RATE --window 0.2 --offset 0.00 --no-plot --overwrite
+            ./radio.py extract $ENVRC_SAMP_RATE --window 0.2 --offset 0.00 --no-plot --overwrite
         elif [[ $FW_MODE == "attack" ]]; then
-            ./radio.py extract $DE_REC_SAMP_RATE --window 0.01 --offset 0.00 --no-plot --overwrite
+            ./radio.py extract $ENVRC_SAMP_RATE --window 0.01 --offset 0.00 --no-plot --overwrite
         fi
         cp /tmp/raw_0_0.npy $OUTPUT_WD/${i}_trace_nf.npy
         cp /tmp/raw_1_0.npy $OUTPUT_WD/${i}_trace_ff.npy
