@@ -26,9 +26,10 @@ def cli():
 @click.argument("freq_ff", type=int)
 @click.argument("samp_rate", type=int)
 @click.option("--duration", type=float, default=0.5, help="Duration of the recording.")
-@click.option("--radio/--no-radio", default=True, help="Enable or disable the radio recording.")
-@click.option("--nf/--no-nf", default=False, help="Enable or disable near-field (NF) recording (index = 0).")
-def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf):
+@click.option("--radio/--no-radio", default=True, help="Enable or disable the radio recording (allows instrumentation only).")
+@click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
+@click.option("--ff-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
+def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
     """Record RAW traces to /tmp.
 
     BD_ADDR is the Bluetooth address of the target device to connect to.
@@ -55,13 +56,15 @@ def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf):
                      }
 
     rad = soapysdr.MySoapySDRs()
-    # Only instance near-field radio if NF is enabled.
-    if nf is True:
-        rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, load.REC_RAW_NF_IDX, radio)
+    if nf_id != -1:
+        rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, nf_id, radio)
         rad.register(rad_nf)
-    # Always instanciate FF radio.
-    rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, load.REC_RAW_FF_IDX, radio)
-    rad.register(rad_ff)
+    if ff_id != -1:
+        rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, ff_id, radio)
+        rad.register(rad_ff)
+    if rad.get_nb() <= 0:
+        l.LOGGER.error("we need at least one radio index to continue!")
+        exit(1)
     rad.open()
 
     with device.Device.create(device_config, baud=115200, ser=bd_addr) as dev:
