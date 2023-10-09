@@ -58,6 +58,10 @@ class MySoapySDRs():
         for sdr in self.sdrs:
             sdr.save(dir)
 
+    def get_nb(self):
+        """Get the number of currently registed SDRs."""
+        return len(self.sdrs)
+
 class MySoapySDR():
     # * Custom dtype
     # It is used to match the CS16 type of SoapySDR, allowing to save disk
