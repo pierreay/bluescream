@@ -276,7 +276,7 @@ def load_raw_trace(dir, rad_idx, rec_idx):
         except Exception as e:
             print(e)
     else:
-        l.LOGGER.warning("no loaded raw trace for rad_idx={}!".format(rax_idx))
+        l.LOGGER.warning("no loaded raw trace for rad_idx={}!".format(rad_idx))
     return trace
 
 def save_pair_trace(dir, idx, nf, ff):

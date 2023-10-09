@@ -64,7 +64,7 @@ function pair() {
 }
 
 function record() {
-    timeout 30 python3 ./radio.py record "$ENVRC_VICTIM_ADDR" "$ENVRC_NF_FREQ" "$ENVRC_FF_FREQ" "$ENVRC_SAMP_RATE" --duration="$ENVRC_DURATION"
+    timeout 30 python3 ./radio.py --dir "$ENVRC_RADIO_DIR" record "$ENVRC_VICTIM_ADDR" "$ENVRC_NF_FREQ" "$ENVRC_FF_FREQ" "$ENVRC_SAMP_RATE" --duration="$ENVRC_DURATION"
     if [[ $? -ge 1 ]]; then
         return 1
     fi
@@ -167,9 +167,9 @@ function collect_one_set() {
             continue
         fi
         if [[ $FW_MODE == "train" ]]; then
-            ./radio.py extract $ENVRC_SAMP_RATE --window 0.2 --offset 0.00 --no-plot --overwrite
+            ./radio.py --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE --window 0.2 --offset 0.00 --no-plot --overwrite
         elif [[ $FW_MODE == "attack" ]]; then
-            ./radio.py extract $ENVRC_SAMP_RATE --window 0.01 --offset 0.00 --no-plot --overwrite
+            ./radio.py --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE --window 0.01 --offset 0.00 --no-plot --overwrite
         fi
         cp /tmp/raw_0_0.npy $OUTPUT_WD/${i}_trace_nf.npy
         cp /tmp/raw_1_0.npy $OUTPUT_WD/${i}_trace_ff.npy

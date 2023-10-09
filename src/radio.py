@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
-# TODO: Change /tmp to a directory in the SSD.
-
+from os import path
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy import signal
@@ -17,10 +16,14 @@ import lib.filters as filters
 import lib.triggers as triggers
 import lib.soapysdr as soapysdr
 
+DIR = None
+
 @click.group(context_settings={'show_default': True})
-def cli():
+@click.option("--dir", type=click.Path(), default="/tmp", help="Temporary directory used to hold raw recording.")
+def cli(dir):
     """Signal recording utility."""
-    pass
+    global DIR
+    DIR = path.expanduser(dir)
 
 @cli.command()
 @click.argument("bd_addr")
@@ -32,7 +35,7 @@ def cli():
 @click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
 @click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
 def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
-    """Record RAW traces to /tmp.
+    """Record RAW traces to DIR.
 
     BD_ADDR is the Bluetooth address of the target device to connect to.
     FREQ_NF is the center frequency for the near-field recording.
@@ -40,7 +43,7 @@ def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
     SAMP_RATE is the sampling rate used for both recording.
 
     Trigger the target device and store the RAW recording of the communication
-    in /tmp.
+    in DIR.
 
     """
     ret_exit_and_resume = 3
@@ -65,7 +68,7 @@ def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
         rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, ff_id, radio)
         rad.register(rad_ff)
     if rad.get_nb() <= 0:
-        l.LOGGER.error("we need at least one radio index to continue!")
+        l.LOGGER.error("we need at least one radio index to record!")
         exit(1)
     rad.open()
 
@@ -82,7 +85,7 @@ def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
                 l.log_n_exit(e, e.strerror, ret_exit_and_resume, traceback=True)
             dev.reset()
 
-    rad.save(outpath)
+    rad.save(DIR)
     rad.close()
 
 @cli.command()
@@ -94,7 +97,7 @@ def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
 @click.option("--offset", type=float, default=0, help="Offset applied to extracted window in seconds.")
 @click.option("--id", type=int, multiple=True, help="Radio indexes on which apply trace extraction (in addition to ID_REF). Can be specified multiple time.")
 def extract(samp_rate, id_ref, plot, overwrite, window, offset, id):
-    """Extract RAW traces from /tmp.
+    """Extract RAW traces from DIR.
 
     Extract a rough window around interesting signals from just-recorded RAW
     traces. It uses one raw trace as reference to find the interesting signal
@@ -112,7 +115,7 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id):
     l.LOGGER.debug("peak search prominence={}".format(trg_peak_prominence))
 
     # * Loading.
-    sig_raw_ref = analyze.normalize(analyze.get_amplitude(load.load_raw_trace("/tmp", id_ref, 0)))
+    sig_raw_ref = analyze.normalize(analyze.get_amplitude(load.load_raw_trace(DIR, id_ref, 0)))
 
     # * Triggering.
     assert(len(trg_bp_low) == len(trg_bp_high))
@@ -142,10 +145,10 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id):
         peak = peaks[0][0]
         id = tuple(set(id + (id_ref,))) # Add id_ref and only get unique values of radio indexes.
         for idx in id:
-            sig_raw = load.load_raw_trace("/tmp", idx, 0)
+            sig_raw = load.load_raw_trace(DIR, idx, 0)
             sig_raw = analyze.extract_time_window(sig_raw, samp_rate, peak, window, offset=offset)
-            l.LOGGER.info("overwrite extracted signal #{} in /tmp".format(idx))
-            load.save_raw_trace(sig_raw, "/tmp", idx, 0)
+            l.LOGGER.info("overwrite extracted signal #{} in {}".format(idx, DIR))
+            load.save_raw_trace(sig_raw, DIR, idx, 0)
     else:
         l.LOGGER.info("ignore overwrite for extracted signal(s)")
 
@@ -156,7 +159,7 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id):
 @click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
 @click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
 def plot(samp_rate, amplitude, phase, nf_id, ff_id):
-    """Plot RAW traces from /tmp.
+    """Plot RAW traces from DIR.
 
     SAMP_RATE is the sampling rate used for both recording.
 
@@ -166,13 +169,13 @@ def plot(samp_rate, amplitude, phase, nf_id, ff_id):
     ff_arr = None
     # Load the traces and quit with an error if nothing is choosen.
     if nf_id != -1:
-        nf_arr = load.load_raw_trace("/tmp", nf_id, 0)
+        nf_arr = load.load_raw_trace(DIR, nf_id, 0)
         s_arr.append(nf_arr)
     if ff_id != -1:
-        ff_arr = load.load_raw_trace("/tmp", ff_id, 0)
+        ff_arr = load.load_raw_trace(DIR, ff_id, 0)
         s_arr.append(ff_arr)
     if nf_arr is None and ff_arr is None:
-        l.LOGGER.error("we need at least one trace index to continue!")
+        l.LOGGER.error("we need at least one trace index to plot!")
         exit(1)
     # Truncate the traces to the exact size for plotting using synchronized axis.
     load.truncate_min(s_arr)

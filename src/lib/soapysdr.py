@@ -2,6 +2,7 @@
 SDRs in parallel using threads."""
 
 import time
+from os import path
 import numpy as np
 from threading import Thread
 import SoapySDR
@@ -171,5 +172,6 @@ class MySoapySDR():
 
     def save(self, dir):
         if self.enabled:
+            dir = path.expanduser(dir)
             l.LOGGER.debug("MySoapySDR(idx={}).save(dir={})".format(self.idx, dir))
             load.save_raw_trace(self.rx_signal, dir, self.idx, 0)
