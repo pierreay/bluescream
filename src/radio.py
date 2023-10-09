@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+# TODO: Change /tmp to a directory in the SSD.
+
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy import signal
