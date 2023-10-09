@@ -134,7 +134,7 @@ def extract(samp_rate, plot, overwrite, window, offset):
     # * Extraction.
     nf = load.load_raw_trace("/tmp", load.REC_RAW_NF_IDX, 0)
     ff = load.load_raw_trace("/tmp", load.REC_RAW_FF_IDX, 0)
-    nf, ff = load.truncate_min(nf, ff)
+    nf, ff = load.truncate_min([nf, ff])
     peak = peaks[0][0]
     bl = int(peak + (offset * samp_rate) - (window / 2) * samp_rate)
     bl = bl if bl > 0 else 0
