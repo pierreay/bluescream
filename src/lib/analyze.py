@@ -127,7 +127,7 @@ def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0, flip=True, plot=Fa
     offset_duration = offset * sr
     peaks = peaks[0] + offset_duration
     if plot is True:
-        libplot.plot_time_spec_share_nf_ff(s, None, sr, peaks=peaks, triggers=trigger_l)
+        libplot.plot_time_spec_sync_axis([s], samp_rate=sr, peaks=peaks, triggers=trigger_l)
     if np.shape(peaks[peaks <= 0]) != (0,):
         l.LOGGER.warning("discard detected aes turned negatives because of the offset")
         peaks = peaks[peaks >= 0]
@@ -268,7 +268,7 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
         error = 1
 
     if plot_enable:
-        libplot.plot_time_spec_share_nf_ff(arr, None, sr, peaks=starts, triggers=trigger)
+        libplot.plot_time_spec_sync_axis([arr], samp_rate=sr, peaks=starts, triggers=trigger)
     if error:
         return None, template
 

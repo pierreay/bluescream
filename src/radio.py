@@ -124,7 +124,7 @@ def extract(samp_rate, plot, overwrite, window, offset):
 
     # * Results.
     if plot:
-        libplot.plot_time_spec_share_nf_ff(nf, None, samp_rate, peaks[0], nf_triggers)
+        libplot.plot_time_spec_sync_axis([nf], samp_rate=samp_rate, peaks=peaks[0], triggers=nf_triggers)
     if len(peaks[0]) != 1:
         l.LOGGER.error("signal locating confusion: multiple peaks detected")
         exit(1)

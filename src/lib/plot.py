@@ -76,18 +76,21 @@ def plot_time_compare_n(arr):
 
 # * Plot components to construct advanced plots
 
-# This section was created to separe plot_time_spec_share_nf_ff() subfunctions
-# in generic functions that would be located here.
+# This section was created to separe plot_time_spec_sync_axis() subfunctions
+# in generic functions that would be located here in the future.
 
 # * Special plot for analysis
 
-def plot_time_spec_share_nf_ff(nf, ff, samp_rate, peaks=None, triggers=None):
-    """Screaming Channels templating main plot, displaying NF and FF recordings
-    (each one being a 1D np.array). Originaly taken from "plot" subcommand of
-    "radio.py".
+def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None):
+    """Plot signals using synchronized time and frequency domains.
+
+    Plot signals contained in the S_ARR array. They must be recorded at the
+    sample rate, which can be specified using SAMP_RATE to duration. PEAKS can
+    be set to an array of indexes to use as vline. TRIGGERS can be set to to a
+    Triggers class containing trigger signals to display.
 
     """
-    SUBPLOT_NB = 4 if ff is not None else 2
+    SUBPLOT_NB = len(s_arr) * 2
     def plot_init(nsamples, duration, nb = 1):
         t = np.linspace(0, duration, nsamples)
         plt.subplots_adjust(hspace = 1)
@@ -128,25 +131,23 @@ def plot_time_spec_share_nf_ff(nf, ff, samp_rate, peaks=None, triggers=None):
         for idx in list(range(triggers.nb())):
             trg = triggers.get(idx)
             plot_time(t, trg.signal, ax, "triggers(idx={}, trg.lowpass={:.3e})".format(idx, trg.lowpass))
-        # Don't use threshold anymore, but keep it here for reference if needed.
-        # if triggers.threshold is not None:
-        #     ax.axhline(triggers.threshold, label="trigger threshold")
 
-    nsamples = len(nf)
+    nsamples = len(s_arr[0])
+    if samp_rate is None:
+        samp_rate = 1
     duration = nsamples / samp_rate
-    t, ax_time = plot_init(nsamples, duration, 1)
-    plot_time(t, nf, ax_time, "NF")
-    if peaks is not None:
-        plot_peaks(peaks, ax_time, samp_rate)
-    if triggers is not None:
-        plot_triggers(triggers, ax_time, t)
-    ax_freq = plot_freq(samp_rate, nf, ax_time, 2, triggers)
-    if peaks is not None:
-        plot_peaks(peaks, ax_freq, samp_rate)
-    if ff is not None:
-        t, ax_time = plot_init(nsamples, duration, 3)
-        plot_time(t, ff, ax_time, "RF")
-        plot_freq(samp_rate, ff, ax_time, 4)
+    for signal_idx, s in enumerate(s_arr):
+        assert len(s) == nsamples, "traces should be of the same length!"
+        subplot_idx = signal_idx * 2 + 1
+        t, ax_time = plot_init(nsamples, duration, subplot_idx)
+        plot_time(t, s, ax_time, "idx={}".format(signal_idx))
+        if peaks is not None:
+            plot_peaks(peaks, ax_time, samp_rate)
+        if triggers is not None:
+            plot_triggers(triggers, ax_time, t)
+        ax_freq = plot_freq(samp_rate, s, ax_time, subplot_idx + 1, triggers)
+        if peaks is not None:
+            plot_peaks(peaks, ax_freq, samp_rate)
     show_fullscreen()
 
 def plot_metadata_balance(ks, pt):

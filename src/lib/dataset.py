@@ -400,7 +400,7 @@ class Profile():
             if ff is None:
                 self.dataset.train_set.load_trace(0, nf=False, ff=True, check=True)
                 ff = [self.dataset.train_set.ff]
-            libplot.plot_time_spec_share_nf_ff(ff[0], None, self.dataset.samp_rate, peaks=[self.POINT_START, self.POINT_END])
+            libplot.plot_time_spec_sync_axis([ff[0]], samp_rate=self.dataset.samp_rate, peaks=[self.POINT_START, self.POINT_END])
    
     def __str__(self):
         string = "profile:\n"

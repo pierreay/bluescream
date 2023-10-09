@@ -126,7 +126,7 @@ def average_fn(q, dset, sset, i, stop, nb_aes, template, plot):
         l.LOGGER.warning("error during averaging aes, trace {} filled with zeroes!".format(i))
     # * Plot the averaged trace if wanted.
     if plot:
-        libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate)
+        libplot.plot_time_spec_sync_axis([sset.ff], samp_rate=dset.samp_rate)
     # * Save the processed trace.
     sset.save_trace(nf=False)
     q.put((sset.template, check, i))
@@ -266,10 +266,10 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
                 l.LOGGER.error("number of detected aes is aberrant: {}".format(len(starts)))
                 # If plot is ON, we are debugging/configuring or processing trace #1, hence don't continue.
                 if plot:
-                    libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate, peaks=starts, triggers=trigger)
+                    libplot.plot_time_spec_sync_axis([sset.ff], samp_rate=dset.samp_rate, peaks=starts, triggers=trigger)
                     raise Exception("aes detection failed!")
             if plot:
-                libplot.plot_time_spec_share_nf_ff(sset.ff, None, dset.samp_rate, peaks=starts, triggers=trigger)
+                libplot.plot_time_spec_sync_axis([sset.ff], samp_rate=dset.samp_rate, peaks=starts, triggers=trigger)
             # * If trace 0, interactively valid the extraction as the template for further traces.
             if i == 0:
                 extracted     = analyze.extract(sset.ff, starts, length=length)

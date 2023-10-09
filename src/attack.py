@@ -989,7 +989,7 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
 
     if PLOT:
         PROFILE.plot(delim=True)
-        libplot.plot_time_spec_share_nf_ff(DATASET.attack_set.ff[0], None, DATASET.samp_rate, peaks=[START_POINT, END_POINT])
+        libplot.plot_time_spec_sync_axis([DATASET.attack_set.ff[0]], samp_rate=DATASET.samp_rate, peaks=[START_POINT, END_POINT])
 
     if align:
         TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
