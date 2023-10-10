@@ -50,19 +50,21 @@ class Device():
     def __exit__(self, *args):
         self.close()
 
-    def __init__(self, ser_port, baud, bd_addr, fixed_plaintext,
-                 ltk_path, addr_path, rand_path, ediv_path, record_duration):
+    def __init__(self, ser_port, baud, bd_addr,
+                 ltk_path, addr_path, rand_path, ediv_path, radio):
         self.central = None # Will be set in `self.configure()`.
         # We need Bluetooth communication, register the BD_ADDR.
         self.ser_port = ser_port
         self.baud = baud
         self.bd_addr = bd_addr
-        self.fixed_plaintext = fixed_plaintext
+        # The "self.bd_addr_spoof" value is hardcoded twice, here and in our
+        # custom firmware inside input.c.
+        self.bd_addr_spoof = "00:19:0E:19:79:D8"
         self.ltk_path = ltk_path
         self.addr_path = addr_path
         self.rand_path = rand_path
         self.ediv_path = ediv_path
-        self.record_duration = record_duration
+        self.radio = radio
         # Timeout for a connection [s].
         self.timeout = 4
         l.LOGGER.debug("Register nRF52 with BD_ADDR='{}'".format(self.bd_addr))
@@ -209,14 +211,14 @@ class Device():
         self.idx = idx
 
     def execute(self):
+        assert hasattr(self, "rep") and self.rep > 0, "Bad repetition configuration"
+        assert hasattr(self, "radio"), "Can't access to radio object"
         assert hasattr(self, "central"), "No initialized WHAD Central"
         assert hasattr(self, "ltk"), "No LTK found!"
         assert hasattr(self, "rand"), "No RAND found!"
         assert hasattr(self, "ediv"), "No EDIV found!"
         assert hasattr(self, "skdm"), "No SKDM found!"
         assert hasattr(self, "ivm"), "No IVM found!"
-        assert hasattr(self, "rep") and self.rep > 0, "Bad repetition configuration"
-        assert hasattr(self, "radio"), "Can't access to radio object"
 
         # Keep trace of number of failed connections.
         fail = 0
@@ -304,8 +306,7 @@ class Device():
                         pass
                     if trgr_recv_ll_start_enc_req.triggered:
                         l.LOGGER.error("Not executed `nRF52_WHAD.radio.record()` with `nRF52_WHAD.trgr_recv_ll_start_enc_req.triggered` to True")
-                    l.LOGGER.info("record_duration={}".format(self.record_duration))
-                    self.radio.record(self.record_duration * self.radio.fs)
+                    self.radio.record()
                     if not trgr_recv_ll_start_enc_req.triggered:
                         l.LOGGER.error("Returned `nRF52_WHAD.radio.record()` without `nRF52_WHAD.trgr_recv_ll_start_enc_req.triggered` to True")
                     else:
