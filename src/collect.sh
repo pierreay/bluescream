@@ -42,7 +42,7 @@ function ykush_reset() {
     log_info
     log_info "=========== YKUSH RESET ==========="
     log_info
-    if [[ $FW_MODE == "train" ]]; then
+    if [[ $COLLECT_MODE == "train" ]]; then
         log_info "power off ykush..."
         sudo ykushcmd -d a
         sleep 10 # Wait for shutdown.
@@ -166,9 +166,9 @@ function collect_one_set() {
             i=$(( $i - 1 ))
             continue
         fi
-        if [[ $FW_MODE == "train" ]]; then
+        if [[ $COLLECT_MODE == "train" ]]; then
             ./radio.py --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE --window 0.15 --offset 0.05 --no-plot --overwrite
-        elif [[ $FW_MODE == "attack" ]]; then
+        elif [[ $COLLECT_MODE == "attack" ]]; then
             ./radio.py --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE --window 0.01 --offset 0.00 --no-plot --overwrite
         fi
         cp /tmp/raw_0_0.npy $OUTPUT_WD/${i}_trace_nf.npy
@@ -209,8 +209,7 @@ export KEY_FIXED=0
 log_info
 log_info "=========== Training set ==========="
 log_info
-export FW_MODE=train
-firmware_set_mode $FW_MODE >/dev/null 2>&1
+export COLLECT_MODE=train
 collect_one_set 2
 
 # ** Attack subset
@@ -218,9 +217,8 @@ collect_one_set 2
 export COLLECT_NB="$COLLECT_ATTACK_NB"
 export OUTPUT_WD="$OUTPUT_WD_ROOT/attack"
 export KEY_FIXED=1
-export FW_MODE=attack
+export COLLECT_MODE=attack
 log_info
 log_info "=========== Attack set ==========="
 log_info
-firmware_set_mode $FW_MODE >/dev/null 2>&1
 collect_one_set 2
