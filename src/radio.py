@@ -55,15 +55,6 @@ def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
     num_traces_per_point = 1
     outpath = "/tmp"
 
-    device_config = {"type": "NRF52_WHAD",
-                     "fixed_plaintext": False,
-                     "ltk_path": "/tmp/mirage_output_ltk",
-                     "addr_path": "/tmp/mirage_output_addr",
-                     "rand_path": "/tmp/mirage_output_rand",
-                     "ediv_path": "/tmp/mirage_output_ediv",
-                     "record_duration": duration
-                     }
-
     rad = soapysdr.MySoapySDRs()
     if nf_id != -1:
         rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, nf_id, radio)
@@ -76,7 +67,9 @@ def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
         exit(1)
     rad.open()
 
-    with device.Device.create(device_config, baud=115200, ser=bd_addr) as dev:
+    with device.Device(baud=115200, ser=bd_addr, fixed_plaintext=False, record_duration=duration,
+                     ltk_path="/tmp/mirage_output_ltk",   addr_path="/tmp/mirage_output_addr",
+                     rand_path="/tmp/mirage_output_rand", ediv_path="/tmp/mirage_output_ediv") as dev:
         dev.configure_input()
         dev.generate(num=num_points, path=outpath)
         dev.init(rep=num_traces_per_point)

@@ -35,20 +35,7 @@ PROCEDURE_INTERLEAVING = False
 
 # * Classes
 
-# WARNING: Numbers must match with "classes" variable in "Device.get()".
-DeviceType = enum.Enum("DeviceType", {"NRF52_WHAD": 0})
-
 class Device():
-    @dataclasses.dataclass
-    class DeviceConfig:
-        type: DeviceType
-        fixed_plaintext: bool = False
-        ltk_path: str = ""
-        addr_path: str = ""
-        rand_path: str = ""
-        ediv_path: str = ""
-        record_duration: float = ""
-
     # Define counters for interesting packets.
     cnt_send_hci_create_connection = 0
     cnt_recv_ll_start_enc_req      = 0
@@ -57,58 +44,24 @@ class Device():
     # Define limits.
     fail_lim = 4
 
-    @classmethod
-    def create(cls, devconfig, **kwargs):
-        """Create the requested target device. Return an instantiated target
-        device based on the type.
-
-        :param type: DeviceType enumeration of type of target device.
-        :param devconfig: Dictionnary of the "device" section in configuration file.
-        :param **kwargs: Dictionnary of additionnal device parameters used by specialized classes.
-        :returns: Object inherited from Device.
-
-        """
-        try:
-            # Get class DeviceConfig parameters out of devconfig because they
-            # are not included in per-device DeviceConfig dataclasses.
-            l.LOGGER.debug("Initialize device of type='{}'".format(devconfig["type"]))
-            cls_devconfig = cls.DeviceConfig(devconfig.get("type"))
-            dev = cls.get(cls_devconfig.type)
-        except KeyError as e:
-            l.LOGGER.critical("Can't find 'type' key in 'device' section of configuration file")
-        else:
-            return dev(devconfig, type=cls_devconfig.type, **kwargs)
-        exit(1) # If critical exception occurs.
-
-    @classmethod
-    def get(cls, type):
-        """Get the class corresponding to the type of target device.
-
-        :param type: DeviceType enumeration of type of target device.
-        :returns: Class inherited from Device.
-        :raises Exception: If type is not supported.
-
-        """
-        classes = [Device]
-        try:
-            return classes[DeviceType[type].value]
-        except KeyError as e:
-            raise Exception("Unsupported device type: {}".format(type))
-
     def __enter__(self):
         return self
 
     def __exit__(self, *args):
         self.close()
 
-    def __init__(self, devconfig, type, **kwargs):
-        """:param devconfig: Dictionnary of the "device" section in old configuration file.
-        :param **kwargs: Dictionnary of additionnal device parameters used by specialized classes."""
-        self.type = DeviceType[type]
-        self.config = self.DeviceConfig(**devconfig)
+    def __init__(self, ser, baud, fixed_plaintext,
+                 ltk_path, addr_path, rand_path, ediv_path, record_duration):
         self.central = None # Will be set in `self.configure()`.
         # We need Bluetooth communication, register the BD_ADDR.
-        self.address = kwargs["ser"]
+        self.address = ser
+        self.baud = baud
+        self.fixed_plaintext = fixed_plaintext
+        self.ltk_path = ltk_path
+        self.addr_path = addr_path
+        self.rand_path = rand_path
+        self.ediv_path = ediv_path
+        self.record_duration = record_duration
         # Timeout for a connection [s].
         self.timeout = 4
         l.LOGGER.debug("Register nRF52 with BD_ADDR='{}'".format(self.address))
@@ -159,10 +112,10 @@ class Device():
 
     def generate(self, num, path):
         # Generate or read needed parameters.
-        bt_addr_path = self.config.addr_path
-        bt_ltk_path  = self.config.ltk_path
-        bt_rand_path = self.config.rand_path
-        bt_ediv_path = self.config.ediv_path
+        bt_addr_path = self.addr_path
+        bt_ltk_path  = self.ltk_path
+        bt_rand_path = self.rand_path
+        bt_ediv_path = self.ediv_path
         l.LOGGER.debug("Open BT_ADDR/LTK/RAND/EDIV files for reading: {} {} {} {}".format(bt_addr_path, bt_ltk_path, bt_rand_path, bt_ediv_path))
         try:
             with open(bt_addr_path, mode="r") as f:
@@ -188,7 +141,7 @@ class Device():
         if not re.match("^[a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9]$", self.ltk):
             raise Exception("LTK is not correctly formatted! Expected format: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX with X a lowercase hexadecimal digit")
         # Half part of the Known Plaintext (KP).
-        npts = 1 if self.config.fixed_plaintext else num
+        npts = 1 if self.fixed_plaintext else num
         if npts == 1:
             # l.LOGGER.debug("Use fixed 0xdeadbeefdeadbeef SKD_M")
             # self.skdm = [0xdeadbeefdeadbeef]
@@ -249,7 +202,7 @@ class Device():
         self.central.set_bd_address(self.bd_addr_spoof)
 
         # Choose which SKDM has to be sent for this batch of recordings.
-        self.skdm_choosen = self.skdm[0 if self.config.fixed_plaintext else idx]
+        self.skdm_choosen = self.skdm[0 if self.fixed_plaintext else idx]
 
         # Current final trace number used for saving the SKD.
         self.idx = idx
@@ -350,8 +303,8 @@ class Device():
                         pass
                     if trgr_recv_ll_start_enc_req.triggered:
                         l.LOGGER.error("Not executed `nRF52_WHAD.radio.record()` with `nRF52_WHAD.trgr_recv_ll_start_enc_req.triggered` to True")
-                    l.LOGGER.info("record_duration={}".format(self.config.record_duration))
-                    self.radio.record(self.config.record_duration * self.radio.fs)
+                    l.LOGGER.info("record_duration={}".format(self.record_duration))
+                    self.radio.record(self.record_duration * self.radio.fs)
                     if not trgr_recv_ll_start_enc_req.triggered:
                         l.LOGGER.error("Returned `nRF52_WHAD.radio.record()` without `nRF52_WHAD.trgr_recv_ll_start_enc_req.triggered` to True")
                     else:
