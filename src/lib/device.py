@@ -50,12 +50,13 @@ class Device():
     def __exit__(self, *args):
         self.close()
 
-    def __init__(self, ser, baud, fixed_plaintext,
+    def __init__(self, ser_port, baud, bd_addr, fixed_plaintext,
                  ltk_path, addr_path, rand_path, ediv_path, record_duration):
         self.central = None # Will be set in `self.configure()`.
         # We need Bluetooth communication, register the BD_ADDR.
-        self.address = ser
+        self.ser_port = ser_port
         self.baud = baud
+        self.bd_addr = bd_addr
         self.fixed_plaintext = fixed_plaintext
         self.ltk_path = ltk_path
         self.addr_path = addr_path
@@ -64,7 +65,7 @@ class Device():
         self.record_duration = record_duration
         # Timeout for a connection [s].
         self.timeout = 4
-        l.LOGGER.debug("Register nRF52 with BD_ADDR='{}'".format(self.address))
+        l.LOGGER.debug("Register nRF52 with BD_ADDR='{}'".format(self.bd_addr))
 
     def configure_input(self):
         def sub_input_to_ser(ser):
@@ -174,7 +175,7 @@ class Device():
         self.rep = rep
 
         # Check for address here and not in __init__ to correctly handle raised excpetion.
-        if not re.match("^[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]$", self.address):
+        if not re.match("^[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]$", self.bd_addr):
             raise Exception("Target address is not correctly formatted! Expected format: XX:XX:XX:XX:XX:XX with X an hexadecimal number")
 
         # Convert read EDIV and RAND to usable values. They have to be converted after the saving part.
@@ -289,8 +290,8 @@ class Device():
             # Connect to the peripheral. The parameters are:
             # 1. Use increased hop interval. Decreasing it speed-up the connection.
             # 2. Set channel map to 0x300 which corresponds to channel 8-9.
-            l.LOGGER.debug("nRF52_WHAD.central.connect(address={}, random=False, hop_interval={}, channel_map=0x{:x})".format(self.address, HOP_INTERVAL, CHANNEL_MAP))
-            device = self.central.connect(self.address, random=False, hop_interval=HOP_INTERVAL, channel_map=CHANNEL_MAP)
+            l.LOGGER.debug("nRF52_WHAD.central.connect(address={}, random=False, hop_interval={}, channel_map=0x{:x})".format(self.bd_addr, HOP_INTERVAL, CHANNEL_MAP))
+            device = self.central.connect(self.bd_addr, random=False, hop_interval=HOP_INTERVAL, channel_map=CHANNEL_MAP)
 
             # Connection can be lost because of firmware bugs, interferances, or because
             # our packets are not legitimate. If so, just retry a connect.
