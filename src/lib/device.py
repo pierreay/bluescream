@@ -113,64 +113,13 @@ class Device():
             sub_input_to_ser(ser)
         l.LOGGER.info("done!")
 
-    def generate(self, num, path):
-        # Generate or read needed parameters.
-        bt_addr_path = self.addr_path
-        bt_ltk_path  = self.ltk_path
-        bt_rand_path = self.rand_path
-        bt_ediv_path = self.ediv_path
-        l.LOGGER.debug("Open BT_ADDR/LTK/RAND/EDIV files for reading: {} {} {} {}".format(bt_addr_path, bt_ltk_path, bt_rand_path, bt_ediv_path))
-        try:
-            with open(bt_addr_path, mode="r") as f:
-                self.bd_addr_spoof = f.readline()[:-1]  # [:-1] to remove the \n character at the end.
-            with open(bt_ltk_path,  mode="r") as f:
-                self.ltk           = f.readline()[:-1]  # [:-1] to remove the \n character at the end.
-            with open(bt_rand_path, mode="r") as f:
-                self.rand          = f.readline()[:-1]  # [:-1] to remove the \n character at the end.
-            with open(bt_ediv_path, mode="r") as f:
-                self.ediv          = f.readline()[:-1]  # [:-1] to remove the \n character at the end.
-        except Exception as e:
-            l.log_n_exit(e, "Can't load the BD_ADDR|LTK|RAND|EDIV parameters from the pairing", 1)
-        l.LOGGER.debug("Read BD_ADDR for spoofing: {}".format(self.bd_addr_spoof))
-        l.LOGGER.debug("Read LTK for side-channel verification: {}".format(self.ltk))
-        l.LOGGER.debug("Read RAND for LTK identification: {}".format(self.rand))
-        l.LOGGER.debug("Read EDIV for LTK identification: {}".format(self.ediv))
-        assert self.bd_addr_spoof, "Read BD_ADDR should not be None!"
-        assert self.ltk,           "Read LTK should not be None!"
-        assert self.rand,          "Read RAND should not be None!"
-        assert self.ediv,          "Read EDIV should not be None!"
-        if not re.match("^[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]$", self.bd_addr_spoof):
-            raise Exception("Spoofing address is not correctly formatted! Expected format: XX:XX:XX:XX:XX:XX with X an uppercase hexadecimal digit")
-        if not re.match("^[a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9][a-z0-9]$", self.ltk):
-            raise Exception("LTK is not correctly formatted! Expected format: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX with X a lowercase hexadecimal digit")
-        # Half part of the Known Plaintext (KP).
-        npts = 1 if self.fixed_plaintext else num
-        if npts == 1:
-            # l.LOGGER.debug("Use fixed 0xdeadbeefdeadbeef SKD_M")
-            # self.skdm = [0xdeadbeefdeadbeef]
-            l.LOGGER.debug("Generate {} SKD_M (plaintext)".format(npts))
-            self.skdm = [random.getrandbits(64) for _it in range(npts)]
-        else:
-            l.LOGGER.debug("Generate {} SKD_M (plaintext)".format(npts))
-            self.skdm = [random.getrandbits(64) for _it in range(npts)]
-        # Can be set to random value.
-        self.ivm  = 0xdeadbeef
-
-        # Save parameters inside output directory.
-        try:
-            l.LOGGER.debug("Open BT_ADDR/LTK/RAND/EDIV files for saving: {} {} {} {}".format("{}/bt_addr".format(path), "{}/bt_ltk".format(path), "{}/bt_rand".format(path), "{}/bt_ediv".format(path)))
-            with open("{}/bt_addr".format(path), mode="w") as f:
-                f.write("{}\n".format(self.bd_addr_spoof))
-            with open("{}/bt_ltk".format(path),  mode="w") as f:
-                f.write("{}\n".format(self.ltk))
-            with open("{}/bt_rand".format(path), mode="w") as f:
-                f.write("{}\n".format(self.rand))
-            with open("{}/bt_ediv".format(path), mode="w") as f:
-                f.write("{}\n".format(self.ediv))
-        except Exception as e:
-            l.log_n_exit(e, "Can't save the BD_ADDR|LTK|RAND|EDIV parameters from the pairing", 1)
-        # Save path for saving only effectively used SKD while saving radio trace later.
-        self.outpath = path
+    def generate(self):
+        # TODO: Set those parameters accordingly.
+        self.ltk  = 0x00000000000000000000000000000000
+        self.rand = 0x0000000000000000
+        self.ediv = 0x0000
+        self.skdm = 0x00000000
+        self.ivm  = 0x00000000
 
     def init(self, rep):
         l.LOGGER.info("Initialization")
@@ -203,9 +152,6 @@ class Device():
         # (BD_ADDR, EDIV).
         l.LOGGER.info("BD_ADDR to spoof with the nRF52 dongle: {} ".format(self.bd_addr_spoof))
         self.central.set_bd_address(self.bd_addr_spoof)
-
-        # Choose which SKDM has to be sent for this batch of recordings.
-        self.skdm_choosen = self.skdm[0 if self.fixed_plaintext else idx]
 
         # Current final trace number used for saving the SKD.
         self.idx = idx
@@ -252,17 +198,17 @@ class Device():
                 l.LOGGER.info("MD=1")
                 self.central.prepare(
                     BTLE_DATA()     / L2CAP_Hdr() / ATT_Hdr() / ATT_Read_Request(gatt_handle=3),
-                    BTLE_DATA(MD=1) / BTLE_CTRL() / LL_ENC_REQ(rand=self.rand, ediv=self.ediv, skdm=self.skdm_choosen, ivm=self.ivm),
+                    BTLE_DATA(MD=1) / BTLE_CTRL() / LL_ENC_REQ(rand=self.rand, ediv=self.ediv, skdm=self.skdm, ivm=self.ivm),
                     trigger=trgr_send_ll_enc_req
                 )
                 l.LOGGER.debug("nRF52_WHAD.central.prepare(ATT_Read_Request[gatt_handle=3]")
             else:
                 l.LOGGER.info("MD=0")
                 self.central.prepare(
-                    BTLE_DATA() / BTLE_CTRL() / LL_ENC_REQ(rand=self.rand, ediv=self.ediv, skdm=self.skdm_choosen, ivm=self.ivm),
+                    BTLE_DATA() / BTLE_CTRL() / LL_ENC_REQ(rand=self.rand, ediv=self.ediv, skdm=self.skdm, ivm=self.ivm),
                     trigger=trgr_send_ll_enc_req
                 )
-            l.LOGGER.debug("nRF52_WHAD.central.prepare(LL_ENC_REQ[rand=0x{:x}, ediv=0x{:x}, skdm=0x{:x}, ivm=0x{:x}])".format(self.rand, self.ediv, self.skdm_choosen, self.ivm))
+            l.LOGGER.debug("nRF52_WHAD.central.prepare(LL_ENC_REQ[rand=0x{:x}, ediv=0x{:x}, skdm=0x{:x}, ivm=0x{:x}])".format(self.rand, self.ediv, self.skdm, self.ivm))
 
             # When receiveing a LL_START_ENC_REQ packet, send an empty packet,
             # used to count the number of successful link encryption to know
@@ -328,19 +274,7 @@ class Device():
                     l.LOGGER.warning("time_elapsed >= nRF52_WHAD.timeout")
             if success:
                 fail = 0
-                skds_path   = "/tmp/whad_skds"                                    # Read
-                skd_path    = "{}/bt_skd_{}".format(self.outpath, str(self.idx))  # Write
-                skds = 0
-                with open(skds_path, mode="r") as f:
-                    skds = int(f.readline()[:-1])
-                skd = (skds << 64) | self.skdm_choosen
-                l.LOGGER.debug("skdm: base10={} base16=0x{:x}".format(self.skdm_choosen, self.skdm_choosen))
-                l.LOGGER.debug("skds: base10={} base16=0x{:x}".format(skds, skds))
-                l.LOGGER.debug("skd: base10={} base16=0x{:x}".format(skd, skd))
-                with open(skd_path, mode="w") as f:
-                    l.LOGGER.info("Save SKD into {}".format(skd_path))
-                    f.write("{}\n".format(skd))
-            
+
             self.cnt_send_hci_create_connection += 1
             self.cnt_total_time += time_elapsed
 
