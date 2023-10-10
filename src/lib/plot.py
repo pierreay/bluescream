@@ -81,15 +81,18 @@ def plot_time_compare_n(arr):
 
 # * Special plot for analysis
 
-def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None):
+def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, cond=True):
     """Plot signals using synchronized time and frequency domains.
 
     Plot signals contained in the S_ARR array. They must be recorded at the
     sample rate, which can be specified using SAMP_RATE to duration. PEAKS can
     be set to an array of indexes to use as vline. TRIGGERS can be set to to a
-    Triggers class containing trigger signals to display.
+    Triggers class containing trigger signals to display. COND can be set to
+    False to not plot and return immediatly.
 
     """
+    if cond is False:
+        return
     SUBPLOT_NB = len(s_arr) * 2
     def plot_init(nsamples, duration, nb = 1):
         t = np.linspace(0, duration, nsamples)
