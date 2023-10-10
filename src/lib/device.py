@@ -54,15 +54,38 @@ class Device():
     def __exit__(self, *args):
         self.close()
 
-    def __init__(self, ser_port, baud, bd_addr, radio, dataset):
-        # We need Bluetooth communication, register the BD_ADDR.
+    def __init__(self, ser_port, baud, bd_addr, radio, dataset, subset):
         self.ser_port = ser_port
         self.baud = baud
         self.bd_addr = bd_addr
         self.radio = radio
         self.dataset = dataset
+        self.subset = subset
+        l.LOGGER.info("instantiate whad's central with uart0's dongle")
+        try:
+            self.central = Central(WhadDevice.create('uart0'))
+        except Exception as e:
+             # Because WHAD exceptions doesn't have descriptions, only names
+             # accessible through __repr__().
+            raise Exception("{}".format(e.__repr__()))
+        l.LOGGER.info("spoof bluetooth address: {}".format(self.bd_addr_spoof))
+        self.central.set_bd_address(self.bd_addr_spoof)
 
-    def configure_input(self):
+    def configure(self, idx):
+        l.LOGGER.info("configure device for recording index #{}".format(idx))
+        self.configure_ser(k=self.subset.ks[idx], p=self.subset.pt[idx])
+        # RAND and EDIV values are hardcoded twice, here and in our custom
+        # firmware inside input.c.
+        self.rand = 0xdeadbeefdeadbeef
+        self.ediv = 0xdead
+        # SKD_M can be kept set to 0 since we submitted a plaintext for our
+        # custom firmware.
+        self.skdm = 0x00000000
+        # IVM can be kept set to 0 since it will only be used after the session
+        # key derivation (hence, after our recording and our instrumentation).
+        self.ivm  = 0x00000000
+
+    def configure_ser(self, k, p):
         def sub_input_to_ser(ser):
             """Submit input to the Nimble security database of our custom firmware."""
             write_to_ser(ser, "input_sub")
@@ -88,82 +111,18 @@ class Device():
             l.LOGGER.debug("ser <- {}".format(cmd))
             ser.write("{}\n\n".format(cmd).encode())
 
-        l.LOGGER.info("send p and k on serial port...")
-        # TODO: The input values sould be provided by dataset.
-        k = utils.str_hex_to_npy_int("deadbeefdeadbeefbeefdeadbeefdead")
-        p = utils.str_hex_to_npy_int("beefdeadbeefdeaddeadbeefdeadbeef")
-        # Convert dataset to input for firmware over serial port.
-        k = utils.npy_int_to_str_hex(k)
-        p = utils.npy_int_to_str_hex(p)
-        # TODO: Register EDIV and RAND to use them during connection.
-        ediv = 0xdead
-        rand = 0xdeadbeefdeadbeef
+        l.LOGGER.info("send p and k on serial port")
         # Configure the input of our custom firmware using serial port.
-        # TODO: Set the serial port from the command line.
-        with serial.Serial('/dev/ttyACM1', 115200) as ser:
-            write_input_to_ser(ser, k, "k")
-            write_input_to_ser(ser, p, "p")
+        with serial.Serial(self.ser_port, self.baud) as ser:
+            # Convert dataset to input for firmware over serial port and send it.
+            write_input_to_ser(ser, utils.npy_int_to_str_hex(k), "k")
+            write_input_to_ser(ser, utils.npy_int_to_str_hex(p), "p")
             sub_input_to_ser(ser)
-        l.LOGGER.info("done!")
-
-    def generate(self):
-        # TODO: Set those parameters accordingly.
-        self.ltk  = 0x00000000000000000000000000000000
-        self.rand = 0x0000000000000000
-        self.ediv = 0x0000
-        self.skdm = 0x00000000
-        self.ivm  = 0x00000000
-
-    def init(self, rep):
-        l.LOGGER.info("Initialization")
-        self.rep = rep
-
-        # Check for address here and not in __init__ to correctly handle raised excpetion.
-        if not re.match("^[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]:[A-Z0-9][A-Z0-9]$", self.bd_addr):
-            raise Exception("Target address is not correctly formatted! Expected format: XX:XX:XX:XX:XX:XX with X an hexadecimal number")
-
-        # Convert read EDIV and RAND to usable values. They have to be converted after the saving part.
-        self.ediv = int(self.ediv, base=16)                                           # Convert from hex string (right-order) to integer.
-        self.rand = struct.unpack('<Q',struct.pack('>Q', int(self.rand, base=16)))[0] # Convert from hex string (reverse-order) to integer.
-
-        l.LOGGER.info("LTK         = 0x{}".format(self.ltk))
-        l.LOGGER.info("RAND        = 0x{:x}".format(self.rand))
-        l.LOGGER.info("EDIV        = 0x{:x}".format(self.ediv))
-        l.LOGGER.info("SKD_M[0]    = 0x{:x}".format(self.skdm[0]))
-        l.LOGGER.info("len(SKD_M)  = {}".format(len(self.skdm)))
-        l.LOGGER.info("IV_M        = 0x{:x}".format(self.ivm))
-
-    def configure(self, idx):
-        l.LOGGER.debug("Create WHAD's Central with UART0's dongle")
-        # Create central device.
-        try:
-            self.central = Central(WhadDevice.create('uart0'))
-        except Exception as e:
-            raise Exception("{}".format(e.__repr__())) # Because WHAD exceptions doesn't have descriptions, only names accessible through __repr__().
-        # This has to be set to the Bluetooth adress of the HCI device used to
-        # establish the pairing, since the tuple used for LTK identification is
-        # (BD_ADDR, EDIV).
-        l.LOGGER.info("BD_ADDR to spoof with the nRF52 dongle: {} ".format(self.bd_addr_spoof))
-        self.central.set_bd_address(self.bd_addr_spoof)
-
-        # Current final trace number used for saving the SKD.
-        self.idx = idx
 
     def execute(self):
-        assert hasattr(self, "rep") and self.rep > 0, "Bad repetition configuration"
-        assert hasattr(self, "radio"), "Can't access to radio object"
-        assert hasattr(self, "central"), "No initialized WHAD Central"
-        assert hasattr(self, "ltk"), "No LTK found!"
-        assert hasattr(self, "rand"), "No RAND found!"
-        assert hasattr(self, "ediv"), "No EDIV found!"
-        assert hasattr(self, "skdm"), "No SKDM found!"
-        assert hasattr(self, "ivm"), "No IVM found!"
-
         # Keep trace of number of failed connections.
         fail = 0
-
-        l.LOGGER.debug("while nRF52_WHAD.cnt_recv_ll_start_enc_req < nRF52_WHAD.rep={}".format(self.rep))
-        while self.cnt_recv_ll_start_enc_req < self.rep:
+        while self.cnt_recv_ll_start_enc_req < 1:
             # Check that most consecutive connections are ok.
             if fail > self.fail_lim:
                 raise OSError(3, "More than {} consecutive failed conection, quit the instrumentation!".format(self.fail_lim))
@@ -281,16 +240,11 @@ class Device():
             sleep(0.2) # Insert a small delay between two subsequent connections.
 
     def reset(self):
-        if self.central:
-            l.LOGGER.debug("Destroy WHAD's Central")
+        if self.central is not None:
+            l.LOGGER.debug("destroy whad's central")
             self.central.stop()
             self.central.close()
             self.central = None
-            l.LOGGER.debug("self.cnt_send_hci_create_connection={}".format(self.cnt_send_hci_create_connection))
-            l.LOGGER.debug("self.cnt_recv_ll_start_enc_req={}".format(self.cnt_recv_ll_start_enc_req))
-            l.LOGGER.debug("self.cnt_total_time={:.2f}s".format(self.cnt_total_time))
-        else:
-            l.LOGGER.debug("WHAD central is not initialized, ignore reset command")
 
     def close(self):
         self.reset()
