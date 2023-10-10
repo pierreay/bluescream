@@ -32,6 +32,7 @@ def cli(dir):
 
 @cli.command()
 @click.argument("indir", type=click.Path())
+@click.argument("subset", type=str)
 @click.argument("bd_addr")
 @click.argument("ser_port")
 @click.argument("freq_nf", type=int)
@@ -42,10 +43,12 @@ def cli(dir):
 @click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
 @click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
 def record(indir, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
+def record(indir, subset, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id, idx):
     """Record RAW traces to DIR.
 
     INDIR is the path to the dataset. It is used for collection parameters
     (e.g. sample rate) and input values (e.g. key and plaintext).
+    SUBSET corresponds to the subset's name where the inputs comes from.
     BD_ADDR is the Bluetooth address of the target device to connect to.
     SER_PORT is the serial port of the target device to connect to.
     FREQ_NF is the center frequency for the near-field recording.
@@ -62,6 +65,7 @@ def record(indir, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, duration, radi
     ret_exit_and_resume = 3
     num_points = 1
     num_traces_per_point = 1
+    sset = dset.get_subset(subset)
 
     rad = soapysdr.MySoapySDRs()
     if nf_id != -1:
