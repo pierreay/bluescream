@@ -156,7 +156,7 @@ def load_raw_input(data_path, filename, number, fixed=False, hex=True):
                     data = data[0:len(data)-1]
     if data[0] == "\n":
         data = data[1:]
-    return [[int(c) for c in bytearray.fromhex(line)]
+    return [utils.str_hex_to_list_int(line)
             for line in data.split('\n')]
             
 def load_keys(dir):
