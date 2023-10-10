@@ -167,7 +167,7 @@ function collect_one_set() {
             continue
         fi
         if [[ $FW_MODE == "train" ]]; then
-            ./radio.py --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE --window 0.2 --offset 0.00 --no-plot --overwrite
+            ./radio.py --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE --window 0.15 --offset 0.05 --no-plot --overwrite
         elif [[ $FW_MODE == "attack" ]]; then
             ./radio.py --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE --window 0.01 --offset 0.00 --no-plot --overwrite
         fi
