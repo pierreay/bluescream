@@ -77,6 +77,7 @@ def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
     rad.open()
 
     with device.Device.create(device_config, baud=115200, ser=bd_addr) as dev:
+        dev.configure_input()
         dev.generate(num=num_points, path=outpath)
         dev.init(rep=num_traces_per_point)
         dev.radio = rad
