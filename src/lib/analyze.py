@@ -95,12 +95,23 @@ def get_trace_format(trace):
         return None
 
 def fill_zeros_if_bad(ref, test):
-    """If a bad trace TEST is given (i.e. wrong shape or None), it is remplaced
-    with a zeroed trace of dtype and shape from REF. Return a tuple (FLAG,
-    TEST) where FLAG is False if trace was OK and True if trace was bad."""
+    """If a bad trace TEST is given (i.e. wrong shape or None), return a bad
+    trace using REF as trace reference. Return a tuple (FLAG, TEST) where FLAG
+    is False if trace was OK and True if trace was bad.
+
+    """
     if test is None or test.shape != ref.shape:
-        return True, np.zeros(ref.shape, dtype=ref.dtype)
+        return True, get_bad_trace(ref)
     return False, test
+
+def get_bad_trace(ref):
+    """Return what we call a bad trace using the REF trace as a reference for
+    the shape and the dtype. A bad trace is a recording which is remplaced with
+    a zeroed trace because of a an analysis step that lead to an error
+    (e.g. wrong AES finding or extraction).
+
+    """
+    return np.zeros(ref.shape, dtype=ref.dtype)
 
 def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0, flip=True, plot=False):
     """Find the start (beginning of the key scheduling) of every AES
