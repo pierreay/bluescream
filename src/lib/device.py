@@ -36,13 +36,17 @@ PROCEDURE_INTERLEAVING = False
 # * Classes
 
 class Device():
-    # Define counters for interesting packets.
+    # Counters for interesting packets.
     cnt_send_hci_create_connection = 0
     cnt_recv_ll_start_enc_req      = 0
     cnt_total_time                 = 0
-
-    # Define limits.
+    # Number of fail limits.
     fail_lim = 4
+    # Timeout for a connection [s].
+    timeout = 4
+    # The "self.bd_addr_spoof" value is hardcoded twice, here and in our
+    # custom firmware inside input.c.
+    bd_addr_spoof = "00:19:0E:19:79:D8"
 
     def __enter__(self):
         return self
@@ -50,24 +54,13 @@ class Device():
     def __exit__(self, *args):
         self.close()
 
-    def __init__(self, ser_port, baud, bd_addr,
-                 ltk_path, addr_path, rand_path, ediv_path, radio):
-        self.central = None # Will be set in `self.configure()`.
+    def __init__(self, ser_port, baud, bd_addr, radio, dataset):
         # We need Bluetooth communication, register the BD_ADDR.
         self.ser_port = ser_port
         self.baud = baud
         self.bd_addr = bd_addr
-        # The "self.bd_addr_spoof" value is hardcoded twice, here and in our
-        # custom firmware inside input.c.
-        self.bd_addr_spoof = "00:19:0E:19:79:D8"
-        self.ltk_path = ltk_path
-        self.addr_path = addr_path
-        self.rand_path = rand_path
-        self.ediv_path = ediv_path
         self.radio = radio
-        # Timeout for a connection [s].
-        self.timeout = 4
-        l.LOGGER.debug("Register nRF52 with BD_ADDR='{}'".format(self.bd_addr))
+        self.dataset = dataset
 
     def configure_input(self):
         def sub_input_to_ser(ser):

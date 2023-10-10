@@ -75,9 +75,7 @@ def record(indir, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, duration, radi
         exit(1)
     rad.open()
 
-    with device.Device(ser_port=ser_port, baud=115200, bd_addr=bd_addr, radio=rad,
-                     ltk_path="/tmp/mirage_output_ltk",   addr_path="/tmp/mirage_output_addr",
-                     rand_path="/tmp/mirage_output_rand", ediv_path="/tmp/mirage_output_ediv") as dev:
+    with device.Device(ser_port=ser_port, baud=115200, bd_addr=bd_addr, radio=rad, dataset=dset) as dev:
         dev.configure_input()
         dev.generate()
         dev.init(rep=num_traces_per_point)
