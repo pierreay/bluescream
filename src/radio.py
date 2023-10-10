@@ -62,27 +62,25 @@ def record(indir, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, duration, radi
     ret_exit_and_resume = 3
     num_points = 1
     num_traces_per_point = 1
-    outpath = "/tmp"
 
     rad = soapysdr.MySoapySDRs()
     if nf_id != -1:
-        rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, nf_id, radio)
+        rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, nf_id, enabled=radio, duration=duration)
         rad.register(rad_nf)
     if ff_id != -1:
-        rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, ff_id, radio)
+        rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, ff_id, enabled=radio, duration=duration)
         rad.register(rad_ff)
     if rad.get_nb() <= 0:
         l.LOGGER.error("we need at least one radio index to record!")
         exit(1)
     rad.open()
 
-    with device.Device(ser_port=ser_port, baud=115200, bd_addr=bd_addr, fixed_plaintext=False, record_duration=duration,
+    with device.Device(ser_port=ser_port, baud=115200, bd_addr=bd_addr, radio=rad,
                      ltk_path="/tmp/mirage_output_ltk",   addr_path="/tmp/mirage_output_addr",
                      rand_path="/tmp/mirage_output_rand", ediv_path="/tmp/mirage_output_ediv") as dev:
         dev.configure_input()
-        dev.generate(num=num_points, path=outpath)
+        dev.generate()
         dev.init(rep=num_traces_per_point)
-        dev.radio = rad
 
         for idx in list(range(num_points)):
             dev.configure(idx)
