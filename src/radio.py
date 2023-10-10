@@ -76,7 +76,6 @@ def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
         exit(1)
     rad.open()
 
-    # TODO: Get ride of Device class and use nRF52_WHAD directly.
     with device.Device.create(device_config, baud=115200, ser=bd_addr) as dev:
         dev.configure_input()
         dev.generate(num=num_points, path=outpath)
