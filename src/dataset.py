@@ -28,11 +28,8 @@ import lib.triggers as triggers
 import lib.dataset as dataset
 
 def load_dataset_or_quit(indir, subset=None, outdir=None):
-    dset = dataset.Dataset.pickle_load(indir)
+    dset = dataset.Dataset.pickle_load(indir, quit_on_error=True)
     sset = None
-    if dset is None:
-        l.LOGGER.error("dataset doesn't exists!")
-        exit(-1)
     if outdir is not None:
         dset.set_dirsave(outdir)
     if subset is not None:

@@ -57,9 +57,13 @@ class Dataset():
         return path.exists(Dataset.get_path_static(dir))
 
     @staticmethod
-    def pickle_load(dir, log=True):
+    def pickle_load(dir, log=True, quit_on_error=False):
         if not Dataset.is_pickable(dir):
-            return None
+            if quit_on_error is True:
+                l.LOGGER.error("dataset doesn't exists!")
+                exit(-1)
+            else:
+                return None
         with open(Dataset.get_path_static(dir), "rb") as f:
             pickled = pickle.load(f)
             assert(type(pickled) == Dataset)
