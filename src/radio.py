@@ -42,7 +42,7 @@ def cli(dir):
 @click.option("--radio/--no-radio", default=True, help="Enable or disable the radio recording (allows instrumentation only).")
 @click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
 @click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
-def record(indir, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
+@click.option("--idx", default=0, help="Current recording index to get correct dataset's inputs.")
 def record(indir, subset, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id, idx):
     """Record RAW traces to DIR.
 
@@ -61,12 +61,9 @@ def record(indir, subset, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, durati
     """
     # Load the dataset.
     dset = dataset.Dataset.pickle_load(indir, quit_on_error=True)
-    
-    ret_exit_and_resume = 3
-    num_points = 1
-    num_traces_per_point = 1
     sset = dset.get_subset(subset)
 
+    # Initialize the radios.
     rad = soapysdr.MySoapySDRs()
     if nf_id != -1:
         rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, nf_id, enabled=radio, duration=duration)
@@ -79,19 +76,16 @@ def record(indir, subset, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, durati
         exit(1)
     rad.open()
 
-    with device.Device(ser_port=ser_port, baud=115200, bd_addr=bd_addr, radio=rad, dataset=dset) as dev:
-        dev.configure_input()
-        dev.generate()
-        dev.init(rep=num_traces_per_point)
-
-        for idx in list(range(num_points)):
-            dev.configure(idx)
-            try:
-                dev.execute()
-            except OSError as e:
-                l.log_n_exit(e, e.strerror, ret_exit_and_resume, traceback=True)
-            dev.reset()
-
+    # Initalize the device.
+    with device.Device(ser_port=ser_port, baud=115200, bd_addr=bd_addr, radio=rad, dataset=dset, subset=sset) as dev:
+        # Configure everything related to current trace index.
+        dev.configure(idx)
+        # Perform the instrumentation and the recording.
+        try:
+            dev.execute()
+        except OSError as e:
+            l.log_n_exit(e, e.strerror, 3, traceback=True)
+        dev.reset()
     rad.save(DIR)
     rad.close()
 
