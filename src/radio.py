@@ -16,6 +16,10 @@ import lib.filters as filters
 import lib.triggers as triggers
 import lib.soapysdr as soapysdr
 
+def exit_on_cond(cond, ret=1):
+    if cond is True:
+        exit(ret)
+
 DIR = None
 
 @click.group(context_settings={'show_default': True})
@@ -96,7 +100,8 @@ def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
 @click.option("--window", type=float, default=0.1, help="Extracted window in seconds, automatically compute if nothing specified.")
 @click.option("--offset", type=float, default=0, help="Offset applied to extracted window in seconds.")
 @click.option("--id", type=int, multiple=True, help="Radio indexes on which apply trace extraction (in addition to ID_REF). Can be specified multiple time.")
-def extract(samp_rate, id_ref, plot, overwrite, window, offset, id):
+@click.option("--exit-on-error/--no-exit-on-error", default=False, help="If true, exit with error on bad AES detection instead of saving a bad trace.")
+def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_error):
     """Extract RAW traces from DIR.
 
     Extract a rough window around interesting signals from just-recorded RAW
@@ -128,24 +133,30 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id):
     nf_triggers.reduce_add()
     # ** Trigger indexes.
     peaks = signal.find_peaks(nf_triggers.get(0).signal, distance=samp_rate/10, prominence=trg_peak_prominence)
-    l.LOGGER.info("number of detected peaks={}".format(len(peaks[0])))
+    peaks = peaks[0]
+    l.LOGGER.info("number of detected peaks={}".format(len(peaks)))
 
     # * Results.
-    if plot:
-        libplot.plot_time_spec_sync_axis([sig_raw_ref], samp_rate=samp_rate, peaks=peaks[0], triggers=nf_triggers)
-    if len(peaks[0]) != 1:
-        l.LOGGER.error("signal locating confusion: multiple peaks detected")
-        # TODO: Don't exit but set a bad trace instead.
-        exit(1)
+    libplot.plot_time_spec_sync_axis([sig_raw_ref], samp_rate=samp_rate, peaks=peaks, triggers=nf_triggers, cond=plot)
+    peak_detect_ok = len(peaks) == 1
+    if peak_detect_ok is False:
+        l.LOGGER.error("signal locating confusion: no or multiple peaks detected")
+        exit_on_cond(exit_on_error)
     else:
-        l.LOGGER.info("peak position={:.2f}%".format((peaks[0][0] / len(sig_raw_ref)) * 100))
+        l.LOGGER.info("peak position={:.2f}%".format((peaks[0] / len(sig_raw_ref)) * 100))
 
     # * Extraction.
     if overwrite:
-        peak = peaks[0][0]
         id = tuple(set(id + (id_ref,))) # Add id_ref and only get unique values of radio indexes.
         for idx in id:
             sig_raw = load.load_raw_trace(DIR, idx, 0)
+            if peak_detect_ok is False:
+                l.LOGGER.warning("replace recording by a bad trace")
+                sig_raw = analyze.get_bad_trace(sig_raw)
+                # Extract at middle of trace.
+                peak = int(len(sig_raw) / 2)
+            else:
+                peak = peaks[0]
             sig_raw = analyze.extract_time_window(sig_raw, samp_rate, peak, window, offset=offset)
             l.LOGGER.info("overwrite extracted signal #{} in {}".format(idx, DIR))
             load.save_raw_trace(sig_raw, DIR, idx, 0)
