@@ -33,21 +33,21 @@ class MySoapySDRs():
         for sdr in self.sdrs:
             sdr.close()
 
-    def record(self, N):
-        """Perform a recording of N samples.
+    def record(self, duration = None):
+        """Perform a recording of DURATION seconds.
 
         Spawn a thread for each radio and start recording. Block until all
         recordings finished and all threads join.
 
         """
-        l.LOGGER.debug("MySoapySDRs.record(N={}).enter".format(N))
+        l.LOGGER.debug("MySoapySDRs.record(duration={}).enter".format(duration))
         thr = [None] * len(self.sdrs)
         for idx, sdr in enumerate(self.sdrs):
-            thr[idx] = Thread(target=sdr.record, args=(N,))
+            thr[idx] = Thread(target=sdr.record, args=(duration,))
             thr[idx].start()
         for sdr in self.sdrs:
             thr[idx].join()
-        l.LOGGER.debug("MySoapySDRs.record(N={}).exit".format(N))
+        l.LOGGER.debug("MySoapySDRs.record(duration={}).exit".format(duration))
 
     def accept(self):
         l.LOGGER.debug("MySoapySDRs.accept()")
@@ -117,12 +117,14 @@ class MySoapySDR():
         assert(arr[arr.imag > np.iinfo(np.int16).max].shape == (0,))
         return arr.view(np.float32).astype(np.int16).view(MySoapySDR.DTYPE)
 
-    def __init__(self, fs, freq, idx = 0, enabled = True):
+    def __init__(self, fs, freq, idx = 0, enabled = True, duration = 1):
         l.LOGGER.debug("MySoapySDR.__init__(fs={},freq={},idx={})".format(fs, freq, idx))
         self.fs = fs
         self.freq = freq
         self.idx = idx
         self.enabled = enabled
+        # Default duration if nothing is specified during self.record().
+        self.duration = duration
         if self.enabled:
             results = SoapySDR.Device.enumerate()
             self.sdr = SoapySDR.Device(results[idx])
@@ -150,20 +152,23 @@ class MySoapySDR():
             self.sdr.closeStream(self.rx_stream)
             l.LOGGER.debug("MySoapySDR(idx={}).close().leave".format(self.idx))
 
-    def record(self, N):
+    def record(self, duration = None):
+        # Choose default duration configured during __init__ if None is given.
+        if duration is None:
+            duration = self.duration
         if self.enabled:
-            l.LOGGER.debug("MySoapySDR(idx={}).record(N={:e}).enter".format(self.idx, N))
-            N = int(N) # Required when N is specified using scientific notation.
+            l.LOGGER.debug("MySoapySDR(idx={}).record(duration={:e}).enter".format(self.idx, duration))
+            samples = int(duration * self.fs)
             rx_buff_len = pow(2, 24)
             rx_buff = np.array([0] * rx_buff_len, MySoapySDR.DTYPE)
             self.rx_signal_candidate = np.array([0], MySoapySDR.DTYPE)
-            while len(self.rx_signal_candidate) < N:
+            while len(self.rx_signal_candidate) < samples:
                 sr = self.sdr.readStream(self.rx_stream, [rx_buff], rx_buff_len, timeoutUs=10000000)
                 if sr.ret == rx_buff_len and sr.flags == 1 << 2:
                     self.rx_signal_candidate = np.concatenate((self.rx_signal_candidate, rx_buff))
             l.LOGGER.debug("MySoapySDR(idx={}).record().leave".format(self.idx))
         else:
-            time.sleep(N/1e7)
+            time.sleep(duration)
 
     def accept(self):
         if self.enabled:
