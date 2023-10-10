@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 from scipy import signal
 import click
 
+import lib.dataset as dataset
 import lib.debug
 import lib.analyze as analyze
 import lib.load as load
@@ -30,7 +31,9 @@ def cli(dir):
     DIR = path.expanduser(dir)
 
 @cli.command()
+@click.argument("indir", type=click.Path())
 @click.argument("bd_addr")
+@click.argument("ser_port")
 @click.argument("freq_nf", type=int)
 @click.argument("freq_ff", type=int)
 @click.argument("samp_rate", type=int)
@@ -38,10 +41,13 @@ def cli(dir):
 @click.option("--radio/--no-radio", default=True, help="Enable or disable the radio recording (allows instrumentation only).")
 @click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
 @click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
-def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
+def record(indir, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
     """Record RAW traces to DIR.
 
+    INDIR is the path to the dataset. It is used for collection parameters
+    (e.g. sample rate) and input values (e.g. key and plaintext).
     BD_ADDR is the Bluetooth address of the target device to connect to.
+    SER_PORT is the serial port of the target device to connect to.
     FREQ_NF is the center frequency for the near-field recording.
     FREQ_FF is the center frequency for the far-field recording.
     SAMP_RATE is the sampling rate used for both recording.
@@ -50,6 +56,9 @@ def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
     in DIR.
 
     """
+    # Load the dataset.
+    dset = dataset.Dataset.pickle_load(indir, quit_on_error=True)
+    
     ret_exit_and_resume = 3
     num_points = 1
     num_traces_per_point = 1
@@ -67,7 +76,7 @@ def record(bd_addr, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id):
         exit(1)
     rad.open()
 
-    with device.Device(baud=115200, ser=bd_addr, fixed_plaintext=False, record_duration=duration,
+    with device.Device(ser_port=ser_port, baud=115200, bd_addr=bd_addr, fixed_plaintext=False, record_duration=duration,
                      ltk_path="/tmp/mirage_output_ltk",   addr_path="/tmp/mirage_output_addr",
                      rand_path="/tmp/mirage_output_rand", ediv_path="/tmp/mirage_output_ediv") as dev:
         dev.configure_input()
