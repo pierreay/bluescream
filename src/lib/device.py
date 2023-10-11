@@ -26,7 +26,7 @@ except ImportError as e: # Don't make these modules mandatory for running all th
 
 # * Globals
 
-START_RADIO_CONN_EVENT = 1
+START_RADIO_CONN_EVENT = 10
 LL_ENC_REQ_CONN_EVENT = 27
 HOP_INTERVAL = 56
 # Channel map of 0x300 => channels 8-9 => frequencies 2.420 GHz and 2.422 GHz.
@@ -36,11 +36,6 @@ PROCEDURE_INTERLEAVING = False
 # * Classes
 
 class Device():
-    # Counters for interesting packets.
-    cnt_send_hci_create_connection = 0
-    cnt_total_time                 = 0
-    # Timeout for a connection [s].
-    timeout = 4
     # The "self.bd_addr_spoof" value is hardcoded twice, here and in our
     # custom firmware inside input.c.
     bd_addr_spoof = "00:19:0E:19:79:D8"
@@ -119,12 +114,11 @@ class Device():
             write_to_ser(ser, "input_dump") # NOTE: Keep it here because otherwise sub_input is not sent properly.
 
     def execute(self):
-        l.LOGGER.debug("nRF52_WHAD.cnt_send_hci_create_connection={}".format(self.cnt_send_hci_create_connection))
-
+        l.LOGGER.debug("start preparing whad's sequences")
         # At specified connection event, send an empty packet, used to
         # inform the radio to start recording at a precise connection
         # event.
-        l.LOGGER.info("START_RADIO_CONN_EVENT = {}".format(START_RADIO_CONN_EVENT))
+        l.LOGGER.info("connection event for starting the recording: {}".format(START_RADIO_CONN_EVENT))
         trgr_start_radio = ConnectionEventTrigger(START_RADIO_CONN_EVENT)
         self.central.prepare(
             BTLE_DATA() / BTLE_EMPTY_PDU(),
@@ -136,11 +130,11 @@ class Device():
         # connection event as the ENC_RSP, excepting to have the
         # ATT_Read_Response during AES processing. If you set the MD bit
         # before, the connection events will be separated.
-        l.LOGGER.info("LL_ENC_REQ_CONN_EVENT = {}".format(LL_ENC_REQ_CONN_EVENT))
+        l.LOGGER.info("connection event for sending the LL_ENC_REQ request: {}".format(LL_ENC_REQ_CONN_EVENT))
         trgr_send_ll_enc_req = ConnectionEventTrigger(LL_ENC_REQ_CONN_EVENT)
-        l.LOGGER.info("PROCEDURE_INTERLEAVING={}".format(PROCEDURE_INTERLEAVING))
+        l.LOGGER.info("enabling of procedure interleaving: {}".format(PROCEDURE_INTERLEAVING))
         if PROCEDURE_INTERLEAVING:
-            l.LOGGER.info("MD=1")
+            l.LOGGER.debug("more data bit=1")
             self.central.prepare(
                 BTLE_DATA()     / L2CAP_Hdr() / ATT_Hdr() / ATT_Read_Request(gatt_handle=3),
                 BTLE_DATA(MD=1) / BTLE_CTRL() / LL_ENC_REQ(rand=self.rand, ediv=self.ediv, skdm=self.skdm, ivm=self.ivm),
@@ -148,12 +142,12 @@ class Device():
             )
             l.LOGGER.debug("nRF52_WHAD.central.prepare(ATT_Read_Request[gatt_handle=3]")
         else:
-            l.LOGGER.info("MD=0")
+            l.LOGGER.debug("more data bit=0")
             self.central.prepare(
                 BTLE_DATA() / BTLE_CTRL() / LL_ENC_REQ(rand=self.rand, ediv=self.ediv, skdm=self.skdm, ivm=self.ivm),
                 trigger=trgr_send_ll_enc_req
             )
-        l.LOGGER.debug("nRF52_WHAD.central.prepare(LL_ENC_REQ[rand=0x{:x}, ediv=0x{:x}, skdm=0x{:x}, ivm=0x{:x}])".format(self.rand, self.ediv, self.skdm, self.ivm))
+        l.LOGGER.debug("central.prepare(LL_ENC_REQ[rand=0x{:x}, ediv=0x{:x}, skdm=0x{:x}, ivm=0x{:x}])".format(self.rand, self.ediv, self.skdm, self.ivm))
 
         # When receiveing a LL_START_ENC_REQ packet, send an empty packet,
         # used to count the number of successful link encryption to know
@@ -183,46 +177,39 @@ class Device():
         # Connect to the peripheral. The parameters are:
         # 1. Use increased hop interval. Decreasing it speed-up the connection.
         # 2. Set channel map to 0x300 which corresponds to channel 8-9.
-        l.LOGGER.debug("nRF52_WHAD.central.connect(address={}, random=False, hop_interval={}, channel_map=0x{:x})".format(self.bd_addr, HOP_INTERVAL, CHANNEL_MAP))
+        l.LOGGER.debug("central.connect(address={}, random=False, hop_interval={}, channel_map=0x{:x})".format(self.bd_addr, HOP_INTERVAL, CHANNEL_MAP))
         device = self.central.connect(self.bd_addr, random=False, hop_interval=HOP_INTERVAL, channel_map=CHANNEL_MAP)
 
-        # Connection can be lost because of firmware bugs, interferances, or because
-        # our packets are not legitimate. If so, just retry a connect.
-        time_start = time()
-        time_elapsed = 0
         if self.central.is_connected():
-            while not trgr_recv_ll_start_enc_req.triggered and time_elapsed < self.timeout:
-                time_elapsed = time() - time_start
-                while not trgr_start_radio.triggered:
-                    pass
-                if trgr_recv_ll_start_enc_req.triggered:
-                    l.LOGGER.error("Not executed `nRF52_WHAD.radio.record()` with `nRF52_WHAD.trgr_recv_ll_start_enc_req.triggered` to True")
-                # Start the recording and wait for it to complete.
-                self.radio.record()
-                if not trgr_recv_ll_start_enc_req.triggered:
-                    l.LOGGER.error("Returned `nRF52_WHAD.radio.record()` without `nRF52_WHAD.trgr_recv_ll_start_enc_req.triggered` to True")
-                else:
-                    self.radio.accept()
+            l.LOGGER.debug("whad's central is connected to target device")
+            # Wait until the connection event we should start the radio.
+            while not trgr_start_radio.triggered:
+                pass
+            # The radio has been started too late if LL_START_ENC_REQ is
+            # already received.
+            if trgr_recv_ll_start_enc_req.triggered:
+                l.LOGGER.error("the recording hasn't been started while we received the encryption confirmation!")
+            # Start the recording and wait for it to complete.
+            self.radio.record()
+            # The recording isn't likely to contain the AES since we didn't
+            # received an LL_START_ENC_REQ. The recording is maybe happening
+            # too soon.
+            if not trgr_recv_ll_start_enc_req.triggered:
+                l.LOGGER.error("the recording is already finished while we didn't received the encryption confirmation!")
+            else:
+                self.radio.accept()
         else:
-            l.LOGGER.warning("nRF52_WHAD.central.is_connected()=False")
+            l.LOGGER.error("cannot connect to target device")
         if trgr_recv_ll_reject_ind.triggered:
-            raise Exception("LL_REJECT_IND received! Encryption request's parameters needs to be updated!")
+            raise Exception("LL_REJECT_IND packet received, LL_ENC_REQ request's parameters were not accepted!")
 
-        l.LOGGER.debug("nRF52_WHAD.device.disconnect()")
+        l.LOGGER.debug("disconnect from the target device")
         device.disconnect()
-
-        success = trgr_recv_ll_start_enc_req.triggered and time_elapsed < self.timeout
-        if not success:
-            l.LOGGER.warning("not nRF52_WHAD.trgr_recv_ll_start_enc_req.triggered and time_elapsed < nRF52_WHAD.timeout")
-            if time_elapsed >= self.timeout:
-                l.LOGGER.warning("time_elapsed >= nRF52_WHAD.timeout")
-
-        self.cnt_send_hci_create_connection += 1
-        self.cnt_total_time += time_elapsed
 
         # Manually delete every previsouly created sequences. It fix a bug
         # in WHAD where sequences should be deleted automatically, but they
         # are not.
+        l.LOGGER.debug("delete prepared sequence of whad's central")
         self.central.delete_sequence(trgr_start_radio)
         self.central.delete_sequence(trgr_send_ll_enc_req)
         self.central.delete_sequence(trgr_recv_ll_start_enc_req)

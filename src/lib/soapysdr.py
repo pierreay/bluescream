@@ -157,7 +157,7 @@ class MySoapySDR():
         if duration is None:
             duration = self.duration
         if self.enabled:
-            l.LOGGER.debug("MySoapySDR(idx={}).record(duration={:e}).enter".format(self.idx, duration))
+            l.LOGGER.info("start record for radio #{} during {:.2}s".format(self.idx, duration))
             samples = int(duration * self.fs)
             rx_buff_len = pow(2, 24)
             rx_buff = np.array([0] * rx_buff_len, MySoapySDR.DTYPE)
@@ -178,5 +178,5 @@ class MySoapySDR():
     def save(self, dir):
         if self.enabled:
             dir = path.expanduser(dir)
-            l.LOGGER.debug("MySoapySDR(idx={}).save(dir={})".format(self.idx, dir))
+            l.LOGGER.info("save recording of radio #{} into directory {}".format(self.idx, dir))
             load.save_raw_trace(self.rx_signal, dir, self.idx, 0)
