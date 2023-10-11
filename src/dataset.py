@@ -17,6 +17,7 @@ import click
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
+import lib.utils as utils
 import lib.debug as libdebug
 import lib.analyze as analyze
 import lib.load as load
