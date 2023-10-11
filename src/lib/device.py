@@ -110,6 +110,7 @@ class Device():
             # NOTE: Needs "\n\n" at the end to actually sends the command.
             l.LOGGER.debug("ser <- {}".format(cmd))
             ser.write("{}\n\n".format(cmd).encode())
+            sleep(0.1)
 
         l.LOGGER.info("send p and k on serial port")
         # Configure the input of our custom firmware using serial port.
@@ -118,6 +119,7 @@ class Device():
             write_input_to_ser(ser, utils.npy_int_to_str_hex(k), "k")
             write_input_to_ser(ser, utils.npy_int_to_str_hex(p), "p")
             sub_input_to_ser(ser)
+            write_to_ser(ser, "input_dump") # NOTE: Keep it here because otherwise sub_input is not sent properly.
 
     def execute(self):
         # Keep trace of number of failed connections.
@@ -204,6 +206,7 @@ class Device():
                         pass
                     if trgr_recv_ll_start_enc_req.triggered:
                         l.LOGGER.error("Not executed `nRF52_WHAD.radio.record()` with `nRF52_WHAD.trgr_recv_ll_start_enc_req.triggered` to True")
+                    # Start the recording and wait for it to complete.
                     self.radio.record()
                     if not trgr_recv_ll_start_enc_req.triggered:
                         l.LOGGER.error("Returned `nRF52_WHAD.radio.record()` without `nRF52_WHAD.trgr_recv_ll_start_enc_req.triggered` to True")
