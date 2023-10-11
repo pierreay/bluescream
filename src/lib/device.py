@@ -230,12 +230,9 @@ class Device():
         self.central.delete_sequence(trgr_recv_ll_start_enc_req)
         self.central.delete_sequence(trgr_recv_ll_reject_ind)
 
-    def reset(self):
+    def close(self):
         if self.central is not None:
             l.LOGGER.debug("destroy whad's central")
             self.central.stop()
             self.central.close()
             self.central = None
-
-    def close(self):
-        self.reset()

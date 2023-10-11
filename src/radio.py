@@ -85,7 +85,6 @@ def record(indir, subset, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, durati
             dev.execute()
         except OSError as e:
             l.log_n_exit(e, e.strerror, 3, traceback=True)
-        dev.reset()
     rad.save(DIR)
     rad.close()
 
