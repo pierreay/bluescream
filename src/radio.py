@@ -63,30 +63,29 @@ def record(indir, subset, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, durati
     dset = dataset.Dataset.pickle_load(indir, quit_on_error=True)
     sset = dset.get_subset(subset)
 
-    # Initialize the radios.
-    rad = soapysdr.MySoapySDRs()
-    if nf_id != -1:
-        rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, nf_id, enabled=radio, duration=duration)
-        rad.register(rad_nf)
-    if ff_id != -1:
-        rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, ff_id, enabled=radio, duration=duration)
-        rad.register(rad_ff)
-    if rad.get_nb() <= 0:
-        l.LOGGER.error("we need at least one radio index to record!")
-        exit(1)
-    rad.open()
+    with soapysdr.MySoapySDRs() as rad:
+        # Initialize the radios individually.
+        if nf_id != -1:
+            rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, nf_id, enabled=radio, duration=duration)
+            rad.register(rad_nf)
+        if ff_id != -1:
+            rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, ff_id, enabled=radio, duration=duration)
+            rad.register(rad_ff)
+        if rad.get_nb() <= 0:
+            l.LOGGER.error("we need at least one radio index to record!")
+            exit(1)
+        rad.open()
 
-    # Initalize the device.
-    with device.Device(ser_port=ser_port, baud=115200, bd_addr=bd_addr, radio=rad, dataset=dset, subset=sset) as dev:
-        # Configure everything related to current trace index.
-        dev.configure(idx)
-        # Perform the instrumentation and the recording.
-        try:
-            dev.execute()
-        except OSError as e:
-            l.log_n_exit(e, e.strerror, 3, traceback=True)
-    rad.save(DIR)
-    rad.close()
+        # Initalize the device.
+        with device.Device(ser_port=ser_port, baud=115200, bd_addr=bd_addr, radio=rad, dataset=dset, subset=sset) as dev:
+            # Configure everything related to current trace index.
+            dev.configure(idx)
+            # Perform the instrumentation and the recording.
+            try:
+                dev.execute()
+            except Exception as e:
+                l.log_n_exit(e, "error during whad instrumentation", 3, traceback=True)
+        rad.save(DIR)
 
 @cli.command()
 @click.argument("samp_rate", type=int)
