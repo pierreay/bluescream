@@ -39,6 +39,8 @@ class Device():
     # The "self.bd_addr_spoof" value is hardcoded twice, here and in our
     # custom firmware inside input.c.
     bd_addr_spoof = "00:19:0E:19:79:D8"
+    # Timeout limit used for the loops of this module [s].
+    TIMEOUT = 4
 
     def __enter__(self):
         return self
@@ -62,6 +64,19 @@ class Device():
             raise Exception("{}".format(e.__repr__()))
         l.LOGGER.info("spoof bluetooth address: {}".format(self.bd_addr_spoof))
         self.central.set_bd_address(self.bd_addr_spoof)
+        self.time_start = time()
+        self.time_elapsed = 0
+
+    def timeouted(self, raise_exc=False):
+        """Return True if timeout is exceeded with RAISE_EXC set to False, or
+        raise an Exception with RAISE_EXC set to True.
+
+        """
+        self.time_elapsed = time() - self.time_start
+        if raise_exc is False:
+            return self.time_elapsed >= Device.TIMEOUT
+        elif raise_exc is True:
+            raise Exception("timeout is exceeded!")
 
     def configure(self, idx):
         l.LOGGER.info("configure device for recording index #{}".format(idx))
@@ -183,7 +198,7 @@ class Device():
         if self.central.is_connected():
             l.LOGGER.debug("whad's central is connected to target device")
             # Wait until the connection event we should start the radio.
-            while not trgr_start_radio.triggered:
+            while not self.timeouted(raise_exc=True) and not trgr_start_radio.triggered:
                 pass
             # The radio has been started too late if LL_START_ENC_REQ is
             # already received.
