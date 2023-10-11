@@ -131,6 +131,8 @@ class MySoapySDR():
         self.enabled = enabled
         # Default duration if nothing is specified during self.record().
         self.duration = duration
+        # Recording acceptation flag.
+        self.accepted = False # Set to True by accept() and to False by save().
         if self.enabled:
             results = SoapySDR.Device.enumerate()
             self.sdr = SoapySDR.Device(results[idx])
@@ -179,10 +181,12 @@ class MySoapySDR():
     def accept(self):
         if self.enabled:
             l.LOGGER.debug("MySoapySDR(idx={}).accept()".format(self.idx))
+            self.accepted = True
             self.rx_signal = np.concatenate((self.rx_signal, self.rx_signal_candidate))
 
     def save(self, dir):
-        if self.enabled:
+        if self.enabled is True and self.accepted is True:
             dir = path.expanduser(dir)
             l.LOGGER.info("save recording of radio #{} into directory {}".format(self.idx, dir))
             load.save_raw_trace(self.rx_signal, dir, self.idx, 0)
+            self.accepted = False
