@@ -301,10 +301,12 @@ class Subset():
                         break
                 assert(len(self.pt) == len(self.ks))
                 assert(len(self.pt) == self.nb_trace_wanted)
+        # NOTE: Deprecated code used for the "before dataset" era, where keys
+        # and plaintexts were generated while connecting to the target.
         # Load inputs from already existing stored on-disk.
-        elif load.is_key_fixed(self.get_path()) is not None:
-            self.ks = np.array(load.load_raw_input(self.get_path(), load.DATASET_RAW_INPUT_KEY_PACK,       self.get_nb_trace_ondisk(), fixed = load.is_key_fixed(self.get_path()), hex=True))
-            self.pt = np.array(load.load_raw_input(self.get_path(), load.DATASET_RAW_INPUT_PLAINTEXT_PACK, self.get_nb_trace_ondisk(), fixed = False,                              hex=False))
+        # elif load.is_key_fixed(self.get_path()) is not None:
+        #     self.ks = np.array(load.load_raw_input(self.get_path(), load.DATASET_RAW_INPUT_KEY_PACK,       self.get_nb_trace_ondisk(), fixed = load.is_key_fixed(self.get_path()), hex=True))
+        #     self.pt = np.array(load.load_raw_input(self.get_path(), load.DATASET_RAW_INPUT_PLAINTEXT_PACK, self.get_nb_trace_ondisk(), fixed = False,                              hex=False))
 
         # NOTE: np.uint8 is important to specify here because of the
         # ".tobytes()" function used in "lib/utils.py". It is the size of each
