@@ -27,3 +27,11 @@ def npy_int_to_str_hex(npy_int):
     """
     assert(type(npy_int) == np.ndarray and npy_int.dtype == np.uint8)
     return "".join([f'{y:x}' for y in npy_int.tobytes()])
+
+def npy_int_to_list_str_hex(npy_int):
+    """Convert a Numpy array NPY_INT containing integers to a list containing
+    strings representing an hexadecimal number.
+
+    """
+    assert(type(npy_int) == np.ndarray and npy_int.dtype == np.uint8)
+    return [hex(x) for x in npy_int]
