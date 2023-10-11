@@ -25,9 +25,12 @@ DIR = None
 
 @click.group(context_settings={'show_default': True})
 @click.option("--dir", type=click.Path(), default="/tmp", help="Temporary directory used to hold raw recording.")
-def cli(dir):
+@click.option("--log/--no-log", default=True, help="Enable or disable logging.")
+@click.option("--loglevel", default="DEBUG", help="Set the logging level.")
+def cli(dir, log, loglevel):
     """Signal recording utility."""
     global DIR
+    l.configure(log, loglevel)
     DIR = path.expanduser(dir)
 
 @cli.command()
