@@ -11,6 +11,12 @@ import lib.log as l
 import lib.load as load
 
 class MySoapySDRs():
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
+
     def __init__(self):
         l.LOGGER.debug("MySoapySDRs.__init__()")
         self.sdrs = []
