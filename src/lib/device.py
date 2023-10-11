@@ -218,7 +218,7 @@ class Device():
             l.LOGGER.debug("disconnect from the target device")
             device.disconnect()
         else:
-            l.LOGGER.error("cannot connect to target device")
+            raise Exception("cannot connect to target device")
         if trgr_recv_ll_reject_ind.triggered:
             raise Exception("LL_REJECT_IND packet received, LL_ENC_REQ request's parameters were not accepted!")
 
@@ -233,7 +233,7 @@ class Device():
 
     def close(self):
         if self.central is not None:
-            l.LOGGER.debug("destroy whad's central")
+            l.LOGGER.debug("stop and close whad's central")
             self.central.stop()
             self.central.close()
             self.central = None
