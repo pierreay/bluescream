@@ -1,4 +1,6 @@
-"""Utilities functions to work with Python."""
+"""Utilities functions to work with Python.
+
+First created to implement type conversion helper functions."""
 
 import numpy as np
 
