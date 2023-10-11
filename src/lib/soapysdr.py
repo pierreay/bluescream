@@ -143,7 +143,7 @@ class MySoapySDR():
 
     def open(self):
         if self.enabled:
-            l.LOGGER.debug("MySoapySDR(idx={}).open()".format(self.idx))
+            l.LOGGER.info("initialize streams for radio #{}".format(self.idx))
             # From SoapySDR/include/SoapySDR/Device.h:
             # - "CF32" - complex float32 (8 bytes per element)
             # - "CS16" - complex int16   (4 bytes per element)
