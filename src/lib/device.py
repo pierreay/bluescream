@@ -214,13 +214,13 @@ class Device():
                 l.LOGGER.error("the recording is already finished while we didn't received the encryption confirmation!")
             else:
                 self.radio.accept()
+                
+            l.LOGGER.debug("disconnect from the target device")
+            device.disconnect()
         else:
             l.LOGGER.error("cannot connect to target device")
         if trgr_recv_ll_reject_ind.triggered:
             raise Exception("LL_REJECT_IND packet received, LL_ENC_REQ request's parameters were not accepted!")
-
-        l.LOGGER.debug("disconnect from the target device")
-        device.disconnect()
 
         # Manually delete every previsouly created sequences. It fix a bug
         # in WHAD where sequences should be deleted automatically, but they
