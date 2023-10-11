@@ -40,7 +40,7 @@ class Device():
     # custom firmware inside input.c.
     bd_addr_spoof = "00:19:0E:19:79:D8"
     # Timeout limit used for the loops of this module [s].
-    TIMEOUT = 4
+    TIMEOUT = 30
 
     def __enter__(self):
         return self
@@ -73,10 +73,11 @@ class Device():
 
         """
         self.time_elapsed = time() - self.time_start
-        if raise_exc is False:
-            return self.time_elapsed >= Device.TIMEOUT
-        elif raise_exc is True:
-            raise Exception("timeout is exceeded!")
+        timeouted = self.time_elapsed >= Device.TIMEOUT
+        if timeouted is True and raise_exc is True:
+            raise Exception("timeout of {}s is exceeded!".format(Device.TIMEOUT))
+        else:
+            return timeouted
 
     def configure(self, idx):
         l.LOGGER.info("configure device for recording index #{}".format(idx))
