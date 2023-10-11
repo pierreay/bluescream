@@ -306,8 +306,11 @@ class Subset():
             self.ks = np.array(load.load_raw_input(self.get_path(), load.DATASET_RAW_INPUT_KEY_PACK,       self.get_nb_trace_ondisk(), fixed = load.is_key_fixed(self.get_path()), hex=True))
             self.pt = np.array(load.load_raw_input(self.get_path(), load.DATASET_RAW_INPUT_PLAINTEXT_PACK, self.get_nb_trace_ondisk(), fixed = False,                              hex=False))
 
-        self.pt = np.asarray(self.pt)
-        self.ks = np.asarray(self.ks)
+        # NOTE: np.uint8 is important to specify here because of the
+        # ".tobytes()" function used in "lib/utils.py". It is the size of each
+        # array element which is 1 byte.
+        self.pt = np.asarray(self.pt, dtype=np.uint8)
+        self.ks = np.asarray(self.ks, dtype=np.uint8)
 
     def get_nb_trace_ondisk(self, save=False):
         return load.get_nb(self.get_path(save))
