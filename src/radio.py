@@ -71,65 +71,38 @@ def listen(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id):
 @click.argument("subset", type=str)
 @click.argument("bd_addr")
 @click.argument("ser_port")
-@click.argument("freq_nf", type=int)
-@click.argument("freq_ff", type=int)
-@click.argument("samp_rate", type=int)
-@click.option("--duration", type=float, default=0.5, help="Duration of the recording.")
 @click.option("--radio/--no-radio", default=True, help="Enable or disable the radio recording (instrument only).")
-@click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
-@click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
 @click.option("--idx", default=0, help="Current recording index to get correct dataset's inputs.")
-def record(indir, subset, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, duration, radio, nf_id, ff_id, idx):
-    """Record RAW traces to DIR.
+def instrument(indir, subset, bd_addr, ser_port, radio, idx):
+    """Instrument the device and record RAW traces to DIR.
 
     INDIR is the path to the dataset. It is used for collection parameters
     (e.g. sample rate) and input values (e.g. key and plaintext).
     SUBSET corresponds to the subset's name where the inputs comes from.
     BD_ADDR is the Bluetooth address of the target device to connect to.
     SER_PORT is the serial port of the target device to connect to.
-    FREQ_NF is the center frequency for the near-field recording.
-    FREQ_FF is the center frequency for the far-field recording.
-    SAMP_RATE is the sampling rate used for both recording.
 
     Trigger the target device and store the RAW recording of the communication
     in DIR.
 
     """
-    # PROG: /START\ Temporary code for process.
-    rad = soapysdr.MySoapySDRsClient(enabled=radio)
-    rad.record()
-    rad.accept()
-    rad.save()
-    exit(0)
-    # PROG: /END\ Temporary code for process.
-    
     # Load the dataset.
     dset = dataset.Dataset.pickle_load(indir, quit_on_error=True)
     sset = dset.get_subset(subset)
 
-    with soapysdr.MySoapySDRs() as rad:
-        # Initialize the radios individually.
-        if nf_id != -1:
-            rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, nf_id, enabled=radio, duration=duration)
-            rad.register(rad_nf)
-        if ff_id != -1:
-            rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, ff_id, enabled=radio, duration=duration)
-            rad.register(rad_ff)
-        if rad.get_nb() <= 0:
-            l.LOGGER.error("we need at least one radio index to record!")
-            exit(1)
-        rad.open()
+    # Initialize the radio client.
+    rad = soapysdr.MySoapySDRsClient(enabled=radio)
 
-        # Initalize the device.
-        with device.Device(ser_port=ser_port, baud=115200, bd_addr=bd_addr, radio=rad, dataset=dset, subset=sset) as dev:
-            # Configure everything related to current trace index.
-            dev.configure(idx)
-            # Perform the instrumentation and the recording.
-            try:
-                dev.execute()
-            except Exception as e:
-                l.log_n_exit(e, "error during whad instrumentation", 3, traceback=True)
-        rad.save(DIR)
+    # Initalize the device.
+    with device.Device(ser_port=ser_port, baud=115200, bd_addr=bd_addr, radio=rad, dataset=dset, subset=sset) as dev:
+        # Configure everything related to current trace index.
+        dev.configure(idx)
+        # Perform the instrumentation and the recording.
+        try:
+            dev.execute()
+        except Exception as e:
+            l.log_n_exit(e, "error during whad instrumentation", 3, traceback=True)
+    rad.save()
 
 @cli.command()
 @click.argument("samp_rate", type=int)
