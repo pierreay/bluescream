@@ -27,7 +27,7 @@ except ImportError as e: # Don't make these modules mandatory for running all th
 # * Globals
 
 START_RADIO_CONN_EVENT = 1
-LL_ENC_REQ_CONN_EVENT = 17
+LL_ENC_REQ_CONN_EVENT = 3
 HOP_INTERVAL = 56
 # Channel map of 0x300 => channels 8-9 => frequencies 2.420 GHz and 2.422 GHz.
 CHANNEL_MAP = 0x00000300
