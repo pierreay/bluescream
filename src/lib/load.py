@@ -228,8 +228,11 @@ def get_dataset_is_ff_exist(dir):
     return ff_raw or ff_pack or ff_unpack
 
 def np_load_if_exist(fp):
-    """Load the FP numpy array from disk if it exists, otherwise return None."""
-    return None if not path.exists(fp) else np.load(fp)
+    """Load the FP numpy array from disk if it exists, otherwise return
+    None. NOTE: Use this function only for traces, not for inputs.
+
+    """
+    return None if not path.exists(fp) else MySoapySDR.numpy_load(fp)
 
 def is_dataset_packed(dir):
     """Return True if the dataset is packed, False otherwise."""
@@ -297,11 +300,11 @@ def load_pair_trace(dir, idx, nf=True, ff=True):
     trace_nf = None
     trace_ff = None
     try:
-        trace_nf = None if nf is False else np.load(get_dataset_path_unpack_nf(dir, idx))
+        trace_nf = None if nf is False else MySoapySDR.numpy_load(get_dataset_path_unpack_nf(dir, idx))
     except Exception as e:
         l.LOGGER.warn(e)
     try:
-        trace_ff = None if ff is False else np.load(get_dataset_path_unpack_ff(dir, idx))
+        trace_ff = None if ff is False else MySoapySDR.numpy_load(get_dataset_path_unpack_ff(dir, idx))
     except Exception as e:
         l.LOGGER.warn(e)
     return trace_nf, trace_ff
@@ -358,7 +361,7 @@ def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=Tr
             iterator = tqdm(range(start, stop), desc="load all nf traces") if bar else list(range(start, stop))
             for i in iterator:
                 nf_p = get_dataset_path_unpack_nf(dir, i)
-                nf[i - start] = np.load(nf_p)
+                nf[i - start] = MySoapySDR.numpy_load(nf_p)
         else:
              l.LOGGER.warning("no loaded nf traces!")
         if ff_wanted is True and ff_exist is True:
@@ -366,7 +369,7 @@ def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=Tr
             iterator = tqdm(range(start, stop), desc="load all ff traces") if bar else list(range(start, stop))
             for i in iterator:
                 ff_p = get_dataset_path_unpack_ff(dir, i)
-                ff[i - start] = np.load(ff_p)
+                ff[i - start] = MySoapySDR.numpy_load(ff_p)
         else:
             l.LOGGER.warning("no loaded ff traces!")
         if nf_exist or ff_exist:
