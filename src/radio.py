@@ -39,8 +39,6 @@ import os
 import errno
 from time import sleep
 
-FIFO_PATH = "/tmp/myfifo"
-
 @cli.command()
 @click.argument("freq_nf", type=int)
 @click.argument("freq_ff", type=int)
@@ -56,7 +54,7 @@ def init(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id):
     """
     # Create the named pipe (FIFO).
     try:
-        os.mkfifo(FIFO_PATH)
+        os.mkfifo(soapysdr.FIFO_PATH)
     except OSError as oe: 
         if oe.errno != errno.EEXIST:
             raise
@@ -74,8 +72,8 @@ def init(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id):
             exit(1)
         rad.open()
         # Open the named pipe.
-        with open(FIFO_PATH, "r") as fifo:
-            l.LOGGER.debug("opened FIFO at {}".format(FIFO_PATH))
+        with open(soapysdr.FIFO_PATH, "r") as fifo:
+            l.LOGGER.debug("opened FIFO at {}".format(soapysdr.FIFO_PATH))
             # Infinitely listen for commands and execute the radio commands accordingly.
             while True:
                 cmd = fifo.read(16)
@@ -122,18 +120,10 @@ def record(indir, subset, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, durati
 
     """
     # PROG: /START\ Temporary code for process.
-    with open(FIFO_PATH, "w") as fifo:
-        l.LOGGER.debug("record")
-        fifo.write("record")
-    sleep(5)
-    with open(FIFO_PATH, "w") as fifo:
-        l.LOGGER.debug("accept")
-        fifo.write("accept")
-    sleep(0.1) # NOTE: Needed otherwise next command will be appended to the previous one.
-    with open(FIFO_PATH, "w") as fifo:
-        l.LOGGER.debug("save")
-        fifo.write("save")
-    sleep(0.1)  # NOTE: Needed otherwise next command will be appended to the previous one.
+    rad = soapysdr.MySoapySDRsClient()
+    rad.record()
+    rad.accept()
+    rad.save()
     exit(0)
     # PROG: /END\ Temporary code for process.
     

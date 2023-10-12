@@ -2,6 +2,7 @@
 SDRs in parallel using threads."""
 
 import time
+from time import sleep
 from os import path
 import numpy as np
 from threading import Thread
@@ -9,6 +10,9 @@ import SoapySDR
 
 import lib.log as l
 import lib.load as load
+
+# Path of the FIFO file used between MySoapySDRs and MySoapySDRsClient.
+FIFO_PATH = "/tmp/soapysdr_fifo"
 
 class MySoapySDRs():
     def __enter__(self):
@@ -190,3 +194,41 @@ class MySoapySDR():
             l.LOGGER.info("save recording of radio #{} into directory {}".format(self.idx, dir))
             load.save_raw_trace(self.rx_signal, dir, self.idx, 0)
             self.accepted = False
+
+class MySoapySDRsClient():
+    """Control a MySoapySDRs object living in another process.
+
+    This class implements a command sending mechanism through a named pipe
+    (FIFO) mechanism allowing to control another process that initialized the
+    radio at startup. It allows to perform multiple radio recordings without
+    re-initializing the radio's driver while using different Python process
+    because of different calls from Bash.
+
+    """
+
+    def __init__(self):
+        pass
+
+    def __cmd__(self, cmd):
+        """Send a command through the FIFO."""
+        # NOTE: The only way I found to reliably send the commands individually
+        # is to open/close/sleep for each commands. Otherwise, the commands
+        # arrived concatenated at the reader process.
+        l.LOGGER.debug("{} -> fifo".format(cmd))
+        with open(FIFO_PATH, "w") as fifo:
+            fifo.write(cmd)
+        sleep(0.1)
+
+    def record(self):
+        """Call the MySoapySDRs.record() method through the FIFO."""
+        self.__cmd__("record")
+        sleep(5)
+        # TODO: Implement a synchronization mechanism to really wait exactly for the time for record.
+
+    def accept(self):
+        """Call the MySoapySDRs.accept() method through the FIFO."""
+        self.__cmd__("accept")
+
+    def save(self):
+        """Call the MySoapySDRs.save() method through the FIFO."""
+        self.__cmd__("save")
