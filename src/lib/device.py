@@ -9,6 +9,7 @@ import struct
 import serial
 
 # Local modules.
+import lib.dataset as dataset
 import lib.utils as utils
 import lib.device as device
 import lib.log as l
@@ -81,7 +82,9 @@ class Device():
 
     def configure(self, idx):
         l.LOGGER.info("configure device for recording index #{}".format(idx))
-        self.configure_ser(k=self.subset.ks[idx], p=self.subset.pt[idx])
+        # Choose index for key.
+        idx_ks = 0 if self.subset.ks_type == dataset.InputType.FIXED else idx
+        self.configure_ser(k=self.subset.ks[idx_ks], p=self.subset.pt[idx])
         # RAND and EDIV values are hardcoded twice, here and in our custom
         # firmware inside input.c.
         self.rand = 0xdeadbeefdeadbeef
