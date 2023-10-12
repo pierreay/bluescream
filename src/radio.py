@@ -122,9 +122,7 @@ def record(indir, subset, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, durati
 
     """
     # PROG: /START\ Temporary code for process.
-    rad = soapysdr.MySoapySDRsClient()
-    if radio is False:
-        rad.disable()
+    rad = soapysdr.MySoapySDRsClient(enabled=radio)
     rad.record()
     rad.accept()
     rad.save()

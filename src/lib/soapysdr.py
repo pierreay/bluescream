@@ -215,24 +215,26 @@ class MySoapySDRsClient():
 
     """
 
-    def __init__(self):
-        pass
+    def __init__(self, enabled = True):
+        self.enabled = enabled
 
     def __cmd__(self, cmd):
         """Send a command through the FIFO."""
         # NOTE: The only way I found to reliably send the commands individually
         # is to open/close/sleep for each commands. Otherwise, the commands
         # arrived concatenated at the reader process.
-        l.LOGGER.debug("{} -> fifo".format(cmd))
-        with open(FIFO_PATH, "w") as fifo:
-            fifo.write(cmd)
-        sleep(0.1)
+        if self.enabled is True:
+            l.LOGGER.debug("{} -> fifo".format(cmd))
+            with open(FIFO_PATH, "w") as fifo:
+                fifo.write(cmd)
+            sleep(0.1)
 
     def record(self):
         """Call the MySoapySDRs.record() method through the FIFO."""
         self.__cmd__("record")
-        sleep(5)
         # TODO: Implement a synchronization mechanism to really wait exactly for the time for record.
+        if self.enabled:
+            sleep(5)
 
     def accept(self):
         """Call the MySoapySDRs.accept() method through the FIFO."""
