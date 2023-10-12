@@ -62,7 +62,9 @@ function radio_init() {
 # Arguments:
 # $1 should be the trace recording index.
 function radio_record() {
-    timeout 30 python3 ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR instrument $ENVRC_DATASET_RAW_PATH $COLLECT_MODE $ENVRC_VICTIM_ADDR $ENVRC_VICTIM_PORT --idx $1
+    # NOTE: Send a SIGINT signal such that Python goes through the __exit__()
+    # of Device class, such that WHAD/Butterfly do not finish in a bad state.
+    timeout --signal=SIGINT 30 python3 ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR instrument $ENVRC_DATASET_RAW_PATH $COLLECT_MODE $ENVRC_VICTIM_ADDR $ENVRC_VICTIM_PORT --idx $1
     if [[ $? -ge 1 ]]; then
         return 1
     fi
