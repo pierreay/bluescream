@@ -165,7 +165,10 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
         l.LOGGER.error("signal locating confusion: no or multiple peaks detected")
         exit_on_cond(exit_on_error)
     else:
-        l.LOGGER.info("peak position={:.2f}%".format((peaks[0] / len(sig_raw_ref)) * 100))
+        peak_position = (peaks[0] / len(sig_raw_ref)) * 100
+        l.LOGGER.info("peak position={:.2f}%".format(peak_position))
+        if peak_position < 25 or peak_position > 75:
+            l.LOGGER.warning("maybe increase recording time to center the aes on the recording")
 
     # * Extraction.
     if overwrite:
