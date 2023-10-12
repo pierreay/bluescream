@@ -166,16 +166,9 @@ function collect_one_set() {
 
 # * Dataset
 
-if [[ -z ${COLLECT_TRAINING_NB+x} ]]; then
-    export COLLECT_TRAINING_NB=65536
-fi
-if [[ -z ${COLLECT_ATTACK_NB+x} ]]; then
-    export COLLECT_ATTACK_NB=16384
-fi
-
 # ** Training subset
 
-export COLLECT_NB="$COLLECT_TRAINING_NB"
+export COLLECT_NB="$ENVRC_WANTED_TRACE_TRAIN"
 export SUBSET_WD="$ENVRC_DATASET_RAW_PATH/train"
 export KEY_FIXED=0
 log_info
@@ -186,7 +179,7 @@ collect_one_set # 2
 
 # ** Attack subset
 
-export COLLECT_NB="$COLLECT_ATTACK_NB"
+export COLLECT_NB="$ENVRC_WANTED_TRACE_ATTACK"
 export SUBSET_WD="$ENVRC_DATASET_RAW_PATH/attack"
 export KEY_FIXED=1
 export COLLECT_MODE=attack
