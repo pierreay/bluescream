@@ -85,6 +85,8 @@ def init(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id):
                         rad.accept()
                     elif cmd == "save":
                         rad.save("/tmp")
+                    elif cmd == "disable":
+                        rad.disable()
     # Delete the FIFO.
     os.remove(FIFO_PATH)
         
@@ -99,7 +101,7 @@ def init(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id):
 @click.argument("freq_ff", type=int)
 @click.argument("samp_rate", type=int)
 @click.option("--duration", type=float, default=0.5, help="Duration of the recording.")
-@click.option("--radio/--no-radio", default=True, help="Enable or disable the radio recording (allows instrumentation only).")
+@click.option("--radio/--no-radio", default=True, help="Enable or disable the radio recording (instrument only).")
 @click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
 @click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
 @click.option("--idx", default=0, help="Current recording index to get correct dataset's inputs.")
@@ -121,6 +123,8 @@ def record(indir, subset, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, durati
     """
     # PROG: /START\ Temporary code for process.
     rad = soapysdr.MySoapySDRsClient()
+    if radio is False:
+        rad.disable()
     rad.record()
     rad.accept()
     rad.save()

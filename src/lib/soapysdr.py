@@ -69,6 +69,10 @@ class MySoapySDRs():
         for sdr in self.sdrs:
             sdr.save(dir)
 
+    def disable(self):
+        for sdr in self.sdrs:
+            sdr.disable()
+
     def get_nb(self):
         """Get the number of currently registed SDRs."""
         return len(self.sdrs)
@@ -158,7 +162,7 @@ class MySoapySDR():
             self.rx_signal = np.array([0], MySoapySDR.DTYPE)
 
     def close(self):
-        if self.enabled:
+        if self.rx_stream is not None:
             l.LOGGER.debug("MySoapySDR(idx={}).close().enter".format(self.idx))
             self.sdr.deactivateStream(self.rx_stream)
             self.sdr.closeStream(self.rx_stream)
@@ -194,6 +198,11 @@ class MySoapySDR():
             l.LOGGER.info("save recording of radio #{} into directory {}".format(self.idx, dir))
             load.save_raw_trace(self.rx_signal, dir, self.idx, 0)
             self.accepted = False
+
+    def disable(self):
+        """Disable the radio."""
+        l.LOGGER.info("disable radio #{}".format(self.idx))
+        self.enabled = False
 
 class MySoapySDRsClient():
     """Control a MySoapySDRs object living in another process.
@@ -232,3 +241,7 @@ class MySoapySDRsClient():
     def save(self):
         """Call the MySoapySDRs.save() method through the FIFO."""
         self.__cmd__("save")
+
+    def disable(self):
+        """Call the MySoapySDRs.disable() method through the FIFO."""
+        self.__cmd__("disable")
