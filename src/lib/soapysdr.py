@@ -126,6 +126,19 @@ class MySoapySDRs():
         return len(self.sdrs)
 
 class MySoapySDR():
+    """SoapySDR controlled radio.
+
+    Typical workflow:
+    
+    1. Initialize: __init__() -> open()
+    
+    2. Records: [ record() -> accept() ] ... -> save()
+
+    3. Records: [ record() -> accept() ] ... -> save()
+    
+    4. Deinitialize: close()
+
+    """
     # * Custom dtype
     # It is used to match the CS16 type of SoapySDR, allowing to save disk
     # space but requires conversion happening in this module, since Numpy can
@@ -191,6 +204,10 @@ class MySoapySDR():
         self.dir = dir
         # Recording acceptation flag.
         self.accepted = False # Set to True by accept() and to False by save().
+        # Recording buffers.
+        self.rx_signal = None
+        self.rx_signal_candidate = None
+        # Initialize the SDR driver.
         if self.enabled:
             results = SoapySDR.Device.enumerate()
             self.sdr = SoapySDR.Device(results[idx])
@@ -200,6 +217,7 @@ class MySoapySDR():
             self.sdr.setAntenna(SoapySDR.SOAPY_SDR_RX, 0, "TX/RX")
 
     def open(self):
+        # Initialize the SoapySDR streams.
         if self.enabled:
             l.LOGGER.info("initialize streams for radio #{}".format(self.idx))
             # From SoapySDR/include/SoapySDR/Device.h:
@@ -209,7 +227,8 @@ class MySoapySDR():
             # UHD and the hardware use "CS16" format in the underlying transport layer.
             self.rx_stream = self.sdr.setupStream(SoapySDR.SOAPY_SDR_RX, SoapySDR.SOAPY_SDR_CS16)
             self.sdr.activateStream(self.rx_stream)
-            self.rx_signal = np.array([0], MySoapySDR.DTYPE)
+            # Initialize for first recordings.
+            self.reinit()
 
     def close(self):
         if self.rx_stream is not None:
@@ -249,7 +268,21 @@ class MySoapySDR():
             dir = path.expanduser(dir)
             l.LOGGER.info("save recording of radio #{} into directory {}".format(self.idx, dir))
             load.save_raw_trace(self.rx_signal, dir, self.idx, 0)
-            self.accepted = False
+            # Re-initialize for further recordings.
+            self.reinit()
+
+    def reinit(self):
+        """Re-initialize the recording state and buffers such that a new
+        recording can occur."""
+        l.LOGGER.debug("re-initialization")
+        self.accepted = False
+        # Delete the signals since buffers can be large.
+        if self.rx_signal is not None:
+            del self.rx_signal
+        self.rx_signal = np.array([0], MySoapySDR.DTYPE)
+        if self.rx_signal_candidate is not None:
+            del self.rx_signal_candidate
+        self.rx_signal_candidate = None
 
     def disable(self):
         """Disable the radio."""
