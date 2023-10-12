@@ -59,8 +59,10 @@ function radio_init() {
     sleep 5
 }
 
+# Arguments:
+# $1 should be the trace recording index.
 function radio_record() {
-    timeout 30 python3 ./radio.py --loglevel DEBUG --dir $ENVRC_RADIO_DIR instrument $ENVRC_DATASET_RAW_PATH $subset $ENVRC_VICTIM_ADDR $ENVRC_VICTIM_PORT
+    timeout 30 python3 ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR instrument $ENVRC_DATASET_RAW_PATH $COLLECT_MODE $ENVRC_VICTIM_ADDR $ENVRC_VICTIM_PORT --idx $1
     if [[ $? -ge 1 ]]; then
         return 1
     fi
@@ -140,7 +142,7 @@ function collect_one_set() {
         log_info
         log_info "=========== TRACE #$i -- KEY_FIXED=$KEY_FIXED -- SUBSET=$COLLECT_MODE ==========="
         log_info
-        radio_record
+        radio_record $i
         if [[ $? == 1 ]]; then
             ykush_reset
             i=$(( $i - 1 ))
@@ -180,7 +182,7 @@ log_info
 log_info "=========== Training set ==========="
 log_info
 export COLLECT_MODE=train
-collect_one_set 2
+collect_one_set # 2
 
 # ** Attack subset
 
@@ -191,4 +193,4 @@ export COLLECT_MODE=attack
 log_info
 log_info "=========== Attack set ==========="
 log_info
-collect_one_set 2
+collect_one_set # 2
