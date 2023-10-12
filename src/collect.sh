@@ -9,8 +9,8 @@ source ./lib/misc.sh
 
 function clean() {
     if [[ -d $SUBSET_WD ]]; then
-        rm -rf $SUBSET_WD/*
-        log_info "Clean $SUBSET_WD"
+        rm -rf $SUBSET_WD/*_trace_*.npy
+        log_info "Clean traces in $SUBSET_WD"
     else
         log_error "$SUBSET_WD is not set!"
         exit 0
@@ -18,8 +18,10 @@ function clean() {
 }
 
 function resume() {
+    # NOTE: A better implementation would be to use the query subcommand of the
+    # dataset.py file, and record last recording index directly in radio.py.
     if [[ -d $SUBSET_WD ]]; then
-        i_start=$(( $(ls $SUBSET_WD/ | grep trace_nf | wc -l) - 1))
+        i_start=$(( $(ls $SUBSET_WD/ | grep trace_ff | wc -l) - 1))
         log_info "Resume collection at i=$i_start in $SUBSET_WD"
     fi
 }
@@ -30,6 +32,7 @@ function quit() {
 
 function display_time_quit() {
     display_time
+    radio_quit
     exit 0
 }
 
@@ -42,31 +45,36 @@ function ykush_reset() {
     log_info
     log_info "=========== YKUSH RESET ==========="
     log_info
-    if [[ $COLLECT_MODE == "train" ]]; then
-        log_info "power off ykush..."
-        sudo ykushcmd -d a
-        sleep 10 # Wait for shutdown.
-        log_info "power on ykush..."
-        sudo ykushcmd -u a
-    else
-        log_info "disabled for attack mode, otherwise pairing is lost..."
-    fi
+    log_info "power off ykush..."
+    sudo ykushcmd -d a
+    sleep 10 # Wait for shutdown.
+    log_info "power on ykush..."
+    sudo ykushcmd -u a
     sleep 20 # Wait for power-up and booting.
-    }
-
-function pair() {
-    timeout 30 ./utils/mirage_pair.sh "$ENVRC_VICTIM_ADDR" | tee /tmp/mirage_pair_output
-    if [[ $? -ge 1 ]]; then
-        return 1
-    fi
-    grep FAIL /tmp/mirage_pair_output >/dev/null 2>&1
-    return $(( 1 - $? ))
 }
 
-function record() {
-    timeout 30 python3 ./radio.py --dir "$ENVRC_RADIO_DIR" record "$ENVRC_VICTIM_ADDR" "$ENVRC_NF_FREQ" "$ENVRC_FF_FREQ" "$ENVRC_SAMP_RATE" --duration="$ENVRC_DURATION"
+function radio_init() {
+    uhd_find_devices
+    ./radio.py --dir $ENVRC_RADIO_DIR --loglevel INFO listen $ENVRC_NF_FREQ $ENVRC_FF_FREQ $ENVRC_SAMP_RATE --ff-id $ENVRC_FF_ID --duration=$ENVRC_DURATION &
+    sleep 5
+}
+
+function radio_record() {
+    timeout 30 python3 ./radio.py --loglevel DEBUG --dir $ENVRC_RADIO_DIR instrument $ENVRC_DATASET_RAW_PATH $subset $ENVRC_VICTIM_ADDR $ENVRC_VICTIM_PORT
     if [[ $? -ge 1 ]]; then
         return 1
+    fi
+}
+
+function radio_quit() {
+    ./radio.py quit
+}
+
+function radio_extract() {
+    if [[ $COLLECT_MODE == "train" ]]; then
+        ./radio.py --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
+    elif [[ $COLLECT_MODE == "attack" ]]; then
+        ./radio.py --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
     fi
 }
 
@@ -125,67 +133,33 @@ function collect_one_set() {
     # if resuming.
     mkdir -p $SUBSET_WD
 
-    if [[ $KEY_FIXED == 1 ]]; then
-        if [[ $i_start == 0 ]]; then
-            pair
-            cp /tmp/mirage_output_ltk $SUBSET_WD/k.txt
-            # Fix record.py trying to load values from /tmp after rebooting.
-            cp /tmp/mirage_output_addr $SUBSET_WD/.addr.txt
-            cp /tmp/mirage_output_rand $SUBSET_WD/.rand.txt
-            cp /tmp/mirage_output_ediv $SUBSET_WD/.ediv.txt
-        else
-            cp $SUBSET_WD/.addr.txt /tmp/mirage_output_addr
-            cp $SUBSET_WD/.rand.txt /tmp/mirage_output_rand
-            cp $SUBSET_WD/.ediv.txt /tmp/mirage_output_ediv
-        fi
-    fi
-
-    log_info "freq_nf=$ENVRC_NF_FREQ"      >  $SUBSET_WD/params.txt
-    log_info "freq_ff=$ENVRC_FF_FREQ"      >> $SUBSET_WD/params.txt
-    log_info "samp_rate=$ENVRC_SAMP_RATE"  >> $SUBSET_WD/params.txt
+    radio_init
 
     for (( i = i_start; i <= $COLLECT_NB; i++ ))
     do
         log_info
-        log_info "=========== TRACE #$i -- KEY_FIXED=$KEY_FIXED ==========="
+        log_info "=========== TRACE #$i -- KEY_FIXED=$KEY_FIXED -- SUBSET=$COLLECT_MODE ==========="
         log_info
-        if [[ $KEY_FIXED == 0 ]]; then
-            pair
-            if [[ $? == 1 ]]; then
-                ykush_reset
-                i=$(( $i - 1 ))
-                continue
-            fi
-            cp /tmp/mirage_output_ltk $SUBSET_WD/${i}_k.txt
-            log_info "saved ks:"
-            ls $SUBSET_WD/${i}_k.txt
-        fi
-        record
+        radio_record
         if [[ $? == 1 ]]; then
             ykush_reset
             i=$(( $i - 1 ))
             continue
         fi
-        if [[ $COLLECT_MODE == "train" ]]; then
-            ./radio.py --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE --window 0.15 --offset 0.05 --no-plot --overwrite
-        elif [[ $COLLECT_MODE == "attack" ]]; then
-            ./radio.py --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE --window 0.01 --offset 0.00 --no-plot --overwrite
-        fi
-        cp /tmp/raw_0_0.npy $SUBSET_WD/${i}_trace_nf.npy
-        cp /tmp/raw_1_0.npy $SUBSET_WD/${i}_trace_ff.npy
-        cp /tmp/bt_skd_0 $SUBSET_WD/${i}_p.txt
-        log_info "saved traces:"
-        ls $SUBSET_WD/${i}_trace_nf.npy $SUBSET_WD/${i}_trace_ff.npy
-        log_info "saved pt:"
-        ls $SUBSET_WD/${i}_p.txt
+        radio_extract
+        cp $ENVRC_RADIO_DIR/raw_${ENVRC_FF_ID}_0.npy $SUBSET_WD/${i}_trace_ff.npy
+        log_info "saved trace:"
+        ls $SUBSET_WD/${i}_trace_ff.npy
 
-        if [[ $KEY_FIXED == 0 && $(( ($i+1) % 100 )) == 0 ]]; then
-            log_warn "restart devices to prevent errors..."
-            ykush_reset
-        fi
+        # NOTE: Should we keep this part?
+        # if [[ $KEY_FIXED == 0 && $(( ($i+1) % 100 )) == 0 ]]; then
+        #     log_warn "restart devices to prevent errors..."
+        #     ykush_reset
+        # fi
     done
 
     display_time
+    radio_quit
 }
 
 # * Dataset
