@@ -193,6 +193,7 @@ class Device():
         # Connect to the peripheral. The parameters are:
         # 1. Use increased hop interval. Decreasing it speed-up the connection.
         # 2. Set channel map to 0x300 which corresponds to channel 8-9.
+        l.LOGGER.info("connect to target device")
         l.LOGGER.debug("central.connect(address={}, random=False, hop_interval={}, channel_map=0x{:x})".format(self.bd_addr, HOP_INTERVAL, CHANNEL_MAP))
         device = self.central.connect(self.bd_addr, random=False, hop_interval=HOP_INTERVAL, channel_map=CHANNEL_MAP)
 
@@ -215,7 +216,7 @@ class Device():
             else:
                 self.radio.accept()
                 
-            l.LOGGER.debug("disconnect from the target device")
+            l.LOGGER.info("disconnect from the target device")
             device.disconnect()
         else:
             raise Exception("cannot connect to target device")
