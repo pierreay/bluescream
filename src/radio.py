@@ -33,12 +33,6 @@ def cli(dir, log, loglevel):
     l.configure(log, loglevel)
     DIR = path.expanduser(dir)
 
-# PROG: /START\ Temporary code for process.
-
-import os
-import errno
-from time import sleep
-
 @cli.command()
 @click.argument("freq_nf", type=int)
 @click.argument("freq_ff", type=int)
@@ -46,22 +40,20 @@ from time import sleep
 @click.option("--duration", type=float, default=0.5, help="Duration of the recording.")
 @click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
 @click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
-def init(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id):
-    """ Initialize the radio and listen for commands.
+def listen(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id):
+    """Initialize the radio and listen for commands.
     
-    TODO
-    
+    This commands will put our radio module in server mode, where the radio is
+    listening for commands from another process through a pipe to perform
+    recordings. This process will not go in background automatically, hence,
+    use Bash to launch it in the background.
+
     """
-    # Create the named pipe (FIFO).
-    try:
-        os.mkfifo(soapysdr.FIFO_PATH)
-    except OSError as oe: 
-        if oe.errno != errno.EEXIST:
-            raise
     # Initialize the radio as requested.
     with soapysdr.MySoapySDRs() as rad:
         # Initialize the radios individually.
         if nf_id != -1:
+            # TODO: Use same system as duration to register the default DIR.
             rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, nf_id, duration=duration)
             rad.register(rad_nf)
         if ff_id != -1:
@@ -70,27 +62,10 @@ def init(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id):
         if rad.get_nb() <= 0:
             l.LOGGER.error("we need at least one radio index to record!")
             exit(1)
+        # Initialize the driver
         rad.open()
-        # Open the named pipe.
-        with open(soapysdr.FIFO_PATH, "r") as fifo:
-            l.LOGGER.debug("opened FIFO at {}".format(soapysdr.FIFO_PATH))
-            # Infinitely listen for commands and execute the radio commands accordingly.
-            while True:
-                cmd = fifo.read(16)
-                if len(cmd) > 0:
-                    l.LOGGER.debug("cmd <- {}".format(cmd))
-                    if cmd == "record":
-                        rad.record()
-                    elif cmd == "accept":
-                        rad.accept()
-                    elif cmd == "save":
-                        rad.save("/tmp")
-                    elif cmd == "disable":
-                        rad.disable()
-    # Delete the FIFO.
-    os.remove(FIFO_PATH)
-        
-# PROG: /END\ Temporary code for process.
+        # Listen for commands from another process.
+        rad.listen()
 
 @cli.command()
 @click.argument("indir", type=click.Path())

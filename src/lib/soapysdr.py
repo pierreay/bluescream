@@ -3,6 +3,8 @@ SDRs in parallel using threads."""
 
 import time
 from time import sleep
+import os
+import errno
 from os import path
 import numpy as np
 from threading import Thread
@@ -42,6 +44,9 @@ class MySoapySDRs():
         l.LOGGER.debug("MySoapySDRs.close()")
         for sdr in self.sdrs:
             sdr.close()
+        if path.exists(FIFO_PATH):
+            # Delete the FIFO.
+            os.remove(FIFO_PATH)
 
     def record(self, duration = None):
         """Perform a recording of DURATION seconds.
@@ -72,6 +77,37 @@ class MySoapySDRs():
     def disable(self):
         for sdr in self.sdrs:
             sdr.disable()
+
+    def listen(self):
+        """Put the radio in server mode.
+
+        This command will create a FIFO and listen for commands on it. The
+        MySoapySDRsClient class can be instantiated in another process to
+        communicate with this server mode.
+
+        """
+        # Create the named pipe (FIFO).
+        try:
+            os.mkfifo(FIFO_PATH)
+        except OSError as oe: 
+            if oe.errno != errno.EEXIST:
+                raise
+        # Open the named pipe.
+        with open(FIFO_PATH, "r") as fifo:
+            l.LOGGER.debug("opened FIFO at {}".format(FIFO_PATH))
+            # Infinitely listen for commands and execute the radio commands accordingly.
+            while True:
+                cmd = fifo.read()
+                if len(cmd) > 0:
+                    l.LOGGER.debug("fifo -> {}".format(cmd))
+                    if cmd == "record":
+                        self.record()
+                    elif cmd == "accept":
+                        self.accept()
+                    elif cmd == "save":
+                        self.save("/tmp")
+                    elif cmd == "disable":
+                        self.disable()
 
     def get_nb(self):
         """Get the number of currently registed SDRs."""
@@ -224,7 +260,7 @@ class MySoapySDRsClient():
         # is to open/close/sleep for each commands. Otherwise, the commands
         # arrived concatenated at the reader process.
         if self.enabled is True:
-            l.LOGGER.debug("{} -> fifo".format(cmd))
+            l.LOGGER.debug("fifo <- {}".format(cmd))
             with open(FIFO_PATH, "w") as fifo:
                 fifo.write(cmd)
             sleep(0.1)
