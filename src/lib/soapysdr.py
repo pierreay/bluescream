@@ -69,7 +69,7 @@ class MySoapySDRs():
         for sdr in self.sdrs:
             sdr.accept()
 
-    def save(self, dir):
+    def save(self, dir = None):
         l.LOGGER.debug("MySoapySDRs.save(dir={})".format(dir))
         for sdr in self.sdrs:
             sdr.save(dir)
@@ -93,6 +93,7 @@ class MySoapySDRs():
             if oe.errno != errno.EEXIST:
                 raise
         # Open the named pipe.
+        l.LOGGER.info("ready for listening!")
         with open(FIFO_PATH, "r") as fifo:
             l.LOGGER.debug("opened FIFO at {}".format(FIFO_PATH))
             # Infinitely listen for commands and execute the radio commands accordingly.
@@ -105,7 +106,7 @@ class MySoapySDRs():
                     elif cmd == "accept":
                         self.accept()
                     elif cmd == "save":
-                        self.save("/tmp")
+                        self.save()
                     elif cmd == "disable":
                         self.disable()
 
@@ -167,7 +168,7 @@ class MySoapySDR():
         assert(arr[arr.imag > np.iinfo(np.int16).max].shape == (0,))
         return arr.view(np.float32).astype(np.int16).view(MySoapySDR.DTYPE)
 
-    def __init__(self, fs, freq, idx = 0, enabled = True, duration = 1):
+    def __init__(self, fs, freq, idx = 0, enabled = True, duration = 1, dir = "/tmp"):
         l.LOGGER.debug("MySoapySDR.__init__(fs={},freq={},idx={})".format(fs, freq, idx))
         self.fs = fs
         self.freq = freq
@@ -175,6 +176,8 @@ class MySoapySDR():
         self.enabled = enabled
         # Default duration if nothing is specified during self.record().
         self.duration = duration
+        # Default directory if nothing is specified during self.save().
+        self.dir = dir
         # Recording acceptation flag.
         self.accepted = False # Set to True by accept() and to False by save().
         if self.enabled:
@@ -228,7 +231,9 @@ class MySoapySDR():
             self.accepted = True
             self.rx_signal = np.concatenate((self.rx_signal, self.rx_signal_candidate))
 
-    def save(self, dir):
+    def save(self, dir = None):
+        if dir is None:
+            dir = self.dir
         if self.enabled is True and self.accepted is True:
             dir = path.expanduser(dir)
             l.LOGGER.info("save recording of radio #{} into directory {}".format(self.idx, dir))
