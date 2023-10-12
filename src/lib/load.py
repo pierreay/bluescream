@@ -286,9 +286,9 @@ def save_pair_trace(dir, idx, nf, ff):
     """Save one pair of traces (NF & FF) located in directory DIR at index
     IDX. If NF or FF are None, they are ignored. """
     if nf is not None:
-        np.save(get_dataset_path_unpack_nf(dir, idx), nf)
+        MySoapySDR.numpy_save(get_dataset_path_unpack_nf(dir, idx), nf)
     if ff is not None:
-        np.save(get_dataset_path_unpack_ff(dir, idx), ff)
+        MySoapySDR.numpy_save(get_dataset_path_unpack_ff(dir, idx), ff)
  
 def load_pair_trace(dir, idx, nf=True, ff=True):
     """Load one pair of traces (NF & FF) located in directory DIR at index
@@ -309,7 +309,7 @@ def load_pair_trace(dir, idx, nf=True, ff=True):
         l.LOGGER.warn(e)
     return trace_nf, trace_ff
 
-def save_all_traces(dir, nf, ff, packed=True, start=0, stop=0):
+def save_all_traces(dir, nf, ff, packed=False, start=0, stop=0):
     """Save traces in DIR. NF and FF can be a 2D np.array of shape (nb_traces,
     nb_samples) or None. If PACKED is set to True or if STOP is set to < 1,
     then all the traces are saved. Othserwise, START and STOP can be specified
@@ -318,6 +318,9 @@ def save_all_traces(dir, nf, ff, packed=True, start=0, stop=0):
     """
     l.LOGGER.info("saving traces...")
     if packed:
+        # NOTE: Following code is not working anymore without
+        # MySoapySDR.numpy_save stub, but I don't know if it can handle packed
+        # dataset for now.
         if nf is not None:
             np.save(get_dataset_path_pack_nf(dir), nf)
         if ff is not None:
@@ -327,9 +330,9 @@ def save_all_traces(dir, nf, ff, packed=True, start=0, stop=0):
             stop = len(nf) if nf is not None else len(ff) 
         for i in tqdm(range(start, stop), desc="save all traces"):
             if nf is not None:
-                np.save(get_dataset_path_unpack_nf(dir, i), nf[i - start])
+                MySoapySDR.numpy_save(get_dataset_path_unpack_nf(dir, i), nf[i - start])
             if ff is not None:
-                np.save(get_dataset_path_unpack_ff(dir, i), ff[i - start])
+                MySoapySDR.numpy_save(get_dataset_path_unpack_ff(dir, i), ff[i - start])
     l.LOGGER.info("done!")
 
 def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=True):
@@ -344,6 +347,9 @@ def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=Tr
     """
     l.LOGGER.info("loading traces...")
     if is_dataset_packed(dir):
+        # NOTE: Following code is not working anymore without
+        # MySoapySDR.numpy_load stub, but I don't know if it can handle packed
+        # dataset for now.
         nf_p = get_dataset_path_pack_nf(dir)
         ff_p = get_dataset_path_pack_ff(dir)
         assert(path.exists(nf_p) and path.exists(ff_p))
