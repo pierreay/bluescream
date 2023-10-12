@@ -14,7 +14,7 @@ import lib.log as l
 import lib.load as load
 
 # Path of the FIFO file used between MySoapySDRs and MySoapySDRsClient.
-FIFO_PATH = "/tmp/soapysdr_fifo"
+FIFO_PATH = "/tmp/soapysdr.fifo"
 
 class MySoapySDRs():
     def __enter__(self):
