@@ -86,13 +86,26 @@ class MySoapySDRs():
         communicate with this server mode.
 
         """
-        # Create the named pipe (FIFO).
-        try:
-            os.mkfifo(FIFO_PATH)
-        except OSError as oe: 
-            if oe.errno != errno.EEXIST:
-                raise
-        # Open the named pipe.
+        def __ack__():
+            """Acknoledge the end of the command execution by opening-closing
+            the FIFO in W mode.
+
+            """
+            with open(FIFO_PATH, "w") as fifo_w:
+                pass
+
+        def __create_fifo():
+            """Create the named pipe (FIFO)."""
+            # Create the named pipe (FIFO).
+            try:
+                os.mkfifo(FIFO_PATH)
+            except OSError as oe: 
+                if oe.errno != errno.EEXIST:
+                    raise
+
+        # Create the FIFO.
+        __create_fifo()
+        # Open the FIFO.
         l.LOGGER.info("ready for listening!")
         with open(FIFO_PATH, "r") as fifo:
             l.LOGGER.debug("opened FIFO at {}".format(FIFO_PATH))
@@ -101,14 +114,12 @@ class MySoapySDRs():
                 cmd = fifo.read()
                 if len(cmd) > 0:
                     l.LOGGER.debug("fifo -> {}".format(cmd))
-                    if cmd == "record":
-                        self.record()
-                    elif cmd == "accept":
-                        self.accept()
-                    elif cmd == "save":
-                        self.save()
-                    elif cmd == "disable":
-                        self.disable()
+                    # Available commands on server-side.
+                    cmds = {"record": self.record, "accept": self.accept, "save": self.save, "disable": self.disable}
+                    # Execute the received command and acknowledge its execution.
+                    if cmd in cmds:
+                        cmds[cmd]()
+                        __ack__()
 
     def get_nb(self):
         """Get the number of currently registed SDRs."""
@@ -270,21 +281,39 @@ class MySoapySDRsClient():
                 fifo.write(cmd)
             sleep(0.1)
 
+    def __wait__(self):
+        """Wait for the previous command to complete."""
+        if self.enabled is True:
+            # NOTE: Hacky trick here, Linux is making the opening of a FIFO in
+            # read mode blocking until a writer opened it. Here, we simply wait
+            # for the radio server to open it in write mode, and exit
+            # immediately. Use this only for long command, because if the
+            # server-side opening in write mode happen before the client-side
+            # opening in read mode, then it will deadlock.
+            l.LOGGER.debug("waiting...")
+            with open(FIFO_PATH, "r") as fifo:
+                pass
+            l.LOGGER.debug("wait completed")
+
     def record(self):
-        """Call the MySoapySDRs.record() method through the FIFO."""
+        """Call the MySoapySDRs.record() method through the FIFO. Wait for the
+        command to complete.
+
+        """
         self.__cmd__("record")
-        # TODO: Implement a synchronization mechanism to really wait exactly for the time for record.
-        if self.enabled:
-            sleep(5)
+        self.__wait__()
 
     def accept(self):
-        """Call the MySoapySDRs.accept() method through the FIFO."""
+        """Call the MySoapySDRs.accept() method through the FIFO. Returns
+        immediately."""
         self.__cmd__("accept")
 
     def save(self):
-        """Call the MySoapySDRs.save() method through the FIFO."""
+        """Call the MySoapySDRs.save() method through the FIFO. Returns
+        immediately."""
         self.__cmd__("save")
 
     def disable(self):
-        """Call the MySoapySDRs.disable() method through the FIFO."""
+        """Call the MySoapySDRs.disable() method through the FIFO. Returns
+        immediately."""
         self.__cmd__("disable")
