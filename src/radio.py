@@ -67,6 +67,16 @@ def listen(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id):
         rad.listen()
 
 @cli.command()
+def quit():
+    """Send a quit message to the listening radio server.
+
+    This command is used to properly quit the radio server instead of killing
+    it, possibly letting the SDR driver in a bad state.
+
+    """
+    soapysdr.MySoapySDRsClient().quit()
+
+@cli.command()
 @click.argument("indir", type=click.Path())
 @click.argument("subset", type=str)
 @click.argument("bd_addr")

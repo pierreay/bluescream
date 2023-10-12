@@ -120,6 +120,9 @@ class MySoapySDRs():
                     if cmd in cmds:
                         cmds[cmd]()
                         __ack__()
+                    elif cmd == "quit":
+                        l.LOGGER.info("quit the listening mode")
+                        break
 
     def get_nb(self):
         """Get the number of currently registed SDRs."""
@@ -350,3 +353,10 @@ class MySoapySDRsClient():
         """Call the MySoapySDRs.disable() method through the FIFO. Returns
         immediately."""
         self.__cmd__("disable")
+
+    def quit(self):
+        """Send instruction to quit the radio listening in server mode. Returns
+        immediately.
+
+        """
+        self.__cmd__("quit")
