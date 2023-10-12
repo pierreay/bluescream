@@ -33,6 +33,65 @@ def cli(dir, log, loglevel):
     l.configure(log, loglevel)
     DIR = path.expanduser(dir)
 
+# PROG: /START\ Temporary code for process.
+
+import os
+import errno
+from time import sleep
+
+FIFO_PATH = "/tmp/myfifo"
+
+@cli.command()
+@click.argument("freq_nf", type=int)
+@click.argument("freq_ff", type=int)
+@click.argument("samp_rate", type=int)
+@click.option("--duration", type=float, default=0.5, help="Duration of the recording.")
+@click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
+@click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
+def init(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id):
+    """ Initialize the radio and listen for commands.
+    
+    TODO
+    
+    """
+    # Create the named pipe (FIFO).
+    try:
+        os.mkfifo(FIFO_PATH)
+    except OSError as oe: 
+        if oe.errno != errno.EEXIST:
+            raise
+    # Initialize the radio as requested.
+    with soapysdr.MySoapySDRs() as rad:
+        # Initialize the radios individually.
+        if nf_id != -1:
+            rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, nf_id, duration=duration)
+            rad.register(rad_nf)
+        if ff_id != -1:
+            rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, ff_id, duration=duration)
+            rad.register(rad_ff)
+        if rad.get_nb() <= 0:
+            l.LOGGER.error("we need at least one radio index to record!")
+            exit(1)
+        rad.open()
+        # Open the named pipe.
+        with open(FIFO_PATH, "r") as fifo:
+            l.LOGGER.debug("opened FIFO at {}".format(FIFO_PATH))
+            # Infinitely listen for commands and execute the radio commands accordingly.
+            while True:
+                cmd = fifo.read(16)
+                if len(cmd) > 0:
+                    l.LOGGER.debug("cmd <- {}".format(cmd))
+                    if cmd == "record":
+                        rad.record()
+                    elif cmd == "accept":
+                        rad.accept()
+                    elif cmd == "save":
+                        rad.save("/tmp")
+    # Delete the FIFO.
+    os.remove(FIFO_PATH)
+        
+# PROG: /END\ Temporary code for process.
+
 @cli.command()
 @click.argument("indir", type=click.Path())
 @click.argument("subset", type=str)
@@ -62,6 +121,22 @@ def record(indir, subset, bd_addr, ser_port, freq_nf, freq_ff, samp_rate, durati
     in DIR.
 
     """
+    # PROG: /START\ Temporary code for process.
+    with open(FIFO_PATH, "w") as fifo:
+        l.LOGGER.debug("record")
+        fifo.write("record")
+    sleep(5)
+    with open(FIFO_PATH, "w") as fifo:
+        l.LOGGER.debug("accept")
+        fifo.write("accept")
+    sleep(0.1) # NOTE: Needed otherwise next command will be appended to the previous one.
+    with open(FIFO_PATH, "w") as fifo:
+        l.LOGGER.debug("save")
+        fifo.write("save")
+    sleep(0.1)  # NOTE: Needed otherwise next command will be appended to the previous one.
+    exit(0)
+    # PROG: /END\ Temporary code for process.
+    
     # Load the dataset.
     dset = dataset.Dataset.pickle_load(indir, quit_on_error=True)
     sset = dset.get_subset(subset)
