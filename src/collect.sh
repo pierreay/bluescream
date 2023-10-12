@@ -8,19 +8,19 @@ source ./lib/misc.sh
 # ** Functions
 
 function clean() {
-    if [[ -d $OUTPUT_WD ]]; then
-        rm -rf $OUTPUT_WD/*
-        log_info "Clean $OUTPUT_WD"
+    if [[ -d $SUBSET_WD ]]; then
+        rm -rf $SUBSET_WD/*
+        log_info "Clean $SUBSET_WD"
     else
-        log_error "$OUTPUT_WD is not set!"
+        log_error "$SUBSET_WD is not set!"
         exit 0
     fi
 }
 
 function resume() {
-    if [[ -d $OUTPUT_WD ]]; then
-        i_start=$(( $(ls $OUTPUT_WD/ | grep trace_nf | wc -l) - 1))
-        log_info "Resume collection at i=$i_start in $OUTPUT_WD"
+    if [[ -d $SUBSET_WD ]]; then
+        i_start=$(( $(ls $SUBSET_WD/ | grep trace_nf | wc -l) - 1))
+        log_info "Resume collection at i=$i_start in $SUBSET_WD"
     fi
 }
 
@@ -123,26 +123,26 @@ function collect_one_set() {
 
     # Make sure output directory is created (/attack or /train) or do nothing
     # if resuming.
-    mkdir -p $OUTPUT_WD
+    mkdir -p $SUBSET_WD
 
     if [[ $KEY_FIXED == 1 ]]; then
         if [[ $i_start == 0 ]]; then
             pair
-            cp /tmp/mirage_output_ltk $OUTPUT_WD/k.txt
+            cp /tmp/mirage_output_ltk $SUBSET_WD/k.txt
             # Fix record.py trying to load values from /tmp after rebooting.
-            cp /tmp/mirage_output_addr $OUTPUT_WD/.addr.txt
-            cp /tmp/mirage_output_rand $OUTPUT_WD/.rand.txt
-            cp /tmp/mirage_output_ediv $OUTPUT_WD/.ediv.txt
+            cp /tmp/mirage_output_addr $SUBSET_WD/.addr.txt
+            cp /tmp/mirage_output_rand $SUBSET_WD/.rand.txt
+            cp /tmp/mirage_output_ediv $SUBSET_WD/.ediv.txt
         else
-            cp $OUTPUT_WD/.addr.txt /tmp/mirage_output_addr
-            cp $OUTPUT_WD/.rand.txt /tmp/mirage_output_rand
-            cp $OUTPUT_WD/.ediv.txt /tmp/mirage_output_ediv
+            cp $SUBSET_WD/.addr.txt /tmp/mirage_output_addr
+            cp $SUBSET_WD/.rand.txt /tmp/mirage_output_rand
+            cp $SUBSET_WD/.ediv.txt /tmp/mirage_output_ediv
         fi
     fi
 
-    log_info "freq_nf=$ENVRC_NF_FREQ"      >  $OUTPUT_WD/params.txt
-    log_info "freq_ff=$ENVRC_FF_FREQ"      >> $OUTPUT_WD/params.txt
-    log_info "samp_rate=$ENVRC_SAMP_RATE"  >> $OUTPUT_WD/params.txt
+    log_info "freq_nf=$ENVRC_NF_FREQ"      >  $SUBSET_WD/params.txt
+    log_info "freq_ff=$ENVRC_FF_FREQ"      >> $SUBSET_WD/params.txt
+    log_info "samp_rate=$ENVRC_SAMP_RATE"  >> $SUBSET_WD/params.txt
 
     for (( i = i_start; i <= $COLLECT_NB; i++ ))
     do
@@ -156,9 +156,9 @@ function collect_one_set() {
                 i=$(( $i - 1 ))
                 continue
             fi
-            cp /tmp/mirage_output_ltk $OUTPUT_WD/${i}_k.txt
+            cp /tmp/mirage_output_ltk $SUBSET_WD/${i}_k.txt
             log_info "saved ks:"
-            ls $OUTPUT_WD/${i}_k.txt
+            ls $SUBSET_WD/${i}_k.txt
         fi
         record
         if [[ $? == 1 ]]; then
@@ -171,13 +171,13 @@ function collect_one_set() {
         elif [[ $COLLECT_MODE == "attack" ]]; then
             ./radio.py --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE --window 0.01 --offset 0.00 --no-plot --overwrite
         fi
-        cp /tmp/raw_0_0.npy $OUTPUT_WD/${i}_trace_nf.npy
-        cp /tmp/raw_1_0.npy $OUTPUT_WD/${i}_trace_ff.npy
-        cp /tmp/bt_skd_0 $OUTPUT_WD/${i}_p.txt
+        cp /tmp/raw_0_0.npy $SUBSET_WD/${i}_trace_nf.npy
+        cp /tmp/raw_1_0.npy $SUBSET_WD/${i}_trace_ff.npy
+        cp /tmp/bt_skd_0 $SUBSET_WD/${i}_p.txt
         log_info "saved traces:"
-        ls $OUTPUT_WD/${i}_trace_nf.npy $OUTPUT_WD/${i}_trace_ff.npy
+        ls $SUBSET_WD/${i}_trace_nf.npy $SUBSET_WD/${i}_trace_ff.npy
         log_info "saved pt:"
-        ls $OUTPUT_WD/${i}_p.txt
+        ls $SUBSET_WD/${i}_p.txt
 
         if [[ $KEY_FIXED == 0 && $(( ($i+1) % 100 )) == 0 ]]; then
             log_warn "restart devices to prevent errors..."
@@ -190,21 +190,17 @@ function collect_one_set() {
 
 # * Dataset
 
-sleep 5         # Be sure fstab mount our partitions.
-if [[ -z ${OUTPUT_WD_ROOT+x} ]]; then
-    export OUTPUT_WD_ROOT=$ENVRC_DATASET_RAW_PATH
-fi
 if [[ -z ${COLLECT_TRAINING_NB+x} ]]; then
     export COLLECT_TRAINING_NB=65536
 fi
 if [[ -z ${COLLECT_ATTACK_NB+x} ]]; then
-    export COLLECT_ATTACK_NB=2048
+    export COLLECT_ATTACK_NB=16384
 fi
 
 # ** Training subset
 
 export COLLECT_NB="$COLLECT_TRAINING_NB"
-export OUTPUT_WD="$OUTPUT_WD_ROOT/train"
+export SUBSET_WD="$ENVRC_DATASET_RAW_PATH/train"
 export KEY_FIXED=0
 log_info
 log_info "=========== Training set ==========="
@@ -215,7 +211,7 @@ collect_one_set 2
 # ** Attack subset
 
 export COLLECT_NB="$COLLECT_ATTACK_NB"
-export OUTPUT_WD="$OUTPUT_WD_ROOT/attack"
+export SUBSET_WD="$ENVRC_DATASET_RAW_PATH/attack"
 export KEY_FIXED=1
 export COLLECT_MODE=attack
 log_info
