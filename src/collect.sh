@@ -47,10 +47,10 @@ function ykush_reset() {
     log_info
     log_info "power off ykush..."
     sudo ykushcmd -d a
-    sleep 10 # Wait for shutdown.
+    sleep 5 # Wait for shutdown.
     log_info "power on ykush..."
     sudo ykushcmd -u a
-    sleep 20 # Wait for power-up and booting.
+    sleep 10 # Wait for power-up and booting.
 }
 
 function radio_init() {
