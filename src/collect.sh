@@ -176,7 +176,7 @@ log_info
 log_info "=========== Training set ==========="
 log_info
 export COLLECT_MODE=train
-collect_one_set # 2
+collect_one_set 2
 
 # ** Attack subset
 
@@ -187,4 +187,4 @@ export COLLECT_MODE=attack
 log_info
 log_info "=========== Attack set ==========="
 log_info
-collect_one_set # 2
+collect_one_set 1
