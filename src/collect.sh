@@ -155,11 +155,10 @@ function collect_one_set() {
         log_info "saved trace:"
         ls $SUBSET_WD/${i}_trace_ff.npy
 
-        # NOTE: Should we keep this part?
-        # if [[ $KEY_FIXED == 0 && $(( ($i+1) % 100 )) == 0 ]]; then
-        #     log_warn "restart devices to prevent errors..."
-        #     ykush_reset
-        # fi
+        if [[ $(( ($i+1) % 200 )) == 0 ]]; then
+            log_warn "restart devices every 200 traces to prevent errors..."
+            ykush_reset
+        fi
     done
 
     display_time
