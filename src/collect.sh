@@ -56,7 +56,7 @@ function ykush_reset() {
 function radio_init() {
     uhd_find_devices
     ./radio.py --dir $ENVRC_RADIO_DIR --loglevel INFO listen $ENVRC_NF_FREQ $ENVRC_FF_FREQ $ENVRC_SAMP_RATE --ff-id $ENVRC_FF_ID --duration=$ENVRC_DURATION &
-    sleep 5
+    sleep 10 # Wait for SDR's driver initialization.
 }
 
 # Arguments:
@@ -170,6 +170,7 @@ function collect_one_set() {
 # TODO: Allows to use an argument to automatize menu or auto choice.
 # TODO: Allows to use an argument to choose between reboot or nothing.
 # TODO: Implement reboot after successive ykush reset.
+# TODO: Add a "Press [ENTER]" before exit to save log when quitting launching by crontab.
 
 # ** Training subset
 
