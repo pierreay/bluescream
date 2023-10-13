@@ -19,6 +19,8 @@
 # sleep 30
 
 # Start tmux server.
+# NOTE: Specifying shell is important, otherwise, it will use "sh" as default
+# shell for new windows and panes.
 SHELL=/bin/zsh tmux start-server
 
 # Source the project environment and start the collection inside a tmux session.
