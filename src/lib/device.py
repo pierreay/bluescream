@@ -208,14 +208,14 @@ class Device():
             # The radio has been started too late if LL_START_ENC_REQ is
             # already received.
             if trgr_recv_ll_start_enc_req.triggered:
-                l.LOGGER.error("the recording hasn't been started while we received the encryption confirmation!")
+                raise Exception("the recording hasn't been started while we received the encryption confirmation!")
             # Start the recording and wait for it to complete.
             self.radio.record()
             # The recording isn't likely to contain the AES since we didn't
             # received an LL_START_ENC_REQ. The recording is maybe happening
             # too soon.
             if not trgr_recv_ll_start_enc_req.triggered:
-                l.LOGGER.error("the recording is already finished while we didn't received the encryption confirmation!")
+                raise Exception("the recording is already finished while we didn't received the encryption confirmation!")
             else:
                 self.radio.accept()
                 
