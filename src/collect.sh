@@ -167,6 +167,8 @@ function collect_one_set() {
 
 # * Dataset
 
+# TODO: Allows to use an argument to automatize menu or auto choice.
+
 # ** Training subset
 
 export COLLECT_NB="$ENVRC_WANTED_TRACE_TRAIN"
