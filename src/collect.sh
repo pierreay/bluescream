@@ -168,6 +168,8 @@ function collect_one_set() {
 # * Dataset
 
 # TODO: Allows to use an argument to automatize menu or auto choice.
+# TODO: Allows to use an argument to choose between reboot or nothing.
+# TODO: Implement reboot after successive ykush reset.
 
 # ** Training subset
 
