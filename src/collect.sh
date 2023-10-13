@@ -26,13 +26,20 @@ function resume() {
     fi
 }
 
-function quit() {
-    exit
+# Initialize the script.
+function init() {
+    # Initialize the radio server.
+    radio_init
 }
 
-function display_time_quit() {
+# Clean and quit the script.
+function quit() {
+    # Display time taken.
     display_time
+    # Stop the radio server.
     radio_quit
+    # Confirm quitting. NOTE: Useful to not loose log when launched using cron.
+    read -p "press [ENTER] to quit"
     exit 0
 }
 
@@ -111,7 +118,7 @@ function collect_one_set() {
                     break
                     ;;
                 ${opts[2]})
-                    quit
+                    exit
                     ;;
                 *) log_error "Invalid option: $REPLY";;
             esac
@@ -122,22 +129,20 @@ function collect_one_set() {
         elif [[ $opt == 2 ]]; then
             resume
         else
-            quit
+            exit
         fi
     fi
 
     # * Profiling.
 
     SECONDS=0
-    trap display_time_quit INT
+    trap quit INT
 
     # * Collecting.
 
     # Make sure output directory is created (/attack or /train) or do nothing
     # if resuming.
     mkdir -p $SUBSET_WD
-
-    radio_init
 
     for (( i = i_start; i <= $COLLECT_NB; i++ ))
     do
@@ -160,9 +165,6 @@ function collect_one_set() {
             ykush_reset
         fi
     done
-
-    display_time
-    radio_quit
 }
 
 # * Dataset
@@ -170,7 +172,8 @@ function collect_one_set() {
 # TODO: Allows to use an argument to automatize menu or auto choice.
 # TODO: Allows to use an argument to choose between reboot or nothing.
 # TODO: Implement reboot after successive ykush reset.
-# TODO: Add a "Press [ENTER]" before exit to save log when quitting launching by crontab.
+
+init
 
 # ** Training subset
 
@@ -193,3 +196,5 @@ log_info
 log_info "=========== Attack set ==========="
 log_info
 collect_one_set 1
+
+quit
