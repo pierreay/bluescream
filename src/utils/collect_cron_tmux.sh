@@ -14,9 +14,8 @@
 
 # * Script
 
-# Sleep a bit to prevent boot loop in case of code error.
-# TODO: Uncomment the following line.
-# sleep 30
+# Sleep a bit to prevent boot loop in case of programmer's error.
+sleep 30
 
 # Start tmux server.
 # NOTE: Specifying shell is important, otherwise, it will use "sh" as default
