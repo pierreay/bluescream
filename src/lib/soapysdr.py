@@ -110,6 +110,7 @@ class MySoapySDRs():
         with open(FIFO_PATH, "r") as fifo:
             l.LOGGER.debug("opened FIFO at {}".format(FIFO_PATH))
             # Infinitely listen for commands and execute the radio commands accordingly.
+            # TODO: Try to add polling under the 0.1 seconds delay, to not use CPU at 100%.
             while True:
                 cmd = fifo.read()
                 if len(cmd) > 0:
