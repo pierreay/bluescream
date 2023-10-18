@@ -144,7 +144,7 @@ function collect_one_set() {
     # if resuming.
     mkdir -p $SUBSET_WD
 
-    for (( i = i_start; i <= $COLLECT_NB; i++ ))
+    for (( i = i_start; i < $COLLECT_NB; i++ ))
     do
         log_info
         log_info "=========== TRACE #$i -- KEY_FIXED=$KEY_FIXED -- SUBSET=$COLLECT_MODE ==========="
