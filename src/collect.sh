@@ -199,6 +199,6 @@ export COLLECT_MODE=attack
 log_info
 log_info "=========== Attack set ==========="
 log_info
-collect_one_set 1
+collect_one_set 2
 
 quit
