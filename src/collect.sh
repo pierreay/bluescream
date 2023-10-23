@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# TODO: Improve script usage and reliability:
+# - Implement reboot after successive ykush reset.
+# - Use an argument to choose between reboot or not on failure.
+# - Automatically resume if previous recording is detected.
+# - Allow option to force restart (e.g. --restart).
+
 source ./lib/log.sh 
 source ./lib/misc.sh
 
@@ -168,14 +174,6 @@ function collect_one_set() {
 }
 
 # * Dataset
-
-# PROG: Usage: collect.sh MODE
-# Continue arguments_getopt.sh in code-example
-
-# TODO: Allows to use an argument to automatize menu or auto choice.
-# TODO: Allows to use an argument to choose between reboot or nothing.
-# TODO: Allows to automatically resume if previous recording is detected, and allow option for restart (e.g. --restart).
-# TODO: Implement reboot after successive ykush reset.
 
 init
 
