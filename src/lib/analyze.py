@@ -151,6 +151,10 @@ def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0, flip=True, plot=Fa
 
     """
     assert(isinstance(s, np.ndarray))
+    # * Pre-processing.
+    # This function will work on the amplitude only and on a normalized signal.
+    s = analyze.normalize(analyze.get_amplitude(s))
+
     # * Trigger signal.
     trigger   = triggers.Trigger(s, bpl, bph, lp, sr)
     trigger_l = triggers.Triggers()
@@ -166,8 +170,11 @@ def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0, flip=True, plot=Fa
     peaks = signal.find_peaks(trigger.signal, distance=len(trigger.signal) / nb_aes / 4, prominence=0.25)
     offset_duration = offset * sr
     peaks = peaks[0] + offset_duration
-    if plot is True:
-        libplot.plot_time_spec_sync_axis([s], samp_rate=sr, peaks=peaks, triggers=trigger_l)
+
+    # * Plot result if asked.
+    libplot.plot_time_spec_sync_axis([s], samp_rate=sr, peaks=peaks, triggers=trigger_l, cond=plot)
+
+    # * Prune bad indexes.
     if np.shape(peaks[peaks <= 0]) != (0,):
         l.LOGGER.warning("discard detected aes turned negatives because of the offset")
         peaks = peaks[peaks >= 0]
