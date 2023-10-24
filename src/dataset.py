@@ -118,10 +118,10 @@ def average_fn(q, dset, sset, i, stop, nb_aes, template, plot):
     sset.load_trace(i, nf=False, ff=True, check=True)
     # * Get the average of all AES and the template.
     sset.ff, sset.template = analyze.average_aes(sset.ff, dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot)
-    # * Check the trace is valid.
-    check, sset.ff = analyze.fill_zeros_if_bad(sset.template, sset.ff)
-    if check is True:
-        l.LOGGER.warning("error during averaging aes, trace {} filled with zeroes!".format(i))
+    # * Check the trace is valid. The trace #0 is assumed be valid.
+    check = False
+    if i > 0:
+        check, sset.ff = analyze.fill_zeros_if_bad(sset.template, sset.ff, log=True, log_idx=i)
     # * Plot the averaged trace if wanted.
     libplot.plot_time_spec_sync_axis([sset.ff], samp_rate=dset.samp_rate, cond=plot)
     # * Save the processed trace.
@@ -279,10 +279,11 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
                 aligned   = analyze.align(sset.template, extracted[0], dset.samp_rate, ignore=False, log=False)
             else:
                 aligned = None
-            # * Check the trace is valid.
-            check, sset.ff = analyze.fill_zeros_if_bad(sset.template, aligned)
+            # * Check the trace is valid. The trace #0 is assumed be valid.
+            check = False
+            if i > 0:
+                check, sset.ff = analyze.fill_zeros_if_bad(sset.template, aligned, log=True, log_idx=i)
             if check is True:
-                l.LOGGER.warning("error during processing, trace {} filled with zeroes!".format(i))
                 sset.bad_entries.append(i)
             # * Save dataset for resuming if not finishing the loop.
             sset.save_trace(nf=False)
