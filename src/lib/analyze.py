@@ -64,18 +64,38 @@ def normalize_zscore(arr, set=False):
     return arr
 
 def get_amplitude(traces):
-    """From the TRACES 2D np.array of shape (nb_traces, nb_samples) or the 1D
+    """Get the amplitude of one or multuples traces.
+
+    From the TRACES 2D np.array of shape (nb_traces, nb_samples) or the 1D
     np.array of shape (nb_samples) containing IQ samples, return an array with
-    the same shape containing the amplitude of the traces."""
-    assert(traces.dtype == np.complex64)
-    return np.abs(traces)
+    the same shape containing the amplitude of the traces.
+
+    If traces contains signals in another format than np.complex64, silently
+    return the input traces such that this function can be called multiple
+    times.
+
+    """
+    if traces.dtype == np.complex64:
+        return np.abs(traces)
+    else:
+        return traces
 
 def get_phase(traces):
-    """From the TRACES 2D np.array of shape (nb_traces, nb_samples) or the 1D
+    """Get the phase of one or multiples traces.
+
+    From the TRACES 2D np.array of shape (nb_traces, nb_samples) or the 1D
     np.array of shape (nb_samples) containing IQ samples, return an array with
-    the same shape containing the phase of the traces."""
-    assert(traces.dtype == np.complex64)
-    return np.angle(traces)
+    the same shape containing the phase of the traces.
+
+    If traces contains signals in another format than np.complex64, silently
+    return the input traces such that this function can be called multiple
+    times.
+
+    """
+    if traces.dtype == np.complex64:
+        return np.angle(traces)
+    else:
+        return traces
 
 def flip_normalized_signal(s):
     """Flip upside-down a normalized signal S in time-domain contained in a 1D
