@@ -113,6 +113,7 @@ def get_bad_trace(ref):
     (e.g. wrong AES finding or extraction).
 
     """
+    assert(type(ref) == np.ndarray)
     return np.zeros(ref.shape, dtype=ref.dtype)
 
 def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0, flip=True, plot=False):
