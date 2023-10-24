@@ -246,7 +246,9 @@ def extract(s, starts, length = 0):
         return extracted
 
 def align(template, target, sr, ignore=True, log=False):
-    """Return the TARGET signal aligned (1D np.array) using cross-correlation
+    """Align a signal against a template.
+
+    Return the TARGET signal aligned (1D np.array) using cross-correlation
     along the TEMPLATE signal, where SR is the sampling rates of signals. The
     shift is filled with zeros shuch that shape is not modified. If IGNORE is
     set to false, raise an assertion for high shift values.
@@ -262,21 +264,13 @@ def align(template, target, sr, ignore=True, log=False):
     target_lpf   = filters.butter_lowpass_filter(target, lpf_freq, sr)
     corr         = signal.correlate(target_lpf, template_lpf)
     shift        = np.argmax(corr) - (len(template) - 1)
+    # Log and check shift value.
     if log:
         l.LOGGER.debug("shift to maximize cross correlation is {}".format(shift))
+    if not ignore:
+        assert np.abs(shift) < len(template/10), "shift is too high, inspect"
     # Apply shift on the raw target signal.
-    # XXX: Shouldn't we use analyze.shift here?
-    if shift > 0:
-        if not ignore:
-            assert shift < len(template/10), "shift is too high, inspect"
-        target = target[shift:]
-        target = np.append(target, np.zeros(shift, dtype=target.dtype))
-    elif shift < 0:
-        if not ignore:
-            assert -shift < len(template/10), "shift is too high, inspect"
-        target = target[:shift]
-        target = np.insert(target, 0, np.zeros(-shift, dtype=target.dtype))
-    return target
+    return analyze.shift(target, shift)
 
 def align_nb(s, nb, sr, template, tqdm_log=True):
     s_aligned = [0] * nb
@@ -356,22 +350,20 @@ def is_nan(arr):
     test = np.isnan(arr)
     return len(test[test == True]) >= 1
 
-def shift(xs, n):
-    """Shift a signal XS from the N offset.
+def shift(sig, shift):
+    """Shift a signal SIG from the SHIFT offset.
 
-    Shift a signal XS to left (negative N) or right (positive N). Empty parts
-    of the signal are completed using np.zeros of same dtype as XS.
+    Shift a signal SIG to left (positive SHIFT) or right (negative
+    SHIFT). Empty parts of the signal are completed using np.zeros of same
+    dtype as SIG.
 
-    Source:
-    https://stackoverflow.com/questions/30399534/shift-elements-in-a-numpy-array
+    SHIFT can be the output of the signal.correlate() function.
 
     """
-    assert xs.ndim == 1
-    e = np.empty_like(xs)
-    if n >= 0:
-        e[:n] = np.zeros(n, dtype=xs.dtype)
-        e[n:] = xs[:-n]
-    else:
-        e[n:] = np.zeros(n, dtype=xs.dtype)
-        e[:n] = xs[-n:]
-    return e
+    if shift > 0:
+        sig = sig[shift:]
+        sig = np.append(sig, np.zeros(shift, dtype=sig.dtype))
+    elif shift < 0:
+        sig = sig[:shift]
+        sig = np.insert(sig, 0, np.zeros(-shift, dtype=sig.dtype))
+    return sig
