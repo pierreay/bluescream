@@ -114,7 +114,7 @@ def average_fn(q, dset, sset, i, stop, nb_aes, template, plot):
     if i >= stop:
         q.put((None, None, i))
         return 0
-    # * Load the to process trace.
+    # * Load the trace to process.
     sset.load_trace(i, nf=False, ff=True, check=True)
     # * Get the average of all AES and the template.
     sset.ff, sset.template = analyze.average_aes(sset.ff, dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot)
