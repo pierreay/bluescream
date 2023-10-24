@@ -229,13 +229,15 @@ def extract(s, starts, length = 0):
 
     """
     assert(s.ndim == 1)
+    # Extract a fixed length.
     if length > 0:
         extracted = np.zeros((len(starts), length), dtype=s.dtype)
         for i in range(len(starts)):
-            condition = np.zeros((len(s)))
+            condition = np.zeros((len(s)), dtype=s.dtype)
             condition[int(starts[i]):int(starts[i] + length)] = 1
             extracted[i] = np.copy(np.extract(condition, s))
         return extracted
+    # Extract a variable length.
     else:
         extracted = [0] * len(starts)
         for i in range(0, len(starts)):
@@ -267,12 +269,12 @@ def align(template, target, sr, ignore=True, log=False):
         if not ignore:
             assert shift < len(template/10), "shift is too high, inspect"
         target = target[shift:]
-        target = np.append(target, np.zeros(shift))
+        target = np.append(target, np.zeros(shift, dtype=target.dtype))
     elif shift < 0:
         if not ignore:
             assert -shift < len(template/10), "shift is too high, inspect"
         target = target[:shift]
-        target = np.insert(target, 0, np.zeros(-shift))
+        target = np.insert(target, 0, np.zeros(-shift, dtype=target.dtype))
     return target
 
 def align_nb(s, nb, sr, template, tqdm_log=True):
