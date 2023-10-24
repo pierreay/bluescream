@@ -105,7 +105,7 @@ def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, c
         ax_time.legend(loc="upper right")
         plt.title("Time-Domain [{}]".format(title))
         plt.xlabel("Time [s]")
-        plt.ylabel("Amplitude [Normalized]")
+        plt.ylabel("Amplitude")
         secax = ax_time.secondary_xaxis('top', functions=(lambda x: x - ax_time.get_xlim()[0], lambda x: x))
         secax.set_xlabel("Time (relative to zoom) [s]")
         secax.ticklabel_format(scilimits=(0,0))
