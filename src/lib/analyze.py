@@ -286,6 +286,7 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
     error = 0
     # * Find AES.
     arr = analyze.get_amplitude(arr)
+    # XXX: Find a better way to configure this function than modifying this place of the source code.
     # First version of find_aes used for training set:
     # starts, trigger = analyze.find_aes(arr, sr, 8.8e6, 9.5e6, nb_aes, 1e4, -0.5e-4, flip=True)
     # Second version of find_aes used for attack set:
