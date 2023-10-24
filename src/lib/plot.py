@@ -5,6 +5,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 import lib.log as l
+import lib.analyze as analyze
 
 # * Global variables
 
@@ -99,7 +100,7 @@ def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, c
         plt.subplots_adjust(hspace = 1)
         ax_time = plt.subplot(SUBPLOT_NB, 1, nb)
         return t, ax_time
-    
+
     def plot_time(t, data, ax_time, label, title=""):
         ax_time.plot(t, data, label = label, lw = 0.7)
         ax_time.legend(loc="upper right")
@@ -109,7 +110,7 @@ def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, c
         secax = ax_time.secondary_xaxis('top', functions=(lambda x: x - ax_time.get_xlim()[0], lambda x: x))
         secax.set_xlabel("Time (relative to zoom) [s]")
         secax.ticklabel_format(scilimits=(0,0))
-        
+
     def plot_freq(fs, data, ax_time, nb = 1, triggers = None):
         ax_specgram = plt.subplot(SUBPLOT_NB, 1, nb, sharex=ax_time)
         ax_specgram.specgram(data, NFFT=256, Fs=fs)
@@ -169,18 +170,64 @@ def plot_metadata_balance(ks, pt):
 
 # * User interaction
 
+class SignalPlot():
+    """Class representing a plot of a signal.
+
+    It allows to easily plot the different components of a signal (amplitude,
+    phase) in both time and frequency domains in a uniform way depending on its
+    type.
+
+    """
+    # Subplot index for amplitude plots.
+    IDX_BASE_AMP = 1
+    # Subplot index for phase plots.
+    IDX_BASE_PHASE = 2
+
+    def __init__(self, sig):
+        assert type(sig) == np.ndarray, "sig should be a numpy array"
+        # Signal to plot.
+        self.sig = sig
+        # Compute the number of columns and rows depending on the signal type.
+        self.nrows = 2
+        self.ncols = 2 if analyze.is_iq(self.sig) else 1
+
+    def __plot_amp(self):
+        """Plot the amplitude of the signal in time and frequency domains in a vertical way."""
+        sig = analyze.get_amplitude(self.sig)
+        plt.subplot(self.nrows, self.ncols, SignalPlot.IDX_BASE_AMP)
+        plt.plot(sig)
+        plt.title("Amplitude")
+        plt.subplot(self.nrows, self.ncols, SignalPlot.IDX_BASE_AMP + self.ncols)
+        plt.specgram(sig, NFFT=NFFT)
+
+    def __plot_phase(self):
+        """Plot the phase of the signal in time and frequency domains in a vertical way."""
+        sig = analyze.get_phase(self.sig)
+        plt.subplot(self.nrows, self.ncols, SignalPlot.IDX_BASE_PHASE)
+        plt.plot(sig)
+        plt.title("Phase")
+        plt.subplot(self.nrows, self.ncols, SignalPlot.IDX_BASE_PHASE + self.ncols)
+        plt.specgram(sig, NFFT=NFFT)
+
+    def plot(self, block=True):
+        """Plot the different components of a signal. If BLOCK is set to False,
+        do not block the program execution while plotting."""
+        if analyze.is_iq(self.sig):
+            self.__plot_amp()
+            self.__plot_phase()
+        else:
+            self.__plot_amp()
+        plt.show(block=block)
+
 def select(candidate):
     global USER_SELECT
     USER_SELECT = False
     fig, _ = plt.subplots()
     fig.canvas.mpl_connect('key_press_event', select_input)
-    plt.subplot(2, 1, 1)
-    plt.plot(candidate)
-    plt.subplot(2, 1, 2)
-    plt.specgram(candidate, NFFT=NFFT)
+    # Ask user confirmation and return choice.
     l.LOGGER.info("Please, press 'y' to select the current trace or 'q' to skip to the next candidate")
-    plt.show(block=True)
-    # Ask user confirmation, return choice.
+    sigplot = SignalPlot(candidate)
+    sigplot.plot(block=True)
     return USER_SELECT
 
 def select_input(event):
