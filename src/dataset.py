@@ -123,8 +123,7 @@ def average_fn(q, dset, sset, i, stop, nb_aes, template, plot):
     if check is True:
         l.LOGGER.warning("error during averaging aes, trace {} filled with zeroes!".format(i))
     # * Plot the averaged trace if wanted.
-    if plot:
-        libplot.plot_time_spec_sync_axis([sset.ff], samp_rate=dset.samp_rate)
+    libplot.plot_time_spec_sync_axis([sset.ff], samp_rate=dset.samp_rate, cond=plot)
     # * Save the processed trace.
     sset.save_trace(nf=False)
     q.put((sset.template, check, i))
