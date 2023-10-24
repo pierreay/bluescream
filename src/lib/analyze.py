@@ -66,8 +66,9 @@ def normalize_zscore(arr, set=False):
 def is_iq(s):
     """Return True is the signal S is composed of IQ samples, False otherwise."""
     return s.dtype == np.complex64
+
 def get_amplitude(traces):
-    """Get the amplitude of one or multuples traces.
+    """Get the amplitude of one or multiples traces.
 
     From the TRACES 2D np.array of shape (nb_traces, nb_samples) or the 1D
     np.array of shape (nb_samples) containing IQ samples, return an array with
