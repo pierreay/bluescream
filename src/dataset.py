@@ -122,8 +122,9 @@ def average_fn(q, dset, sset, i, stop, nb_aes, template, plot):
     check = False
     if i > 0:
         check, sset.ff = analyze.fill_zeros_if_bad(sset.template, sset.ff, log=True, log_idx=i)
-    # * Plot the averaged trace if wanted.
-    libplot.plot_time_spec_sync_axis([sset.ff], samp_rate=dset.samp_rate, cond=plot)
+    # * Plot the averaged trace if wanted and average succeed.
+    if sset.ff is not None:
+        libplot.plot_time_spec_sync_axis([sset.ff], samp_rate=dset.samp_rate, cond=plot)
     # * Save the processed trace.
     sset.save_trace(nf=False)
     q.put((sset.template, check, i))
