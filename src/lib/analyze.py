@@ -94,13 +94,15 @@ def get_trace_format(trace):
         print("Unknown type!")
         return None
 
-def fill_zeros_if_bad(ref, test):
+def fill_zeros_if_bad(ref, test, log=True, log_idx=-1):
     """If a bad trace TEST is given (i.e. wrong shape or None), return a bad
     trace using REF as trace reference. Return a tuple (FLAG, TEST) where FLAG
     is False if trace was OK and True if trace was bad.
 
     """
     if test is None or test.shape != ref.shape:
+        if log is True:
+            l.LOGGER.warning("trace {} filled with zeroes!".format(log_idx))
         return True, get_bad_trace(ref)
     return False, test
 
