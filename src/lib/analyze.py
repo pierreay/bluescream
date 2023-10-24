@@ -139,11 +139,15 @@ def get_bad_trace(ref):
     return np.zeros(ref.shape, dtype=ref.dtype)
 
 def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0, flip=True, plot=False):
-    """Find the start (beginning of the key scheduling) of every AES
-    computation contained in the signal S of sampling rate SR. The signal must
-    contained approximately NB_AES number of AES. BPL, BPH, LP are the bandpass
-    and lowpass filters values used to create the trigger signal. Return the
-    list of start indexes and the Triggers object used for the trigger signal.
+    """Find the indexes of AES computations inside a trace.
+
+    Find the start (beginning of the key scheduling) of every AES computation
+    contained in the signal S of sampling rate SR. The signal must contained
+    approximately NB_AES number of AES. BPL, BPH, LP are the bandpass and
+    lowpass filters values used to create the trigger signal.
+
+    Return the list of start indexes and the Triggers object used for the
+    trigger signal.
 
     """
     assert(isinstance(s, np.ndarray))
