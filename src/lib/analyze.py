@@ -316,26 +316,19 @@ def average_aes(arr, sr, nb_aes, template, plot_enable):
     Return a tuple of the averaged trace (np.ndarray) (or None on error) and the template.
 
     """
-    error = 0
     # * Find AES.
-    arr = analyze.normalize(analyze.get_amplitude(arr))
     # XXX: Find a better way to configure this function than modifying this place of the source code.
     # First version of find_aes used for training set:
     # starts, trigger = analyze.find_aes(arr, sr, 8.8e6, 9.5e6, nb_aes, 1e4, -0.5e-4, flip=True)
     # Second version of find_aes used for attack set:
     # starts, trigger = analyze.find_aes(arr, sr, 8.1e6, 8.5e6, nb_aes, 1e4, -0.5e-4, flip=False)
     # Third version of find_aes used to train set using 10 MHz bandwidth:
-    starts, trigger = analyze.find_aes(arr, sr, 2.9e6, 3.3e6, nb_aes, 1e4, -0.5e-4, flip=True)
+    starts, trigger = analyze.find_aes(arr, sr, 2.9e6, 3.3e6, nb_aes, 1e4, -0.5e-4, flip=True, plot=plot_enable)
     check_nb = len(starts) < (1.1 * nb_aes) and len(starts) > (0.8 * nb_aes)
     if check_nb:
         l.LOGGER.debug("number of detected aes: {}".format(len(starts)))
     else:
         l.LOGGER.error("number of detected aes seems to be aberrant: {}".format(len(starts)))
-        error = 1
-
-    if plot_enable:
-        libplot.plot_time_spec_sync_axis([arr], samp_rate=sr, peaks=starts, triggers=trigger)
-    if error:
         return None, template
 
     # * Select one extraction as template.
