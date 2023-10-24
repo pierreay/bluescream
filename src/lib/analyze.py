@@ -301,7 +301,6 @@ def average(arr):
     """Return the average signal of all signals composing the ARR 2D numpy
     array."""
     assert(arr.ndim == 2)
-
     return np.average(arr, axis=0)
 
 def average_aes(arr, sr, nb_aes, template, plot_enable):
