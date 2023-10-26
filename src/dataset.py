@@ -118,14 +118,14 @@ def average_fn(q, dset, sset, i, stop, nb_aes, template, plot):
     # * Load the trace to process.
     sset.load_trace(i, nf=False, ff=True, check=True)
     # * Get the average of all AES and the template.
-    sset.ff, sset.template = analyze.average_aes(sset.ff, dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot)
+    sset.ff, sset.template = analyze.average_aes(sset.ff, dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot_enable=plot)
     # * Check the trace is valid. The trace #0 is assumed be valid.
     check = False
     if i > 0:
         check, sset.ff = analyze.fill_zeros_if_bad(sset.template, sset.ff, log=True, log_idx=i)
     # * Plot the averaged trace if wanted and average succeed.
     if sset.ff is not None:
-        libplot.plot_time_spec_sync_axis([sset.ff], samp_rate=dset.samp_rate, cond=plot)
+        libplot.plot_time_spec_sync_axis([sset.ff], samp_rate=dset.samp_rate, cond=plot, comp=complex.CompType.AMPLITUDE)
     # * Save the processed trace.
     sset.save_trace(nf=False)
     q.put((sset.template, check, i))
