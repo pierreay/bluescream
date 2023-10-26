@@ -16,6 +16,7 @@ import lib.plot as libplot
 import lib.filters as filters
 import lib.triggers as triggers
 import lib.soapysdr as soapysdr
+import lib.complex as complex
 
 def exit_on_cond(cond, ret=1):
     if cond is True:
@@ -142,7 +143,7 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
     l.LOGGER.debug("peak search prominence={}".format(trg_peak_prominence))
 
     # * Loading.
-    sig_raw_ref = analyze.normalize(analyze.get_amplitude(load.load_raw_trace(DIR, id_ref, 0)))
+    sig_raw_ref = analyze.normalize(complex.get_amplitude(load.load_raw_trace(DIR, id_ref, 0)))
 
     # * Triggering.
     assert(len(trg_bp_low) == len(trg_bp_high))
@@ -216,8 +217,8 @@ def plot(samp_rate, amplitude, phase, nf_id, ff_id):
     # Truncate the traces to the exact size for plotting using synchronized axis.
     load.truncate_min(s_arr)
     # Get only one component of the IQ if needed.
-    component_func = analyze.get_amplitude if amplitude else None
-    component_func = analyze.get_phase if phase else component_func
+    component_func = complex.get_amplitude if amplitude else None
+    component_func = complex.get_phase if phase else component_func
     if component_func is not None:
         s_arr = component_func(s_arr)
     # Plot the result.

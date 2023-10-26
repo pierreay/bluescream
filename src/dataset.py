@@ -27,6 +27,7 @@ import lib.plot as libplot
 import lib.filters as filters
 import lib.triggers as triggers
 import lib.dataset as dataset
+import lib.complex as complex
 
 def load_dataset_or_quit(indir, subset=None, outdir=None):
     dset = dataset.Dataset.pickle_load(indir, quit_on_error=True)
@@ -255,7 +256,7 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
             dset.dirty_idx = i
             sset.load_trace(i, nf=False, ff=True, check=True)
             # * Find AES and check for error.
-            sset.ff = analyze.get_amplitude(sset.ff)
+            sset.ff = complex.get_amplitude(sset.ff)
             starts, trigger = analyze.find_aes(sset.ff, dset.samp_rate, 1e6, 10e6, 1, lp=1e5, offset=-1.5e-4, flip=False)
             # XXX: Refactor all of the following insde the find_aes function?
             if len(starts) == 1:

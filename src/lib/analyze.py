@@ -12,6 +12,7 @@ import lib.plot as libplot
 import lib.filters as filters
 import lib.triggers as triggers
 import lib.analyze as analyze
+import lib.complex as complex
 
 # Note about implementation:
 # - We often use np.copy when it comes to get a smaller portion of a
@@ -62,44 +63,6 @@ def normalize_zscore(arr, set=False):
     if std != 0:
         arr = (arr - mu) / std
     return arr
-
-def is_iq(s):
-    """Return True is the signal S is composed of IQ samples, False otherwise."""
-    return s.dtype == np.complex64
-
-def get_amplitude(traces):
-    """Get the amplitude of one or multiples traces.
-
-    From the TRACES 2D np.array of shape (nb_traces, nb_samples) or the 1D
-    np.array of shape (nb_samples) containing IQ samples, return an array with
-    the same shape containing the amplitude of the traces.
-
-    If traces contains signals in another format than np.complex64, silently
-    return the input traces such that this function can be called multiple
-    times.
-
-    """
-    if traces.dtype == np.complex64:
-        return np.abs(traces)
-    else:
-        return traces
-
-def get_phase(traces):
-    """Get the phase of one or multiples traces.
-
-    From the TRACES 2D np.array of shape (nb_traces, nb_samples) or the 1D
-    np.array of shape (nb_samples) containing IQ samples, return an array with
-    the same shape containing the phase of the traces.
-
-    If traces contains signals in another format than np.complex64, silently
-    return the input traces such that this function can be called multiple
-    times.
-
-    """
-    if traces.dtype == np.complex64:
-        return np.angle(traces)
-    else:
-        return traces
 
 def flip_normalized_signal(s):
     """Flip upside-down a normalized signal S in time-domain contained in a 1D
@@ -291,53 +254,6 @@ def align_all(s, sr, template=None, tqdm_log=True):
     """
     return align_nb(s, len(s), sr, template if template is not None else s[0], tqdm_log)
 
-def complex_p2r(radii, angles):
-    """Complex polar to regular.
-
-    Convert a complex number from Polar coordinate to Regular (Cartesian)
-    coordinates.
-
-    The input and output is symmetric to the complex_r2p() function. RADII is
-    the magnitude while ANGLES is the angles in radians (default for
-    np.angle()).
-
-    Example using complex_r2p for a regular-polar-regular conversion:
-    > polar = complex_r2p(2d_ndarray_containing_iq)
-    > polar[0].shape
-    (262, 2629)
-    > polar[1].shape
-    (262, 2629)
-    > regular = complex_p2r(polar[0], polar[1])
-    > regular.shape
-    (262, 2629)
-    > np.array_equal(arr, regular)
-    False
-    > np.isclose(arr, regular)
-    array([[ True,  True,  True, ...,  True,  True,  True], ..., [ True,  True,  True, ...,  True,  True,  True]])
-
-    Source: https://stackoverflow.com/questions/16444719/python-numpy-complex-numbers-is-there-a-function-for-polar-to-rectangular-co?rq=4
-    """
-    return radii * np.exp(1j * angles)
-
-def complex_r2p(x):
-    """Complex regular to polar.
-
-    Convert a complex number from Regular (Cartesian) coordinates to Polar
-    coordinates.
-
-    The input X can be a 1) single complex number 2) a 1D ndarray of complex
-    numbers 3) a 2D ndarray of complex numbers. The returned output is a tuple
-    composed of a 1) two scalars (float32) representing magnitude and phase 2)
-    two ndarray containing the scalars.
-
-    Example using a 2D ndarray as input:
-    complex_r2p(arr)[0][1][0] -> magnitude of 1st IQ of 2nd trace.2
-    complex_r2p(arr)[1][0][1] -> phase of 2nd IQ of 1st trace.
-
-    Source: https://stackoverflow.com/questions/16444719/python-numpy-complex-numbers-is-there-a-function-for-polar-to-rectangular-co?rq=4
-    """
-    return np.abs(x), np.angle(x)
-
 def average(arr, norm=False):
     """Average a series of signals between them.
 
@@ -351,9 +267,9 @@ def average(arr, norm=False):
     """
     assert(arr.ndim == 2)
     # 2D array (traces) of signal's IQ.
-    if is_iq(arr):
-        arr_polar = complex_r2p(arr)
-        return complex_p2r(average(arr_polar[0]), average(arr_polar[1]))
+    if complex.is_iq(arr):
+        arr_polar = complex.r2p(arr)
+        return complex.p2r(average(arr_polar[0]), average(arr_polar[1]))
     # 2D array (traces) of signal's amplitude or phase.
     else:
         return np.average(arr, axis=0)

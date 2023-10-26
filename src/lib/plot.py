@@ -6,6 +6,7 @@ import matplotlib.pyplot as plt
 
 import lib.log as l
 import lib.analyze as analyze
+import lib.complex as complex
 
 # * Global variables
 
@@ -189,11 +190,11 @@ class SignalPlot():
         self.sig = sig
         # Compute the number of columns and rows depending on the signal type.
         self.nrows = 2
-        self.ncols = 2 if analyze.is_iq(self.sig) else 1
+        self.ncols = 2 if complex.is_iq(self.sig) else 1
 
     def __plot_amp(self):
         """Plot the amplitude of the signal in time and frequency domains in a vertical way."""
-        sig = analyze.get_amplitude(self.sig)
+        sig = complex.get_amplitude(self.sig)
         plt.subplot(self.nrows, self.ncols, SignalPlot.IDX_BASE_AMP)
         plt.plot(sig)
         plt.title("Amplitude")
@@ -202,7 +203,7 @@ class SignalPlot():
 
     def __plot_phase(self):
         """Plot the phase of the signal in time and frequency domains in a vertical way."""
-        sig = analyze.get_phase(self.sig)
+        sig = complex.get_phase(self.sig)
         plt.subplot(self.nrows, self.ncols, SignalPlot.IDX_BASE_PHASE)
         plt.plot(sig)
         plt.title("Phase")
@@ -212,7 +213,7 @@ class SignalPlot():
     def plot(self, block=True):
         """Plot the different components of a signal. If BLOCK is set to False,
         do not block the program execution while plotting."""
-        if analyze.is_iq(self.sig):
+        if complex.is_iq(self.sig):
             self.__plot_amp()
             self.__plot_phase()
         else:

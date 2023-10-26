@@ -11,6 +11,7 @@ import lib.analyze as analyze
 import lib.filters as filters
 import lib.plot as libplot
 import lib.debug as debug
+import lib.complex as complex
 
 SMALL_SIZE = 8*4
 MEDIUM_SIZE = 10*4
@@ -105,7 +106,7 @@ def load_data(subset):
     PLAINTEXTS                  = PLAINTEXTS.tolist()
     KEYS                        = KEYS.tolist()
     TRACES                      = load.truncate(TRACES, START_POINT, END_POINT)
-    TRACES                      = analyze.get_amplitude(TRACES)
+    TRACES                      = complex.get_amplitude(TRACES)
     if NORM or NORM2:
         TRACES = analyze.normalize_zscore(TRACES, NORM2)
     assert(isinstance(PLAINTEXTS, list))
