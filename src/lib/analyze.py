@@ -260,18 +260,26 @@ def average(arr, norm=False):
     Return the average signal of all signals composing the ARR 2D numpy
     array. The signals can be IQ or amplitude/phase.
 
-    If NORM is set to True, normalize each signals individually. Depending on
-    the usage, it may not make sense to average signal without normalization if
-    signals are representing the same transmission/operation.
+    If NORM is set to True, normalize each signals individually. If signals are
+    IQ, normalize each components (amplitude and phase) individually. Depending
+    on the usage, it may not make sense to average signal without normalization
+    if signals are representing the same transmission/operation.
 
     """
     assert(arr.ndim == 2)
     # 2D array (traces) of signal's IQ.
     if complex.is_iq(arr):
-        arr_polar = complex.r2p(arr)
-        return complex.p2r(average(arr_polar[0]), average(arr_polar[1]))
+        arr_polar_amp, arr_polar_phase = complex.r2p(arr)
+        # Normalize before averaging if requested.
+        if norm is True:
+            arr_polar_amp = analyze.normalize(arr_polar_amp)
+            arr_polar_phase = analyze.normalize(arr_polar_phase)
+        return complex.p2r(average(arr_polar_amp), average(arr_polar_phase))
     # 2D array (traces) of signal's amplitude or phase.
     else:
+        # Normalize before averaging if requested.
+        if norm is True:
+            arr = analyze.normalize(arr)
         return np.average(arr, axis=0)
 
 def average_aes(arr, sr, nb_aes, template, plot_enable=True):
