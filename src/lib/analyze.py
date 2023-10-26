@@ -274,7 +274,7 @@ def average(arr, norm=False):
     else:
         return np.average(arr, axis=0)
 
-def average_aes(arr, sr, nb_aes, template, plot_enable):
+def average_aes(arr, sr, nb_aes, template, plot_enable=True):
     """Average multiple AES execution contained in trace ARR into a single
     trace. To average multiple AES runs inside one trace, this command will
     perform:
