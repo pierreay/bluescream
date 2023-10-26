@@ -213,8 +213,13 @@ def align(template, target, sr, ignore=True, log=False):
 
     Return the TARGET signal aligned (1D np.array) using cross-correlation
     along the TEMPLATE signal, where SR is the sampling rates of signals. The
-    shift is filled with zeros shuch that shape is not modified. If IGNORE is
-    set to false, raise an assertion for high shift values.
+    shift is filled with zeros shuch that shape is not modified.
+
+    - If IGNORE is set to false, raise an assertion for high shift values.
+    - If LOG is set to True, log the shift produced by the cross-correlation.
+
+    NOTE: The cross-correlation shift is computed based on amplitude
+    (np.float64) of signals.
 
     """
     # +++===+++++++++
@@ -222,9 +227,10 @@ def align(template, target, sr, ignore=True, log=False):
     # ===++++++++++++ -> shift < 0 -> shift right target -> shrink template from left or pad target to left
     assert(template.shape == target.shape)
     assert(template.ndim == 1 and target.ndim == 1)
+    # Compute the cross-correlation and find shift across amplitude.
     lpf_freq     = sr / 4
-    template_lpf = filters.butter_lowpass_filter(template, lpf_freq, sr)
-    target_lpf   = filters.butter_lowpass_filter(target, lpf_freq, sr)
+    template_lpf = filters.butter_lowpass_filter(complex.get_amplitude(template), lpf_freq, sr)
+    target_lpf   = filters.butter_lowpass_filter(complex.get_amplitude(target), lpf_freq, sr)
     corr         = signal.correlate(target_lpf, template_lpf)
     shift        = np.argmax(corr) - (len(template) - 1)
     # Log and check shift value.
