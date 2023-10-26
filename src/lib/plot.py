@@ -36,29 +36,49 @@ def plot_loop(arr, func, nb=0):
         if nb and i == nb:
             break
 
-def plot_time_simple(s):
-    """Show signals' in time-domain on different windows."""
+def plot_time_simple(s, comp=complex.CompType.AMPLITUDE):
+    """Show signals' in time-domain on different windows.
+
+    COMP can be set to enumeration of AMPLITUDE or PHASE to print only one
+    component of a complex signal.
+
+    """
     s = [s] if isinstance(s, np.ndarray) and s.ndim == 1 else s
     assert(len(s) < 15)
     for i in range(len(s)):
+        # Get the corresponding component of the signal.
+        s_i = complex.get_comp(s[i], comp)
         plt.figure()
-        plt.plot(s[i])
+        plt.plot(s_i)
         plt.title("idx={}".format(i))
     plt.show()
 
-def plot_spec_simple(s):
-    """Show signals' spectrogram on different windows."""
+def plot_spec_simple(s, comp=complex.CompType.AMPLITUDE):
+    """Show signals' spectrogram on different windows.
+
+    COMP can be set to enumeration of AMPLITUDE or PHASE to print only one
+    component of a complex signal.
+
+    """
     s = [s] if isinstance(s, np.ndarray) and s.ndim == 1 else s
     assert(len(s) < 15)
     for i in range(len(s)):
+        # Get the corresponding component of the signal.
+        s_i = complex.get_comp(s[i], comp)
         plt.figure()
-        plt.specgram(s[i], NFFT)
+        plt.specgram(s_i, NFFT)
         plt.title("idx={}".format(i))
     plt.show()
 
-def plot_simple(s):
-    plot_time_simple(s)
-    plot_spec_simple(s)
+def plot_simple(s, comp=complex.CompType.AMPLITUDE):
+    """Plot signal(s) in time and frequency domains.
+
+    COMP can be set to enumeration of AMPLITUDE or PHASE to print only one
+    component of a complex signal.
+
+    """
+    plot_time_simple(s, comp=comp)
+    plot_spec_simple(s, comp=comp)
 
 def plot_time_compare_2(s1, s2):
     assert(s1.shape == s2.shape)
