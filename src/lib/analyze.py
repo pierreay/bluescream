@@ -337,11 +337,26 @@ def complex_r2p(x):
     Source: https://stackoverflow.com/questions/16444719/python-numpy-complex-numbers-is-there-a-function-for-polar-to-rectangular-co?rq=4
     """
     return np.abs(x), np.angle(x)
-def average(arr):
-    """Return the average signal of all signals composing the ARR 2D numpy
-    array."""
+
+def average(arr, norm=False):
+    """Average a series of signals between them.
+
+    Return the average signal of all signals composing the ARR 2D numpy
+    array. The signals can be IQ or amplitude/phase.
+
+    If NORM is set to True, normalize each signals individually. Depending on
+    the usage, it may not make sense to average signal without normalization if
+    signals are representing the same transmission/operation.
+
+    """
     assert(arr.ndim == 2)
-    return np.average(arr, axis=0)
+    # 2D array (traces) of signal's IQ.
+    if is_iq(arr):
+        arr_polar = complex_r2p(arr)
+        return complex_p2r(average(arr_polar[0]), average(arr_polar[1]))
+    # 2D array (traces) of signal's amplitude or phase.
+    else:
+        return np.average(arr, axis=0)
 
 def average_aes(arr, sr, nb_aes, template, plot_enable):
     """Average multiple AES execution contained in trace ARR into a single
