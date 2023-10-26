@@ -119,8 +119,8 @@ def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0, flip=True, plot=Fa
     """
     assert(isinstance(s, np.ndarray))
     # * Pre-processing.
-    # This function will work on the amplitude only and on a normalized signal.
-    s = analyze.normalize(analyze.get_amplitude(s))
+    # This function will work on the amplitude and not the phase of the signal.
+    s = complex.get_amplitude(s)
 
     # * Trigger signal.
     trigger   = triggers.Trigger(s, bpl, bph, lp, sr)
