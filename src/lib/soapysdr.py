@@ -148,6 +148,9 @@ class MySoapySDR():
     # space but requires conversion happening in this module, since Numpy can
     # only work with np.complex64 using float32.
     DTYPE = np.dtype([('real', np.int16), ('imag', np.int16)])
+    # XXX: May be simpler to use np.float16?
+    # To not waste space but get ride of int <-> float casting/rescaling? Since
+    # we need float anyway for signal processing...
 
     @staticmethod
     def numpy_save(file, arr):
