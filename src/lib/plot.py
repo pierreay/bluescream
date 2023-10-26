@@ -56,10 +56,6 @@ def plot_spec_simple(s):
         plt.title("idx={}".format(i))
     plt.show()
 
-def save_spec_simple(s, i=0):
-    plt.specgram(s, NFFT)
-    savetmp("spec{}.png".format(i))
-
 def plot_simple(s):
     plot_time_simple(s)
     plot_spec_simple(s)
