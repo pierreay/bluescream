@@ -15,6 +15,10 @@ Functions:
 """
 
 import numpy as np
+from enum import Enum
+
+# Enumeration of components type of a signal.
+CompType = Enum('CompType', ['AMPLITUDE', 'PHASE'])
 
 def is_iq(s):
     """Return True is the signal S is composed of IQ samples, False otherwise."""
@@ -53,6 +57,23 @@ def get_phase(traces):
         return np.angle(traces)
     else:
         return traces
+
+def get_comp(traces, comp):
+    """Get a choosen component.
+
+    Return the choosen component of signals contained in the 1D or 2D ndarray
+    TRACES according to COMP set to CompType.AMPLITUDE or CompType.PHASE.
+
+    If the signals contained in TRACES are already of the given component, this
+    function will do nothing.
+
+    """
+    assert type(traces) == np.ndarray, "traces should be numpy array"
+    assert comp in CompType, "comp is set to a bad value instead of the enum"
+    if comp == CompType.AMPLITUDE:
+        return get_amplitude(traces)
+    elif comp == CompType.PHASE:
+        return get_phase(traces)
 
 def p2r(radii, angles):
     """Complex polar to regular.

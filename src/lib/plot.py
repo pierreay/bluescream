@@ -83,18 +83,24 @@ def plot_time_compare_n(arr):
 
 # * Special plot for analysis
 
-def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, cond=True):
+def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, cond=True, comp=complex.CompType.AMPLITUDE):
     """Plot signals using synchronized time and frequency domains.
 
     Plot signals contained in the S_ARR array. They must be recorded at the
-    sample rate, which can be specified using SAMP_RATE to duration. PEAKS can
-    be set to an array of indexes to use as vline. TRIGGERS can be set to to a
-    Triggers class containing trigger signals to display. COND can be set to
-    False to not plot and return immediatly.
+    same sample rate, which can be specified using SAMP_RATE to show duration.
+
+    - PEAKS can be set to an array of indexes to use as vline.
+    - TRIGGERS can be set to to a Triggers class containing trigger signals to
+      display.
+    - COND can be set to False to not plot and return immediatly.
+    - COMP can be set to enumeration of AMPLITUDE or PHASE to print only one
+      component of a complex signal.
 
     """
     if cond is False:
         return
+    # Get the corresponding component of the signal and convert s_arr into Numpy array.
+    s_arr = complex.get_comp(np.array(s_arr), comp)
     SUBPLOT_NB = len(s_arr) * 2
     def plot_init(nsamples, duration, nb = 1):
         t = np.linspace(0, duration, nsamples)
