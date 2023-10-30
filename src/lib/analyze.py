@@ -134,6 +134,25 @@ def normalize_generic(values, bounds):
     """
     assert values.dtype == np.float32 or values.dtype == np.float64
     return bounds['desired']['lower'] + (values - bounds['actual']['lower']) * (bounds['desired']['upper'] - bounds['desired']['lower']) / (bounds['actual']['upper'] - bounds['actual']['lower'])
+
+def is_normalized(values):
+    """Return True if values contained in VALUES are normalized.
+
+    VALUES is a 1D ndarray containing floating-points numbers.
+
+    NOTE: In this function, we assume normalization means min-max feature
+    scaling (floats between 0 and 1).
+
+    NOTE: VALUES cannot contains IQ (complex numbers) as it doesn't make sense
+    to have a normalized signal (assuming 0 and 1) in the cartesian / regular
+    representation.
+
+    """
+    assert type(values) == np.ndarray
+    assert values.ndim == 1
+    assert values.dtype == np.float32 or values.dtype == np.float64
+    return values[values < 0].shape == (0,) and values[values > 1].shape == (0,)
+
 def flip_normalized_signal(s):
     """Flip upside-down a normalized signal S in time-domain contained in a 1D
     np.array.
