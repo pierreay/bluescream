@@ -11,6 +11,7 @@ import lib.load as load
 import lib.log as l
 import lib.plot as libplot
 
+TraceType = Enum('TraceType', ['NF', 'FF'])
 SubsetType = Enum('SubsetType', ['TRAIN', 'ATTACK'])
 InputType = Enum('InputType', ['FIXED', 'VARIABLE'])
 InputGeneration = Enum('InputGeneration', ['REAL_TIME', 'INIT_TIME'])
@@ -333,6 +334,25 @@ class Subset():
 
         """
         return path.join(self.dataset.dir if not save else self.dataset.dirsave, self.dir)
+
+    def replace_trace(self, sig, typ):
+        """Replace traces with new one(s).
+
+        This function has to be used when we want to register new trace(s) in a
+        subset which doesn't have the same shape, for example after a
+        processing (e.g. extraction). Hence, all previously contained traces
+        will be replaced by the new one(s).
+
+        SIG is a ND np.ndarray containing trace(s), TYP is a TraceType.[NF|FF]
+        to choose between near-field trace or far-field trace.
+
+        """
+        if typ == TraceType.NF:
+            del self.nf
+            self.nf = np.array(sig, ndmin=2)
+        elif typ == TraceType.FF:
+            del self.ff
+            self.ff = np.array(sig, ndmin=2)
 
     def __str__(self):
         string = "subset '{}':\n".format(self.name)
