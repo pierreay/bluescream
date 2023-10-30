@@ -12,6 +12,9 @@ import SoapySDR
 
 import lib.log as l
 import lib.load as load
+import lib.analyze as analyze
+import lib.plot as libplot
+import lib.complex as complex
 
 # Path of the FIFO file used between MySoapySDRs and MySoapySDRsClient.
 FIFO_PATH = "/tmp/soapysdr.fifo"
@@ -190,6 +193,11 @@ class MySoapySDR():
         """Convert an array from a standard np.complex64 (composed of 2
         np.float32) to our custom DTYPE."""
         assert(arr.dtype == np.complex64)
+        # Check that the signal ready to convert is not normalized, otherwise,
+        # it will give a zeroed signal. It should not happened with the
+        # hardened complex.p2r() function.
+        assert not analyze.is_normalized(complex.get_amplitude(arr)), "tried to save normalized signal, it will give a zeroed signal"
+        assert not analyze.is_normalized(complex.get_phase(arr)), "tried to save normalized signal, it will give a zeroed signal"
         # Check that no value contained in arr is superior to maximum or
         # inferior to minimum of np.int16 (-2^15 or +2^15), since casting from
         # np.float32 to np.int16 is not safe.
