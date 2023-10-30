@@ -181,7 +181,7 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
     # Load traces one by one since traces containing multiple AES executions
     # can be large (> 30 MB).
     with logging_redirect_tqdm(loggers=[l.LOGGER]):
-        with tqdm(total=stop, desc="average") as pbar:
+        with tqdm(initial=start, total=stop, desc="average") as pbar:
             i = start
             while i < stop:
                 # * Load trace and save current processing step in dataset.
