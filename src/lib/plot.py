@@ -102,8 +102,9 @@ def plot_time_compare_n(arr):
 def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, cond=True, comp=complex.CompType.AMPLITUDE, norm=False):
     """Plot signals using synchronized time and frequency domains.
 
-    Plot signals contained in the S_ARR array. They must be recorded at the
-    same sample rate, which can be specified using SAMP_RATE to show duration.
+    Plot signals contained in the S_ARR 2D np.ndarray or list containing 1D
+    np.ndarray. They must be recorded at the same sample rate, which can be
+    specified using SAMP_RATE to show duration.
 
     - PEAKS can be set to an array of indexes to use as vline.
     - TRIGGERS can be set to to a Triggers class containing trigger signals to
