@@ -42,7 +42,53 @@ def print_traces_idx_with_ks_n_pt_equal(ks, pt):
 
 # * Trace-level
 
-def normalize(arr):
+from enum import Enum
+
+NormMethod = Enum('NormMethod', ['MINMAX', 'ZSCORE', 'COMPLEX_ABS', 'COMPLEX_ANGLE'])
+
+def normalize(arr, method=NormMethod.MINMAX, arr_complex=False):
+    """Return a normalized ARR array.
+
+    Set method to NormMethod.MINMAX to normalize using min-max feature scaling.
+
+    Set method to NormMethod.ZSCORE to normalize using zscore normalization.
+
+    Set method to NormMethod.COMPLEX_ABS to normalize between range of absolute
+    value of a complex number.
+
+    Set method to NormMethod.COMPLEX_ANGLE to normalize between range of angle
+    of a complex number.
+
+    By default, ARR is a ND np.ndarray containing floating points numbers. It
+    should not contains IQ, as normalizing complex numbers doesn't makes sense
+    (leads to artifacts). The normalization has to be applied on the magnitude
+    and angle of the complex numbers, obtained using polar representation with
+    complex.r2p(). Normalizing and converting back to regular representation
+    just after doesn't make sense, since the normalization is reverted in the
+    complex.p2r() function. Hence, we offer the optional ARR_COMPLEX option. If
+    ARR_COMPLEX is set to True, ARR must contains complex numbers, and it will
+    be returned a tuple composed of the normalized amplitude and the normalized
+    angle. We use an explicit option to more easily show what is the input and
+    output in the code that will use this function.
+
+    """
+    assert method in NormMethod
+    if arr_complex is True:
+        assert complex.is_iq(arr), "normalization input should be complex numbers"
+        arr_polar = complex.r2p(arr)
+        return normalize(arr_polar[0], method=method), normalize(arr_polar[1], method=method)
+    else:
+        assert arr.dtype == np.float32 or arr.dtype == np.float64, "normalization input should be floating points numbers"
+        if method == NormMethod.MINMAX:
+            return normalize_minmax(arr)
+        elif method == NormMethod.ZSCORE:
+            return normalize_zscore(arr)
+        elif method == NormMethod.COMPLEX_ABS:
+            # Refer to complex.is_p2r_ready() and complex.r2p() for bounds reference.
+            return analyze.normalize_generic(arr, {'actual': {'lower': arr.min(), 'upper': arr.max()}, 'desired': {'lower': 0, 'upper': np.iinfo(np.int16).max}})
+        elif method == NormMethod.COMPLEX_ANGLE:
+            # Refer to complex.is_p2r_ready() and complex.r2p() for bounds reference.
+            return analyze.normalize_generic(arr, {'actual': {'lower': arr.min(), 'upper': arr.max()}, 'desired': {'lower': -np.pi, 'upper': np.pi}})
     """Apply min-max feature scaling normalization to a 1D np.array ARR
     representing the amplitude of a signal."""
     # Do not normalize I/Q samples (complex numbers). It will center the
