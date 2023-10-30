@@ -17,6 +17,8 @@ Functions:
 import numpy as np
 from enum import Enum
 
+import lib.analyze as analyze
+
 # Enumeration of components type of a signal.
 CompType = Enum('CompType', ['AMPLITUDE', 'PHASE'])
 
@@ -74,6 +76,28 @@ def get_comp(traces, comp):
         return get_amplitude(traces)
     elif comp == CompType.PHASE:
         return get_phase(traces)
+
+def is_p2r_ready(radii, angles):
+    """Check if polar complex can be converted to regular complex.
+
+    Return True if values contained in RADII and ANGLES are in the acceptable
+    ranges for the P2R (polar to regular) conversion. Without ensuring this,
+    the conversion may lead to aberrant values.
+
+    RADII and ANGLES can be ND np.ndarray containing floating points values.
+
+    """
+    # Check that RADII and ANGLES are not normalized.
+    norm = analyze.is_normalized(radii) or analyze.is_normalized(angles)
+    # Check that 0 <= RADII <= 2^16. NOTE: RADII is computed like the following
+    # with maximum value of 16 bits integers (because we use CS16 from
+    # SoapySDR):
+    # sqrt((2^16)*(2^16) + (2^16)*(2^16)) = 92681
+    # Hence, should we use 2^17 instead?
+    radii_interval = radii[radii < 0].shape == (0,) and radii[radii > np.iinfo(np.uint16).max].shape == (0,)
+    # Check that -PI <= ANGLES <= PI.
+    angles_interval = angles[angles < -np.pi].shape == (0,) and angles[angles > np.pi].shape == (0,)
+    return not norm and radii_interval and angles_interval
 
 def p2r(radii, angles):
     """Complex polar to regular.
