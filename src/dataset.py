@@ -256,6 +256,7 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
             dset.dirty_idx = i
             sset.load_trace(i, nf=False, ff=True, check=True)
             # * Find AES and check for error.
+            # XXX: I think the following line will not work since dtype are different... To test.
             sset.ff[0] = complex.get_amplitude(sset.ff[0])
             starts, trigger = analyze.find_aes(sset.ff[0], dset.samp_rate, 1e6, 10e6, 1, lp=1e5, offset=-1.5e-4, flip=False)
             # XXX: Refactor all of the following insde the find_aes function?
@@ -283,6 +284,7 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
                 aligned = None
             # * Check the trace is valid. The trace #0 is assumed be valid.
             check = False
+            # XXX: Is the trace #0 saved if we do not enter this block, since this block seems to save at the same time at checking?
             if i > 0:
                 check, sset.ff[0] = analyze.fill_zeros_if_bad(sset.template, aligned, log=True, log_idx=i)
             if check is True:
