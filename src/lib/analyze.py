@@ -141,7 +141,8 @@ def is_normalized(values):
     VALUES is a 1D ndarray containing floating-points numbers.
 
     NOTE: In this function, we assume normalization means min-max feature
-    scaling (floats between 0 and 1).
+    scaling (floats between 0 and 1) and that a zeroed signal is not a
+    normalized signal.
 
     NOTE: VALUES cannot contains IQ (complex numbers) as it doesn't make sense
     to have a normalized signal (assuming 0 and 1) in the cartesian / regular
@@ -151,7 +152,9 @@ def is_normalized(values):
     assert type(values) == np.ndarray
     assert values.ndim == 1
     assert values.dtype == np.float32 or values.dtype == np.float64
-    return values[values < 0].shape == (0,) and values[values > 1].shape == (0,)
+    zeroed = values.nonzero()[0].shape == (0,)
+    interval = values[values < 0].shape == (0,) and values[values > 1].shape == (0,)
+    return not zeroed and interval
 
 def flip_normalized_signal(s):
     """Flip upside-down a normalized signal S in time-domain contained in a 1D
