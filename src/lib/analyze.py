@@ -364,12 +364,8 @@ def average(arr, norm=False):
     assert(arr.ndim == 2)
     # 2D array (traces) of signal's IQ.
     if complex.is_iq(arr):
-        arr_polar_amp, arr_polar_phase = complex.r2p(arr)
-        # Normalize before averaging if requested.
-        if norm is True:
-            arr_polar_amp = analyze.normalize(arr_polar_amp)
-            arr_polar_phase = analyze.normalize(arr_polar_phase)
-        return complex.p2r(average(arr_polar_amp), average(arr_polar_phase))
+        arr_polar = complex.r2p(arr)
+        return complex.p2r(average(arr_polar[0], norm=norm), average(arr_polar[1], norm=norm))
     # 2D array (traces) of signal's amplitude or phase.
     else:
         # Normalize before averaging if requested.
