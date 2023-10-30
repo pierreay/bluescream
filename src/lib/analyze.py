@@ -101,11 +101,19 @@ def normalize_minmax(arr):
     return (arr - np.min(arr)) / (np.max(arr) - np.min(arr))
 
 def normalize_zscore(arr, set=False):
-    """Normalize a trace using Z-Score normalization. Taken from load.py from
-    Screaming Channels. If SET is set to TRUE, apply normalization on the
-    entire set instead of on each trace individually."""
+    """Normalize a trace using Z-Score normalization.
+
+    Z-Score Normalization will converts data into a normal distribution with a
+    mean of 0 and a standard deviation of 1.
+
+    If SET is set to TRUE, apply normalization on the entire set instead of on
+    each trace individually.
+
+    Source: load.py from original Screaming Channels.
+
+    """
     # Do not normalize I/Q samples (complex numbers).
-    assert(arr.dtype == np.float32 or arr.dtype == np.float64)
+    assert arr.dtype == np.float32 or arr.dtype == np.float64
     mu = np.average(arr) if set is False else np.average(arr, axis=0)
     std = np.std(arr) if set is False else np.std(arr, axis=0)
     if std != 0:
