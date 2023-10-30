@@ -109,6 +109,9 @@ def p2r(radii, angles):
     the magnitude while ANGLES is the angles in radians (default for
     np.angle()).
 
+    NOTE: This function will revert previous normalization as the range of
+    values of RADII and ANGLES are mathematically important for the conversion.
+
     Example using r2p for a regular-polar-regular conversion:
     > polar = r2p(2d_ndarray_containing_iq)
     > polar[0].shape
@@ -124,7 +127,11 @@ def p2r(radii, angles):
     array([[ True,  True,  True, ...,  True,  True,  True], ..., [ True,  True,  True, ...,  True,  True,  True]])
 
     Source: https://stackoverflow.com/questions/16444719/python-numpy-complex-numbers-is-there-a-function-for-polar-to-rectangular-co?rq=4
+
     """
+    if not is_p2r_ready(radii, angles):
+        radii  = analyze.normalize(radii,  method=analyze.NormMethod.COMPLEX_ABS)
+        angles = analyze.normalize(angles, method=analyze.NormMethod.COMPLEX_ANGLE)
     return radii * np.exp(1j * angles)
 
 def r2p(x):
@@ -144,4 +151,6 @@ def r2p(x):
 
     Source: https://stackoverflow.com/questions/16444719/python-numpy-complex-numbers-is-there-a-function-for-polar-to-rectangular-co?rq=4
     """
+    # abs   = [ 0   ; +inf ] ; sqrt(a^2 + b^2)
+    # angle = [ -PI ; +PI  ] ; angle in rad
     return np.abs(x), np.angle(x)
