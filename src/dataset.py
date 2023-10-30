@@ -118,14 +118,14 @@ def average_fn(q, dset, sset, i, stop, nb_aes, template, plot):
     # * Load the trace to process.
     sset.load_trace(i, nf=False, ff=True, check=True)
     # * Get the average of all AES and the template.
-    sset.ff, sset.template = analyze.average_aes(sset.ff, dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot_enable=plot)
+    sset.ff[0], sset.template = analyze.average_aes(sset.ff[0], dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot_enable=plot)
     # * Check the trace is valid. The trace #0 is assumed be valid.
     check = False
     if i > 0:
-        check, sset.ff = analyze.fill_zeros_if_bad(sset.template, sset.ff, log=True, log_idx=i)
+        check, sset.ff[0] = analyze.fill_zeros_if_bad(sset.template, sset.ff[0], log=True, log_idx=i)
     # * Plot the averaged trace if wanted and average succeed.
-    if sset.ff is not None:
-        libplot.plot_time_spec_sync_axis([sset.ff], samp_rate=dset.samp_rate, cond=plot, comp=complex.CompType.AMPLITUDE)
+    if sset.ff[0] is not None:
+        libplot.plot_time_spec_sync_axis(sset.ff[0:1], samp_rate=dset.samp_rate, cond=plot, comp=complex.CompType.AMPLITUDE)
     # * Save the processed trace.
     sset.save_trace(nf=False)
     q.put((sset.template, check, i))
@@ -256,8 +256,8 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
             dset.dirty_idx = i
             sset.load_trace(i, nf=False, ff=True, check=True)
             # * Find AES and check for error.
-            sset.ff = complex.get_amplitude(sset.ff)
-            starts, trigger = analyze.find_aes(sset.ff, dset.samp_rate, 1e6, 10e6, 1, lp=1e5, offset=-1.5e-4, flip=False)
+            sset.ff[0] = complex.get_amplitude(sset.ff[0])
+            starts, trigger = analyze.find_aes(sset.ff[0], dset.samp_rate, 1e6, 10e6, 1, lp=1e5, offset=-1.5e-4, flip=False)
             # XXX: Refactor all of the following insde the find_aes function?
             if len(starts) == 1:
                 l.LOGGER.debug("number of detected aes: {}".format(len(starts)))
@@ -265,26 +265,26 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
                 l.LOGGER.error("number of detected aes is aberrant: {}".format(len(starts)))
                 # If plot is ON, we are debugging/configuring or processing trace #1, hence don't continue.
                 if plot:
-                    libplot.plot_time_spec_sync_axis([sset.ff], samp_rate=dset.samp_rate, peaks=starts, triggers=trigger)
+                    libplot.plot_time_spec_sync_axis(sset.ff[0:1], samp_rate=dset.samp_rate, peaks=starts, triggers=trigger)
                     raise Exception("aes detection failed!")
             if plot:
-                libplot.plot_time_spec_sync_axis([sset.ff], samp_rate=dset.samp_rate, peaks=starts, triggers=trigger)
+                libplot.plot_time_spec_sync_axis(sset.ff[0:1], samp_rate=dset.samp_rate, peaks=starts, triggers=trigger)
             # * If trace 0, interactively valid the extraction as the template for further traces.
             if i == 0:
-                extracted     = analyze.extract(sset.ff, starts, length=length)
+                extracted     = analyze.extract(sset.ff[0], starts, length=length)
                 sset.template = analyze.choose_signal(extracted, -1 if plot is True else 0)
                 if sset.template is None:
                     raise Exception("no choosen template signal")
             # * Align current trace against the template.
             if len(starts) == 1: # Only process if find_aes returned correctly, otherwise, set a bad trace.
-                extracted = analyze.extract(sset.ff, starts, len(sset.template))
+                extracted = analyze.extract(sset.ff[0], starts, len(sset.template))
                 aligned   = analyze.align(sset.template, extracted[0], dset.samp_rate, ignore=False, log=False)
             else:
                 aligned = None
             # * Check the trace is valid. The trace #0 is assumed be valid.
             check = False
             if i > 0:
-                check, sset.ff = analyze.fill_zeros_if_bad(sset.template, aligned, log=True, log_idx=i)
+                check, sset.ff[0] = analyze.fill_zeros_if_bad(sset.template, aligned, log=True, log_idx=i)
             if check is True:
                 sset.bad_entries.append(i)
             # * Save dataset for resuming if not finishing the loop.

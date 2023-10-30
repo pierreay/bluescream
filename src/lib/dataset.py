@@ -197,13 +197,17 @@ class Subset():
             self.ks_type = InputType.FIXED
 
     def load_trace(self, idx=-1, nf=True, ff=True, check=False):
-        """IDX can be -1 for all traces, an INT for a specific trace index, or
+        """Load the on-disk traces into memory.
+
+        The loading will put the traces in the self.nf and self.ff
+        variables. For scripting conveniance, the functions also returns
+        references to the loaded trace(s). The trace(s) are loaded into a 2D
+        np.ndarray.
+
+        IDX can be -1 for all traces, an INT for a specific trace index, or
         a RANGE for a range of traces. If using a RANGE, please use range(0, x)
         with x > 1. NF and FF can be set to False to not load them in an
         unpacked dataset.
-
-        For scripting conveniance, return references to the loaded trace(s)
-        pair (self.nf and self.ff).
 
         """
         assert(path.exists(self.get_path()))
@@ -211,6 +215,9 @@ class Subset():
             self.nf, self.ff = load.load_all_traces(self.get_path(), nf_wanted=nf, ff_wanted=ff)
         elif isinstance(idx, int):
             self.nf, self.ff = load.load_pair_trace(self.get_path(), idx, nf=nf, ff=ff)
+            # NOTE: Hack the load_pair_trace() result to return 2D np.ndarray.
+            self.nf = None if self.nf is None else np.array(self.nf, ndmin=2)
+            self.ff = None if self.ff is None else np.array(self.ff, ndmin=2)
         elif isinstance(idx, range):
             self.nf, self.ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf_wanted=nf, ff_wanted=ff)
         self.load_trace_idx = idx
@@ -219,6 +226,9 @@ class Subset():
                 raise Exception("can't load nf trace")
             if ff is True and self.ff is None:
                 raise Exception("can't load ff trace")
+        # Check dimensions.
+        assert self.nf is None or self.nf.ndim == 2
+        assert self.ff is None or self.ff.ndim == 2
         return self.nf, self.ff
 
     def unload_trace(self):
@@ -402,14 +412,11 @@ class Profile():
     def plot(self, delim=False):
         libplot.plot_simple(self.MEAN_TRACE)
         if delim is True:
-            # Hacky part to find if dataset.train_set.ff is an array of traces
-            # or a single trace. It also implies that PROFILE has been built
-            # against FF and not NF.
-            ff = self.dataset.train_set.ff
-            if ff is None:
+            # Print the delimiters using the FF trace #0.
+            # NOTE: This part imply that profile has been built with FF and not NF.
+            if self.dataset.train_set.ff is None:
                 self.dataset.train_set.load_trace(0, nf=False, ff=True, check=True)
-                ff = [self.dataset.train_set.ff]
-            libplot.plot_time_spec_sync_axis([ff[0]], samp_rate=self.dataset.samp_rate, peaks=[self.POINT_START, self.POINT_END])
+            libplot.plot_time_spec_sync_axis(self.dataset.train_set.ff[0:1], samp_rate=self.dataset.samp_rate, peaks=[self.POINT_START, self.POINT_END])
    
     def __str__(self):
         string = "profile:\n"
