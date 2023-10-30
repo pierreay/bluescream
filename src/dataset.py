@@ -123,7 +123,8 @@ def average_fn(q, dset, sset, i, stop, nb_aes, template, plot):
     # * Check the trace is valid. The trace #0 is assumed be valid.
     check = False
     if i > 0:
-        check, sset.ff[0] = analyze.fill_zeros_if_bad(sset.template, sset.ff[0], log=True, log_idx=i)
+        check, ff_checked = analyze.fill_zeros_if_bad(sset.template, sset.ff[0], log=True, log_idx=i)
+        sset.replace_trace(ff_checked, dataset.TraceType.FF)
     # * Plot the averaged trace if wanted and average succeed.
     if sset.ff[0] is not None:
         libplot.plot_time_spec_sync_axis(sset.ff[0:1], samp_rate=dset.samp_rate, cond=plot, comp=complex.CompType.AMPLITUDE)
