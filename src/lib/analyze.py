@@ -89,13 +89,15 @@ def normalize(arr, method=NormMethod.MINMAX, arr_complex=False):
         elif method == NormMethod.COMPLEX_ANGLE:
             # Refer to complex.is_p2r_ready() and complex.r2p() for bounds reference.
             return analyze.normalize_generic(arr, {'actual': {'lower': arr.min(), 'upper': arr.max()}, 'desired': {'lower': -np.pi, 'upper': np.pi}})
+
+def normalize_minmax(arr):
     """Apply min-max feature scaling normalization to a 1D np.array ARR
-    representing the amplitude of a signal."""
-    # Do not normalize I/Q samples (complex numbers). It will center the
-    # amplitude value around 0.5 (min/max between 0 and 1) instead of 0
-    # (min/max between -1 and 1) in time domain and create a strong DC offset
-    # in freq domain.
-    assert(arr.dtype == np.float32 or arr.dtype == np.float64)
+    representing the amplitude of a signal.
+
+    Min-Max Scaling will scales data between a range of 0 to 1 in float.
+
+    """
+    assert arr.dtype == np.float32 or arr.dtype == np.float64
     return (arr - np.min(arr)) / (np.max(arr) - np.min(arr))
 
 def normalize_zscore(arr, set=False):
