@@ -418,10 +418,15 @@ def average_aes(arr, sr, nb_aes, template, plot_enable=True):
     # * Extract all AES and average them.
     extracted = analyze.extract(arr, starts, len(template_s))
     aligned   = analyze.align_all(extracted, sr, template_s, False)
+    # Set NORM to False as we average signals extracted from a single trace,
+    # hence with same amplitude levels.
+    averaged  = analyze.average(aligned, norm=False)
+
+    # * Debuging code.
     # Compare result of alignement to debug if needed. The 13 here is a trace
     # index that produced a "high" shift.
     # libplot.plot_time_spec_sync_axis([template_s, extracted[13], aligned[13]])
-    averaged  = analyze.average(aligned, norm=False)
+
     return averaged, template_s
 
 def is_nan(arr):
