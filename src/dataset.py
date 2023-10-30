@@ -118,7 +118,8 @@ def average_fn(q, dset, sset, i, stop, nb_aes, template, plot):
     # * Load the trace to process.
     sset.load_trace(i, nf=False, ff=True, check=True)
     # * Get the average of all AES and the template.
-    sset.ff[0], sset.template = analyze.average_aes(sset.ff[0], dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot_enable=plot)
+    ff_avg, sset.template = analyze.average_aes(sset.ff[0], dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot_enable=plot)
+    sset.replace_trace(ff_avg, dataset.TraceType.FF)
     # * Check the trace is valid. The trace #0 is assumed be valid.
     check = False
     if i > 0:
