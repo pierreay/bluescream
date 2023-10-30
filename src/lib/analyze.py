@@ -120,6 +120,20 @@ def normalize_zscore(arr, set=False):
         arr = (arr - mu) / std
     return arr
 
+def normalize_generic(values, bounds):
+    """Normalize VALUES between BOUNDS.
+
+    VALUES is a ND np.ndarray. BOUNDS is a dictionnary with two entries,
+    "desired" and "actual", each one having the "upper" and "lower"
+    bounds. This dictionnary is used to rescale the values from the "actual"
+    bounds to the "desired" ones.
+
+    Source:
+    https://stackoverflow.com/questions/48109228/normalizing-data-to-certain-range-of-values
+
+    """
+    assert values.dtype == np.float32 or values.dtype == np.float64
+    return bounds['desired']['lower'] + (values - bounds['actual']['lower']) * (bounds['desired']['upper'] - bounds['desired']['lower']) / (bounds['actual']['upper'] - bounds['actual']['lower'])
 def flip_normalized_signal(s):
     """Flip upside-down a normalized signal S in time-domain contained in a 1D
     np.array.
