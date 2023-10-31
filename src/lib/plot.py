@@ -115,6 +115,9 @@ def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, c
     - NORM can be set to True to normalize each signals individually.
 
     """
+    # NOTE: Tried to implement a non-blocking version of this function, but
+    # when using plt.plot(block=False) and re-entering this function again for
+    # another plot, both plots are plotted on same figure.
     if cond is False:
         return
     # Get the corresponding component of the signal and convert s_arr into Numpy array.
