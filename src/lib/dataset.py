@@ -430,10 +430,12 @@ class Profile():
         self.MEAN_TRACE = np.load(path.join(self.get_path(), Profile.MEAN_TRACE_FN))
 
     def plot(self, delim=False):
-        libplot.plot_simple(self.MEAN_TRACE)
-        if delim is True:
-            # Print the delimiters using the FF trace #0.
-            # NOTE: This part imply that profile has been built with FF and not NF.
+        # Simple plot of the profile.
+        if delim is False:
+            libplot.plot_simple(self.MEAN_TRACE)
+        # Advanced plot. Print the delimiters using the FF trace #0.
+        # NOTE: This part imply that profile has been built with FF and not NF.
+        else:
             if self.dataset.train_set.ff is None:
                 self.dataset.train_set.load_trace(0, nf=False, ff=True, check=True)
             libplot.plot_time_spec_sync_axis(self.dataset.train_set.ff[0:1], samp_rate=self.dataset.samp_rate, peaks=[self.POINT_START, self.POINT_END])
