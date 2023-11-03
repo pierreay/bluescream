@@ -225,8 +225,12 @@ class MySoapySDR():
         # Initialize the SDR driver.
         if self.enabled:
             results = SoapySDR.Device.enumerate()
+            # Check result of device detection and requested index.
+            if len(results) == 0:
+                raise Exception("SoapySDR didn't detected any device!")
             if idx > len(results):
                 raise Exception("SoapySDR didn't detected the requested radio index!")
+            # Initialize the radio with requested parameters.
             self.sdr = SoapySDR.Device(results[idx])
             self.sdr.setSampleRate(SoapySDR.SOAPY_SDR_RX, 0, fs)
             self.sdr.setFrequency(SoapySDR.SOAPY_SDR_RX, 0, freq)
