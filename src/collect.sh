@@ -37,6 +37,10 @@ function resume() {
         i_start=$(( $(ls $SUBSET_WD/ | grep trace_ff | wc -l) - 1))
         log_info "Resume collection at i=$i_start in $SUBSET_WD"
     fi
+    # If we detect -1, then the dataset is empty, hence set it to 0.
+    if [[ $i_start -eq -1 ]]; then
+        i_start=0
+    fi
 }
 
 # Initialize the script.
