@@ -76,7 +76,7 @@ def init(outdir, samp_rate, input_gen_init, nb_trace_wanted_train, nb_trace_want
         dset.pickle_dump(force=True)
         l.LOGGER.info("save dataset in {}".format(dset.get_path(save=True)))
     else:
-        l.LOGGER.error("{} doesn't exists!".format(indir))
+        l.LOGGER.error("{} doesn't exists!".format(outdir))
         exit(1)
 
 @cli.command()
