@@ -10,6 +10,11 @@ function pair() {
     return $(( 1 - $? ))
 }
 
+# Compile and flash the Nimble firmware from another git repository.
+function firmware_compile_flash() {
+    (cd ~/git/screaming_channels_nimble && make all)
+}
+
 # Evaluate a step depending on the chosen mode (incremental or equal).
 # If $1 is set to "equal", return 1 (and echo 1) if $2 is equal $3.
 # If $1 is set to "incr",  return 1 (and echo 1) if $2 is greater or equal $3.
