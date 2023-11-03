@@ -10,10 +10,10 @@ source ./lib/misc.sh
 
 # * Global variables
 
-# Counter of YKush reset.
-YKUSH_RESET_CTR=0
-# Limit of YKush reset before rebooting.
-YKUSH_RESET_LIM=5
+# Counter of events (e.g. failures) before rebooting.
+REBOOT_CTR=0
+# Limit of events before rebooting.
+REBOOT_LIM=5
 
 # * Subset
 
@@ -70,9 +70,13 @@ function ykush_reset() {
     log_info "power on ykush..."
     sudo ykushcmd -u a
     sleep 10 # Wait for power-up and booting.
-    # Update counter and reboot if needed.
-    YKUSH_RESET_CTR=$(( $YKUSH_RESET_CTR + 1 ))
-    if [[ $YKUSH_RESET_CTR -ge $YKUSH_RESET_LIM ]]; then
+}
+
+function reboot_if_needed() {
+    # Update counter
+    REBOOT_CTR=$(( $REBOOT_CTR + 1 ))
+    # Reboot if needed.
+    if [[ $REBOOT_CTR -ge $REBOOT_LIM ]]; then
         sudo reboot
     fi
 }
@@ -163,6 +167,7 @@ function collect_one_set() {
         radio_record $i
         if [[ $? == 1 ]]; then
             ykush_reset
+            reboot_if_needed
             i=$(( $i - 1 ))
             continue
         fi
