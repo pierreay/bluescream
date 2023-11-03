@@ -68,6 +68,8 @@ def init(outdir, samp_rate, input_gen_init, nb_trace_wanted_train, nb_trace_want
     SAMP_RATE is the sampling rate used for both recording.
 
     """
+    # TODO: Add a flag to force overwriting an already existing dataset, with
+    # the check in this function.
     if path.exists(outdir):
         dset = dataset.Dataset("tmp", outdir, samp_rate)
         input_gen = dataset.InputGeneration.INIT_TIME if input_gen_init else dataset.InputGeneration.REAL_TIME
