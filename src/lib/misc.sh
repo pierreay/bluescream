@@ -31,7 +31,7 @@ function eval_cond() {
 # dataset already exists.
 function dataset_init() {
     if [[ ! -f $1/dataset.pyc ]]; then
-        log_info "Initialize a dataset in $ENVRC_DATASET_RAW_PATH"
+        log_info "Initialize a dataset in $1"
         ./dataset.py init $1 $2 --input-gen-init --nb-trace-wanted-train 65536 --nb-trace-wanted-attack 16384
     fi
 }
