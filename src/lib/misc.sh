@@ -10,6 +10,18 @@ function pair() {
     return $(( 1 - $? ))
 }
 
+# Evaluate a step depending on the chosen mode (incremental or equal).
+# If $1 is set to "equal", return 1 (and echo 1) if $2 is equal $3.
+# If $1 is set to "incr",  return 1 (and echo 1) if $2 is greater or equal $3.
+# Otherwise, return 0 and echo nothing.
+function eval_cond() {
+    if [[ $1 == "equal" && $2 -eq $3 || $1 == "incr" && $2 -ge $3 ]]; then
+        echo 1
+        return 1
+    fi
+    return 0
+}
+
 # Initialize a dataset in $1 using sample rate $2. Silently do nothing if
 # dataset already exists.
 function dataset_init() {
