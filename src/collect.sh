@@ -35,7 +35,7 @@ function resume() {
 # Initialize the script.
 function init() {
     # Initialize the radio server.
-    radio_init
+    radio_init INFO
 }
 
 # Clean and quit the script.
@@ -64,12 +64,6 @@ function ykush_reset() {
     log_info "power on ykush..."
     sudo ykushcmd -u a
     sleep 10 # Wait for power-up and booting.
-}
-
-function radio_init() {
-    uhd_find_devices
-    ./radio.py --dir $ENVRC_RADIO_DIR --loglevel INFO listen $ENVRC_NF_FREQ $ENVRC_FF_FREQ $ENVRC_SAMP_RATE --ff-id $ENVRC_FF_ID --duration=$ENVRC_DURATION &
-    sleep 10 # Wait for SDR's driver initialization.
 }
 
 # Arguments:
