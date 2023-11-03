@@ -144,8 +144,9 @@ def debug(indir, outdir):
     """
     dset, sset = load_dataset_or_quit(indir, "train", outdir)
     # * Scratchpad:
-    import ipdb; ipdb.set_trace()
     print(dset)
+    # import ipdb; ipdb.set_trace()
+    from IPython import embed; embed()
 
 @cli.command()
 @click.argument("indir", type=click.Path())
