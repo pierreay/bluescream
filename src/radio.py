@@ -220,9 +220,9 @@ def plot(samp_rate, amplitude, phase, nf_id, ff_id):
     # Truncate the traces to the exact size for plotting using synchronized axis.
     s_arr = np.asarray(load.truncate_min(s_arr))
     # Plot the result.
-    if amplitude:
+    if amplitude is True:
         libplot.plot_time_spec_sync_axis(s_arr, samp_rate, comp=complex.CompType.AMPLITUDE)
-    if phase:
+    if phase is True:
         libplot.plot_time_spec_sync_axis(s_arr, samp_rate, comp=complex.CompType.PHASE)
 
 if __name__ == "__main__":
