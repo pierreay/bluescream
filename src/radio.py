@@ -194,8 +194,8 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
 
 @cli.command()
 @click.argument("samp_rate", type=int)
-@click.option("--amplitude/--no-amplitude", default=False, help="Get the amplitude of the traces.")
-@click.option("--phase/--no-phase", default=False, help="Get the phase of the traces.")
+@click.option("--amplitude/--no-amplitude", default=True, help="Plot the amplitude of the traces.")
+@click.option("--phase/--no-phase", default=False, help="Plot the phase of the traces.")
 @click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
 @click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
 def plot(samp_rate, amplitude, phase, nf_id, ff_id):
@@ -220,7 +220,10 @@ def plot(samp_rate, amplitude, phase, nf_id, ff_id):
     # Truncate the traces to the exact size for plotting using synchronized axis.
     s_arr = np.asarray(load.truncate_min(s_arr))
     # Plot the result.
-    libplot.plot_time_spec_sync_axis(s_arr, samp_rate)
+    if amplitude:
+        libplot.plot_time_spec_sync_axis(s_arr, samp_rate, comp=complex.CompType.AMPLITUDE)
+    if phase:
+        libplot.plot_time_spec_sync_axis(s_arr, samp_rate, comp=complex.CompType.PHASE)
 
 if __name__ == "__main__":
     cli()
