@@ -1,0 +1,3 @@
+export ENVRC_VICTIM_ADDR="F4:9E:F2:6D:37:85"
+export ENVRC_NF_ID=0
+export ENVRC_FF_ID=1
