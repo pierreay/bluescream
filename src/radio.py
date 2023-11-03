@@ -218,11 +218,6 @@ def plot(samp_rate, amplitude, phase, nf_id, ff_id):
         l.LOGGER.error("we need at least one trace index to plot!")
         exit(1)
     # Truncate the traces to the exact size for plotting using synchronized axis.
-    # Get only one component of the IQ if needed.
-    component_func = complex.get_amplitude if amplitude else None
-    component_func = complex.get_phase if phase else component_func
-    if component_func is not None:
-        s_arr = component_func(s_arr)
     s_arr = np.asarray(load.truncate_min(s_arr))
     # Plot the result.
     libplot.plot_time_spec_sync_axis(s_arr, samp_rate)
