@@ -1,13 +1,19 @@
 #!/bin/bash
 
 # TODO: Improve script usage and reliability:
-# - Implement reboot after successive ykush reset.
 # - Use an argument to choose between reboot or not on failure.
 # - Automatically resume if previous recording is detected.
 # - Allow option to force restart (e.g. --restart).
 
 source ./lib/log.sh 
 source ./lib/misc.sh
+
+# * Global variables
+
+# Counter of YKush reset.
+YKUSH_RESET_CTR=0
+# Limit of YKush reset before rebooting.
+YKUSH_RESET_LIM=5
 
 # * Subset
 
@@ -64,6 +70,11 @@ function ykush_reset() {
     log_info "power on ykush..."
     sudo ykushcmd -u a
     sleep 10 # Wait for power-up and booting.
+    # Update counter and reboot if needed.
+    YKUSH_RESET_CTR=$(( $YKUSH_RESET_CTR + 1 ))
+    if [[ $YKUSH_RESET_CTR -ge $YKUSH_RESET_LIM ]]; then
+        sudo reboot
+    fi
 }
 
 # Arguments:
