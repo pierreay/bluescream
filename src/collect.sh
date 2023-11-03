@@ -102,11 +102,8 @@ function radio_quit() {
 }
 
 function radio_extract() {
-    if [[ $COLLECT_MODE == "train" ]]; then
-        ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
-    elif [[ $COLLECT_MODE == "attack" ]]; then
-        ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
-    fi
+    ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_NF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
+    ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
 }
 
 # ** Script
@@ -177,8 +174,10 @@ function collect_one_set() {
             continue
         fi
         radio_extract
+        cp $ENVRC_RADIO_DIR/raw_${ENVRC_NF_ID}_0.npy $SUBSET_WD/${i}_trace_nf.npy
         cp $ENVRC_RADIO_DIR/raw_${ENVRC_FF_ID}_0.npy $SUBSET_WD/${i}_trace_ff.npy
         log_info "saved trace:"
+        ls $SUBSET_WD/${i}_trace_nf.npy
         ls $SUBSET_WD/${i}_trace_ff.npy
 
         if [[ $(( ($i+1) % 200 )) == 0 ]]; then
