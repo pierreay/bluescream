@@ -53,12 +53,15 @@ def listen(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id):
     # Initialize the radio as requested.
     with soapysdr.MySoapySDRs() as rad:
         # Initialize the radios individually.
-        if nf_id != -1:
-            rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, nf_id, duration=duration, dir=DIR)
-            rad.register(rad_nf)
-        if ff_id != -1:
-            rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, ff_id, duration=duration, dir=DIR)
-            rad.register(rad_ff)
+        try:
+            if nf_id != -1:
+                rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, nf_id, duration=duration, dir=DIR)
+                rad.register(rad_nf)
+            if ff_id != -1:
+                rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, ff_id, duration=duration, dir=DIR)
+                rad.register(rad_ff)
+        except Exception as e:
+            l.log_n_exit(e, "Error during radio initialization", 1)
         if rad.get_nb() <= 0:
             l.LOGGER.error("we need at least one radio index to record!")
             exit(1)
