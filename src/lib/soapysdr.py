@@ -20,6 +20,12 @@ import lib.complex as complex
 FIFO_PATH = "/tmp/soapysdr.fifo"
 
 class MySoapySDRs():
+    # Polling interval of the listening radio thread, i.e. sleeping time,
+    # i.e. interval to check whether a command is queued in the FIFO or
+    # not. High enough to not consume too much CPU (here, 5%) but small enough
+    # to not introduce noticeable delay to the recording.
+    POLLING_INTERVAL = 1e-6
+
     def __enter__(self):
         return self
 
@@ -102,7 +108,7 @@ class MySoapySDRs():
             # Create the named pipe (FIFO).
             try:
                 os.mkfifo(FIFO_PATH)
-            except OSError as oe: 
+            except OSError as oe:
                 if oe.errno != errno.EEXIST:
                     raise
 
@@ -113,7 +119,6 @@ class MySoapySDRs():
         with open(FIFO_PATH, "r") as fifo:
             l.LOGGER.debug("opened FIFO at {}".format(FIFO_PATH))
             # Infinitely listen for commands and execute the radio commands accordingly.
-            # TODO: Try to add polling under the 0.1 seconds delay, to not use CPU at 100%.
             while True:
                 cmd = fifo.read()
                 if len(cmd) > 0:
@@ -127,6 +132,8 @@ class MySoapySDRs():
                     elif cmd == "quit":
                         l.LOGGER.info("quit the listening mode")
                         break
+                # Smart polling.
+                sleep(self.POLLING_INTERVAL)
 
     def get_nb(self):
         """Get the number of currently registed SDRs."""
@@ -136,13 +143,13 @@ class MySoapySDR():
     """SoapySDR controlled radio.
 
     Typical workflow:
-    
+
     1. Initialize: __init__() -> open()
-    
+
     2. Records: [ record() -> accept() ] ... -> save()
 
     3. Records: [ record() -> accept() ] ... -> save()
-    
+
     4. Deinitialize: close()
 
     """
