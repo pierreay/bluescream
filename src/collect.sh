@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # TODO: Improve script usage and reliability:
+# - Initialize a dataset if not already exists.
 # - Use an argument to choose between reboot or not on failure.
 # - Automatically resume if previous recording is detected.
 # - Allow option to force restart (e.g. --restart).
