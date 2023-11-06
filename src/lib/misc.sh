@@ -44,6 +44,10 @@ function radio_init() {
     sleep 20 # Wait for SDR's driver initialization.
 }
 
+function radio_quit() {
+    ./radio.py quit
+}
+
 # If $1 is an HCI device IFNAME, then echo it, otherwise echo the first one
 # found.
 function select_hci() {

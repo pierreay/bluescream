@@ -102,10 +102,6 @@ function radio_record() {
     fi
 }
 
-function radio_quit() {
-    ./radio.py quit
-}
-
 function radio_extract() {
     ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_NF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
     ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
