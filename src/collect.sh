@@ -204,11 +204,6 @@ function collect_one_set() {
             continue
         fi
         radio_extract
-        cp $ENVRC_RADIO_DIR/raw_${ENVRC_NF_ID}_0.npy $SUBSET_WD/${i}_trace_nf.npy
-        cp $ENVRC_RADIO_DIR/raw_${ENVRC_FF_ID}_0.npy $SUBSET_WD/${i}_trace_ff.npy
-        log_info "saved trace:"
-        ls $SUBSET_WD/${i}_trace_nf.npy
-        ls $SUBSET_WD/${i}_trace_ff.npy
         radio_save
 
         if [[ $(( ($i+1) % 200 )) == 0 ]]; then
