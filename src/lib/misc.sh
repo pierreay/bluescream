@@ -1,15 +1,5 @@
 # Miscellaneous functions used across bash scripts.
 
-# NOTE: DEPRECATED
-function pair() {
-    timeout 30 ./utils/mirage_pair.sh "$ENVRC_VICTIM_ADDR" | tee /tmp/mirage_pair_output
-    if [[ $? -ge 1 ]]; then
-        return 1
-    fi
-    grep FAIL /tmp/mirage_pair_output >/dev/null 2>&1
-    return $(( 1 - $? ))
-}
-
 # Compile and flash the Nimble firmware from another git repository.
 function firmware_compile_flash() {
     (cd ~/git/screaming_channels_nimble && make all)

@@ -1,5 +1,23 @@
 #!/bin/bash
 
+# * About
+
+# Deprecated script using Mirage to pair a device and export important
+# information.
+
+# * External interface
+
+function pair() {
+    timeout 30 ./utils/mirage_pair.sh "$ENVRC_VICTIM_ADDR" | tee /tmp/mirage_pair_output
+    if [[ $? -ge 1 ]]; then
+        return 1
+    fi
+    grep FAIL /tmp/mirage_pair_output >/dev/null 2>&1
+    return $(( 1 - $? ))
+}
+
+# * Script
+
 set -e
 source ./lib/misc.sh
 
