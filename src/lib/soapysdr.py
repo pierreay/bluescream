@@ -115,7 +115,7 @@ class MySoapySDRs():
         # Create the FIFO.
         __create_fifo()
         # Open the FIFO.
-        l.LOGGER.info("ready for listening!")
+        l.LOGGER.info("process #{} ready for listening!".format(os.getpid()))
         with open(FIFO_PATH, "r") as fifo:
             l.LOGGER.debug("opened FIFO at {}".format(FIFO_PATH))
             # Infinitely listen for commands and execute the radio commands accordingly.
