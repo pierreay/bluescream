@@ -46,6 +46,8 @@ function resume() {
 
 # Initialize the script.
 function init() {
+    # Print and find our hardware setup.
+    discover_setup
     # Initialize the radio server.
     radio_init INFO
 }
