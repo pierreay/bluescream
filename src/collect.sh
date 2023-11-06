@@ -66,6 +66,11 @@ function display_time() {
 }
 
 function ykush_reset() {
+    # Test that ykushcmd is available, otherwise, return immediately.
+    if ! type ykushcmd &> /dev/null; then
+        log_warn "Skip ykush reset because ykushcmd is not available!"
+        return 1
+    fi
     log_info
     log_info "=========== YKUSH RESET ==========="
     log_info
