@@ -117,6 +117,19 @@ function radio_extract() {
     fi
 }
 
+function radio_save() {
+    if [[ $ENVRC_NF_ID != -1 ]]; then
+        cp $ENVRC_RADIO_DIR/raw_${ENVRC_NF_ID}_0.npy $SUBSET_WD/${i}_trace_nf.npy
+        log_info "saved trace:"
+        ls $SUBSET_WD/${i}_trace_nf.npy
+    fi
+    if [[ $ENVRC_FF_ID != -1 ]]; then
+        cp $ENVRC_RADIO_DIR/raw_${ENVRC_FF_ID}_0.npy $SUBSET_WD/${i}_trace_ff.npy
+        log_info "saved trace:"
+        ls $SUBSET_WD/${i}_trace_ff.npy
+    fi
+}
+
 # ** Script
 
 function collect_one_set() {
@@ -195,6 +208,7 @@ function collect_one_set() {
         log_info "saved trace:"
         ls $SUBSET_WD/${i}_trace_nf.npy
         ls $SUBSET_WD/${i}_trace_ff.npy
+        radio_save
 
         if [[ $(( ($i+1) % 200 )) == 0 ]]; then
             log_warn "restart devices every 200 traces to prevent errors..."
