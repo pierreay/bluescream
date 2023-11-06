@@ -4,8 +4,10 @@
 
 # * Functions
 
-function test_setup() {
-    # SDRs.
+# Print the found devices in our hardware setup. (Do not return test value for
+# their presence).
+function discover_setup() {
+    # SDRs using SoapySDR.
     echo "=== SDR ==="
     echo "BladeRF: " && SoapySDRUtil --probe="driver=bladerf" >/dev/null 2>&1 | grep get_serial
     echo "USRP: "    && SoapySDRUtil --probe="driver=uhd"     >/dev/null 2>&1 | grep mboard_serial
