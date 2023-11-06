@@ -17,7 +17,7 @@
 # Sleep to:
 # 1. Prevent boot loop in case of programmer's error.
 # 2. Wait enough time for J-Link OB be recognize by nrfjprog.
-sleep 120
+sleep 60
 
 # Start tmux server.
 # NOTE: Specifying shell is important, otherwise, it will use "sh" as default

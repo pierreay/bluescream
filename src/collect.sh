@@ -161,6 +161,10 @@ function collect_one_set() {
     # if resuming.
     mkdir -p $SUBSET_WD
 
+    # NOTE: Prevent the "There is no debugger connected to the PC after reboot".
+    log_warn "reinitialize devices in default state..."
+    ykush_reset
+
     for (( i = i_start; i < $COLLECT_NB; i++ ))
     do
         log_info
