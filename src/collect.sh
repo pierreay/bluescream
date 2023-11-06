@@ -107,8 +107,14 @@ function radio_record() {
 }
 
 function radio_extract() {
-    ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_NF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
-    ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
+    # NOTE: -1 here is set according to the --nf-id, --ff-id, and --id
+    # specifications of the radio.py arguments.
+    if [[ $ENVRC_NF_ID != -1 ]]; then
+        ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_NF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
+    fi
+    if [[ $ENVRC_FF_ID != -1 ]]; then
+        ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
+    fi
 }
 
 # ** Script
