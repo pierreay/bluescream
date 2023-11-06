@@ -2,8 +2,8 @@
 
 # TODO: Improve script usage and reliability:
 # - Initialize a dataset if not already exists.
-# - Use an argument to choose between reboot or not on failure.
-# - Automatically resume if previous recording is detected.
+# - Allow option to choose between reboot or not on failure.
+# - Allow option to choose ykush timeout.
 # - Allow option to force restart (e.g. --restart).
 
 source ./lib/log.sh 
@@ -38,7 +38,8 @@ function resume() {
         i_start=$(( $(ls $SUBSET_WD/ | grep trace_ff | wc -l) - 1))
         log_info "Resume collection at i=$i_start in $SUBSET_WD"
     fi
-    # If we detect -1, then the dataset is empty, hence set it to 0.
+    # If we detect -1, then the dataset is empty, hence set it to 0 to
+    # automatically start from scratch.
     if [[ $i_start -eq -1 ]]; then
         i_start=0
     fi
