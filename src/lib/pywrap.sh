@@ -7,7 +7,6 @@
 # Initialize the radio thread in the background.
 # $1 is loglevel [default = DEBUG].
 function radio_init() {
-    uhd_find_devices
     ./radio.py --dir $ENVRC_RADIO_DIR --loglevel ${1-DEBUG} listen $ENVRC_NF_FREQ $ENVRC_FF_FREQ $ENVRC_SAMP_RATE --nf-id $ENVRC_NF_ID --ff-id $ENVRC_FF_ID --duration=$ENVRC_DURATION &
     sleep 20 # Wait for SDR's driver initialization.
 }
