@@ -34,11 +34,21 @@ class MySoapySDRs():
 
     def __init__(self):
         l.LOGGER.debug("MySoapySDRs.__init__()")
+        # List of registered SDRs.
         self.sdrs = []
+        # List of registered SDRs' indexes.
+        # NOTE: The IDXs must be unique, as the IDX is used as filename
+        # identifier and as SoapySDR's result index.
+        self.registered_idx = []
 
     def register(self, sdr):
         l.LOGGER.debug("MySoapySDRs.register(idx={})".format(sdr.idx))
+        # Check if SDR is not already initialized.
+        if sdr.idx in self.registered_idx:
+            raise Exception("The same SDR is registered twice!")
+        # Proceed to the registration.
         self.sdrs.append(sdr)
+        self.registered_idx.append(sdr.idx)
         # Temporary hack to be compatible with nrf52_whad.py who access
         # self.radio.fs variable. This imply to have the same sampling rate
         # accross two SDRs.
