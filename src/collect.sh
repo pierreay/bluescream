@@ -34,6 +34,7 @@ function clean() {
 function resume() {
     # NOTE: A better implementation would be to use the query subcommand of the
     # dataset.py file, and record last recording index directly in radio.py.
+    # TODO: Work only if trace_ff is recorded... Base the grep on NF_ID != -1 and FF_ID != -1 instead.
     if [[ -d $SUBSET_WD ]]; then
         i_start=$(( $(ls $SUBSET_WD/ | grep trace_ff | wc -l) - 1))
         log_info "Resume collection at i=$i_start in $SUBSET_WD"
