@@ -4,6 +4,22 @@
 
 # * Functions
 
+function test_setup() {
+    # SDRs.
+    echo "=== SDR ==="
+    SoapySDRUtil --probe="driver=bladerf"
+    SoapySDRUtil --probe="driver=uhd"
+    # J-Link OB from nRF52 DK.
+    echo "=== nRF52 DK ==="
+    nrfjprog --com | grep VCOM0
+    # HCI dongle for Mirage.
+    echo "=== HCI ==="
+    whadup | grep hci
+    # Butterfly on nRF52 dongle for WHAD.
+    echo "=== Butterfly ==="
+    whadup | grep uart
+}
+
 # If $1 is an HCI device IFNAME, then echo it, otherwise echo the first one
 # found.
 function select_hci() {
