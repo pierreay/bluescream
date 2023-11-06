@@ -7,8 +7,8 @@
 function test_setup() {
     # SDRs.
     echo "=== SDR ==="
-    SoapySDRUtil --probe="driver=bladerf"
-    SoapySDRUtil --probe="driver=uhd"
+    echo "BladeRF: " && SoapySDRUtil --probe="driver=bladerf" >/dev/null 2>&1 | grep get_serial
+    echo "USRP: "    && SoapySDRUtil --probe="driver=uhd"     >/dev/null 2>&1 | grep mboard_serial
     # J-Link OB from nRF52 DK.
     echo "=== nRF52 DK ==="
     nrfjprog --com | grep VCOM0
