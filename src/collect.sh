@@ -157,6 +157,7 @@ function collect_one_set() {
     # * Profiling.
 
     SECONDS=0
+    # Catch INT signal to properly quit the SDR.
     trap quit INT
 
     # * Collecting.
