@@ -1,4 +1,12 @@
+# * About
+
 # Miscellaneous functions used across bash scripts.
+
+# * Load
+
+source ./lib/discover.sh
+
+# * Functions
 
 # Compile and flash the Nimble firmware from another git repository.
 function firmware_compile_flash() {
@@ -15,30 +23,6 @@ function eval_cond() {
         return 1
     fi
     return 0
-}
-
-# If $1 is an HCI device IFNAME, then echo it, otherwise echo the first one
-# found.
-function select_hci() {
-    if [[ -z ${1+x} ]]; then
-        find_hci
-    else
-        echo $1
-    fi
-}
-
-# Echo the IFNAME of the first HCI device found.
-function find_hci() {
-    hciconfig | head -n 1 | cut -f 1 -d ":"
-}
-
-# Echo the ADDRESS of the first HCI device found.
-function find_hci_addr() {
-    hciconfig | sed '2q;d' | awk '{print $(3)}'
-}
-
-function find_nrf_com() {
-     nrfjprog --com | cut - -d " " -f 5
 }
 
 # Usage: firmware_set_mode [train | attack] >/dev/null 2>&1

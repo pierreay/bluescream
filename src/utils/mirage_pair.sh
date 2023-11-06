@@ -20,6 +20,7 @@ function pair() {
 
 set -e
 source ./lib/misc.sh
+source ./lib/discover.sh
 
 help() {
     cat << EOF
