@@ -51,6 +51,28 @@ REBOOT_LIM=5
 
 # ** Functions
 
+function collect_train() {
+    export COLLECT_NB="$ENVRC_WANTED_TRACE_TRAIN"
+    export SUBSET_WD="$ENVRC_DATASET_RAW_PATH/train"
+    export KEY_FIXED=0
+    log_info
+    log_info "=========== Training set ==========="
+    log_info
+    export COLLECT_MODE=train
+    collect_one_set 2
+}
+
+function collect_attack() {
+    export COLLECT_NB="$ENVRC_WANTED_TRACE_ATTACK"
+    export SUBSET_WD="$ENVRC_DATASET_RAW_PATH/attack"
+    export KEY_FIXED=1
+    export COLLECT_MODE=attack
+    log_info
+    log_info "=========== Attack set ==========="
+    log_info
+    collect_one_set 2
+}
+
 function clean() {
     if [[ -d $SUBSET_WD ]]; then
         rm -rf $SUBSET_WD/*_trace_*.npy
@@ -84,7 +106,7 @@ function init() {
     # Print and find our hardware setup.
     discover_setup
     # Initialize the radio server.
-    radio_init INFO
+    radio_init $OPT_LOGLEVEL
 }
 
 # Clean and quit the script.
@@ -134,7 +156,7 @@ function reboot_if_needed() {
 function radio_record() {
     # NOTE: Send a SIGINT signal such that Python goes through the __exit__()
     # of Device class, such that WHAD/Butterfly do not finish in a bad state.
-    timeout --signal=SIGINT 30 python3 ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR instrument $ENVRC_DATASET_RAW_PATH $COLLECT_MODE $ENVRC_VICTIM_ADDR $ENVRC_VICTIM_PORT --idx $1
+    timeout --signal=SIGINT 30 python3 ./radio.py --loglevel $OPT_LOGLEVEL --dir $ENVRC_RADIO_DIR instrument $ENVRC_DATASET_RAW_PATH $COLLECT_MODE $ENVRC_VICTIM_ADDR $ENVRC_VICTIM_PORT --idx $1
     if [[ $? -ge 1 ]]; then
         return 1
     fi
@@ -144,10 +166,10 @@ function radio_extract() {
     # NOTE: -1 here is set according to the --nf-id, --ff-id, and --id
     # specifications of the radio.py arguments.
     if [[ $ENVRC_NF_ID != -1 ]]; then
-        ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_NF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
+        ./radio.py --loglevel $OPT_LOGLEVEL --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_NF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
     fi
     if [[ $ENVRC_FF_ID != -1 ]]; then
-        ./radio.py --loglevel INFO --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
+        ./radio.py --loglevel $OPT_LOGLEVEL --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
     fi
 }
 
@@ -245,30 +267,9 @@ function collect_one_set() {
     done
 }
 
-# * Dataset
+# * Script
 
 init
-
-# ** Training subset
-
-export COLLECT_NB="$ENVRC_WANTED_TRACE_TRAIN"
-export SUBSET_WD="$ENVRC_DATASET_RAW_PATH/train"
-export KEY_FIXED=0
-log_info
-log_info "=========== Training set ==========="
-log_info
-export COLLECT_MODE=train
-collect_one_set 2
-
-# ** Attack subset
-
-export COLLECT_NB="$ENVRC_WANTED_TRACE_ATTACK"
-export SUBSET_WD="$ENVRC_DATASET_RAW_PATH/attack"
-export KEY_FIXED=1
-export COLLECT_MODE=attack
-log_info
-log_info "=========== Attack set ==========="
-log_info
-collect_one_set 2
-
+collect_train
+collect_attack
 quit
