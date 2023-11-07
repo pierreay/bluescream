@@ -20,6 +20,7 @@ function radio_quit() {
 # Initialize a dataset in $1 using sample rate $2. Silently do nothing if
 # dataset already exists.
 function dataset_init() {
+    # NOTE: Dataset name is taken from lib/dataset.py/Dataset.FILENAME variable.
     if [[ ! -f $1/dataset.pyc ]]; then
         log_info "Initialize a dataset in $1"
         ./dataset.py init $1 $2 --input-gen-init --nb-trace-wanted-train 65536 --nb-trace-wanted-attack 16384

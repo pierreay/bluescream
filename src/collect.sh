@@ -1,7 +1,6 @@
 #!/bin/bash
 
 # TODO: Improve script usage and reliability:
-# - Initialize a dataset if not already exists.
 # - Allow option to choose between reboot or not on failure.
 # - Allow option to choose ykush timeout.
 # - Allow option to force restart (e.g. --restart).
@@ -190,6 +189,8 @@ function collect_one_set() {
     # NOTE: Prevent the "There is no debugger connected to the PC after reboot".
     log_warn "reinitialize devices in default state..."
     ykush_reset
+    # Make sure the dataset is initialized.
+    dataset_init $SUBSET_WD
 
     for (( i = i_start; i < $COLLECT_NB; i++ ))
     do
