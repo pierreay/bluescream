@@ -118,6 +118,8 @@ function resume() {
 
 # Initialize the script.
 function init() {
+    # Catch INT signal to properly quit the SDR.
+    trap quit INT
     # NOTE: Prevent the "There is no debugger connected to the PC after reboot".
     log_warn "Reinitialize devices in default state..."
     ykush_reset
@@ -257,8 +259,6 @@ function collect_one_set() {
     # * Profiling.
 
     SECONDS=0
-    # Catch INT signal to properly quit the SDR.
-    trap quit INT
 
     # * Collecting.
 
