@@ -190,17 +190,6 @@ function reboot_if_needed() {
     fi
 }
 
-# Arguments:
-# $1 should be the trace recording index.
-function radio_record() {
-    # NOTE: Send a SIGINT signal such that Python goes through the __exit__()
-    # of Device class, such that WHAD/Butterfly do not finish in a bad state.
-    timeout --signal=SIGINT 30 python3 ./radio.py --loglevel $OPT_LOGLEVEL --dir $ENVRC_RADIO_DIR instrument $ENVRC_DATASET_RAW_PATH $COLLECT_MODE $ENVRC_VICTIM_ADDR $ENVRC_VICTIM_PORT --idx $1
-    if [[ $? -ge 1 ]]; then
-        return 1
-    fi
-}
-
 function radio_extract() {
     # NOTE: -1 here is set according to the --nf-id, --ff-id, and --id
     # specifications of the radio.py arguments.
@@ -284,7 +273,7 @@ function collect_one_set() {
         log_info
         log_info "=========== TRACE #$i -- KEY_FIXED=$KEY_FIXED -- SUBSET=$COLLECT_MODE ==========="
         log_info
-        radio_record $i
+        radio_instrument $OPT_LOGLEVEL $COLLECT_MODE $i
         if [[ $? == 1 ]]; then
             ykush_reset
             reboot_if_needed
