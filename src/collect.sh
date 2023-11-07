@@ -136,7 +136,9 @@ function init() {
     ykush_reset
     # Print and find our hardware setup.
     discover_setup
-    # Initialize the radio server.
+    # Make sure the dataset is initialized.
+    dataset_init $ENVRC_DATASET_RAW_PATH
+    # Initialize the radio daemon.
     radio_init $OPT_LOGLEVEL
 }
 
@@ -276,8 +278,6 @@ function collect_one_set() {
     # Make sure output directory is created (/attack or /train) or do nothing
     # if resuming.
     mkdir -p $SUBSET_WD
-    # Make sure the dataset is initialized.
-    dataset_init $SUBSET_WD
 
     for (( i = i_start; i < $COLLECT_NB; i++ ))
     do
