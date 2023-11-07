@@ -96,11 +96,17 @@ function clean() {
 }
 
 function resume() {
+    # Choose which trace we should count.
     # NOTE: A better implementation would be to use the query subcommand of the
     # dataset.py file, and record last recording index directly in radio.py.
-    # TODO: Work only if trace_ff is recorded... Base the grep on NF_ID != -1 and FF_ID != -1 instead.
+    if [[ $ENVRC_NF_ID != -1 ]]; then
+        pattern="trace_nf"
+    else
+        pattern="trace_ff"
+    fi
+    # Get number of traces in current dataset.
     if [[ -d $SUBSET_WD ]]; then
-        i_start=$(( $(ls $SUBSET_WD/ | grep trace_ff | wc -l) - 1))
+        i_start=$(( $(ls $SUBSET_WD/ | grep $pattern | wc -l) - 1))
         log_info "Resume collection at i=$i_start in $SUBSET_WD"
     fi
     # If we detect -1 after resuming (hence the dataset is empty) or user ask
