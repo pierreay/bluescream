@@ -27,4 +27,4 @@ SHELL=/bin/zsh tmux start-server
 # Source the project environment and start the collection inside a tmux session.
 # NOTE: -d is important to not trying to attach to current terminal, as cron
 # doesn't provide terminal.
-tmux new-session -d -s collect "cd /home/drac/git/screaming_channels_ble/src && direnv exec . ./collect.sh -l INFO -r -y"
+tmux new-session -d -s collect "tmux set-window-option remain-on-exit on && cd /home/drac/git/screaming_channels_ble/src && direnv exec . ./collect.sh -l INFO -r -y"
