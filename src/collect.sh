@@ -47,6 +47,9 @@ function resume() {
 
 # Initialize the script.
 function init() {
+    # NOTE: Prevent the "There is no debugger connected to the PC after reboot".
+    log_warn "reinitialize devices in default state..."
+    ykush_reset
     # Print and find our hardware setup.
     discover_setup
     # Initialize the radio server.
@@ -186,9 +189,6 @@ function collect_one_set() {
     # if resuming.
     mkdir -p $SUBSET_WD
 
-    # NOTE: Prevent the "There is no debugger connected to the PC after reboot".
-    log_warn "reinitialize devices in default state..."
-    ykush_reset
     # Make sure the dataset is initialized.
     dataset_init $SUBSET_WD
 
