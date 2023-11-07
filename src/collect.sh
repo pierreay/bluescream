@@ -9,6 +9,37 @@ source ./lib/log.sh
 source ./lib/misc.sh
 source ./lib/pywrap.sh
 
+# * Arguments
+
+# Reset getopts.
+OPTIND=1
+
+# Set Python logging level.
+OPT_LOGLEVEL="INFO"
+
+# Program's help.
+function help() {
+    cat << EOF
+Usage: collect.sh [-l LOGLEVEL]
+
+Run a full collection.
+
+Set -l to the desired Python LOGLEVEL [default = $OPT_LOGLEVEL].
+EOF
+    exit 0
+}
+
+# Get the scripts arguments.
+while getopts "h?l:" opt; do
+    case "$opt" in
+        h|\?)
+            help
+            ;;
+        l) OPT_LOGLEVEL=$OPTARG
+           ;;
+    esac
+done
+
 # * Global variables
 
 # Counter of events (e.g. failures) before rebooting.
