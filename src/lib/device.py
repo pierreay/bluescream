@@ -37,9 +37,6 @@ PROCEDURE_INTERLEAVING = False
 # * Classes
 
 class Device():
-    # The "self.bd_addr_spoof" value is hardcoded twice, here and in our
-    # custom firmware inside input.c.
-    bd_addr_spoof = "00:19:0E:19:79:D8"
     # Timeout limit used for the loops of this module [s].
     TIMEOUT = 30
 
@@ -49,10 +46,11 @@ class Device():
     def __exit__(self, *args):
         self.close()
 
-    def __init__(self, ser_port, baud, bd_addr, radio, dataset, subset):
+    def __init__(self, ser_port, baud, bd_addr_src, bd_addr_dest, radio, dataset, subset):
         self.ser_port = ser_port
         self.baud = baud
-        self.bd_addr = bd_addr
+        self.bd_addr_src = bd_addr_src
+        self.bd_addr_dest = bd_addr_dest
         self.radio = radio
         self.dataset = dataset
         self.subset = subset
@@ -63,8 +61,8 @@ class Device():
              # Because WHAD exceptions doesn't have descriptions, only names
              # accessible through __repr__().
             raise Exception("{}".format(e.__repr__()))
-        l.LOGGER.info("spoof bluetooth address: {}".format(self.bd_addr_spoof))
-        self.central.set_bd_address(self.bd_addr_spoof)
+        l.LOGGER.info("spoof bluetooth address: {}".format(self.bd_addr_src))
+        self.central.set_bd_address(self.bd_addr_src)
         self.time_start = time()
         self.time_elapsed = 0
 
@@ -197,8 +195,8 @@ class Device():
         # 1. Use increased hop interval. Decreasing it speed-up the connection.
         # 2. Set channel map to 0x300 which corresponds to channel 8-9.
         l.LOGGER.info("connect to target device")
-        l.LOGGER.debug("central.connect(address={}, random=False, hop_interval={}, channel_map=0x{:x})".format(self.bd_addr, HOP_INTERVAL, CHANNEL_MAP))
-        device = self.central.connect(self.bd_addr, random=False, hop_interval=HOP_INTERVAL, channel_map=CHANNEL_MAP)
+        l.LOGGER.debug("central.connect(address={}, random=False, hop_interval={}, channel_map=0x{:x})".format(self.bd_addr_dest, HOP_INTERVAL, CHANNEL_MAP))
+        device = self.central.connect(self.bd_addr_dest, random=False, hop_interval=HOP_INTERVAL, channel_map=CHANNEL_MAP)
 
         if self.central.is_connected():
             l.LOGGER.debug("whad's central is connected to target device")

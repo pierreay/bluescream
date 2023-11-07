@@ -83,17 +83,19 @@ def quit():
 @cli.command()
 @click.argument("indir", type=click.Path())
 @click.argument("subset", type=str)
-@click.argument("bd_addr")
+@click.argument("bd_addr_src")
+@click.argument("bd_addr_dest")
 @click.argument("ser_port")
 @click.option("--radio/--no-radio", default=True, help="Enable or disable the radio recording (instrument only).")
 @click.option("--idx", default=0, help="Current recording index to get correct dataset's inputs.")
-def instrument(indir, subset, bd_addr, ser_port, radio, idx):
+def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx):
     """Instrument the device and record RAW traces to DIR.
 
     INDIR is the path to the dataset. It is used for collection parameters
     (e.g. sample rate) and input values (e.g. key and plaintext).
     SUBSET corresponds to the subset's name where the inputs comes from.
-    BD_ADDR is the Bluetooth address of the target device to connect to.
+    BD_ADDR_SRC the Bluetooth address of the spoofed legitimate device.
+    BD_ADDR_DEST is the Bluetooth address of the target device to connect to.
     SER_PORT is the serial port of the target device to connect to.
 
     Trigger the target device and store the RAW recording of the communication
@@ -108,7 +110,7 @@ def instrument(indir, subset, bd_addr, ser_port, radio, idx):
     rad = soapysdr.MySoapySDRsClient(enabled=radio)
 
     # Initalize the device.
-    with device.Device(ser_port=ser_port, baud=115200, bd_addr=bd_addr, radio=rad, dataset=dset, subset=sset) as dev:
+    with device.Device(ser_port=ser_port, baud=115200, bd_addr_src=bd_addr_src, bd_addr_dest=bd_addr_dest, radio=rad, dataset=dset, subset=sset) as dev:
         # Configure everything related to current trace index.
         dev.configure(idx)
         # Perform the instrumentation and the recording.
