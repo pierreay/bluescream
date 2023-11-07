@@ -23,11 +23,22 @@ function help() {
     cat << EOF
 Usage: collect.sh [-l LOGLEVEL] [-r] [-y] [-f]
 
-Run a full collection.
-Use the following environment variables:
-- TODO
+Run a full collection and record it inside \$ENVRC_DATASET_RAW_PATH. It will
+record \$ENVRC_WANTED_TRACE_TRAIN and \$ENVRC_WANTED_TRACE_ATTACK number of
+traces.
 
-Set -l to the desired Python LOGLEVEL [default = $OPT_LOGLEVEL].
+Concerning the radio, the sampling rate will be set at \$ENVRC_SAMP_RATE and
+frequencies at \$ENVRC_NF_FREQ and \$ENVRC_FF_FREQ. The recording will be of
+duration \$ENVRC_DURATION. You can enable the recordings for NF and FF traces
+using \$ENVRC_NF_ID and \$ENVRC_FF_ID, or set it to -1 to disable this
+recording. The \$ENVRC_RADIO_DIR will be used as a temporary storage for the
+recordings.
+
+Concerning the target, it will be connected using the \$ENVRC_VICTIM_ADDR
+address and the inputs will be configured using the \$ENVRC_VICTIM_PORT dev
+port.
+
+Set -l to the desired Python LOGLEVEL [default = INFO].
 Set -r to reboot on repeated errors [default = False]
 Set -y to switch YKush on error [default = False]
 Set -f to restart collection from trace #0 [default = False].
