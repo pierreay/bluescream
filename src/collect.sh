@@ -1,10 +1,5 @@
 #!/bin/bash
 
-# TODO: Improve script usage and reliability:
-# - Allow option to choose between reboot or not on failure.
-# - Allow option to choose ykush timeout.
-# - Allow option to force restart (e.g. --restart).
-
 source ./lib/log.sh 
 source ./lib/misc.sh
 source ./lib/pywrap.sh
@@ -16,26 +11,43 @@ OPTIND=1
 
 # Set Python logging level.
 OPT_LOGLEVEL="INFO"
+# If set to 1, instruct to reboot in case of repeated errors.
+OPT_REBOOT=0
+# If set to 1, instruct to switch YKush down and up in case of error.
+OPT_YKUSH=0
+# If set to 1, instruct to restart collection from 0.
+OPT_RESTART=0
 
 # Program's help.
 function help() {
     cat << EOF
-Usage: collect.sh [-l LOGLEVEL]
+Usage: collect.sh [-l LOGLEVEL] [-r] [-y] [-f]
 
 Run a full collection.
+Use the following environment variables:
+- TODO
 
 Set -l to the desired Python LOGLEVEL [default = $OPT_LOGLEVEL].
+Set -r to reboot on repeated errors [default = False]
+Set -y to switch YKush on error [default = False]
+Set -f to restart collection from trace #0 [default = False].
 EOF
     exit 0
 }
 
 # Get the scripts arguments.
-while getopts "h?l:" opt; do
+while getopts "h?l:ryf" opt; do
     case "$opt" in
         h|\?)
             help
             ;;
         l) OPT_LOGLEVEL=$OPTARG
+           ;;
+        r) OPT_REBOOT=1
+           ;;
+        y) OPT_YKUSH=1
+           ;;
+        f) OPT_RESTART=1
            ;;
     esac
 done
@@ -91,9 +103,9 @@ function resume() {
         i_start=$(( $(ls $SUBSET_WD/ | grep trace_ff | wc -l) - 1))
         log_info "Resume collection at i=$i_start in $SUBSET_WD"
     fi
-    # If we detect -1, then the dataset is empty, hence set it to 0 to
-    # automatically start from scratch.
-    if [[ $i_start -eq -1 ]]; then
+    # If we detect -1 after resuming (hence the dataset is empty) or user ask
+    # restart, set it to 0 to start from scratch.
+    if [[ $i_start == -1 || $OPT_RESTART == 1 ]]; then
         i_start=0
     fi
 }
@@ -126,28 +138,32 @@ function display_time() {
 }
 
 function ykush_reset() {
-    # Test that ykushcmd is available, otherwise, return immediately.
-    if ! type ykushcmd &> /dev/null; then
-        log_warn "Skip ykush reset because ykushcmd is not available!"
-        return 1
+    if [[ $OPT_YKUSH == 1 ]]; then
+        # Test that ykushcmd is available, otherwise, return immediately.
+        if ! type ykushcmd &> /dev/null; then
+            log_warn "Skip ykush reset because ykushcmd is not available!"
+            return 1
+        fi
+        log_info
+        log_info "=========== YKUSH RESET ==========="
+        log_info
+        log_info "power off ykush..."
+        sudo ykushcmd -d a
+        sleep 5 # Wait for shutdown.
+        log_info "power on ykush..."
+        sudo ykushcmd -u a
+        sleep 10 # Wait for power-up and booting.
     fi
-    log_info
-    log_info "=========== YKUSH RESET ==========="
-    log_info
-    log_info "power off ykush..."
-    sudo ykushcmd -d a
-    sleep 5 # Wait for shutdown.
-    log_info "power on ykush..."
-    sudo ykushcmd -u a
-    sleep 10 # Wait for power-up and booting.
 }
 
 function reboot_if_needed() {
-    # Update counter
-    REBOOT_CTR=$(( $REBOOT_CTR + 1 ))
-    # Reboot if needed.
-    if [[ $REBOOT_CTR -ge $REBOOT_LIM ]]; then
-        sudo reboot
+    if [[ $OPT_REBOOT == 1 ]]; then
+        # Update counter
+        REBOOT_CTR=$(( $REBOOT_CTR + 1 ))
+        # Reboot if needed.
+        if [[ $REBOOT_CTR -ge $REBOOT_LIM ]]; then
+            sudo reboot
+        fi
     fi
 }
 
@@ -241,7 +257,6 @@ function collect_one_set() {
     # Make sure output directory is created (/attack or /train) or do nothing
     # if resuming.
     mkdir -p $SUBSET_WD
-
     # Make sure the dataset is initialized.
     dataset_init $SUBSET_WD
 
