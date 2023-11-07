@@ -229,11 +229,15 @@ class Device():
         # Manually delete every previsouly created sequences. It fix a bug
         # in WHAD where sequences should be deleted automatically, but they
         # are not.
-        l.LOGGER.debug("delete prepared sequence of whad's central")
-        self.central.delete_sequence(trgr_start_radio)
-        self.central.delete_sequence(trgr_send_ll_enc_req)
-        self.central.delete_sequence(trgr_recv_ll_start_enc_req)
-        self.central.delete_sequence(trgr_recv_ll_reject_ind)
+        # NOTE: As of [2023-11-07 mar.], deprecate this code snippet as it was
+        #       generating a hang from WHAD infinitely waiting a message from
+        #       Butterfly, and it seems it is not necessary anymore since WHAD
+        #       is only used once per trace.
+        # l.LOGGER.debug("delete prepared sequence of whad's central")
+        # self.central.delete_sequence(trgr_start_radio)
+        # self.central.delete_sequence(trgr_send_ll_enc_req)
+        # self.central.delete_sequence(trgr_recv_ll_start_enc_req)
+        # self.central.delete_sequence(trgr_recv_ll_reject_ind)
 
     def close(self):
         if self.central is not None:
