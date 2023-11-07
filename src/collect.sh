@@ -119,7 +119,7 @@ function resume() {
 # Initialize the script.
 function init() {
     # NOTE: Prevent the "There is no debugger connected to the PC after reboot".
-    log_warn "reinitialize devices in default state..."
+    log_warn "Reinitialize devices in default state..."
     ykush_reset
     # Print and find our hardware setup.
     discover_setup
@@ -159,6 +159,8 @@ function ykush_reset() {
         log_info "power on ykush..."
         sudo ykushcmd -u a
         sleep 10 # Wait for power-up and booting.
+    else
+        log_warn "Skip ykush reset because it is not enable!"
     fi
 }
 
