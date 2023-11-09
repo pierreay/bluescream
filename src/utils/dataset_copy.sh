@@ -8,6 +8,7 @@ source ./lib/log.sh
 # $1 is [SRC...].
 # $2 is [DST].
 function copy() {
+    log_info "Copy $1 to $2..."
     rsync -avz --progress $1 $2
 }
 
