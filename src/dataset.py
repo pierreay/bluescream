@@ -103,6 +103,7 @@ def average_fn(q, dset, sset, i, stop, nb_aes, template, plot):
         q.put((None, None, i))
         return 0
     # * Load the trace to process.
+    # NOTE: Load traces one by one since raw traces can be large (> 30 MB).
     sset.load_trace(i, nf=False, ff=True, check=True)
     # * Get the average of all AES and the template.
     ff_avg, sset.template = analyze.average_aes(sset.ff[0], dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot_enable=plot)
@@ -163,8 +164,6 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
     sset = dproc.sset
     # * Resume from previously saved dataset.
     dproc.resume(from_zero=force)
-    # Load traces one by one since traces containing multiple AES executions
-    # can be large (> 30 MB).
     with logging_redirect_tqdm(loggers=[l.LOGGER]):
         with tqdm(initial=dproc.start, total=dproc.stop, desc="average") as pbar:
             i = dproc.start
