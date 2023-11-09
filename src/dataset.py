@@ -157,32 +157,25 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
 
 
     """
-    start = 0
     # * Load input dataset and selected subset.
-    dproc = dataset.DatasetProcessing(indir, subset=subset, outdir=outdir)
+    dproc = dataset.DatasetProcessing(indir, subset, outdir=outdir, stop=stop)
     dset = dproc.dset
     sset = dproc.sset
-    # * Fetch template from previously saved dataset in case of resuming.
-    if force is False and dset.get_savedir_dirty():
-        dset.resume_from_savedir(subset)
-        start = dset.dirty_idx
-        l.LOGGER.info("resume at trace {} using template from previous processing".format(start))
-        l.LOGGER.debug("template shape={}".format(sset.template.shape))
-    if stop == -1:
-        stop = sset.get_nb_trace_ondisk()
+    # * Resume from previously saved dataset.
+    dproc.resume(from_zero=force)
     # Load traces one by one since traces containing multiple AES executions
     # can be large (> 30 MB).
     with logging_redirect_tqdm(loggers=[l.LOGGER]):
-        with tqdm(initial=start, total=stop, desc="average") as pbar:
-            i = start
-            while i < stop:
+        with tqdm(initial=dproc.start, total=dproc.stop, desc="average") as pbar:
+            i = dproc.start
+            while i < dproc.stop:
                 # * Load trace and save current processing step in dataset.
                 dset.dirty_idx = i
 
                 # * Process start. First trace is always progressed sequentially.
                 q = Queue()
                 if i == 0:
-                    average_fn(q, dset, sset, i, stop, nb_aes, template, plot)
+                    average_fn(q, dset, sset, i, dproc.stop, nb_aes, template, plot)
                     sset.template, check, _ = q.get()
                     if check is True:
                         sset.bad_entries.append(i)
@@ -191,7 +184,7 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
                 else:
                     ps = [None] * (os.cpu_count() - 1)
                     for pidx in range(len(ps)):
-                        ps[pidx] = Process(target=average_fn, args=(q, dset, sset, i + pidx, stop, nb_aes, template, plot,))
+                        ps[pidx] = Process(target=average_fn, args=(q, dset, sset, i + pidx, dproc.stop, nb_aes, template, plot,))
                     for pidx in range(len(ps)):
                         l.LOGGER.debug("start process pidx={}".format(pidx))
                         ps[pidx].start()
@@ -210,7 +203,7 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
                 dset.pickle_dump(unload=False, log=False)
                 # * Disable plot for remainaing traces.
                 plot = False
-    dset.dirty_idx = stop # Can be less than stop because of "i = i + len(ps)".
+    dset.dirty_idx = dproc.stop # Can be less than dproc.stop because of "i = i + len(ps)".
     sset.prune_input(save=True)
     dset.pickle_dump()
     
