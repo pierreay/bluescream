@@ -61,7 +61,7 @@ def listen(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id):
                 rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, ff_id, duration=duration, dir=DIR)
                 rad.register(rad_ff)
         except Exception as e:
-            l.log_n_exit(e, "Error during radio initialization", 1)
+            l.log_n_exit("Error during radio initialization", 1, e)
         if rad.get_nb() <= 0:
             l.LOGGER.error("we need at least one radio index to record!")
             exit(1)
@@ -117,7 +117,7 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx):
         try:
             dev.execute()
         except Exception as e:
-            l.log_n_exit(e, "error during whad instrumentation", 3, traceback=True)
+            l.log_n_exit("error during whad instrumentation", 3, e, traceback=True)
     rad.save()
 
 @cli.command()

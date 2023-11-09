@@ -19,12 +19,12 @@ LOGGER_DEFAULT_LEVEL = "DEBUG"
 
 # * Functions
 
-def log_n_exit(e, str, code, traceback=True):
+def log_n_exit(str, code, e=None, traceback=True):
     """Log a critical error and exit.
 
-    :param e: Exception object.
     :param str: Log message.
     :param code: Exit code.
+    :param e: Exception object.
 
     """
     assert LOGGER, "No initialized logger"
