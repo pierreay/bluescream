@@ -39,11 +39,12 @@ def cli(log, loglevel):
 @cli.command()
 @click.argument("outdir", type=click.Path())
 @click.argument("samp_rate", type=int)
+@click.option("--force/--no-force", default=False, help="Force an overwriting of an existing initialized dataset.")
 @click.option("--input-gen-init/--no-input-gen-init", default=False,
               help="Generate plaintexts and keys at initialization instead of real-time.")
 @click.option("--nb-trace-wanted-train", default=0, help="Number of wanted traces for train subset.")
 @click.option("--nb-trace-wanted-attack", default=0, help="Number of wanted traces for attack subset.")
-def init(outdir, samp_rate, input_gen_init, nb_trace_wanted_train, nb_trace_wanted_attack):
+def init(outdir, samp_rate, force, input_gen_init, nb_trace_wanted_train, nb_trace_wanted_attack):
     """Initialize a dataset.
 
     Initialize a dataset in OUTDIR following given options.
@@ -51,18 +52,19 @@ def init(outdir, samp_rate, input_gen_init, nb_trace_wanted_train, nb_trace_want
     SAMP_RATE is the sampling rate used for both recording.
 
     """
-    # TODO: Add a flag to force overwriting an already existing dataset, with
-    # the check in this function.
     if path.exists(outdir):
-        dset = dataset.Dataset("tmp", outdir, samp_rate)
-        input_gen = dataset.InputGeneration.INIT_TIME if input_gen_init else dataset.InputGeneration.REAL_TIME
-        dset.add_subset("train", dataset.SubsetType.TRAIN, input_gen, nb_trace_wanted=nb_trace_wanted_train)
-        dset.add_subset("attack", dataset.SubsetType.ATTACK, input_gen, nb_trace_wanted=nb_trace_wanted_attack)
-        dset.pickle_dump(force=True)
-        l.LOGGER.info("save dataset in {}".format(dset.get_path(save=True)))
+        dset_path = dataset.Dataset.get_path_static(outdir)
+        if not path.exists(dset_path) or force is True:
+            dset = dataset.Dataset("tmp", outdir, samp_rate)
+            input_gen = dataset.InputGeneration.INIT_TIME if input_gen_init else dataset.InputGeneration.REAL_TIME
+            dset.add_subset("train", dataset.SubsetType.TRAIN, input_gen, nb_trace_wanted=nb_trace_wanted_train)
+            dset.add_subset("attack", dataset.SubsetType.ATTACK, input_gen, nb_trace_wanted=nb_trace_wanted_attack)
+            dset.pickle_dump(force=True)
+            l.LOGGER.info("save dataset in {}".format(dset.get_path(save=True)))
+        else:
+            l.log_n_exit("{} already exists!".format(dset_path), 1)
     else:
-        l.LOGGER.error("{} doesn't exists!".format(outdir))
-        exit(1)
+        l.log_n_exit("{} doesn't exists!".format(outdir), 1)
 
 @cli.command()
 @click.argument("indir", type=click.Path())
