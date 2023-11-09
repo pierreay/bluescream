@@ -521,4 +521,7 @@ class DatasetProcessing():
 
     def __str__(self):
         """Return the __str__ from the dataset."""
-        return self.dset.__str__()
+        string = "dataset_processing:\n"
+        string += "- start: {}\n".format(self.start)
+        string += "- stop: {}\n".format(self.stop)
+        return string + self.dset.__str__()
