@@ -226,6 +226,11 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
     dset.dirty_idx = stop # Can be less than stop because of "i = i + len(ps)".
     sset.prune_input(save=True)
     save_dataset_and_quit(dset)
+    
+if __name__ == "__main__":
+    cli()
+
+# * Deprectated
 
 @cli.command()
 @click.argument("indir", type=click.Path())
@@ -237,7 +242,7 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
 @click.option("--stop", default=1, help="Range of traces to process in the subset of the dataset. Set to -1 for maximum.")
 @click.option("--force/--no-force", default=False, help="Force a restart of the processing even if resuming is detected.")
 def extralign(indir, outdir, subset, plot, offset, length, stop, force):
-    """Extract roughly the AES from RAW FF traces and align them.
+    """[DEPRECATED] Extract roughly the AES from RAW FF traces and align them.
 
     INDIR corresponds to the input dataset directory.
     OUTDIR corresponds to the output dataset directory.
@@ -301,6 +306,3 @@ def extralign(indir, outdir, subset, plot, offset, length, stop, force):
             plot = False
     sset.prune_input(save=True)
     save_dataset_and_quit(dset)
-    
-if __name__ == "__main__":
-    cli()
