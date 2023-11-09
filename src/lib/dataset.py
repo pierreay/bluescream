@@ -453,3 +453,32 @@ class Profile():
         if self.POINT_END:
             string += "- profile end point: {}\n".format(self.POINT_END)
         return string
+
+class DatasetProcessing():
+    """Processing workflow using a Dataset.
+
+    Allows to use friendly interface functions for scripting and advanced
+    processing functions (e.g. parallelization).
+
+    """
+
+    # * List all public variables.
+    # Dataset of the processing.
+    # NOTE: Mandatory to not be None.
+    dset = None
+    # Subset of the processing.
+    # NOTE: Can be None.
+    sset = None
+
+    def __init__(self, indir, subset=None, outdir=None):
+        self.dset = Dataset.pickle_load(indir, quit_on_error=True)
+        self.sset = None
+        if outdir is not None:
+            self.dset.set_dirsave(outdir)
+        if subset is not None:
+            self.sset = self.dset.get_subset(subset)
+        self.dset.dirty = True
+        assert self.dset is not None
+
+    def __str__(self):
+        return self.dset.__str__()

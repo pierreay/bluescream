@@ -29,16 +29,6 @@ import lib.triggers as triggers
 import lib.dataset as dataset
 import lib.complex as complex
 
-def load_dataset_or_quit(indir, subset=None, outdir=None):
-    dset = dataset.Dataset.pickle_load(indir, quit_on_error=True)
-    sset = None
-    if outdir is not None:
-        dset.set_dirsave(outdir)
-    if subset is not None:
-        sset = dset.get_subset(subset)
-    dset.dirty = True
-    return dset, sset
-
 def save_dataset_and_quit(dset):
     # Disable setting dirty to False, otherwise, after a completeed averaging,
     # we are not able to extend a previous averaging.
@@ -144,10 +134,9 @@ def debug(indir, outdir):
     INDIR is the path of a directory containing a dataset.
 
     """
-    dset, sset = load_dataset_or_quit(indir, "train", outdir)
+    dproc = dataset.DatasetProcessing(indir, "train", outdir)
     # * Scratchpad:
-    print(dset)
-    # import ipdb; ipdb.set_trace()
+    print(dproc)
     from IPython import embed; embed()
 
 @cli.command()
@@ -174,7 +163,9 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
     """
     start = 0
     # * Load input dataset and selected subset.
-    dset, sset = load_dataset_or_quit(indir, subset, outdir=outdir)
+    dproc = dataset.DatasetProcessing(indir, subset=subset, outdir=outdir)
+    dset = dproc.dset
+    sset = dproc.sset
     # * Fetch template from previously saved dataset in case of resuming.
     if force is False and dset.get_savedir_dirty():
         dset.resume_from_savedir(subset)
