@@ -460,6 +460,9 @@ class DatasetProcessing():
     Allows to use friendly interface functions for scripting and advanced
     processing functions (e.g. parallelization).
 
+    Functions:
+    - resume: Resume from previous processing.
+
     """
 
     # * List all public variables.
@@ -467,25 +470,33 @@ class DatasetProcessing():
     # NOTE: Mandatory to not be None.
     dset = None
     # Subset of the processing.
-    # NOTE: Can be None.
+    # NOTE: Mandatory to not be None.
     sset = None
+    # Index of stop trace for the processing (-1 means infinite).
+    stop = -1
 
-    def __init__(self, indir, subset=None, outdir=None):
+    def __init__(self, indir, subset, outdir=None, stop=-1):
         """Initialize a dataset processing.
 
-        Load a dataset from INDIR and optionnaly load the SUBSET subset. If
-        OUTDIR is not None, set it as the savedir of the dataset. On error
-        during the dataset loading, quit the programm.
+        Load a dataset from INDIR and load the SUBSET subset. If OUTDIR is not
+        None, set it as the savedir of the dataset. On error during the dataset
+        loading, quit the programm.
 
         """
+        # Get dataset and subset.
         self.dset = Dataset.pickle_load(indir, quit_on_error=True)
-        self.sset = None
+        self.sset = self.dset.get_subset(subset)
+        assert self.dset is not None and self.sset is not None
+        # Set the outdir directory for saving.
         if outdir is not None:
             self.dset.set_dirsave(outdir)
-        if subset is not None:
-            self.sset = self.dset.get_subset(subset)
+        # Set stop trace.
+        if stop == -1:
+            self.stop = self.sset.get_nb_trace_ondisk()
+        else:
+            self.stop = stop
+        # Set the dirty flag to True after loading.
         self.dset.dirty = True
-        assert self.dset is not None
 
     def __str__(self):
         """Return the __str__ from the dataset."""
