@@ -122,14 +122,15 @@ def average_fn(q, dset, sset, i, stop, nb_aes, template, plot):
 
 @cli.command()
 @click.argument("indir", type=click.Path())
+@click.option("--subset", type=str, default="train", help="If specified, set the debugged subset.")
 @click.option("--outdir", type=click.Path(), default=None, help="If specified, set the outdir/savedir of the dataset.")
-def debug(indir, outdir):
+def debug(indir, subset, outdir):
     """Debug a dataset.
 
     INDIR is the path of a directory containing a dataset.
 
     """
-    dproc = dataset.DatasetProcessing(indir, "train", outdir)
+    dproc = dataset.DatasetProcessing(indir, subset, outdir)
     # * Scratchpad:
     print(dproc)
     from IPython import embed; embed()
