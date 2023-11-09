@@ -232,77 +232,77 @@ if __name__ == "__main__":
 
 # * Deprectated
 
-@cli.command()
-@click.argument("indir", type=click.Path())
-@click.argument("outdir", type=click.Path())
-@click.argument("subset", type=str)
-@click.option("--plot/--no-plot", default=True, help="Plot AES finding and template validation.")
-@click.option("--offset", default=0, help="Number of samples to addition to the detected AES.")
-@click.option("--length", default=10000, help="Number of samples of the window to extract.")
-@click.option("--stop", default=1, help="Range of traces to process in the subset of the dataset. Set to -1 for maximum.")
-@click.option("--force/--no-force", default=False, help="Force a restart of the processing even if resuming is detected.")
-def extralign(indir, outdir, subset, plot, offset, length, stop, force):
-    """[DEPRECATED] Extract roughly the AES from RAW FF traces and align them.
+# @cli.command()
+# @click.argument("indir", type=click.Path())
+# @click.argument("outdir", type=click.Path())
+# @click.argument("subset", type=str)
+# @click.option("--plot/--no-plot", default=True, help="Plot AES finding and template validation.")
+# @click.option("--offset", default=0, help="Number of samples to addition to the detected AES.")
+# @click.option("--length", default=10000, help="Number of samples of the window to extract.")
+# @click.option("--stop", default=1, help="Range of traces to process in the subset of the dataset. Set to -1 for maximum.")
+# @click.option("--force/--no-force", default=False, help="Force a restart of the processing even if resuming is detected.")
+# def extralign(indir, outdir, subset, plot, offset, length, stop, force):
+#     """[DEPRECATED] Extract roughly the AES from RAW FF traces and align them.
 
-    INDIR corresponds to the input dataset directory.
-    OUTDIR corresponds to the output dataset directory.
-    SUBSET corresponds to the subset's name that will be proceed.
+#     INDIR corresponds to the input dataset directory.
+#     OUTDIR corresponds to the output dataset directory.
+#     SUBSET corresponds to the subset's name that will be proceed.
 
-    """
-    start = 0
-    # * Load input dataset and selected subset.
-    dset, sset = load_dataset_or_quit(indir, subset, outdir=outdir)
-    # * Resume from previously saved dataset if needed.
-    if force is False and dset.get_savedir_dirty():
-        dset.resume_from_savedir(subset)
-        start = dset.dirty_idx
-        l.LOGGER.info("resume at trace {} using template from previous processing".format(start))
-        l.LOGGER.debug("template shape={}".format(sset.template.shape))
-    if stop == -1:
-        stop = sset.get_nb_trace_ondisk()
-    with logging_redirect_tqdm(loggers=[l.LOGGER]):
-        for i in tqdm(range(start, stop), desc="extralign"):
-            # * Load trace and save current processing step in dataset.
-            dset.dirty_idx = i
-            sset.load_trace(i, nf=False, ff=True, check=True)
-            # * Find AES and check for error.
-            # XXX: I think the following line will not work since dtype are different... To test.
-            sset.ff[0] = complex.get_amplitude(sset.ff[0])
-            starts, trigger = analyze.find_aes(sset.ff[0], dset.samp_rate, 1e6, 10e6, 1, lp=1e5, offset=-1.5e-4, flip=False)
-            # XXX: Refactor all of the following insde the find_aes function?
-            if len(starts) == 1:
-                l.LOGGER.debug("number of detected aes: {}".format(len(starts)))
-            else:
-                l.LOGGER.error("number of detected aes is aberrant: {}".format(len(starts)))
-                # If plot is ON, we are debugging/configuring or processing trace #1, hence don't continue.
-                if plot:
-                    libplot.plot_time_spec_sync_axis(sset.ff[0:1], samp_rate=dset.samp_rate, peaks=starts, triggers=trigger)
-                    raise Exception("aes detection failed!")
-            if plot:
-                libplot.plot_time_spec_sync_axis(sset.ff[0:1], samp_rate=dset.samp_rate, peaks=starts, triggers=trigger)
-            # * If trace 0, interactively valid the extraction as the template for further traces.
-            if i == 0:
-                extracted     = analyze.extract(sset.ff[0], starts, length=length)
-                sset.template = analyze.choose_signal(extracted, -1 if plot is True else 0)
-                if sset.template is None:
-                    raise Exception("no choosen template signal")
-            # * Align current trace against the template.
-            if len(starts) == 1: # Only process if find_aes returned correctly, otherwise, set a bad trace.
-                extracted = analyze.extract(sset.ff[0], starts, len(sset.template))
-                aligned   = analyze.align(sset.template, extracted[0], dset.samp_rate, ignore=False, log=False)
-            else:
-                aligned = None
-            # * Check the trace is valid. The trace #0 is assumed be valid.
-            check = False
-            # XXX: Is the trace #0 saved if we do not enter this block, since this block seems to save at the same time at checking?
-            if i > 0:
-                check, sset.ff[0] = analyze.fill_zeros_if_bad(sset.template, aligned, log=True, log_idx=i)
-            if check is True:
-                sset.bad_entries.append(i)
-            # * Save dataset for resuming if not finishing the loop.
-            sset.save_trace(nf=False)
-            dset.pickle_dump(unload=False, log=False)
-            # * Disable plot for remainaing traces.
-            plot = False
-    sset.prune_input(save=True)
-    save_dataset_and_quit(dset)
+#     """
+#     start = 0
+#     # * Load input dataset and selected subset.
+#     dset, sset = load_dataset_or_quit(indir, subset, outdir=outdir)
+#     # * Resume from previously saved dataset if needed.
+#     if force is False and dset.get_savedir_dirty():
+#         dset.resume_from_savedir(subset)
+#         start = dset.dirty_idx
+#         l.LOGGER.info("resume at trace {} using template from previous processing".format(start))
+#         l.LOGGER.debug("template shape={}".format(sset.template.shape))
+#     if stop == -1:
+#         stop = sset.get_nb_trace_ondisk()
+#     with logging_redirect_tqdm(loggers=[l.LOGGER]):
+#         for i in tqdm(range(start, stop), desc="extralign"):
+#             # * Load trace and save current processing step in dataset.
+#             dset.dirty_idx = i
+#             sset.load_trace(i, nf=False, ff=True, check=True)
+#             # * Find AES and check for error.
+#             # XXX: I think the following line will not work since dtype are different... To test.
+#             sset.ff[0] = complex.get_amplitude(sset.ff[0])
+#             starts, trigger = analyze.find_aes(sset.ff[0], dset.samp_rate, 1e6, 10e6, 1, lp=1e5, offset=-1.5e-4, flip=False)
+#             # XXX: Refactor all of the following insde the find_aes function?
+#             if len(starts) == 1:
+#                 l.LOGGER.debug("number of detected aes: {}".format(len(starts)))
+#             else:
+#                 l.LOGGER.error("number of detected aes is aberrant: {}".format(len(starts)))
+#                 # If plot is ON, we are debugging/configuring or processing trace #1, hence don't continue.
+#                 if plot:
+#                     libplot.plot_time_spec_sync_axis(sset.ff[0:1], samp_rate=dset.samp_rate, peaks=starts, triggers=trigger)
+#                     raise Exception("aes detection failed!")
+#             if plot:
+#                 libplot.plot_time_spec_sync_axis(sset.ff[0:1], samp_rate=dset.samp_rate, peaks=starts, triggers=trigger)
+#             # * If trace 0, interactively valid the extraction as the template for further traces.
+#             if i == 0:
+#                 extracted     = analyze.extract(sset.ff[0], starts, length=length)
+#                 sset.template = analyze.choose_signal(extracted, -1 if plot is True else 0)
+#                 if sset.template is None:
+#                     raise Exception("no choosen template signal")
+#             # * Align current trace against the template.
+#             if len(starts) == 1: # Only process if find_aes returned correctly, otherwise, set a bad trace.
+#                 extracted = analyze.extract(sset.ff[0], starts, len(sset.template))
+#                 aligned   = analyze.align(sset.template, extracted[0], dset.samp_rate, ignore=False, log=False)
+#             else:
+#                 aligned = None
+#             # * Check the trace is valid. The trace #0 is assumed be valid.
+#             check = False
+#             # XXX: Is the trace #0 saved if we do not enter this block, since this block seems to save at the same time at checking?
+#             if i > 0:
+#                 check, sset.ff[0] = analyze.fill_zeros_if_bad(sset.template, aligned, log=True, log_idx=i)
+#             if check is True:
+#                 sset.bad_entries.append(i)
+#             # * Save dataset for resuming if not finishing the loop.
+#             sset.save_trace(nf=False)
+#             dset.pickle_dump(unload=False, log=False)
+#             # * Disable plot for remainaing traces.
+#             plot = False
+#     sset.prune_input(save=True)
+#     save_dataset_and_quit(dset)
