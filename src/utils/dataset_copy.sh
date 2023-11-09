@@ -53,6 +53,7 @@ function subset_copy() {
 if [[ $# -lt 3 ]]; then
     echo "Usage: dataset_copy.sh SRC DST NB_TRACE [-p]"
     echo "This script will (partially or completely) copy (using rsync) a dataset from SRC to DST using NB_TRACE number of traces."
+    echo "DST (not SRC) can be specified using an SSH remote, e.g. myserver:/home/storage"
     echo "If -p is passed, use parallel copy."
     exit 0
 fi
