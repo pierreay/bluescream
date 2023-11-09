@@ -1,5 +1,6 @@
 """Classes representing dataset."""
 
+from multiprocessing import Process, Queue
 import os
 from os import path
 from enum import Enum
@@ -7,6 +8,8 @@ import numpy as np
 import pickle
 import signal
 import sys
+from tqdm import tqdm
+from tqdm.contrib.logging import logging_redirect_tqdm
 
 import lib.input_generators as input_generators
 import lib.load as load
@@ -481,6 +484,12 @@ class DatasetProcessing():
     start = 0
     # Index of stop trace for the processing (-1 means infinite).
     stop = -1
+    # Processing title.
+    process_title = None
+    # Processing function.
+    process_fn = None
+    # Processing function arguments.
+    process_args = None
 
     def __init__(self, indir, subset, outdir=None, stop=-1):
         """Initialize a dataset processing.
@@ -525,6 +534,72 @@ class DatasetProcessing():
             self.start = self.dset.dirty_idx
             l.LOGGER.info("Resume at trace {} using template from previous processing".format(self.start))
             l.LOGGER.debug("template.shape={}".format(self.sset.template.shape))
+
+    def create(self, title, fn, args):
+        """Create a processing.
+
+        The processing will be titled TITLE, running the function FN with
+        arguments ARGS.
+
+        """
+        self.process_title = title
+        self.process_fn = fn
+        self.process_args = args
+
+    def process(self):
+        """Run the parallelized processing.
+
+        The processing must be configured using DatasetProcessing.create()
+        before to use this function.
+
+        """
+        # Check that self.create() function has been called.
+        assert self.process_title is not None
+        assert self.process_fn is not None
+        assert self.process_args is not None
+        # Setup progress bar.
+        with logging_redirect_tqdm(loggers=[l.LOGGER]):
+            with tqdm(initial=self.start, total=self.stop, desc=self.process_title) as pbar:
+                i = self.start
+                while i < self.stop:
+                    # * Process start. First trace is always progressed sequentially.
+                    q = Queue()
+                    # TODO: Try to factorize those two branches.
+                    if i == 0:
+                        # Perform the processing.
+                        self.process_fn(q, self.dset, self.sset, i, self.stop, self.process_args)
+                        # Check the result.
+                        self.sset.template, check, _ = q.get()
+                        if check is True:
+                            self.sset.bad_entries.append(i)
+                        # Update the progress.
+                        i = i + 1
+                        pbar.update(1)
+                    else:
+                        # Create the processes.
+                        ps = [None] * (os.cpu_count() - 1)
+                        for pidx in range(len(ps)):
+                            ps[pidx] = Process(target=self.process_fn, args=(q, self.dset, self.sset, i + pidx, self.stop, self.process_args,))
+                        # # Perform the processing.
+                        for pidx in range(len(ps)):
+                            l.LOGGER.debug("start process pidx={}".format(pidx))
+                            ps[pidx].start()
+                        # Check the result.
+                        for pidx in range(len(ps)):
+                            l.LOGGER.debug("get from process pidx={}".format(pidx))
+                            _, check, pidx_get = q.get()
+                            if check is True:
+                                self.sset.bad_entries.append(i + pidx_get)
+                        for pidx in range(len(ps)):
+                            ps[pidx].join()
+                            l.LOGGER.debug("end process pidx={}".format(pidx))
+                        # Update the progress.
+                        i = i + len(ps)
+                        pbar.update(len(ps))
+                    # * Set current processing step and save dataset for
+                    # * resuming if not finishing the loop.
+                    self.dset.dirty_idx = i
+                    self.dset.pickle_dump(unload=False, log=False)
 
     def __signal_install(self):
         """Install the signal handler.

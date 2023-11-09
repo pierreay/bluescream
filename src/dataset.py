@@ -7,15 +7,12 @@
 # during the processing of the first subset, like the template and the bad
 # entries.
 
-from multiprocessing import Process, Queue
 import os
 from os import path
 import numpy as np
 from matplotlib import pyplot as plt
 from scipy import signal
 import click
-from tqdm import tqdm
-from tqdm.contrib.logging import logging_redirect_tqdm
 
 import lib.utils as utils
 import lib.debug as libdebug
@@ -95,9 +92,16 @@ def query(indir, train, attack, pt_gen_init, ks_gen_init):
     if ks_gen_init:
         exit(subset.ks_gen == dataset.InputGeneration.INIT_TIME)
 
-def average_fn(q, dset, sset, i, stop, nb_aes, template, plot):
+def average_fn(q, dset, sset, i, stop, average_args):
     """Main function for processes used in the average command/function."""
     l.LOGGER.debug("start average_fn for trace #{}".format(i))
+    # Get average_fn-specific arguments.
+    # NOTE: Temporary before to continue refactoring.
+    nb_aes = average_args[0]
+    template = average_args[1]
+    plot = average_args[2]
+    # Silently disable plotting if index is different from 0.
+    plot = plot if i == 0 else False
     # * If process start with trace out of bound, return.
     if i >= stop:
         q.put((None, None, i))
@@ -160,51 +164,14 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
     """
     # * Load input dataset and selected subset.
     dproc = dataset.DatasetProcessing(indir, subset, outdir=outdir, stop=stop)
-    dset = dproc.dset
-    sset = dproc.sset
     # * Resume from previously saved dataset.
     dproc.resume(from_zero=force)
-    with logging_redirect_tqdm(loggers=[l.LOGGER]):
-        with tqdm(initial=dproc.start, total=dproc.stop, desc="average") as pbar:
-            i = dproc.start
-            while i < dproc.stop:
-                # * Load trace and save current processing step in dataset.
-                dset.dirty_idx = i
-
-                # * Process start. First trace is always progressed sequentially.
-                q = Queue()
-                if i == 0:
-                    average_fn(q, dset, sset, i, dproc.stop, nb_aes, template, plot)
-                    sset.template, check, _ = q.get()
-                    if check is True:
-                        sset.bad_entries.append(i)
-                    i = i + 1
-                    pbar.update(1)
-                else:
-                    ps = [None] * (os.cpu_count() - 1)
-                    for pidx in range(len(ps)):
-                        ps[pidx] = Process(target=average_fn, args=(q, dset, sset, i + pidx, dproc.stop, nb_aes, template, plot,))
-                    for pidx in range(len(ps)):
-                        l.LOGGER.debug("start process pidx={}".format(pidx))
-                        ps[pidx].start()
-                    for pidx in range(len(ps)):
-                        l.LOGGER.debug("get from process pidx={}".format(pidx))
-                        _, check, pidx_get = q.get()
-                        if check is True:
-                            sset.bad_entries.append(i + pidx_get)
-                    for pidx in range(len(ps)):
-                        ps[pidx].join()
-                        l.LOGGER.debug("end process pidx={}".format(pidx))
-                    i = i + len(ps)
-                    pbar.update(len(ps))
-
-                # * Save dataset for resuming if not finishing the loop.
-                dset.pickle_dump(unload=False, log=False)
-                # * Disable plot for remainaing traces.
-                plot = False
-    dset.dirty_idx = dproc.stop # Can be less than dproc.stop because of "i = i + len(ps)".
-    sset.prune_input(save=True)
-    dset.pickle_dump()
+    # * Define and run the processing.
+    dproc.create("average", average_fn, (nb_aes, template, plot))
+    dproc.process()
+    # * Save the resulting dataset.
+    dproc.sset.prune_input(save=True)
+    dproc.dset.pickle_dump()
     
 if __name__ == "__main__":
     cli()
