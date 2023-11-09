@@ -471,6 +471,13 @@ class DatasetProcessing():
     sset = None
 
     def __init__(self, indir, subset=None, outdir=None):
+        """Initialize a dataset processing.
+
+        Load a dataset from INDIR and optionnaly load the SUBSET subset. If
+        OUTDIR is not None, set it as the savedir of the dataset. On error
+        during the dataset loading, quit the programm.
+
+        """
         self.dset = Dataset.pickle_load(indir, quit_on_error=True)
         self.sset = None
         if outdir is not None:
@@ -481,4 +488,5 @@ class DatasetProcessing():
         assert self.dset is not None
 
     def __str__(self):
+        """Return the __str__ from the dataset."""
         return self.dset.__str__()
