@@ -5,6 +5,8 @@ from os import path
 from enum import Enum
 import numpy as np
 import pickle
+import signal
+import sys
 
 import lib.input_generators as input_generators
 import lib.load as load
@@ -15,6 +17,9 @@ TraceType = Enum('TraceType', ['NF', 'FF'])
 SubsetType = Enum('SubsetType', ['TRAIN', 'ATTACK'])
 InputType = Enum('InputType', ['FIXED', 'VARIABLE'])
 InputGeneration = Enum('InputGeneration', ['REAL_TIME', 'INIT_TIME'])
+
+# Global reference to a DatasetProcessing object used for the signal handler.
+DPROC = None
 
 class Dataset():
     """Top-level class representing a dataset."""
@@ -485,6 +490,8 @@ class DatasetProcessing():
         loading, quit the programm.
 
         """
+        # Install the signal handler.
+        self.__signal_install()
         # Get dataset and subset.
         self.dset = Dataset.pickle_load(indir, quit_on_error=True)
         self.sset = self.dset.get_subset(subset)
@@ -518,6 +525,27 @@ class DatasetProcessing():
             self.start = self.dset.dirty_idx
             l.LOGGER.info("Resume at trace {} using template from previous processing".format(self.start))
             l.LOGGER.debug("template.shape={}".format(self.sset.template.shape))
+
+    def __signal_install(self):
+        """Install the signal handler.
+
+        Catch the SIGINT signal.
+
+        """
+        global DPROC
+        DPROC = self
+        signal.signal(signal.SIGINT, self.__signal_handler)
+
+    @staticmethod
+    def __signal_handler(sig, frame):
+        """Catch signal properly exiting process.
+
+        Signal handler supposed to catch SIGINT to properly quit the processing
+        by setting the stop index to 0.
+
+        """
+        global DPROC
+        DPROC.stop = 0
 
     def __str__(self):
         """Return the __str__ from the dataset."""
