@@ -24,12 +24,20 @@ function subset_copy() {
         copy $1/$3/p.npy $2/$3/p.npy
         for (( i = 0; i < $4; i++ ))
         do
+            # NOTE: Hacky parallelization using launching 2 background copy
+            # every 0.2 seconds.
             if [[ -f $1/$3/${i}_trace_nf.npy ]]; then
-                copy $1/$3/${i}_trace_nf.npy $2/$3/${i}_trace_nf.npy
+                copy $1/$3/${i}_trace_nf.npy $2/$3/${i}_trace_nf.npy &
             fi
             if [[ -f $1/$3/${i}_trace_ff.npy ]]; then
-                copy $1/$3/${i}_trace_ff.npy $2/$3/${i}_trace_ff.npy
+                copy $1/$3/${i}_trace_ff.npy $2/$3/${i}_trace_ff.npy &
             fi
+            sleep 0.1
+            # NOTE: No more than 10 rsync in parallel.
+            while [[ $(pgrep rsync | wc -l) > 10 ]]; do
+                log_warn "Sleep waiting rsync background processes to terminate..."
+                sleep 10
+            done
         done
     fi
 }
