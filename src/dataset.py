@@ -29,13 +29,6 @@ import lib.triggers as triggers
 import lib.dataset as dataset
 import lib.complex as complex
 
-def save_dataset_and_quit(dset):
-    # Disable setting dirty to False, otherwise, after a completeed averaging,
-    # we are not able to extend a previous averaging.
-    # dset.dirty = False
-    dset.pickle_dump()
-    exit(0)
-
 @click.group(context_settings={'show_default': True})
 @click.option("--log/--no-log", default=True, help="Enable or disable logging.")
 @click.option("--loglevel", default="DEBUG", help="Set the logging level.")
@@ -216,7 +209,7 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
                 plot = False
     dset.dirty_idx = stop # Can be less than stop because of "i = i + len(ps)".
     sset.prune_input(save=True)
-    save_dataset_and_quit(dset)
+    dset.pickle_dump()
     
 if __name__ == "__main__":
     cli()
