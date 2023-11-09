@@ -40,3 +40,18 @@ function dataset_init() {
         ./dataset.py init $1 $2 --input-gen-init --nb-trace-wanted-train 65536 --nb-trace-wanted-attack 16384
     fi
 }
+
+# * attack.py
+
+# Create a profile from a train subset.
+# $1 can be --plot or --no-plot [default = --plot].
+# $2 is the --dataset-path [default = $ENVRC_DATASET_AVG_PATH].
+# $3 is the --num-traces [default = 0].
+# $4 is the --start-point [default = 0].
+# $5 is the --end-point [default = 0].
+# $6 is the --num-pois [default = 2].
+# $7 is the --poi-spacing [default = 2].
+# $8 is the --variable [default = p_xor_k].
+function attack_profile() {
+    ./attack.py ${1---plot} --norm --dataset-path ${2-$ENVRC_DATASET_AVG_PATH} --num-traces ${3-0} --start-point ${4-0} --end-point ${5-0} profile --pois-algo r --num-pois ${6-2} --poi-spacing ${7-2} --variable ${8-p_xor_k}
+}
