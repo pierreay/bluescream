@@ -472,6 +472,8 @@ class DatasetProcessing():
     # Subset of the processing.
     # NOTE: Mandatory to not be None.
     sset = None
+    # Index of start trace for the processing.
+    start = 0
     # Index of stop trace for the processing (-1 means infinite).
     stop = -1
 
@@ -497,6 +499,25 @@ class DatasetProcessing():
             self.stop = stop
         # Set the dirty flag to True after loading.
         self.dset.dirty = True
+
+    def resume(self, from_zero=False):
+        """Resume the processing of a dataset...
+
+        If:
+        - The FROM_ZERO parameter is set to False.
+        - The DIRTY flag of the previsouly saved dataset is set to True.
+
+        By:
+        1. Fetching the template previously saved.
+        2. Fetching the bad entries previously saved.
+        3. Using the dirty idx previously saved as start index.
+
+        """
+        if from_zero is False and self.dset.get_savedir_dirty():
+            self.dset.resume_from_savedir(self.sset.subtype)
+            self.start = self.dset.dirty_idx
+            l.LOGGER.info("Resume at trace {} using template from previous processing".format(self.start))
+            l.LOGGER.debug("template.shape={}".format(self.sset.template.shape))
 
     def __str__(self):
         """Return the __str__ from the dataset."""
