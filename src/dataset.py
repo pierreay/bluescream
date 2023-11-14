@@ -101,7 +101,7 @@ def average_fn(q, dset, sset, i, stop, plot, average_args):
     template = average_args[1]
     # * If process start with trace out of bound, return.
     if i >= stop:
-        q.put((None, None, i))
+        q.put((None, i))
         return 0
     # * Load the trace to process.
     # NOTE: Load traces one by one since raw traces can be large (> 30 MB).
@@ -119,7 +119,7 @@ def average_fn(q, dset, sset, i, stop, plot, average_args):
         libplot.plot_time_spec_sync_axis(sset.ff[0:1], samp_rate=dset.samp_rate, cond=plot, comp=complex.CompType.AMPLITUDE)
     # * Save the processed trace.
     sset.save_trace(nf=False)
-    q.put((sset.template, check, i))
+    q.put((check, i))
     l.LOGGER.debug("End average_fn for trace #{}".format(i))
 
 @cli.command()

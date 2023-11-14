@@ -627,7 +627,7 @@ class DatasetProcessing():
             # Check the result.
             for _ in range(self.process_nb):
                 l.LOGGER.debug("Wait result from queue...")
-                self.sset.template, check, i_processed = q.get()
+                check, i_processed = q.get()
                 if check is True:
                     self.sset.bad_entries.append(i_processed)
 
