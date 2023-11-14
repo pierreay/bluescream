@@ -94,7 +94,7 @@ def query(indir, train, attack, pt_gen_init, ks_gen_init):
 
 def average_fn(q, dset, sset, i, stop, average_args):
     """Main function for processes used in the average command/function."""
-    l.LOGGER.debug("start average_fn for trace #{}".format(i))
+    l.LOGGER.debug("Start average_fn for trace #{}...".format(i))
     # Get average_fn-specific arguments.
     # NOTE: Temporary before to continue refactoring.
     nb_aes = average_args[0]
@@ -123,7 +123,7 @@ def average_fn(q, dset, sset, i, stop, average_args):
     # * Save the processed trace.
     sset.save_trace(nf=False)
     q.put((sset.template, check, i))
-    l.LOGGER.debug("end average_fn for trace #{}".format(i))
+    l.LOGGER.debug("End average_fn for trace #{}".format(i))
 
 @cli.command()
 @click.argument("indir", type=click.Path())

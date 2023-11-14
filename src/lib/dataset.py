@@ -84,7 +84,7 @@ class Dataset():
             pickled.attack_set.load_input()
         pickled.run_resumed = False
         if log is True:
-            l.LOGGER.info("dataset loaded from {}".format(Dataset.get_path_static(dir)))
+            l.LOGGER.info("Dataset loaded from '{}'".format(Dataset.get_path_static(dir)))
         return pickled
 
     def get_path(self, save=False):
@@ -140,7 +140,7 @@ class Dataset():
         with open(self.get_path(save=True), "wb") as f:
              pickle.dump(self, f)
              if log is True:
-                 l.LOGGER.info("dataset saved in {}".format(self.get_path(save=True)))
+                 l.LOGGER.info("Dataset saved to '{}'".format(self.get_path(save=True)))
 
     def add_subset(self, name, subtype, input_gen, nb_trace_wanted=0):
         assert(subtype in SubsetType)
@@ -539,7 +539,7 @@ class DatasetProcessing():
             self.dset.resume_from_savedir(self.sset.subtype)
             self.start = self.dset.dirty_idx
             l.LOGGER.info("Resume at trace {} using template from previous processing".format(self.start))
-            l.LOGGER.debug("template.shape={}".format(self.sset.template.shape))
+            l.LOGGER.debug("Template: shape={}".format(self.sset.template.shape))
 
     def create(self, title, fn, args, nb = -1):
         """Create a processing.
