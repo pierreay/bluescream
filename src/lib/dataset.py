@@ -470,6 +470,8 @@ class DatasetProcessing():
 
     Functions:
     - resume: Resume from previous processing.
+    - create: Create a new processing.
+    - process: Execute the previously created processing.
 
     """
 
