@@ -494,6 +494,8 @@ class DatasetProcessing():
     process_args = None
     # Processing number of workers.
     process_nb = None
+    # Processing parallelization switch.
+    process_parallel = None
 
     def __init__(self, indir, subset, outdir=None, stop=-1):
         """Initialize a dataset processing.
@@ -546,7 +548,8 @@ class DatasetProcessing():
         arguments ARGS.
 
         If NB is set to a strictly positive number, use this number as number
-        of workers instead of maximum.
+        of workers instead of maximum. If set to 1, disable parallelization and
+        use a single-process processing.
 
         """
         self.process_title = title
@@ -556,9 +559,10 @@ class DatasetProcessing():
             self.process_nb = nb
         else:
             self.process_nb = os.cpu_count() - 1
+        self.process_parallel = self.process_nb > 1
 
     def process(self):
-        """Run the parallelized processing.
+        """Run the (parallelized) processing.
 
         The processing must be configured using DatasetProcessing.create()
         before to use this function.
@@ -569,48 +573,38 @@ class DatasetProcessing():
         assert self.process_fn is not None
         assert self.process_args is not None
         # Setup progress bar.
-        with logging_redirect_tqdm(loggers=[l.LOGGER]):
-            with tqdm(initial=self.start, total=self.stop, desc=self.process_title) as pbar:
-                i = self.start
-                while i < self.stop:
-                    # * Process start. First trace is always progressed sequentially.
-                    q = Queue()
-                    # TODO: Try to factorize those two branches.
-                    if i == 0:
-                        # Perform the processing.
-                        self.process_fn(q, self.dset, self.sset, i, self.stop, self.process_args)
-                        # Check the result.
-                        self.sset.template, check, _ = q.get()
-                        if check is True:
-                            self.sset.bad_entries.append(i)
-                        # Update the progress.
-                        i = i + 1
-                        pbar.update(1)
-                    else:
-                        # Create the processes.
-                        ps = [None] * self.process_nb
-                        for pidx in range(len(ps)):
-                            ps[pidx] = Process(target=self.process_fn, args=(q, self.dset, self.sset, i + pidx, self.stop, self.process_args,))
-                        # # Perform the processing.
-                        for pidx in range(len(ps)):
-                            l.LOGGER.debug("start process pidx={}".format(pidx))
-                            ps[pidx].start()
-                        # Check the result.
-                        for pidx in range(len(ps)):
-                            l.LOGGER.debug("get from process pidx={}".format(pidx))
-                            _, check, pidx_get = q.get()
-                            if check is True:
-                                self.sset.bad_entries.append(i + pidx_get)
-                        for pidx in range(len(ps)):
-                            ps[pidx].join()
-                            l.LOGGER.debug("end process pidx={}".format(pidx))
-                        # Update the progress.
-                        i = i + len(ps)
-                        pbar.update(len(ps))
-                    # * Set current processing step and save dataset for
-                    # * resuming if not finishing the loop.
-                    self.dset.dirty_idx = i
-                    self.dset.pickle_dump(unload=False, log=False)
+        with (logging_redirect_tqdm(loggers=[l.LOGGER]),
+              tqdm(initial=self.start, total=self.stop, desc=self.process_title) as pbar,):
+            i = self.start
+            while i < self.stop:
+                q = Queue()
+                ps = [None] * self.process_nb
+                # Create the processes and perform the parallelized processing...
+                if self.process_parallel is True:
+                    for pidx in range(len(ps)):
+                        ps[pidx] = Process(target=self.process_fn, args=(q, self.dset, self.sset, i + pidx, self.stop, self.process_args,))
+                        ps[pidx].start()
+                        l.LOGGER.debug("Started process: pidx={}".format(pidx))
+                # ...or perform process sequentially.
+                else:
+                    self.process_fn(q, self.dset, self.sset, i, self.stop, self.process_args)
+                # Check the result.
+                for _ in range(self.process_nb):
+                    l.LOGGER.debug("Get result from queue...")
+                    self.sset.template, check, i_processed = q.get()
+                    if check is True:
+                        self.sset.bad_entries.append(i_processed)
+                if self.process_parallel is True:
+                    for pidx in range(len(ps)):
+                        l.LOGGER.debug("Join process... pidx={}".format(pidx))
+                        ps[pidx].join()
+                # Update the progress.
+                i = i + self.process_nb
+                pbar.update(self.process_nb)
+                # * Set current processing step and save dataset for
+                # * resuming if not finishing the loop.
+                self.dset.dirty_idx = i
+                self.dset.pickle_dump(unload=False, log=False)
 
     def __signal_install(self):
         """Install the signal handler.
