@@ -492,6 +492,8 @@ class DatasetProcessing():
     process_fn = None
     # Processing function arguments.
     process_args = None
+    # Processing number of workers.
+    process_nb = None
 
     def __init__(self, indir, subset, outdir=None, stop=-1):
         """Initialize a dataset processing.
@@ -537,16 +539,23 @@ class DatasetProcessing():
             l.LOGGER.info("Resume at trace {} using template from previous processing".format(self.start))
             l.LOGGER.debug("template.shape={}".format(self.sset.template.shape))
 
-    def create(self, title, fn, args):
+    def create(self, title, fn, args, nb = -1):
         """Create a processing.
 
         The processing will be titled TITLE, running the function FN with
         arguments ARGS.
 
+        If NB is set to a strictly positive number, use this number as number
+        of workers instead of maximum.
+
         """
         self.process_title = title
         self.process_fn = fn
         self.process_args = args
+        if nb > 0:
+            self.process_nb = nb
+        else:
+            self.process_nb = os.cpu_count() - 1
 
     def process(self):
         """Run the parallelized processing.
@@ -579,7 +588,7 @@ class DatasetProcessing():
                         pbar.update(1)
                     else:
                         # Create the processes.
-                        ps = [None] * (os.cpu_count() - 1)
+                        ps = [None] * self.process_nb
                         for pidx in range(len(ps)):
                             ps[pidx] = Process(target=self.process_fn, args=(q, self.dset, self.sset, i + pidx, self.stop, self.process_args,))
                         # # Perform the processing.

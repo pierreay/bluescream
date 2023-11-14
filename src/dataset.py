@@ -149,7 +149,8 @@ def debug(indir, subset, outdir):
 @click.option("--template", default=-1, help="Specify template signal index to use. -1 means prompting.")
 @click.option("--stop", default=1, help="Range of traces to process in the subset of the dataset. Set to -1 for maximum.")
 @click.option("--force/--no-force", default=False, help="Force a restart of the processing even if resuming is detected.")
-def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
+@click.option("--jobs", default=-1, help="Number of workers for processing parallelization [default = maximum].")
+def average(indir, outdir, subset, nb_aes, plot, template, stop, force, jobs):
     """Average multiple AES executions.
 
     INDIR corresponds to a directory containing a dataset with traces
@@ -160,14 +161,13 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force):
 
     SUBSET corresponds to the subset's name that will be proceed.
 
-
     """
     # * Load input dataset and selected subset.
     dproc = dataset.DatasetProcessing(indir, subset, outdir=outdir, stop=stop)
     # * Resume from previously saved dataset.
     dproc.resume(from_zero=force)
     # * Define and run the processing.
-    dproc.create("average", average_fn, (nb_aes, template, plot))
+    dproc.create("average", average_fn, (nb_aes, template, plot), nb=jobs)
     dproc.process()
     # * Save the resulting dataset.
     dproc.sset.prune_input(save=True)
