@@ -92,17 +92,13 @@ def query(indir, train, attack, pt_gen_init, ks_gen_init):
     if ks_gen_init:
         exit(subset.ks_gen == dataset.InputGeneration.INIT_TIME)
 
-def average_fn(q, dset, sset, i, stop, plot, average_args):
+def average_fn(q, dset, sset, i, plot, average_args):
     """Main function for processes used in the average command/function."""
     l.LOGGER.debug("Start average_fn for trace #{}...".format(i))
     # Get average_fn-specific arguments.
     # NOTE: Temporary before to continue refactoring.
     nb_aes = average_args[0]
     template = average_args[1]
-    # * If process start with trace out of bound, return.
-    if i >= stop:
-        q.put((None, i))
-        return 0
     # * Load the trace to process.
     # NOTE: Load traces one by one since raw traces can be large (> 30 MB).
     sset.load_trace(i, nf=False, ff=True, check=True)

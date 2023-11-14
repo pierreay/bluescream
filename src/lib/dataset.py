@@ -583,8 +583,9 @@ class DatasetProcessing():
         assert self.process_fn is not None
         assert self.process_plot is not None
         assert self.process_args is not None
+        assert self.process_nb >= 0
         
-        def _init(i):
+        def _init(i, stop):
             """Initialize the processing starting at trace index I.
 
             Return a tuple composed of the Queue for result transfer and a list
@@ -597,11 +598,15 @@ class DatasetProcessing():
             self.disable_parallel(i == 0)
             # Queue for transferring results from processing function (parallelized or not).
             q = Queue()
-            # List of processes.
-            ps = [None] * self.process_nb
+            # List of processes. Only create necessary processes.
+            ps_len = self.process_nb
+            if i + self.process_nb >= stop:
+                ps_len -= i + self.process_nb - stop
+            ps = [None] * ps_len
             # Initialize the processes if needed (but do not run them).
-            for pidx in range(self.process_nb):
-                ps[pidx] = Process(target=self.process_fn, args=(q, self.dset, self.sset, i + pidx, self.stop, self.process_plot, self.process_args,))
+            for idx, _ in enumerate(ps):
+                l.LOGGER.debug("Create process index #{} for trace index #{}".format(idx, i + idx))
+                ps[idx] = Process(target=self.process_fn, args=(q, self.dset, self.sset, i + idx, self.process_plot, self.process_args,))
                 # NOTE: We only want to plot once during all the processings.
                 self.disable_plot()
             return q, ps
@@ -613,19 +618,19 @@ class DatasetProcessing():
             """
             # Create the processes and perform the parallelized processing...
             if self.is_parallel():
-                for pidx in range(self.process_nb):
-                    ps[pidx].start()
-                    l.LOGGER.debug("Started process: pidx={}".format(pidx))
+                for idx, proc in enumerate(ps):
+                    proc.start()
+                    l.LOGGER.debug("Started process: idx={}".format(idx))
             # ...or perform process sequentially.
             else:
-                self.process_fn(q, self.dset, self.sset, i, self.stop, self.process_plot, self.process_args)
+                self.process_fn(q, self.dset, self.sset, i, self.process_plot, self.process_args)
                 # NOTE: We only want to plot once during all the processings.
                 self.disable_plot()
 
         def _get(q, ps):
             """Get the processing results using the Queue Q and the processes of list PS."""
             # Check the result.
-            for _ in range(self.process_nb):
+            for _, __ in enumerate(ps):
                 l.LOGGER.debug("Wait result from queue...")
                 check, i_processed = q.get()
                 if check is True:
@@ -646,12 +651,12 @@ class DatasetProcessing():
 
             """
             # Terminate the processes.
-            for pidx in range(self.process_nb):
-                l.LOGGER.debug("Join process... pidx={}".format(pidx))
-                ps[pidx].join()
+            for idx, proc in enumerate(ps):
+                l.LOGGER.debug("Join process... idx={}".format(idx))
+                proc.join()
             # Update the progress index and bar.
             # NOTE: Handle case where process_nb == 0 for single-process processing.
-            i_step = self.process_nb if self.process_nb > 0 else 1
+            i_step = len(ps) if self.process_nb > 0 else 1
             i = i_done + i_step
             pbar.update(i_step)
             # Save dataset for resuming if not finishing the loop.
@@ -669,7 +674,7 @@ class DatasetProcessing():
             i = self.start
             while i < self.stop:
                 # Initialize processing for trace(s) starting at index i.
-                q, ps = _init(i)
+                q, ps = _init(i, self.stop)
                 # Run the processing.
                 _run(i, q, ps)
                 # Get and check the results.
