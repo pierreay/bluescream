@@ -249,9 +249,10 @@ def choose_signal(arr, i = -1):
     if i == -1:
         for i in range(len(arr)):
             if libplot.select(arr[i]):
-                l.LOGGER.info("select signal index {}".format(i))
+                l.LOGGER.info("Select signal #{}".format(i))
                 return np.copy(arr[i])
     else:
+        l.LOGGER.debug("Automatically select signal #{}".format(i))
         return np.copy(arr[i])
 
 def extract_time_window(s, sr, center, length, offset=0):
@@ -412,9 +413,11 @@ def average_aes(arr, sr, nb_aes, template, plot_enable=True):
 
     # * Select one extraction as template.
     if isinstance(template, int):
+        l.LOGGER.debug("Start template selection...")
         extracted  = analyze.extract(arr, starts)
         template_s = analyze.choose_signal(extracted, template)
     elif isinstance(template, np.ndarray):
+        l.LOGGER.debug("Use provided template signal")
         template_s = template
     assert(template_s is not None)
 

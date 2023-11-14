@@ -591,9 +591,9 @@ class DatasetProcessing():
             of processes.
 
             """
-            # NOTE: First trace processing will never be parallelized, as
-            # remaning trace processings can rely on this one (e.g. finding a
-            # template).
+            # NOTE: The first processing needs to be executed in the main
+            # process. Remaning processings could rely on this one to set some
+            # parameters (e.g. finding a template).
             self.disable_parallel(i == 0)
             # Queue for transferring results from processing function (parallelized or not).
             q = Queue()
