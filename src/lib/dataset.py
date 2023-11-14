@@ -472,6 +472,9 @@ class DatasetProcessing():
     - resume: Resume from previous processing.
     - create: Create a new processing.
     - process: Execute the previously created processing.
+    - disable_plot: Disable the plot(s) for next processing.
+    - disable_parallel: Disable the processing parallelization.
+    - restore_parallel: Restore the previous processing parallelization.
 
     """
 
@@ -490,6 +493,8 @@ class DatasetProcessing():
     process_title = None
     # Processing function.
     process_fn = None
+    # Processing plotting switch.
+    process_plot = None
     # Processing function arguments.
     process_args = None
     # Processing number of workers.
@@ -541,11 +546,11 @@ class DatasetProcessing():
             l.LOGGER.info("Resume at trace {} using template from previous processing".format(self.start))
             l.LOGGER.debug("Template: shape={}".format(self.sset.template.shape))
 
-    def create(self, title, fn, args, nb = -1):
+    def create(self, title, fn, plot, args, nb = -1):
         """Create a processing.
 
-        The processing will be titled TITLE, running the function FN with
-        arguments ARGS.
+        The processing will be titled TITLE, running the function FN using the
+        plot switch PLOT and custom arguments ARGS.
 
         If NB is set to a strictly positive number, use this number as number
         of workers instead of maximum. If set to 1, disable parallelization and
@@ -554,7 +559,12 @@ class DatasetProcessing():
         """
         self.process_title = title
         self.process_fn = fn
+        self.process_plot = plot
         self.process_args = args
+        # TODO: Remove process_parallel and use only process_nb:
+        # -1 = maximum processes.
+        # > 1 = specified number of processes.
+        # 1 = no process, run sequentially.
         if nb > 0:
             self.process_nb = nb
         else:
@@ -571,40 +581,126 @@ class DatasetProcessing():
         # Check that self.create() function has been called.
         assert self.process_title is not None
         assert self.process_fn is not None
+        assert self.process_plot is not None
         assert self.process_args is not None
+        
+        def _init(i):
+            """Initialize the processing for trace number I.
+
+            Return a tuple composed of the Queue for result transfer and a list
+            of processes.
+
+            """
+            # NOTE: First trace processing will never be parallelized, as
+            # remaning trace processings can rely on this one (e.g. finding a
+            # template).
+            self.disable_parallel(i == 0)
+            # Queue for transferring results from processing function (parallelized or not).
+            q = Queue()
+            # List of processes.
+            ps = [None] * self.process_nb # NOTE: Only used if self.process_parallel is True.
+            # Initialize the processes if needed (but do not run them).
+            if self.process_parallel is True:
+                for pidx in range(self.process_nb):
+                    ps[pidx] = Process(target=self.process_fn, args=(q, self.dset, self.sset, i + pidx, self.stop, self.process_plot, self.process_args,))
+            return q, ps
+
+        def _run(q, ps):
+            """Run the processing using the Queue Q and the processes of list PS."""
+            # Create the processes and perform the parallelized processing...
+            if self.process_parallel is True:
+                for pidx in range(self.process_nb):
+                    ps[pidx].start()
+                    l.LOGGER.debug("Started process: pidx={}".format(pidx))
+                    # NOTE: We only want to plot once during all the processings.
+                    self.disable_plot()
+            # ...or perform process sequentially.
+            else:
+                self.process_fn(q, self.dset, self.sset, i, self.stop, self.process_plot, self.process_args)
+                # NOTE: We only want to plot once during all the processings.
+                self.disable_plot()
+
+        def _get(q, ps):
+            """Get the processing results using the Queue Q and the processes of list PS."""
+            # Check the result.
+            for _ in range(self.process_nb):
+                l.LOGGER.debug("Wait result from queue...")
+                self.sset.template, check, i_processed = q.get()
+                if check is True:
+                    self.sset.bad_entries.append(i_processed)
+
+        def _end(i_done, ps, pbar=None):
+            """Terminate the processing for trace index I_DONE.
+
+            1. Update the processing loop information to prepare the next
+               processing.
+            2. Save the processing state in the dataset for further
+               resuming.
+            3. If parallelized, terminated the processing contained in
+               the PS list.
+            4. If specified, update TQDM's PBAR just like index I_DONE.
+
+            Return the new index I for next processing.
+
+            """
+            # Terminate the processes.
+            if self.process_parallel is True:
+                for pidx in range(self.process_nb):
+                    l.LOGGER.debug("Join process... pidx={}".format(pidx))
+                    ps[pidx].join()
+            # Update the progress bar.
+            i = i_done + self.process_nb
+            pbar.update(self.process_nb)
+            # Save dataset for resuming if not finishing the loop.
+            self.dset.dirty_idx = i
+            self.dset.pickle_dump(unload=False, log=False)
+            # Restore parallelization after first trace processing if needed.
+            # NOTE: Should be at the end since it will modify self.process_nb.
+            self.restore_parallel(i_done == 0)
+            l.LOGGER.debug("Finished processing: trace #{} -> #{}".format(i_done, i - 1))
+            return i
+            
         # Setup progress bar.
         with (logging_redirect_tqdm(loggers=[l.LOGGER]),
               tqdm(initial=self.start, total=self.stop, desc=self.process_title) as pbar,):
             i = self.start
             while i < self.stop:
-                q = Queue()
-                ps = [None] * self.process_nb
-                # Create the processes and perform the parallelized processing...
-                if self.process_parallel is True:
-                    for pidx in range(len(ps)):
-                        ps[pidx] = Process(target=self.process_fn, args=(q, self.dset, self.sset, i + pidx, self.stop, self.process_args,))
-                        ps[pidx].start()
-                        l.LOGGER.debug("Started process: pidx={}".format(pidx))
-                # ...or perform process sequentially.
-                else:
-                    self.process_fn(q, self.dset, self.sset, i, self.stop, self.process_args)
-                # Check the result.
-                for _ in range(self.process_nb):
-                    l.LOGGER.debug("Get result from queue...")
-                    self.sset.template, check, i_processed = q.get()
-                    if check is True:
-                        self.sset.bad_entries.append(i_processed)
-                if self.process_parallel is True:
-                    for pidx in range(len(ps)):
-                        l.LOGGER.debug("Join process... pidx={}".format(pidx))
-                        ps[pidx].join()
-                # Update the progress.
-                i = i + self.process_nb
-                pbar.update(self.process_nb)
-                # * Set current processing step and save dataset for
-                # * resuming if not finishing the loop.
-                self.dset.dirty_idx = i
-                self.dset.pickle_dump(unload=False, log=False)
+                # Initialize processing for trace(s) starting at index i.
+                q, ps = _init(i)
+                # Run the processing.
+                _run(q, ps)
+                # Get and check the results.
+                _get(q, ps)
+                # Terminate the processing.
+                i = _end(i, ps, pbar=pbar)
+
+    def disable_plot(self, cond=True):
+        """Disable the plotting parameter if COND is True."""
+        if cond is True:
+            self.process_plot = False
+
+    def disable_parallel(self, cond=True):
+        """Disable the parallel processing if COND is True.
+
+        One can call restore_parallel() to restore the previous parallelization
+        value.
+
+        """
+        self._process_nb = self.process_nb
+        self._process_parallel = self.process_parallel
+        if cond is True:
+            self.process_nb = 1
+            self.process_parallel = False
+
+    def restore_parallel(self, cond=True):
+        """Restore the process parallelization as before disable_parallel()
+        call if COND is True.
+
+        """
+        if cond is True:
+            assert hasattr(self, "_process_nb") and hasattr(self, "_process_parallel"), "You should run disable_parallel() before!"
+            self.process_nb = self._process_nb
+            self.process_parallel = self._process_parallel
 
     def __signal_install(self):
         """Install the signal handler.

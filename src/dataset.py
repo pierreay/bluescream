@@ -92,16 +92,13 @@ def query(indir, train, attack, pt_gen_init, ks_gen_init):
     if ks_gen_init:
         exit(subset.ks_gen == dataset.InputGeneration.INIT_TIME)
 
-def average_fn(q, dset, sset, i, stop, average_args):
+def average_fn(q, dset, sset, i, stop, plot, average_args):
     """Main function for processes used in the average command/function."""
     l.LOGGER.debug("Start average_fn for trace #{}...".format(i))
     # Get average_fn-specific arguments.
     # NOTE: Temporary before to continue refactoring.
     nb_aes = average_args[0]
     template = average_args[1]
-    plot = average_args[2]
-    # Silently disable plotting if index is different from 0.
-    plot = plot if i == 0 else False
     # * If process start with trace out of bound, return.
     if i >= stop:
         q.put((None, None, i))
@@ -167,7 +164,7 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force, jobs):
     # * Resume from previously saved dataset.
     dproc.resume(from_zero=force)
     # * Define and run the processing.
-    dproc.create("average", average_fn, (nb_aes, template, plot), nb=jobs)
+    dproc.create("average", average_fn, plot, (nb_aes, template), nb=jobs)
     dproc.process()
     # * Save the resulting dataset.
     dproc.sset.prune_input(save=True)
