@@ -96,7 +96,7 @@ def average_fn(q, dset, sset, i, plot, average_args):
     """Main function for processes used in the average command/function."""
     l.LOGGER.debug("Start average_fn for trace #{}...".format(i))
     # Get average_fn-specific arguments.
-    # NOTE: Temporary before to continue refactoring.
+    # PROG: Temporary before to continue refactoring.
     nb_aes = average_args[0]
     template = average_args[1]
     # * Load the trace to process.
