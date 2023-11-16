@@ -137,7 +137,7 @@ function init() {
     # Print and find our hardware setup.
     discover_setup
     # Make sure the dataset is initialized.
-    dataset_init $ENVRC_DATASET_RAW_PATH
+    dataset_init $ENVRC_DATASET_RAW_PATH $ENVRC_SAMP_RATE
     # Initialize the radio daemon.
     radio_init $OPT_LOGLEVEL
 }
