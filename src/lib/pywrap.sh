@@ -51,7 +51,7 @@ function dataset_init() {
 # $7 is the stop option [default = 1 [stop after first trace]]
 # $8 is the force option [default = --no-force]
 function dataset_average() {
-    ./dataset.py --loglevel ${1-DEBUG} average --nb-aes 300 ${2-$ENVRC_DATASET_RAW_PATH} ${3-$ENVRC_DATASET_AVG_PATH} ${4-train} --template ${5--1} ${6---plot} --stop ${7-1} ${8---no-force}
+    ./dataset.py --loglevel ${1-DEBUG} average --nb-aes 300 ${2-$ENVRC_DATASET_RAW_PATH} ${3-$ENVRC_DATASET_AVG_PATH} ${4-train} --template ${5--1} ${6---plot} --stop ${7-1} ${8---no-force} --jobs=-1
 }
 
 # * attack.py

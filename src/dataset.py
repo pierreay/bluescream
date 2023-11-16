@@ -115,7 +115,7 @@ def debug(indir, subset, outdir):
 @click.option("--template", default=-1, help="Specify template signal index to use. -1 means prompting.")
 @click.option("--stop", default=1, help="Range of traces to process in the subset of the dataset. Set to -1 for maximum.")
 @click.option("--force/--no-force", default=False, help="Force a restart of the processing even if resuming is detected.")
-@click.option("--jobs", default=0, help="Number of workers for processing parallelization [default = single process].")
+@click.option("--jobs", default=0, help="Number of workers for processing parallelization [0 = single process ; -1 = maximum].")
 def average(indir, outdir, subset, nb_aes, plot, template, stop, force, jobs):
     """Average multiple AES executions.
 
