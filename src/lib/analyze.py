@@ -377,6 +377,18 @@ def average(arr, norm=False):
             arr = analyze.normalize(arr)
         return np.average(arr, axis=0)
 
+def average_aes_dproc(dset, sset, plot, args):
+    """Wrapper around average_aes() for the DatasetProcessing class."""
+    # Get supplementary arguments.
+    nb_aes = args[0]
+    template = args[1]
+    # * Get the average of all AES and the template.
+    ff_avg, sset.template = analyze.average_aes(sset.ff[0], dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot_enable=plot)
+    # * Return the averaged trace.
+    # NOTE: The template will be modified in the final Subset object if this
+    # function is ran by the MainProcess.
+    return ff_avg
+    
 def average_aes(arr, sr, nb_aes, template, plot_enable=True):
     """Average multiple AES execution contained in trace ARR into a single
     trace. To average multiple AES runs inside one trace, this command will

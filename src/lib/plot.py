@@ -266,3 +266,20 @@ def select_input(event):
     if event.key == 'y':
         USER_SELECT = True
         plt.close()
+
+class PlotOnce():
+    """Plot only once by switching off the flag."""
+
+    def __init__(self, default=True):
+        self.state = default
+
+    def pop(self):
+        val = self.get()
+        self.off()
+        return val
+
+    def get(self):
+        return self.state is True
+
+    def off(self):
+        self.state = False

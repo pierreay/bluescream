@@ -24,7 +24,6 @@ import lib.plot as libplot
 import lib.filters as filters
 import lib.triggers as triggers
 import lib.dataset as dataset
-import lib.complex as complex
 
 @click.group(context_settings={'show_default': True})
 @click.option("--log/--no-log", default=True, help="Enable or disable logging.")
@@ -92,32 +91,6 @@ def query(indir, train, attack, pt_gen_init, ks_gen_init):
     if ks_gen_init:
         exit(subset.ks_gen == dataset.InputGeneration.INIT_TIME)
 
-def average_fn(q, dset, sset, i, plot, average_args):
-    """Main function for processes used in the average command/function."""
-    l.LOGGER.debug("Start average_fn for trace #{}...".format(i))
-    # Get average_fn-specific arguments.
-    # PROG: Temporary before to continue refactoring.
-    nb_aes = average_args[0]
-    template = average_args[1]
-    # * Load the trace to process.
-    # NOTE: Load traces one by one since raw traces can be large (> 30 MB).
-    sset.load_trace(i, nf=False, ff=True, check=True)
-    # * Get the average of all AES and the template.
-    ff_avg, sset.template = analyze.average_aes(sset.ff[0], dset.samp_rate, nb_aes, template if sset.template is None else sset.template, plot_enable=plot)
-    sset.replace_trace(ff_avg, dataset.TraceType.FF)
-    # * Check the trace is valid. The trace #0 is assumed be valid.
-    check = False
-    if i > 0:
-        check, ff_checked = analyze.fill_zeros_if_bad(sset.template, sset.ff[0], log=True, log_idx=i)
-        sset.replace_trace(ff_checked, dataset.TraceType.FF)
-    # * Plot the averaged trace if wanted and average succeed.
-    if sset.ff[0] is not None:
-        libplot.plot_time_spec_sync_axis(sset.ff[0:1], samp_rate=dset.samp_rate, cond=plot, comp=complex.CompType.AMPLITUDE)
-    # * Save the processed trace.
-    sset.save_trace(nf=False)
-    q.put((check, i))
-    l.LOGGER.debug("End average_fn for trace #{}".format(i))
-
 @cli.command()
 @click.argument("indir", type=click.Path())
 @click.option("--subset", type=str, default="train", help="If specified, set the debugged subset.")
@@ -160,7 +133,7 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force, jobs):
     # * Resume from previously saved dataset.
     dproc.resume(from_zero=force)
     # * Define and run the processing.
-    dproc.create("average", average_fn, plot, (nb_aes, template), nb=jobs)
+    dproc.create("average", analyze.average_aes_dproc, libplot.PlotOnce(default=plot), (nb_aes, template), nb=jobs)
     dproc.process()
     # * Save the resulting dataset.
     dproc.sset.prune_input(save=True)

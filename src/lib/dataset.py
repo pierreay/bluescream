@@ -15,6 +15,8 @@ import lib.input_generators as input_generators
 import lib.load as load
 import lib.log as l
 import lib.plot as libplot
+import lib.complex as complex
+import lib.analyze as analyze
 
 TraceType = Enum('TraceType', ['NF', 'FF'])
 SubsetType = Enum('SubsetType', ['TRAIN', 'ATTACK'])
@@ -492,9 +494,11 @@ class DatasetProcessing():
     stop = -1
     # Processing title.
     process_title = None
-    # Processing function.
+    # Processing function. Must have this signature:
+    # FUNC_NAME(dset, sset, plot, args)
+    # Where the FUNC_NAME can get supplementary arguments from the ARGS list/tuple.
     process_fn = None
-    # Processing plotting switch.
+    # Processing plotting switch (a PlotOnce class).
     process_plot = None
     # Processing function arguments.
     process_args = None
@@ -560,6 +564,7 @@ class DatasetProcessing():
         disable multi-process processing and use a single-process processing.
 
         """
+        assert isinstance(plot, libplot.PlotOnce), "plot parameter must be a PlotOnce class!"
         self.process_title = title
         self.process_fn = fn
         self.process_plot = plot
@@ -593,8 +598,9 @@ class DatasetProcessing():
 
             """
             # NOTE: The first processing needs to be executed in the main
-            # process. Remaning processings could rely on this one to set some
-            # parameters (e.g. finding a template).
+            # process to modify the dataset object. Remaning processings could
+            # rely on this one to get some parameters (e.g. the template
+            # signal).
             self.disable_parallel(i == 0)
             # Queue for transferring results from processing function (parallelized or not).
             q = Queue()
@@ -606,9 +612,7 @@ class DatasetProcessing():
             # Initialize the processes if needed (but do not run them).
             for idx, _ in enumerate(ps):
                 l.LOGGER.debug("Create process index #{} for trace index #{}".format(idx, i + idx))
-                ps[idx] = Process(target=self.process_fn, args=(q, self.dset, self.sset, i + idx, self.process_plot, self.process_args,))
-                # NOTE: We only want to plot once during all the processings.
-                self.disable_plot()
+                ps[idx] = Process(target=self.__process_fn, args=(q, self.dset, self.sset, i + idx, self.process_plot.pop(), self.process_args,))
             return q, ps
 
         def _run(i, q, ps):
@@ -623,9 +627,7 @@ class DatasetProcessing():
                     l.LOGGER.debug("Started process: idx={}".format(idx))
             # ...or perform process sequentially.
             else:
-                self.process_fn(q, self.dset, self.sset, i, self.process_plot, self.process_args)
-                # NOTE: We only want to plot once during all the processings.
-                self.disable_plot()
+                self.__process_fn(q, self.dset, self.sset, i, self.process_plot.pop(), self.process_args)
 
         def _get(q, ps):
             """Get the processing results using the Queue Q and the processes of list PS."""
@@ -727,6 +729,44 @@ class DatasetProcessing():
         global DPROC
         DPROC = self
         signal.signal(signal.SIGINT, self.__signal_handler)
+
+    def __process_fn(self, q, dset, sset, i, plot, args):
+        """Main function for processes.
+
+        It is usually ran by a caller process from the self.process/_run()
+        function. It may be run in the main proces too. It will load a trace,
+        execute the processing based on the self.process_fn function pointer,
+        may check and plot the result, and save the resulting trace.
+
+        Q is a Queue to transmit the results, DSET a Dataset, SSET a Subset, I
+        the trace index to load and process, PLOT a flag indicating to plot the
+        result, and ARGS additionnal arguments transmitted to the
+        self.process_fn function.
+
+        """
+        l.LOGGER.debug("Start __process_fn() for trace #{}...".format(i))
+        # * Load the trace to process.
+        # NOTE: We choose to always load traces one by one since raw traces can
+        # be large (> 30 MB).
+        sset.load_trace(i, nf=False, ff=True, check=True)
+        # * Apply the processing and get the resulting trace.
+        # NOTE: ff can be None if the processing fails.
+        ff = self.process_fn(dset, sset, plot, args)
+        # * Check the trace is valid.
+        # NOTE: The trace #0 is assumed be valid.
+        check = False
+        if i > 0:
+            check, ff_checked = analyze.fill_zeros_if_bad(sset.template, ff, log=True, log_idx=i)
+        else:
+            ff_checked = ff
+        sset.replace_trace(ff_checked, TraceType.FF)
+        # * Plot the averaged trace if wanted and processing succeed.
+        if sset.ff[0] is not None:
+            libplot.plot_time_spec_sync_axis(sset.ff[0:1], samp_rate=dset.samp_rate, cond=plot, comp=complex.CompType.AMPLITUDE)
+        # * Save the processed trace and transmit result to caller process.
+        sset.save_trace(nf=False)
+        q.put((check, i))
+        l.LOGGER.debug("End __process_fn() for trace #{}".format(i))
 
     @staticmethod
     def __signal_handler(sig, frame):
