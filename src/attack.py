@@ -96,7 +96,7 @@ def load_data(subset):
     DATASET = dataset.Dataset.pickle_load(DATASET_PATH)
     assert(DATASET)
     SUBSET = DATASET.get_subset(subset)
-    SUBSET.load_trace(range(0, NUM_TRACES), nf=False, ff=True)
+    SUBSET.load_trace(range(0, NUM_TRACES), nf=False, ff=True, start_point=START_POINT, end_point=END_POINT)
     PROFILE = DATASET.get_profile()
     PLAINTEXTS                  = SUBSET.pt
     KEYS                        = SUBSET.ks
@@ -105,7 +105,6 @@ def load_data(subset):
     KEYS, PLAINTEXTS, _, TRACES = load.reduce_entry_all_dataset(KEYS, PLAINTEXTS, None, TRACES, NUM_TRACES)
     PLAINTEXTS                  = PLAINTEXTS.tolist()
     KEYS                        = KEYS.tolist()
-    TRACES                      = load.truncate(TRACES, START_POINT, END_POINT)
     TRACES                      = complex.get_amplitude(TRACES)
     if NORM or NORM2:
         TRACES = analyze.normalize_zscore(TRACES, NORM2)
