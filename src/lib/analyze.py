@@ -197,7 +197,23 @@ def get_bad_trace(ref):
     assert(type(ref) == np.ndarray)
     return np.zeros(ref.shape, dtype=ref.dtype)
 
-def find_aes(s, sr, bpl, bph, nb_aes = 1, lp = 0, offset = 0, flip=True, plot=False):
+def find_aes_configured(s, sr, nb_aes=1, plot=False):
+    """Wrapper around find_aes() which handle the correct configuration."""
+    # XXX: Find a better way to configure this function than modifying this place of the source code.
+    # First version of find_aes used for training set:
+    # starts, trigger = analyze.find_aes(arr, sr, 8.8e6, 9.5e6, nb_aes, 1e4, -0.5e-4, flip=True)
+    # Second version of find_aes used for attack set:
+    # starts, trigger = analyze.find_aes(arr, sr, 8.1e6, 8.5e6, nb_aes, 1e4, -0.5e-4, flip=False)
+    # Third version of find_aes used to train set using 10 MHz bandwidth:
+    starts, trigger = analyze.find_aes(s, sr, 2.9e6, 3.3e6, nb_aes=nb_aes, lp=1e4, offset=-0.5e-4, flip=True, plot=plot)
+    check_nb = len(starts) < (1.1 * nb_aes) and len(starts) > (0.8 * nb_aes)
+    if check_nb is True:
+        l.LOGGER.debug("#{} detected AES".format(len(starts)))
+    else:
+        raise Exception("Aberrant number of detected AES: {}".format(len(starts)))
+    return starts, trigger
+
+def find_aes(s, sr, bpl, bph, nb_aes=1, lp=0, offset=0, flip=True, plot=False):
     """Find the indexes of AES computations inside a trace.
 
     Find the start (beginning of the key scheduling) of every AES computation
@@ -409,18 +425,10 @@ def average_aes(arr, sr, nb_aes, template, plot_enable=True):
 
     """
     # * Find AES.
-    # XXX: Find a better way to configure this function than modifying this place of the source code.
-    # First version of find_aes used for training set:
-    # starts, trigger = analyze.find_aes(arr, sr, 8.8e6, 9.5e6, nb_aes, 1e4, -0.5e-4, flip=True)
-    # Second version of find_aes used for attack set:
-    # starts, trigger = analyze.find_aes(arr, sr, 8.1e6, 8.5e6, nb_aes, 1e4, -0.5e-4, flip=False)
-    # Third version of find_aes used to train set using 10 MHz bandwidth:
-    starts, trigger = analyze.find_aes(arr, sr, 2.9e6, 3.3e6, nb_aes, 1e4, -0.5e-4, flip=True, plot=plot_enable)
-    check_nb = len(starts) < (1.1 * nb_aes) and len(starts) > (0.8 * nb_aes)
-    if check_nb:
-        l.LOGGER.debug("number of detected aes: {}".format(len(starts)))
-    else:
-        l.LOGGER.error("number of detected aes seems to be aberrant: {}".format(len(starts)))
+    try:
+        starts, trigger = analyze.find_aes_configured(arr, sr, nb_aes=nb_aes, plot=plot_enable)
+    except Exception as e:
+        l.LOGGER.error("Error during finding AES: {}".format(e), stack_info=True)
         return None, template
 
     # * Select one extraction as template.
