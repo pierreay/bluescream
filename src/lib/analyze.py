@@ -270,6 +270,27 @@ def choose_signal(arr, i = -1):
         l.LOGGER.debug("Automatically select signal #{}".format(i))
         return np.copy(arr[i])
 
+def choose_signal_from_starts(template, arr, starts):
+    """Choose a signal from segments signals or a template signal.
+
+    If TEMPLATE is a signal, then return it as the chosen signal. If TEMPLATE
+    is an index number, automatically choose the segment at this index from the
+    ARR trace and the STARTS segments position. If TEMPLATE is -1,
+    interactively prompt which signal to choose.
+
+    Return (and assert it is not None) the chosen signal.
+
+    """
+    if isinstance(template, int):
+        l.LOGGER.debug("Start signal selection...")
+        extracted  = analyze.extract(arr, starts)
+        template_s = analyze.choose_signal(extracted, template)
+    elif isinstance(template, np.ndarray):
+        l.LOGGER.debug("Use provided signal")
+        template_s = template
+    assert(template_s is not None)
+    return template_s
+
 def extract_time_window(s, sr, center, length, offset=0):
     """Extract a time window from a signal S.
 
@@ -403,7 +424,7 @@ def average_aes_dproc(dset, sset, plot, args):
     # NOTE: The template will be modified in the final Subset object if this
     # function is ran by the MainProcess.
     return ff_avg
-    
+
 def average_aes(arr, sr, nb_aes, template, plot_enable=True):
     """Average multiple AES execution contained in trace ARR into a single
     trace. To average multiple AES runs inside one trace, this command will
@@ -431,14 +452,8 @@ def average_aes(arr, sr, nb_aes, template, plot_enable=True):
         return None, template
 
     # * Select one extraction as template.
-    if isinstance(template, int):
-        l.LOGGER.debug("Start template selection...")
-        extracted  = analyze.extract(arr, starts)
-        template_s = analyze.choose_signal(extracted, template)
-    elif isinstance(template, np.ndarray):
-        l.LOGGER.debug("Use provided template signal")
-        template_s = template
-    assert(template_s is not None)
+    l.LOGGER.debug("Select a template...")
+    template_s = choose_signal_from_starts(template, arr, starts)
 
     # * Extract all AES and average them.
     extracted = analyze.extract(arr, starts, len(template_s))
