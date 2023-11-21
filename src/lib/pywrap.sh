@@ -73,3 +73,7 @@ function dataset_average() {
 function attack_profile() {
     ./attack.py ${1---plot} --norm --dataset-path ${2-$ENVRC_DATASET_AVG_PATH} --num-traces ${3-0} --start-point ${4-0} --end-point ${5-0} profile --pois-algo r --num-pois ${6-2} --poi-spacing ${7-2} --variable ${8-p_xor_k} ${9---no-align}
 }
+
+function attack_pcc() {
+    ./attack.py ${1---plot} --norm --dataset-path ${2-$ENVRC_DATASET_AVG_PATH} --num-traces ${3-0} --start-point ${4-0} --end-point ${5-0} attack --attack-algo pcc --num-pois ${6-2} --poi-spacing ${7-2} --variable ${8-p_xor_k} ${9---no-align}
+}
