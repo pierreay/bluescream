@@ -207,7 +207,7 @@ class Subset():
             self.pt_type = InputType.VARIABLE
             self.ks_type = InputType.FIXED
 
-    def load_trace(self, idx=-1, nf=True, ff=True, check=False):
+    def load_trace(self, idx=-1, nf=True, ff=True, check=False, start_point=0, end_point=0):
         """Load the on-disk traces into memory.
 
         The loading will put the traces in the self.nf and self.ff
@@ -220,17 +220,24 @@ class Subset():
         with x > 1. NF and FF can be set to False to not load them in an
         unpacked dataset.
 
+        Traces truncation during loading can be achieved using START_POINT and
+        END_POINT. If START_POINT is set to different from 0, use it as start index
+        during loading the traces. If END_POINT is set to different from 0, use it
+        as end index during loading the traces.
+
         """
         assert(path.exists(self.get_path()))
         if isinstance(idx, int) and idx == -1:
-            self.nf, self.ff = load.load_all_traces(self.get_path(), nf_wanted=nf, ff_wanted=ff)
+            self.nf, self.ff = load.load_all_traces(self.get_path(), nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point)
         elif isinstance(idx, int):
             self.nf, self.ff = load.load_pair_trace(self.get_path(), idx, nf=nf, ff=ff)
-            # NOTE: Hack the load_pair_trace() result to return 2D np.ndarray.
-            self.nf = None if self.nf is None else np.array(self.nf, ndmin=2)
-            self.ff = None if self.ff is None else np.array(self.ff, ndmin=2)
+            self.nf = None if self.nf is None else load.truncate(self.nf, start_point, end_point)
+            self.ff = None if self.ff is None else load.truncate(self.nf, start_point, end_point)
         elif isinstance(idx, range):
-            self.nf, self.ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf_wanted=nf, ff_wanted=ff)
+            self.nf, self.ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point)
+        # NOTE: Hack the load_xxx_trace() result to always return 2D np.ndarray.
+        self.nf = None if self.nf is None else np.array(self.nf, ndmin=2)
+        self.ff = None if self.ff is None else np.array(self.ff, ndmin=2)
         self.load_trace_idx = idx
         if check is True:
             if nf is True and self.nf is None:

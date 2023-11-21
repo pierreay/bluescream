@@ -335,7 +335,7 @@ def save_all_traces(dir, nf, ff, packed=False, start=0, stop=0):
                 MySoapySDR.numpy_save(get_dataset_path_unpack_ff(dir, i), ff[i - start])
     l.LOGGER.info("done!")
 
-def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=True):
+def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=True, start_point=0, end_point=0):
     """Load traces contained in DIR. Can be packed or unpacked. Return a 2D
     np.array of shape (nb_traces, nb_samples). START and STOP can be specified
     to load a specific range of file from the disk for an unpacked
@@ -343,6 +343,11 @@ def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=Tr
     None/empty/zeroes if traces doesn't exists. Beware to not overflow the
     memory. NF and FF can be set to False to not load them in an unpacked
     dataset.
+
+    Traces truncation during loading can be achieved using START_POINT and
+    END_POINT. If START_POINT is set to different from 0, use it as start index
+    during loading the traces. If END_POINT is set to different from 0, use it
+    as end index during loading the traces.
 
     """
     l.LOGGER.info("loading traces...")
@@ -359,23 +364,26 @@ def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=Tr
         nf, ff = None, None
         stop = get_nb(dir) if stop < 1 else stop
         nb = stop - start
-        ref_shape, ref_dtype = get_dataset_shape_type(dir)
         nf_exist = get_dataset_is_nf_exist(dir)
         ff_exist = get_dataset_is_ff_exist(dir)
         if nf_wanted is True and nf_exist is True:
-            nf = np.empty((nb, ref_shape[0]), dtype=ref_dtype)
+            nf = [None] * nb
             iterator = tqdm(range(start, stop), desc="load all nf traces") if bar else list(range(start, stop))
             for i in iterator:
                 nf_p = get_dataset_path_unpack_nf(dir, i)
-                nf[i - start] = MySoapySDR.numpy_load(nf_p)
+                # NOTE: Make sure "copy" is enabled to not overflow the memory
+                # after truncating loaded trace.
+                nf[i - start] = truncate(MySoapySDR.numpy_load(nf_p), start=start_point, end=end_point, copy=True)
         else:
              l.LOGGER.warning("no loaded nf traces!")
         if ff_wanted is True and ff_exist is True:
-            ff = np.empty((nb, ref_shape[0]), dtype=ref_dtype)
+            ff = [None] * nb
             iterator = tqdm(range(start, stop), desc="load all ff traces") if bar else list(range(start, stop))
             for i in iterator:
                 ff_p = get_dataset_path_unpack_ff(dir, i)
-                ff[i - start] = MySoapySDR.numpy_load(ff_p)
+                # NOTE: Make sure "copy" is enabled to not overflow the memory
+                # after truncating loaded trace.
+                ff[i - start] = truncate(MySoapySDR.numpy_load(ff_p), start=start_point, end=end_point, copy=True)
         else:
             l.LOGGER.warning("no loaded ff traces!")
         if nf_exist or ff_exist:
@@ -432,11 +440,22 @@ def truncate_min(arr):
         arr[idx] = s[:target_len]
     return arr
 
-def truncate(traces, start=0, end=0):
-    """Truncate all traces containted in TRACES (2D np.array) according to
-    START and END if they are set."""
-    if start:
-        traces = traces[:,start:]
-    if end:
-        traces = traces[:,:end-start]
-    return traces
+def truncate(traces, start=0, end=0, copy=False):
+    """Truncate all traces containted in TRACES (1D or 2D np.array) according
+    to START and END if they are set.
+
+    If COPY is set to True, return a copy of the input traces (useful to delete
+    the old reference to input traces if their size is huge).
+
+    """
+    if traces.ndim == 2:
+        if start != 0:
+            traces = traces[:,start:]
+        if end != 0:
+            traces = traces[:,:end-start]
+    elif traces.ndim == 1:
+        if start != 0:
+            traces = traces[start:]
+        if end != 0:
+            traces = traces[:end-start]
+    return traces if copy is False else np.copy(traces)
