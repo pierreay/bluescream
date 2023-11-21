@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import lib.log as l
 import lib.analyze as analyze
 import lib.complex as complex
+import lib.load as load
 
 # * Global variables
 
@@ -25,6 +26,26 @@ def show_fullscreen():
 def savetmp(filename):
     plt.savefig(path.join("/tmp", filename))
     plt.close()
+
+def plot_time_overwrite(traces, align=False, align_sr=0, start=0, end=0):
+    """Plot the amplitude component of all signals contained in the 2D numpy
+    array TRACES in time-domain on a single figure.
+
+    Allows to truncate the traces using the START and the END indexes.
+
+    Allows to align the traces before the plot and after the truncation using
+    the ALIGN bool and the ALIGN_SR sampling rate.
+
+    """
+    # Pre-process traces.
+    traces = complex.get_comp(traces, complex.CompType.AMPLITUDE)
+    traces = load.truncate(traces, start, end)
+    if align is True and align_sr != 0:
+        traces = analyze.align_all(traces, align_sr, tqdm_log=True)
+    # Plot all traces in time-domain.
+    for trace in traces:
+        plt.plot(trace)
+    plt.show()
 
 def plot_loop(arr, func, nb=0):
     """Iterate over every element of the ARR list or numpy array and apply the
