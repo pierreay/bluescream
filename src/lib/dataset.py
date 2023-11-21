@@ -760,12 +760,14 @@ class DatasetProcessing():
         # NOTE: ff can be None if the processing fails.
         ff = self.process_fn(dset, sset, plot, args)
         # * Check the trace is valid.
-        # NOTE: The trace #0 is assumed be valid.
         check = False
         if i > 0:
             check, ff_checked = analyze.fill_zeros_if_bad(sset.template, ff, log=True, log_idx=i)
-        else:
+        elif i == 0 and ff is not None:
+            l.LOGGER.info("Trace #0 processing (e.g. creating a template) is assumed to be valid!")
             ff_checked = ff
+        else:
+            raise Exception("Trace #0 processing encountered an error!")
         sset.replace_trace(ff_checked, TraceType.FF)
         # * Plot the averaged trace if wanted and processing succeed.
         if sset.ff[0] is not None:
