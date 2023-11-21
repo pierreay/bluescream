@@ -916,7 +916,9 @@ def bruteforce(bit_bound_end):
               help="Minimum number of points between two points of interest.")
 @click.option("--pois-dir", default="", type=click.Path(file_okay=False, writable=True),
               help="Reduce the trace using the POIS in this folder")
-def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir):
+@click.option("--align/--no-align", default=False, show_default=True,
+             help="Align the traces using the first one as template before to profile.")
+def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir, align):
     """
     Build a template using a chosen technique.
 
@@ -927,6 +929,9 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
     load_data(dataset.SubsetType.TRAIN)
     DATASET.add_profile()
     PROFILE = DATASET.get_profile()
+
+    if align:
+        TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
 
     if pois_dir != "":
         pois = np.load(os.path.join(pois_dir, dataset.Profile.POIS_FN))

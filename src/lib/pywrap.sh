@@ -69,6 +69,7 @@ function dataset_average() {
 # $6 is the --num-pois [default = 2].
 # $7 is the --poi-spacing [default = 2].
 # $8 is the --variable [default = p_xor_k].
+# $9 is the --align or --no-align [default = --no-align].
 function attack_profile() {
-    ./attack.py ${1---plot} --norm --dataset-path ${2-$ENVRC_DATASET_AVG_PATH} --num-traces ${3-0} --start-point ${4-0} --end-point ${5-0} profile --pois-algo r --num-pois ${6-2} --poi-spacing ${7-2} --variable ${8-p_xor_k}
+    ./attack.py ${1---plot} --norm --dataset-path ${2-$ENVRC_DATASET_AVG_PATH} --num-traces ${3-0} --start-point ${4-0} --end-point ${5-0} profile --pois-algo r --num-pois ${6-2} --poi-spacing ${7-2} --variable ${8-p_xor_k} ${9---no-align}
 }
