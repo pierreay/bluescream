@@ -133,7 +133,7 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force, jobs):
     # * Resume from previously saved dataset.
     dproc.resume(from_zero=force)
     # * Define and run the processing.
-    dproc.create("average", analyze.average_aes_dproc, libplot.PlotOnce(default=plot), (nb_aes, template), nb=jobs)
+    dproc.create("Average", analyze.average_aes_dproc, libplot.PlotOnce(default=plot), (nb_aes, template), nb=jobs)
     dproc.process()
     # * Save the resulting dataset.
     dproc.sset.prune_input(save=True)
@@ -169,7 +169,7 @@ def extract(indir, outdir, subset, nb_aes, plot, template, stop, force, jobs, id
     # * Resume from previously saved dataset.
     dproc.resume(from_zero=force)
     # * Define and run the processing.
-    dproc.create("extract", analyze.extract_aes_dproc, libplot.PlotOnce(default=plot), (nb_aes, template, idx), nb=jobs)
+    dproc.create("Extract", analyze.extract_aes_dproc, libplot.PlotOnce(default=plot), (nb_aes, template, idx, window), nb=jobs)
     dproc.process()
     # * Save the resulting dataset.
     dproc.sset.prune_input(save=True)
