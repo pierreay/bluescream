@@ -213,6 +213,8 @@ def find_aes_configured(s, sr, nb_aes=1, starts_offset=0, plot=False):
     if check_nb is True:
         l.LOGGER.debug("#{} detected AES".format(len(starts)))
     else:
+        # TODO: Use a custom exception type to not print its stack in try
+        # statements using this function.
         raise Exception("Aberrant number of detected AES: {}".format(len(starts)))
     return starts
 
