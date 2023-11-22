@@ -41,14 +41,16 @@ def npy_int_to_list_str_hex(npy_int):
     return [hex(x) for x in npy_int]
 
 def list_array_to_2d_array(arr):
-    """Convert a list to a 2D array.
+    """Convert a list or a 1D array to a 2D array.
 
-    Convert the Python list ARR containing 1D np.array to a 2D np.array.
+    Convert ARR, a Python list containing 1D np.array or a single 1D np.array,
+    to a 2D np.array.
 
     Return the 2D np.array, but if ARR is None, return None.
 
     """
-    if arr is not None:
-        if load.reshape_needed(arr):
-            arr = load.reshape(arr)
+    if arr is None:
+        return None
+    elif isinstance(arr, list) and load.reshape_needed(arr):
+        arr = load.reshape(arr)
     return np.array(arr, ndmin=2)
