@@ -67,7 +67,7 @@ function dataset_average() {
 # $6 is the plot switch [default = --plot]
 # $7 is the stop option [default = 1 [stop after first trace]]
 # $8 is the force option [default = --no-force]
-# $8 is the index extraction option [default = 0 [first AES]]
+# $9 is the index extraction option [default = 0 [first AES]]
 function dataset_extract() {
     ./dataset.py --loglevel ${1-DEBUG} extract --nb-aes 300 ${2-$ENVRC_DATASET_RAW_PATH} ${3-$ENVRC_DATASET_EXT_PATH} ${4-train} --template ${5--1} ${6---plot} --stop ${7-1} ${8---no-force} --jobs=-1 --idx ${9-0}
 }
