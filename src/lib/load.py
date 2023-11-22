@@ -368,7 +368,7 @@ def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=Tr
         ff_exist = get_dataset_is_ff_exist(dir)
         if nf_wanted is True and nf_exist is True:
             nf = [None] * nb
-            iterator = tqdm(range(start, stop), desc="Load all NF traces") if bar else list(range(start, stop))
+            iterator = tqdm(range(start, stop), desc="Load NF traces") if bar else list(range(start, stop))
             for i in iterator:
                 nf_p = get_dataset_path_unpack_nf(dir, i)
                 # NOTE: Make sure "copy" is enabled to not overflow the memory
@@ -378,7 +378,7 @@ def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=Tr
              l.LOGGER.warning("No loaded NF traces!")
         if ff_wanted is True and ff_exist is True:
             ff = [None] * nb
-            iterator = tqdm(range(start, stop), desc="Load all FF traces") if bar else list(range(start, stop))
+            iterator = tqdm(range(start, stop), desc="Load FF traces") if bar else list(range(start, stop))
             for i in iterator:
                 ff_p = get_dataset_path_unpack_ff(dir, i)
                 # NOTE: Make sure "copy" is enabled to not overflow the memory

@@ -183,7 +183,7 @@ def fill_zeros_if_bad(ref, test, log=True, log_idx=-1):
     """
     if test is None or test.shape != ref.shape:
         if log is True:
-            l.LOGGER.warning("trace {} filled with zeroes!".format(log_idx))
+            l.LOGGER.warning("Trace #{} filled with zeroes!".format(log_idx))
         return True, get_bad_trace(ref)
     return False, test
 
@@ -401,7 +401,7 @@ def align(template, target, sr, ignore=True, log=False):
 def align_nb(s, nb, sr, template, tqdm_log=True):
     s_aligned = [0] * nb
     if tqdm_log:
-        lrange = tqdm(range(0, nb), desc="align")
+        lrange = tqdm(range(0, nb), desc="Align")
     else:
         lrange = list(range(0, nb))
     for idx in lrange:
