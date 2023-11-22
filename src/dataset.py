@@ -150,7 +150,8 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force, jobs):
 @click.option("--force/--no-force", default=False, help="Force a restart of the processing even if resuming is detected.")
 @click.option("--jobs", default=0, help="Number of workers for processing parallelization [0 = single process ; -1 = maximum].")
 @click.option("--idx", default=0, help="Index of the AES to extract from the trace.")
-def extract(indir, outdir, subset, nb_aes, plot, template, stop, force, jobs, idx):
+@click.option("--window", default=0, help="Sample window extracted around the detected AES.")
+def extract(indir, outdir, subset, nb_aes, plot, template, stop, force, jobs, idx, window):
     """Extract an aligned AES.
 
     INDIR corresponds to a directory containing a dataset with traces

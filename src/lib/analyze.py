@@ -197,15 +197,18 @@ def get_bad_trace(ref):
     assert(type(ref) == np.ndarray)
     return np.zeros(ref.shape, dtype=ref.dtype)
 
-def find_aes_configured(s, sr, nb_aes=1, plot=False):
-    """Wrapper around find_aes() which handle the correct configuration."""
+def find_aes_configured(s, sr, nb_aes=1, starts_offset=0, plot=False):
+    """Wrapper around find_aes(). It handles the correct configuration to
+    exactly match the beginning of each AES computation by default.
+
+    """
     # XXX: Find a better way to configure this function than modifying this place of the source code.
     # First version of find_aes used for training set:
     # starts, trigger = analyze.find_aes(arr, sr, 8.8e6, 9.5e6, nb_aes, 1e4, -0.5e-4, flip=True)
     # Second version of find_aes used for attack set:
     # starts, trigger = analyze.find_aes(arr, sr, 8.1e6, 8.5e6, nb_aes, 1e4, -0.5e-4, flip=False)
     # Third version of find_aes used to train set using 10 MHz bandwidth:
-    starts = analyze.find_aes(s, sr, 2.9e6, 3.3e6, nb_aes=nb_aes, lp=1e4, offset=-0.5e-4, flip=True, plot=plot)
+    starts = analyze.find_aes(s, sr, 2.9e6, 3.3e6, nb_aes=nb_aes, lp=1e4, offset=(-0.5e-4 * sr) + starts_offset, flip=True, plot=plot)
     check_nb = len(starts) < (1.1 * nb_aes) and len(starts) > (0.8 * nb_aes)
     if check_nb is True:
         l.LOGGER.debug("#{} detected AES".format(len(starts)))
@@ -220,6 +223,9 @@ def find_aes(s, sr, bpl, bph, nb_aes=1, lp=0, offset=0, flip=True, plot=False):
     contained in the signal S of sampling rate SR. The signal must contained
     approximately NB_AES number of AES. BPL, BPH, LP are the bandpass and
     lowpass filters values used to create the trigger signal.
+
+    OFFSET can be a positive or negative number applied to each indexes after
+    detection.
 
     Return the list of start indexes.
 
@@ -242,15 +248,14 @@ def find_aes(s, sr, bpl, bph, nb_aes=1, lp=0, offset=0, flip=True, plot=False):
     # divided by the number of AES and that at least 1/4 of the signal is
     # fullfilled with AES computations.
     peaks = signal.find_peaks(trigger.signal, distance=len(trigger.signal) / nb_aes / 4, prominence=0.25)
-    offset_duration = offset * sr
-    peaks = peaks[0] + offset_duration
+    peaks = peaks[0] + offset
 
     # * Plot result if asked.
     libplot.plot_time_spec_sync_axis([s], samp_rate=sr, peaks=peaks, triggers=trigger_l, cond=plot)
 
     # * Prune bad indexes.
     if np.shape(peaks[peaks <= 0]) != (0,):
-        l.LOGGER.warning("discard detected aes turned negatives because of the offset")
+        l.LOGGER.warning("Discard some detected AES turned negatives because of the offset set to {}".format(offset))
         peaks = peaks[peaks >= 0]
     return peaks
 
@@ -270,7 +275,7 @@ def choose_signal(arr, i = -1):
         l.LOGGER.debug("Automatically select signal #{}".format(i))
         return np.copy(arr[i])
 
-def choose_signal_from_starts(template, arr, starts):
+def choose_signal_from_starts(template, arr, starts, end_offset=0):
     """Choose a signal from segments signals or a template signal.
 
     If TEMPLATE is a signal, then return it as the chosen signal. If TEMPLATE
@@ -278,12 +283,15 @@ def choose_signal_from_starts(template, arr, starts):
     ARR trace and the STARTS segments position. If TEMPLATE is -1,
     interactively prompt which signal to choose.
 
+    END_OFFSET is a positive/negative number applied to the end of extracted
+    signal to increase/decrease its lengths.
+
     Return (and assert it is not None) the chosen signal.
 
     """
     if isinstance(template, int):
         l.LOGGER.debug("Start signal selection...")
-        extracted  = analyze.extract(arr, starts)
+        extracted  = analyze.extract(arr, starts, end_offset=end_offset)
         template_s = analyze.choose_signal(extracted, template)
     elif isinstance(template, np.ndarray):
         l.LOGGER.debug("Use provided signal")
@@ -320,7 +328,7 @@ def extract_time_window(s, sr, center, length, offset=0):
     bh = bh if bh < len(s) else len(s)
     return s[bl:bh]
 
-def extract(s, starts, length = 0):
+def extract(s, starts, length=0, end_offset=0):
     """Exract sub-signals of S delimited by STARTS.
 
     The extraction use a list of STARTS indexes as delimiters of a 1D numpy
@@ -332,10 +340,15 @@ def extract(s, starts, length = 0):
     sub-signals using its start index and the next start index as stop
     index. Result is a Python list of variable length signals.
 
+    END_OFFSET is a positive/negative number applied to the end of extracted
+    signal to increase/decrease its lengths.
+
     """
     assert(s.ndim == 1)
     # Extract a fixed length.
     if length > 0:
+        # NOTE: Didn't check for length overflow before implementing the following.
+        length += end_offset
         extracted = np.zeros((len(starts), length), dtype=s.dtype)
         for i in range(len(starts)):
             condition = np.zeros((len(s)), dtype=s.dtype)
@@ -347,6 +360,8 @@ def extract(s, starts, length = 0):
         extracted = [0] * len(starts)
         for i in range(0, len(starts)):
             length = starts[i] - starts[i-1] if i == len(starts) - 1 else starts[i+1] - starts[i]
+            # NOTE: Didn't check for length overflow before implementing the following.
+            length += end_offset
             extracted[i] = np.copy(s[int(starts[i]):int(starts[i] + length)])
         return extracted
 
@@ -446,8 +461,9 @@ def extract_aes_dproc(dset, sset, plot, args):
     nb_aes = args[0]
     template = args[1]
     idx = args[2]
+    window = args[3]
     # * Get the extract and aligned AES along with the template.
-    ff_extracted, sset.template = analyze.extract_aes(sset.ff[0], dset.samp_rate, nb_aes, template if sset.template is None else sset.template, idx, plot_enable=plot)
+    ff_extracted, sset.template = analyze.extract_aes(sset.ff[0], dset.samp_rate, nb_aes, template if sset.template is None else sset.template, idx, window, plot_enable=plot)
     # * Return the extracted trace.
     # NOTE: The template will be modified in the final Subset object if this
     # function is ran by the MainProcess.
@@ -494,7 +510,7 @@ def average_aes(arr, sr, nb_aes, template, plot_enable=True):
 
     return averaged, template_s
 
-def extract_aes(arr, sr, nb_aes, template, idx, plot_enable=True):
+def extract_aes(arr, sr, nb_aes, template, idx, window, plot_enable=True):
     """Extract a single AES execution contained in trace ARR into a single
     trace. 
 
@@ -506,9 +522,9 @@ def extract_aes(arr, sr, nb_aes, template, idx, plot_enable=True):
 
     SR is the sampling rate of ARR.
     NB_AES is the number of AES executions in the trace ARR.
-    TEMPLATE can be set to -1 for interactive template selection, to an index
+    TEMPLATE can be set to -1 for interactive template selection, to an index for the automatic template selection, or a template signal.
     IDX is the index of the AES segment to extract.
-    for the automatic template selection, or a template signal.
+    WINDOW is a sample window extracted around the detected AES.
     If PLOT is set to True, plot triggers and start indexes.
     Return a tuple of the extracted trace (np.ndarray) (or None on error) and the template.
 
@@ -517,14 +533,14 @@ def extract_aes(arr, sr, nb_aes, template, idx, plot_enable=True):
     # average_aes().
     # * Find AES.
     try:
-        starts = analyze.find_aes_configured(arr, sr, nb_aes=nb_aes, plot=plot_enable)
+        starts = analyze.find_aes_configured(arr, sr, nb_aes=nb_aes, starts_offset=-window, plot=plot_enable)
     except Exception as e:
         l.LOGGER.error("Error during finding AES: {}".format(e), stack_info=True)
         return None, template
 
     # * Select one extraction as template.
     l.LOGGER.debug("Select a template...")
-    template_s = choose_signal_from_starts(template, arr, starts)
+    template_s = choose_signal_from_starts(template, arr, starts, end_offset=window)
 
     # * Extract the desired AES and align it along the template.
     l.LOGGER.debug("Extract and align the AES segment...")
