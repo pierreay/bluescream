@@ -138,6 +138,42 @@ def average(indir, outdir, subset, nb_aes, plot, template, stop, force, jobs):
     # * Save the resulting dataset.
     dproc.sset.prune_input(save=True)
     dproc.dset.pickle_dump()
+
+@cli.command()
+@click.argument("indir", type=click.Path())
+@click.argument("outdir", type=click.Path())
+@click.argument("subset", type=str)
+@click.option("--nb-aes", default=1, help="Number of AES in the trace.")
+@click.option("--plot/--no-plot", default=True, help="Plot a summary of the processing.")
+@click.option("--template", default=-1, help="Specify template signal index to use. -1 means prompting.")
+@click.option("--stop", default=1, help="Range of traces to process in the subset of the dataset. Set to -1 for maximum.")
+@click.option("--force/--no-force", default=False, help="Force a restart of the processing even if resuming is detected.")
+@click.option("--jobs", default=0, help="Number of workers for processing parallelization [0 = single process ; -1 = maximum].")
+@click.option("--idx", default=0, help="Index of the AES to extract from the trace.")
+def extract(indir, outdir, subset, nb_aes, plot, template, stop, force, jobs, idx):
+    """Extract an aligned AES.
+
+    INDIR corresponds to a directory containing a dataset with traces
+    containing multiple AES. For each trace, the program will extract the
+    desired AES computation and will align it with a template.
+
+    OUTDIR corresponds to the directory where the new dataset will be stored.
+
+    SUBSET corresponds to the subset's name that will be proceed.
+
+    """
+    # NOTE: If modifying this function, it is possible to also need to modify
+    # average().
+    # * Load input dataset and selected subset.
+    dproc = dataset.DatasetProcessing(indir, subset, outdir=outdir, stop=stop)
+    # * Resume from previously saved dataset.
+    dproc.resume(from_zero=force)
+    # * Define and run the processing.
+    dproc.create("extract", analyze.extract_aes_dproc, libplot.PlotOnce(default=plot), (nb_aes, template, idx), nb=jobs)
+    dproc.process()
+    # * Save the resulting dataset.
+    dproc.sset.prune_input(save=True)
+    dproc.dset.pickle_dump()
     
 if __name__ == "__main__":
     cli()

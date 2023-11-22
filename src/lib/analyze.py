@@ -438,6 +438,21 @@ def average_aes_dproc(dset, sset, plot, args):
     # function is ran by the MainProcess.
     return ff_avg
 
+def extract_aes_dproc(dset, sset, plot, args):
+    """Wrapper around extract_aes() for the DatasetProcessing class."""
+    # NOTE: If modifying this function, it is possible to also need to modify
+    # average_aes_dproc().
+    # Get supplementary arguments.
+    nb_aes = args[0]
+    template = args[1]
+    idx = args[2]
+    # * Get the extract and aligned AES along with the template.
+    ff_extracted, sset.template = analyze.extract_aes(sset.ff[0], dset.samp_rate, nb_aes, template if sset.template is None else sset.template, idx, plot_enable=plot)
+    # * Return the extracted trace.
+    # NOTE: The template will be modified in the final Subset object if this
+    # function is ran by the MainProcess.
+    return ff_extracted
+
 def average_aes(arr, sr, nb_aes, template, plot_enable=True):
     """Average multiple AES execution contained in trace ARR into a single
     trace. To average multiple AES runs inside one trace, this command will
@@ -478,6 +493,46 @@ def average_aes(arr, sr, nb_aes, template, plot_enable=True):
     # libplot.plot_time_spec_sync_axis([template_s, extracted[13], aligned[13]])
 
     return averaged, template_s
+
+def extract_aes(arr, sr, nb_aes, template, idx, plot_enable=True):
+    """Extract a single AES execution contained in trace ARR into a single
+    trace. 
+
+    To do so, the function will perform:
+    1. AES detection
+    2. Templating selection
+    3. Extraction
+    4. Alignment
+
+    SR is the sampling rate of ARR.
+    NB_AES is the number of AES executions in the trace ARR.
+    TEMPLATE can be set to -1 for interactive template selection, to an index
+    IDX is the index of the AES segment to extract.
+    for the automatic template selection, or a template signal.
+    If PLOT is set to True, plot triggers and start indexes.
+    Return a tuple of the extracted trace (np.ndarray) (or None on error) and the template.
+
+    """
+    # NOTE: If modifying this function, it is possible to also need to modify
+    # average_aes().
+    # * Find AES.
+    try:
+        starts = analyze.find_aes_configured(arr, sr, nb_aes=nb_aes, plot=plot_enable)
+    except Exception as e:
+        l.LOGGER.error("Error during finding AES: {}".format(e), stack_info=True)
+        return None, template
+
+    # * Select one extraction as template.
+    l.LOGGER.debug("Select a template...")
+    template_s = choose_signal_from_starts(template, arr, starts)
+
+    # * Extract the desired AES and align it along the template.
+    l.LOGGER.debug("Extract and align the AES segment...")
+    extracted = analyze.extract(arr, starts, len(template_s))
+    extracted = extracted[idx]
+    extracted = analyze.align(template_s, extracted, sr, log=True)
+
+    return extracted, template_s
 
 def is_nan(arr):
     """Return True if at least one NAN (not a number) is contained in ARR."""
