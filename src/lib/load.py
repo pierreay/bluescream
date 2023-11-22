@@ -350,7 +350,7 @@ def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=Tr
     as end index during loading the traces.
 
     """
-    l.LOGGER.info("loading traces...")
+    l.LOGGER.info("Loading traces...")
     if is_dataset_packed(dir):
         # NOTE: Following code is not working anymore without
         # MySoapySDR.numpy_load stub, but I don't know if it can handle packed
@@ -358,7 +358,7 @@ def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=Tr
         nf_p = get_dataset_path_pack_nf(dir)
         ff_p = get_dataset_path_pack_ff(dir)
         assert(path.exists(nf_p) and path.exists(ff_p))
-        l.LOGGER.info("done!")
+        l.LOGGER.info("Done!")
         return np.load(nf_p), np.load(ff_p)
     elif is_dataset_unpacked(dir):
         nf, ff = None, None
@@ -368,32 +368,32 @@ def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=Tr
         ff_exist = get_dataset_is_ff_exist(dir)
         if nf_wanted is True and nf_exist is True:
             nf = [None] * nb
-            iterator = tqdm(range(start, stop), desc="load all nf traces") if bar else list(range(start, stop))
+            iterator = tqdm(range(start, stop), desc="Load all NF traces") if bar else list(range(start, stop))
             for i in iterator:
                 nf_p = get_dataset_path_unpack_nf(dir, i)
                 # NOTE: Make sure "copy" is enabled to not overflow the memory
                 # after truncating loaded trace.
                 nf[i - start] = truncate(MySoapySDR.numpy_load(nf_p), start=start_point, end=end_point, copy=True)
         else:
-             l.LOGGER.warning("no loaded nf traces!")
+             l.LOGGER.warning("No loaded NF traces!")
         if ff_wanted is True and ff_exist is True:
             ff = [None] * nb
-            iterator = tqdm(range(start, stop), desc="load all ff traces") if bar else list(range(start, stop))
+            iterator = tqdm(range(start, stop), desc="Load all FF traces") if bar else list(range(start, stop))
             for i in iterator:
                 ff_p = get_dataset_path_unpack_ff(dir, i)
                 # NOTE: Make sure "copy" is enabled to not overflow the memory
                 # after truncating loaded trace.
                 ff[i - start] = truncate(MySoapySDR.numpy_load(ff_p), start=start_point, end=end_point, copy=True)
         else:
-            l.LOGGER.warning("no loaded ff traces!")
+            l.LOGGER.warning("No loaded FF traces!")
         if nf_exist or ff_exist:
-            l.LOGGER.info("done!")
+            l.LOGGER.info("Done!")
             return nf, ff
         else:
-            l.LOGGER.error("no loaded traces!")
+            l.LOGGER.error("No loaded traces!")
             return None, None
     else:
-        l.LOGGER.error("unknown dataset format!")
+        l.LOGGER.error("Unknown dataset format!")
         return None, None
 
 def reshape_trimming_zeroes():
@@ -427,10 +427,10 @@ def reshape(arr):
 
     """
     len_min = sys.maxsize
-    for i in tqdm(range(len(arr)), desc="reshape()"):
+    for i in range(len(arr)):
         if len(arr[i]) < len_min:
             len_min = len(arr[i])
-    for i in tqdm(range(len(arr)), desc="reshape()"):
+    for i in range(len(arr)):
         arr[i] = arr[i][:len_min]
     return arr
 

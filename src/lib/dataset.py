@@ -242,9 +242,9 @@ class Subset():
         self.load_trace_idx = idx
         if check is True:
             if nf is True and self.nf is None:
-                raise Exception("can't load nf trace")
+                raise Exception("Can't load NF trace!")
             if ff is True and self.ff is None:
-                raise Exception("can't load ff trace")
+                raise Exception("Can't load FF trace!")
         # Check dimensions.
         assert self.nf is None or self.nf.ndim == 2
         assert self.ff is None or self.ff.ndim == 2
