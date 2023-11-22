@@ -291,6 +291,19 @@ def choose_signal_from_starts(template, arr, starts):
     assert(template_s is not None)
     return template_s
 
+def average_from_starts(template, arr, starts, sr):
+    """Average all segments.
+
+    Average all segments delimited by STARTS contained in ARR of sampling rate
+    SR using template signal TEMPLATE.
+
+    """
+    extracted = analyze.extract(arr, starts, len(template))
+    aligned   = analyze.align_all(extracted, sr, template, False)
+    # NOTE: Set NORM to False as we average signals extracted from a single
+    # trace, hence with same amplitude levels.
+    return analyze.average(aligned, norm=False)
+
 def extract_time_window(s, sr, center, length, offset=0):
     """Extract a time window from a signal S.
 
@@ -456,11 +469,8 @@ def average_aes(arr, sr, nb_aes, template, plot_enable=True):
     template_s = choose_signal_from_starts(template, arr, starts)
 
     # * Extract all AES and average them.
-    extracted = analyze.extract(arr, starts, len(template_s))
-    aligned   = analyze.align_all(extracted, sr, template_s, False)
-    # Set NORM to False as we average signals extracted from a single trace,
-    # hence with same amplitude levels.
-    averaged  = analyze.average(aligned, norm=False)
+    l.LOGGER.debug("Average all segments...")
+    averaged = average_from_starts(template_s, arr, starts, sr)
 
     # * Debuging code.
     # Compare result of alignement to debug if needed. The 13 here is a trace
