@@ -17,6 +17,7 @@ import lib.log as l
 import lib.plot as libplot
 import lib.complex as complex
 import lib.analyze as analyze
+import lib.utils as utils
 
 TraceType = Enum('TraceType', ['NF', 'FF'])
 SubsetType = Enum('SubsetType', ['TRAIN', 'ATTACK'])
@@ -235,9 +236,9 @@ class Subset():
             self.ff = None if self.ff is None else load.truncate(self.ff, start_point, end_point)
         elif isinstance(idx, range):
             self.nf, self.ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point)
-        # NOTE: Hack the load_xxx_trace() result to always return 2D np.ndarray.
-        self.nf = None if self.nf is None else np.array(self.nf, ndmin=2)
-        self.ff = None if self.ff is None else np.array(self.ff, ndmin=2)
+        # NOTE: Always return 2D np.ndarray.
+        self.nf = utils.list_array_to_2d_array(self.nf)
+        self.ff = utils.list_array_to_2d_array(self.ff)
         self.load_trace_idx = idx
         if check is True:
             if nf is True and self.nf is None:

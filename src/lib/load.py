@@ -408,6 +408,17 @@ def reshape_trimming_zeroes():
     """
     pass
 
+def reshape_needed(arr):
+    """Return True if all arrays inside ARR are not of equal length (i.e. a
+    reshape() call is needed before to create a 2D np.array).
+
+    """
+    len_ref = len(arr[0])
+    for i in range(len(arr)):
+        if len(arr[i]) != len_ref:
+            return True
+    return False
+
 def reshape(arr):
     """Reshape a Python list of 1D np.array to same dimension.
 
