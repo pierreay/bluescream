@@ -377,7 +377,7 @@ def align(template, target, sr, ignore=True, log=False):
     shift        = np.argmax(corr) - (len(template) - 1)
     # Log and check shift value.
     if log:
-        l.LOGGER.debug("shift to maximize cross correlation is {}".format(shift))
+        l.LOGGER.debug("Shift to maximize cross correlation: {}".format(shift))
     if not ignore:
         assert np.abs(shift) < len(template/10), "shift is too high, inspect"
     # Apply shift on the raw target signal.
