@@ -5,10 +5,11 @@
 # * radio.py
 
 # Initialize the radio thread in the background.
-# $1 is loglevel [default = DEBUG].
+# $1 is sleeping time for radio initialization [default = 20].
+# $2 is loglevel [default = DEBUG].
 function radio_init() {
-    ./radio.py --dir $ENVRC_RADIO_DIR --loglevel ${1-DEBUG} listen $ENVRC_NF_FREQ $ENVRC_FF_FREQ $ENVRC_SAMP_RATE --nf-id $ENVRC_NF_ID --ff-id $ENVRC_FF_ID --duration=$ENVRC_DURATION &
-    sleep 20 # Wait for SDR's driver initialization.
+    ./radio.py --dir $ENVRC_RADIO_DIR --loglevel ${2-DEBUG} listen $ENVRC_NF_FREQ $ENVRC_FF_FREQ $ENVRC_SAMP_RATE --nf-id $ENVRC_NF_ID --ff-id $ENVRC_FF_ID --duration=$ENVRC_DURATION &
+    sleep ${1-20} # Wait for SDR's driver initialization.
 }
 
 # Arguments:
@@ -25,8 +26,22 @@ function radio_instrument() {
     fi
 }
 
+# Arguments:
+# $1 is --dir [default = $ENVRC_RADIO_DIR]
+# $2 is SAMP_RATE [default = $ENVRC_SAMP_RATE]
+# $3 is --nf-id [default = $ENVRC_NF_ID]
+# $4 is --ff-id [default = $ENVRC_FF_ID]
+# Default is to plot amplitude of recorded signal.
+function radio_plot() {
+    ./radio.py --dir ${1-$ENVRC_RADIO_DIR} plot ${2-$ENVRC_SAMP_RATE} --nf-id ${3-$ENVRC_NF_ID} --ff-id ${3-$ENVRC_FF_ID} --amplitude
+}
+
 function radio_quit() {
     ./radio.py quit
+}
+
+function radio_all() {
+    radio_init && radio_instrument && radio_plot && radio_quit
 }
 
 # * dataset.py
