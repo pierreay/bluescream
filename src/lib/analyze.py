@@ -13,6 +13,7 @@ import lib.filters as filters
 import lib.triggers as triggers
 import lib.analyze as analyze
 import lib.complex as complex
+from lib.exception import BadAESDetection
 
 # Note about implementation:
 # - We often use np.copy when it comes to get a smaller portion of a
@@ -213,9 +214,7 @@ def find_aes_configured(s, sr, nb_aes=1, starts_offset=0, plot=False):
     if check_nb is True:
         l.LOGGER.debug("#{} detected AES".format(len(starts)))
     else:
-        # TODO: Use a custom exception type to not print its stack in try
-        # statements using this function.
-        raise Exception("Aberrant number of detected AES: {}".format(len(starts)))
+        raise BadAESDetection("Aberrant number of detected AES: {}".format(len(starts)))
     return starts
 
 def find_aes(s, sr, bpl, bph, nb_aes=1, lp=0, offset=0, flip=True, plot=False):
@@ -445,6 +444,8 @@ def average(arr, norm=False):
 
 def average_aes_dproc(dset, sset, plot, args):
     """Wrapper around average_aes() for the DatasetProcessing class."""
+    # NOTE: If modifying this function, it is possible to also need to modify
+    # extract_aes_dproc().
     # Get supplementary arguments.
     nb_aes = args[0]
     template = args[1]
@@ -490,12 +491,17 @@ def average_aes(arr, sr, nb_aes, template, plot_enable=True):
     Return a tuple of the averaged trace (np.ndarray) (or None on error) and the template.
 
     """
+    # NOTE: If modifying this function, it is possible to also need to modify
+    # extract_aes().
     # * Find AES.
     try:
         starts = analyze.find_aes_configured(arr, sr, nb_aes=nb_aes, plot=plot_enable)
+    except BadAESDetection as e:
+        l.LOGGER.error("Expected error during finding AES: {}".format(e), stack_info=False)
+        return None, template # NOTE: Will generate a bad trace in dataset.py/__process_fn().
     except Exception as e:
-        l.LOGGER.error("Error during finding AES: {}".format(e), stack_info=True)
-        return None, template
+        l.LOGGER.error("Unexpected error during finding AES: {}".format(e), stack_info=True)
+        return None, template # NOTE: Will generate a bad trace in dataset.py/__process_fn().
 
     # * Select one extraction as template.
     l.LOGGER.debug("Select a template...")
@@ -536,9 +542,12 @@ def extract_aes(arr, sr, nb_aes, template, idx, window, plot_enable=True):
     # * Find AES.
     try:
         starts = analyze.find_aes_configured(arr, sr, nb_aes=nb_aes, starts_offset=-window, plot=plot_enable)
+    except BadAESDetection as e:
+        l.LOGGER.error("Expected error during finding AES: {}".format(e), stack_info=False)
+        return None, template # NOTE: Will generate a bad trace in dataset.py/__process_fn().
     except Exception as e:
-        l.LOGGER.error("Error during finding AES: {}".format(e), stack_info=True)
-        return None, template
+        l.LOGGER.error("Unexpected error during finding AES: {}".format(e), stack_info=True)
+        return None, template # NOTE: Will generate a bad trace in dataset.py/__process_fn().
 
     # * Select one extraction as template.
     l.LOGGER.debug("Select a template...")
