@@ -54,14 +54,14 @@ class Device():
         self.radio = radio
         self.dataset = dataset
         self.subset = subset
-        l.LOGGER.info("instantiate whad's central with uart0's dongle")
+        l.LOGGER.info("Instantiate WHAD's central with uart0's dongle")
         try:
             self.central = Central(WhadDevice.create('uart0'))
         except Exception as e:
              # Because WHAD exceptions doesn't have descriptions, only names
              # accessible through __repr__().
             raise Exception("{}".format(e.__repr__()))
-        l.LOGGER.info("spoof bluetooth address: {}".format(self.bd_addr_src))
+        l.LOGGER.info("Spoof bluetooth address: {}".format(self.bd_addr_src))
         self.central.set_bd_address(self.bd_addr_src)
         self.time_start = time()
         self.time_elapsed = 0
@@ -79,7 +79,7 @@ class Device():
             return timeouted
 
     def configure(self, idx):
-        l.LOGGER.info("configure device for recording index #{}".format(idx))
+        l.LOGGER.info("Configure device for recording index #{}".format(idx))
         # Choose index for key.
         idx_ks = 0 if self.subset.ks_type == dataset.InputType.FIXED else idx
         self.configure_ser(k=self.subset.ks[idx_ks], p=self.subset.pt[idx])
@@ -107,7 +107,7 @@ class Device():
             """
             assert(type(input) == str)
             assert(input_type == "k" or input_type == "p")
-            l.LOGGER.info("send {}={}".format(input_type, input))
+            l.LOGGER.info("Send {}={}".format(input_type, input))
             write_to_ser(ser, "{}:{}".format(input_type, input))
 
         def write_to_ser(ser, cmd):
@@ -121,7 +121,7 @@ class Device():
             ser.write("{}\n\n".format(cmd).encode())
             sleep(0.1)
 
-        l.LOGGER.info("send p and k on serial port")
+        l.LOGGER.info("Send p and k on serial port...")
         # Configure the input of our custom firmware using serial port.
         with serial.Serial(self.ser_port, self.baud) as ser:
             # Convert dataset to input for firmware over serial port and send it.
@@ -131,11 +131,11 @@ class Device():
             write_to_ser(ser, "input_dump") # NOTE: Keep it here because otherwise sub_input is not sent properly.
 
     def execute(self):
-        l.LOGGER.debug("start preparing whad's sequences")
+        l.LOGGER.debug("Start preparing WHAD's sequences...")
         # At specified connection event, send an empty packet, used to
         # inform the radio to start recording at a precise connection
         # event.
-        l.LOGGER.info("connection event for starting the recording: {}".format(START_RADIO_CONN_EVENT))
+        l.LOGGER.info("Connection event for starting the recording: {}".format(START_RADIO_CONN_EVENT))
         trgr_start_radio = ConnectionEventTrigger(START_RADIO_CONN_EVENT)
         self.central.prepare(
             BTLE_DATA() / BTLE_EMPTY_PDU(),
@@ -147,11 +147,11 @@ class Device():
         # connection event as the ENC_RSP, excepting to have the
         # ATT_Read_Response during AES processing. If you set the MD bit
         # before, the connection events will be separated.
-        l.LOGGER.info("connection event for sending the LL_ENC_REQ request: {}".format(LL_ENC_REQ_CONN_EVENT))
+        l.LOGGER.info("Connection event for sending the LL_ENC_REQ request: {}".format(LL_ENC_REQ_CONN_EVENT))
         trgr_send_ll_enc_req = ConnectionEventTrigger(LL_ENC_REQ_CONN_EVENT)
-        l.LOGGER.info("enabling of procedure interleaving: {}".format(PROCEDURE_INTERLEAVING))
+        l.LOGGER.info("Procedure interleaving enabled: {}".format(PROCEDURE_INTERLEAVING))
         if PROCEDURE_INTERLEAVING:
-            l.LOGGER.debug("more data bit=1")
+            l.LOGGER.debug("More Data Bit=1")
             self.central.prepare(
                 BTLE_DATA()     / L2CAP_Hdr() / ATT_Hdr() / ATT_Read_Request(gatt_handle=3),
                 BTLE_DATA(MD=1) / BTLE_CTRL() / LL_ENC_REQ(rand=self.rand, ediv=self.ediv, skdm=self.skdm, ivm=self.ivm),
@@ -159,7 +159,7 @@ class Device():
             )
             l.LOGGER.debug("nRF52_WHAD.central.prepare(ATT_Read_Request[gatt_handle=3]")
         else:
-            l.LOGGER.debug("more data bit=0")
+            l.LOGGER.debug("More Data Bit=0")
             self.central.prepare(
                 BTLE_DATA() / BTLE_CTRL() / LL_ENC_REQ(rand=self.rand, ediv=self.ediv, skdm=self.skdm, ivm=self.ivm),
                 trigger=trgr_send_ll_enc_req
@@ -194,33 +194,33 @@ class Device():
         # Connect to the peripheral. The parameters are:
         # 1. Use increased hop interval. Decreasing it speed-up the connection.
         # 2. Set channel map to 0x300 which corresponds to channel 8-9.
-        l.LOGGER.info("connect to target device")
-        l.LOGGER.debug("central.connect(address={}, random=False, hop_interval={}, channel_map=0x{:x}, timeout={})".format(self.bd_addr_dest, HOP_INTERVAL, CHANNEL_MAP, self.TIMEOUT))
+        l.LOGGER.info("Connect to target device...")
+        l.LOGGER.debug("Connection parameters: address={}, random=False, hop_interval={}, channel_map=0x{:x}, timeout={}".format(self.bd_addr_dest, HOP_INTERVAL, CHANNEL_MAP, self.TIMEOUT))
         device = self.central.connect(self.bd_addr_dest, random=False, hop_interval=HOP_INTERVAL, channel_map=CHANNEL_MAP, timeout=self.TIMEOUT)
 
         if self.central.is_connected():
-            l.LOGGER.debug("whad's central is connected to target device")
+            l.LOGGER.debug("WHAD's central is connected to target device!")
             # Wait until the connection event we should start the radio.
             while not self.timeouted(raise_exc=True) and not trgr_start_radio.triggered:
                 pass
             # The radio has been started too late if LL_START_ENC_REQ is
             # already received.
             if trgr_recv_ll_start_enc_req.triggered:
-                raise Exception("the recording hasn't been started while we received the encryption confirmation!")
+                raise Exception("The recording hasn't been started while we received the encryption confirmation!")
             # Start the recording and wait for it to complete.
             self.radio.record()
             # The recording isn't likely to contain the AES since we didn't
             # received an LL_START_ENC_REQ. The recording is maybe happening
             # too soon.
             if not trgr_recv_ll_start_enc_req.triggered:
-                raise Exception("the recording is already finished while we didn't received the encryption confirmation!")
+                raise Exception("The recording is already finished while we didn't received the encryption confirmation!")
             else:
                 self.radio.accept()
                 
-            l.LOGGER.info("disconnect from the target device")
+            l.LOGGER.info("Disconnect from the target device")
             device.disconnect()
         else:
-            raise Exception("cannot connect to target device")
+            raise Exception("Cannot connect to target device!")
         if trgr_recv_ll_reject_ind.triggered:
             raise Exception("LL_REJECT_IND packet received, LL_ENC_REQ request's parameters were not accepted!")
 
@@ -239,7 +239,7 @@ class Device():
 
     def close(self):
         if self.central is not None:
-            l.LOGGER.debug("stop and close whad's central")
+            l.LOGGER.debug("Stop and close WHAD's central")
             self.central.stop()
             self.central.close()
             self.central = None
