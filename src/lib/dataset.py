@@ -309,12 +309,26 @@ class Subset():
         # Handle generation at initialization time.
         if self.input_gen == InputGeneration.INIT_TIME:
             self.init_input_init_time()
+        elif self.input_gen == InputGeneration.RUN_TIME:
+            self.init_input_run_time()
 
         # NOTE: np.uint8 is important to specify here because of the
         # ".tobytes()" function used in "lib/utils.py". It is the size of each
         # array element which is 1 byte.
         self.pt = np.asarray(self.pt, dtype=np.uint8)
         self.ks = np.asarray(self.ks, dtype=np.uint8)
+
+    def init_input_run_time(self):
+        """Initialize the input storage based on the number of wanted traces.
+
+        It is meant to be set later using set_current_ks() and set_current_pt()
+        functions.
+
+        """
+        pt_nb = self.nb_trace_wanted if self.pt_type == InputType.VARIABLE else 1
+        ks_nb = self.nb_trace_wanted if self.ks_type == InputType.VARIABLE else 1
+        self.pt = np.zeros((pt_nb, 16), dtype=np.uint8)
+        self.ks = np.zeros((ks_nb, 16), dtype=np.uint8)
 
     def init_input_init_time(self):
         """Generate the input when InputGeneration has been set to INIT_TIME."""
@@ -414,6 +428,14 @@ class Subset():
         """
         assert idx >= 0 and idx < len(self.pt)
         return self.pt[idx]
+
+    def set_current_ks(self, idx):
+        assert self.input_gen == InputGeneration.RUN_TIME
+        pass
+
+    def set_current_pt(self, idx):
+        assert self.input_gen == InputGeneration.RUN_TIME
+        pass
 
 class Profile():
     POIS_FN       = "POIS.npy"
