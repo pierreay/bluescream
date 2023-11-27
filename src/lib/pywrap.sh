@@ -17,6 +17,7 @@ function radio_init() {
 # $2 should be the subset [train | attack] [default = train].
 # $3 should be the trace recording index [default = 0].
 # $4 should be any supplementary switch [EMPTY | --no-radio] [default = EMPTY]
+# radio_instrument DEBUG train 0 ""
 function radio_instrument() {
     # NOTE: Send a SIGINT signal such that Python goes through the __exit__()
     # of Device class, such that WHAD/Butterfly do not finish in a bad state.
