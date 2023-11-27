@@ -270,16 +270,17 @@ def save_raw_trace(trace, dir, rad_idx, rec_idx):
     assert(path.exists(dir))
     MySoapySDR.numpy_save(get_record_path_raw(dir, rad_idx, rec_idx), trace)
 
-def load_raw_trace(dir, rad_idx, rec_idx):
+def load_raw_trace(dir, rad_idx, rec_idx, log=False):
     trace = None
     fp = get_record_path_raw(dir, rad_idx, rec_idx)
     if path.exists(fp):
+        l.LOGGER.info("Load RAW trace from {}".format(fp))
         try:
             trace = MySoapySDR.numpy_load(fp)
         except Exception as e:
             print(e)
     else:
-        l.LOGGER.warning("no loaded raw trace for rad_idx={}!".format(rad_idx))
+        l.LOGGER.warning("No loaded raw trace for radio index #{}!".format(rad_idx))
     return trace
 
 def save_pair_trace(dir, idx, nf, ff):

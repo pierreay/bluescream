@@ -211,10 +211,10 @@ def plot(samp_rate, amplitude, phase, nf_id, ff_id):
     ff_arr = None
     # Load the traces and quit with an error if nothing is choosen.
     if nf_id != -1:
-        nf_arr = load.load_raw_trace(DIR, nf_id, 0)
+        nf_arr = load.load_raw_trace(DIR, nf_id, 0, log=True)
         s_arr.append(nf_arr)
     if ff_id != -1:
-        ff_arr = load.load_raw_trace(DIR, ff_id, 0)
+        ff_arr = load.load_raw_trace(DIR, ff_id, 0, log=True)
         s_arr.append(ff_arr)
     if nf_arr is None and ff_arr is None:
         l.LOGGER.error("we need at least one trace index to plot!")
