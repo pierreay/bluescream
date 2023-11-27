@@ -53,11 +53,12 @@ function radio_all() {
 # dataset already exists.
 # $1 is the dataset directory [default = $ENVRC_DATASET_RAW_PATH]
 # $2 is the sample rate [default = $ENVRC_SAMP_RATE]
+# $3 is the input generation method [default = --input-gen-run]
 function dataset_init() {
     # NOTE: Dataset name is taken from lib/dataset.py/Dataset.FILENAME variable.
-        ./dataset.py init ${1-$ENVRC_DATASET_RAW_PATH} ${2-$ENVRC_SAMP_RATE} --input-gen-init --nb-trace-wanted-train 65536 --nb-trace-wanted-attack 16384
     if [[ ! -f ${1-$ENVRC_DATASET_RAW_PATH}/dataset.pyc ]]; then
         log_info "Initialize a dataset in ${1-$ENVRC_DATASET_RAW_PATH}..."
+        ./dataset.py init ${1-$ENVRC_DATASET_RAW_PATH} ${2-$ENVRC_SAMP_RATE} ${3---input-gen-run} --nb-trace-wanted-train 65536 --nb-trace-wanted-attack 16384
     else
         log_info "Dataset already initialized in ${1-$ENVRC_DATASET_RAW_PATH}!"
     fi
