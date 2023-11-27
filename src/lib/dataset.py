@@ -191,7 +191,7 @@ class Subset():
         self.ff = None
         self.template = None
         self.bad_entries = []
-        if input_gen == InputGeneration.INIT_TIME and nb_trace_wanted < 1:
+        if self.input_gen == InputGeneration.INIT_TIME and nb_trace_wanted < 1:
             l.LOGGER.error("initialization of plaintexts and keys at init time using {} traces is not possible!".format(nb_trace_wanted))
             raise Exception("initilization of subset failed!")
         self.init_subset_type()
@@ -306,30 +306,9 @@ class Subset():
         assert(self.pt_type in InputType and self.ks_type in InputType)
         self.pt = []
         self.ks = []
+        # Handle generation at initialization time.
         if self.input_gen == InputGeneration.INIT_TIME:
-            if self.subtype == SubsetType.TRAIN:
-                generator = input_generators.balanced_generator
-            elif self.subtype == SubsetType.ATTACK:
-                generator = input_generators.unrestricted_generator
-            if self.pt_type == InputType.VARIABLE and self.ks_type == InputType.FIXED:
-                self.ks = [generator(length=16).__next__()]
-                for plaintext in generator(length=16, bunches=256):
-                    if len(self.pt) == self.nb_trace_wanted:
-                        break
-                    self.pt.append(plaintext)
-                assert(len(self.pt) == self.nb_trace_wanted)
-                assert(len(self.ks) == 1)
-            elif self.pt_type == InputType.VARIABLE and self.ks_type == InputType.VARIABLE:
-                for key in generator(length=16):
-                    for plaintext in generator(length=16):
-                        if len(self.pt) == self.nb_trace_wanted:
-                            break
-                        self.ks.append(key)
-                        self.pt.append(plaintext)
-                    if len(self.pt) == self.nb_trace_wanted:
-                        break
-                assert(len(self.pt) == len(self.ks))
-                assert(len(self.pt) == self.nb_trace_wanted)
+            self.init_input_init_time()
         # NOTE: Deprecated code used for the "before dataset" era, where keys
         # and plaintexts were generated while connecting to the target.
         # Load inputs from already existing stored on-disk.
@@ -342,6 +321,33 @@ class Subset():
         # array element which is 1 byte.
         self.pt = np.asarray(self.pt, dtype=np.uint8)
         self.ks = np.asarray(self.ks, dtype=np.uint8)
+
+    def init_input_init_time(self):
+        """Generate the input when InputGeneration has been set to INIT_TIME."""
+        assert(self.input_gen == InputGeneration.INIT_TIME)
+        if self.subtype == SubsetType.TRAIN:
+            generator = input_generators.balanced_generator
+        elif self.subtype == SubsetType.ATTACK:
+            generator = input_generators.unrestricted_generator
+        if self.pt_type == InputType.VARIABLE and self.ks_type == InputType.FIXED:
+            self.ks = [generator(length=16).__next__()]
+            for plaintext in generator(length=16, bunches=256):
+                if len(self.pt) == self.nb_trace_wanted:
+                    break
+                self.pt.append(plaintext)
+            assert(len(self.pt) == self.nb_trace_wanted)
+            assert(len(self.ks) == 1)
+        elif self.pt_type == InputType.VARIABLE and self.ks_type == InputType.VARIABLE:
+            for key in generator(length=16):
+                for plaintext in generator(length=16):
+                    if len(self.pt) == self.nb_trace_wanted:
+                        break
+                    self.ks.append(key)
+                    self.pt.append(plaintext)
+                if len(self.pt) == self.nb_trace_wanted:
+                    break
+            assert(len(self.pt) == len(self.ks))
+            assert(len(self.pt) == self.nb_trace_wanted)
 
     def get_nb_trace_ondisk(self, save=False):
         return load.get_nb(self.get_path(save))
