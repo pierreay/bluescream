@@ -81,10 +81,9 @@ class Device():
     def configure(self, idx):
         l.LOGGER.info("Configure device for recording index #{}".format(idx))
         # Choose index for key.
-        idx_ks = 0 if self.subset.ks_type == dataset.InputType.FIXED else idx
-        self.configure_ser(k=self.subset.ks[idx_ks], p=self.subset.pt[idx])
         # RAND and EDIV values are hardcoded twice, here and in our custom
         # firmware inside input.c.
+        self.configure_ser(k=self.subset.get_current_ks(idx), p=self.subset.get_current_pt(idx))
         self.rand = 0xdeadbeefdeadbeef
         self.ediv = 0xdead
         # SKD_M can be kept set to 0 since we submitted a plaintext for our

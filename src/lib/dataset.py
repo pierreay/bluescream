@@ -397,6 +397,24 @@ class Subset():
         string += "- bad entries are {}\n".format(self.bad_entries)
         return string
 
+    def get_current_ks(self, idx):
+        """Get the current key based on an recording index.
+
+        Assert for correct index bounds.
+
+        """
+        assert idx >= 0 and (self.ks_type == InputType.FIXED or idx < len(self.ks))
+        return self.ks[0 if self.ks_type == InputType.FIXED else idx]
+
+    def get_current_pt(self, idx):
+        """Get the current plaintext based on an recording index.
+
+        Assert for correct index bounds.
+
+        """
+        assert idx >= 0 and idx < len(self.pt)
+        return self.pt[idx]
+
 class Profile():
     POIS_FN       = "POIS.npy"
     RS_FN         = "PROFILE_RS.npy"
