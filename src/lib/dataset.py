@@ -22,7 +22,7 @@ import lib.utils as utils
 TraceType = Enum('TraceType', ['NF', 'FF'])
 SubsetType = Enum('SubsetType', ['TRAIN', 'ATTACK'])
 InputType = Enum('InputType', ['FIXED', 'VARIABLE'])
-InputGeneration = Enum('InputGeneration', ['REAL_TIME', 'INIT_TIME'])
+InputGeneration = Enum('InputGeneration', ['RUN_TIME', 'INIT_TIME'])
 
 # Global reference to a DatasetProcessing object used for the signal handler.
 DPROC = None
