@@ -15,6 +15,7 @@ import lib.device as device
 import lib.log as l
 
 # External modules.
+import numpy as np
 try:
     from scapy.all import BTLE_DATA, BTLE_ADV, ATT_Hdr, L2CAP_Hdr, ATT_Read_Request, BTLE_EMPTY_PDU, BTLE_CTRL, LL_ENC_REQ, LL_START_ENC_REQ, LL_REJECT_IND
     import whad
@@ -80,6 +81,18 @@ class Device():
 
     def configure(self, idx):
         l.LOGGER.info("Configure device for recording index #{}".format(idx))
+        # If the input should be generated at run time, get it from the device.
+        if self.subset.input_gen == dataset.InputGeneration.RUN_TIME:
+            # Get random numbers from serial port.
+            # TODO: Implement getting random numbers from serial port instead
+            #       of using a bunch of 1.
+            pt = np.array([1] * 16, dtype=np.uint8)
+            ks = np.array([1] * 16, dtype=np.uint8)
+            # Save those random numbers as plaintext and keys in our dataset.
+            # TODO: Implement saving input on disk after modification by the
+            #       following functions only of recording was successfull:
+            self.subset.set_current_ks(idx, ks)
+            self.subset.set_current_pt(idx, pt)
         # Send input on serial port.
         self.configure_ser(k=self.subset.get_current_ks(idx), p=self.subset.get_current_pt(idx))
         # Configure the RAND, EDIV, SKDM and IVM values.
