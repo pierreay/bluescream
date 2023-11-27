@@ -195,8 +195,8 @@ class Device():
         # 1. Use increased hop interval. Decreasing it speed-up the connection.
         # 2. Set channel map to 0x300 which corresponds to channel 8-9.
         l.LOGGER.info("connect to target device")
-        l.LOGGER.debug("central.connect(address={}, random=False, hop_interval={}, channel_map=0x{:x})".format(self.bd_addr_dest, HOP_INTERVAL, CHANNEL_MAP))
-        device = self.central.connect(self.bd_addr_dest, random=False, hop_interval=HOP_INTERVAL, channel_map=CHANNEL_MAP)
+        l.LOGGER.debug("central.connect(address={}, random=False, hop_interval={}, channel_map=0x{:x}, timeout={})".format(self.bd_addr_dest, HOP_INTERVAL, CHANNEL_MAP, self.TIMEOUT))
+        device = self.central.connect(self.bd_addr_dest, random=False, hop_interval=HOP_INTERVAL, channel_map=CHANNEL_MAP, timeout=self.TIMEOUT)
 
         if self.central.is_connected():
             l.LOGGER.debug("whad's central is connected to target device")
