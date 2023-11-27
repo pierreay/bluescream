@@ -80,20 +80,25 @@ class Device():
 
     def configure(self, idx):
         l.LOGGER.info("Configure device for recording index #{}".format(idx))
-        # Choose index for key.
-        # RAND and EDIV values are hardcoded twice, here and in our custom
-        # firmware inside input.c.
+        # Send input on serial port.
         self.configure_ser(k=self.subset.get_current_ks(idx), p=self.subset.get_current_pt(idx))
+        # Configure the RAND, EDIV, SKDM and IVM values.
+        # NOTE: RAND and EDIV values are hardcoded twice, here and in our
+        # custom firmware inside input.c.
         self.rand = 0xdeadbeefdeadbeef
         self.ediv = 0xdead
-        # SKD_M can be kept set to 0 since we submitted a plaintext for our
-        # custom firmware.
+        # NOTE: SKD_M can be kept set to 0 since we submitted a plaintext for
+        # our custom firmware.
         self.skdm = 0x00000000
-        # IVM can be kept set to 0 since it will only be used after the session
-        # key derivation (hence, after our recording and our instrumentation).
+        # NOTE: IVM can be kept set to 0 since it will only be used after the
+        # session key derivation (hence, after our recording and our
+        # instrumentation).
         self.ivm  = 0x00000000
 
     def configure_ser(self, k, p):
+        """Configure the input of our custom firmware using serial port.
+
+        """
         def sub_input_to_ser(ser):
             """Submit input to the Nimble security database of our custom firmware."""
             write_to_ser(ser, "input_sub")
@@ -121,7 +126,6 @@ class Device():
             sleep(0.1)
 
         l.LOGGER.info("Send p and k on serial port...")
-        # Configure the input of our custom firmware using serial port.
         with serial.Serial(self.ser_port, self.baud) as ser:
             # Convert dataset to input for firmware over serial port and send it.
             write_input_to_ser(ser, utils.npy_int_to_str_hex(k), "k")
