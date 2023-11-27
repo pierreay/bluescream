@@ -55,11 +55,11 @@ function radio_all() {
 # $2 is the sample rate [default = $ENVRC_SAMP_RATE]
 function dataset_init() {
     # NOTE: Dataset name is taken from lib/dataset.py/Dataset.FILENAME variable.
-    if [[ ! -f $1/dataset.pyc ]]; then
-        log_info "Initialize a dataset in $1..."
         ./dataset.py init ${1-$ENVRC_DATASET_RAW_PATH} ${2-$ENVRC_SAMP_RATE} --input-gen-init --nb-trace-wanted-train 65536 --nb-trace-wanted-attack 16384
+    if [[ ! -f ${1-$ENVRC_DATASET_RAW_PATH}/dataset.pyc ]]; then
+        log_info "Initialize a dataset in ${1-$ENVRC_DATASET_RAW_PATH}..."
     else
-        log_info "Dataset already initialized in $1!"
+        log_info "Dataset already initialized in ${1-$ENVRC_DATASET_RAW_PATH}!"
     fi
 }
 
