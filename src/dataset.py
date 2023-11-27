@@ -37,10 +37,12 @@ def cli(log, loglevel):
 @click.argument("samp_rate", type=int)
 @click.option("--force/--no-force", default=False, help="Force an overwriting of an existing initialized dataset.")
 @click.option("--input-gen-init/--no-input-gen-init", default=False,
-              help="Generate plaintexts and keys at initialization instead of real-time.")
+              help="Generate plaintexts and keys at initialization instead of runtime.")
+@click.option("--input-gen-run/--no-input-gen-run", default=False,
+              help="Generate plaintexts and keys at runtime instead of initialization time.")
 @click.option("--nb-trace-wanted-train", default=0, help="Number of wanted traces for train subset.")
 @click.option("--nb-trace-wanted-attack", default=0, help="Number of wanted traces for attack subset.")
-def init(outdir, samp_rate, force, input_gen_init, nb_trace_wanted_train, nb_trace_wanted_attack):
+def init(outdir, samp_rate, force, input_gen_init, input_gen_run, nb_trace_wanted_train, nb_trace_wanted_attack):
     """Initialize a dataset.
 
     Initialize a dataset in OUTDIR following given options.
@@ -52,7 +54,13 @@ def init(outdir, samp_rate, force, input_gen_init, nb_trace_wanted_train, nb_tra
         dset_path = dataset.Dataset.get_path_static(outdir)
         if not path.exists(dset_path) or force is True:
             dset = dataset.Dataset("tmp", outdir, samp_rate)
-            input_gen = dataset.InputGeneration.INIT_TIME if input_gen_init else dataset.InputGeneration.REAL_TIME
+            # Determine user-choice of input generation method.
+            if input_gen_init is True:
+                input_gen = dataset.InputGeneration.INIT_TIME
+            elif input_gen_run is True:
+                input_gen = dataset.InputGeneration.RUN_TIME
+            else:
+                l.log_n_exit("Please, choose an input generation method!", 1)
             dset.add_subset("train", dataset.SubsetType.TRAIN, input_gen, nb_trace_wanted=nb_trace_wanted_train)
             dset.add_subset("attack", dataset.SubsetType.ATTACK, input_gen, nb_trace_wanted=nb_trace_wanted_attack)
             dset.pickle_dump(force=True)
