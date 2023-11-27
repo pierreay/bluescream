@@ -340,8 +340,11 @@ class MySoapySDRsClient():
     because of different calls from Bash.
 
     """
+    # Time sleeped to simulate wait a SoapySDR server's command return [s].
+    STUB_WAIT = 0.5
 
     def __init__(self, enabled = True):
+        l.LOGGER.info("Initialize a SoapySDR client... (enabled={})".format(enabled))
         self.enabled = enabled
 
     def __cmd__(self, cmd):
@@ -368,6 +371,9 @@ class MySoapySDRsClient():
             with open(FIFO_PATH, "r") as fifo:
                 pass
             l.LOGGER.debug("wait completed")
+        else:
+            l.LOGGER.debug("Waiting stub for disabled SoapySDR client by sleeping {}s".format(self.STUB_WAIT))
+            sleep(self.STUB_WAIT)
 
     def record(self):
         """Call the MySoapySDRs.record() method through the FIFO. Wait for the
