@@ -414,28 +414,58 @@ class Subset():
     def get_current_ks(self, idx):
         """Get the current key based on an recording index.
 
+        If the input type is set to InputType.FIXED, always return the key at
+        index 0.
+
         Assert for correct index bounds.
 
         """
-        assert idx >= 0 and (self.ks_type == InputType.FIXED or idx < len(self.ks))
+        assert self.ks_type == InputType.FIXED or (idx >= 0 and idx < len(self.ks))
         return self.ks[0 if self.ks_type == InputType.FIXED else idx]
 
     def get_current_pt(self, idx):
         """Get the current plaintext based on an recording index.
 
+        If the input type is set to InputType.FIXED, always return the
+        plaintext at index 0.
+
         Assert for correct index bounds.
 
         """
-        assert idx >= 0 and idx < len(self.pt)
-        return self.pt[idx]
+        assert self.pt_type == InputType.FIXED or (idx >= 0 and idx < len(self.pt))
+        return self.pt[0 if self.pt_type == InputType.FIXED else idx]
 
-    def set_current_ks(self, idx):
-        assert self.input_gen == InputGeneration.RUN_TIME
-        pass
+    def set_current_ks(self, idx, val):
+        """Set the current plaintext to VAL based on recording index IDX.
 
-    def set_current_pt(self, idx):
+        If the input type is set to InputType.FIXED, only set the plaintext if
+        IDX is equal to 0, otherwise silently discard it.
+
+        Assert for correct index bounds and input generation method.
+
+        """
+        assert self.ks_type == InputType.FIXED or (idx >= 0 and idx < len(self.ks))
         assert self.input_gen == InputGeneration.RUN_TIME
-        pass
+        if self.ks_type == InputType.FIXED and idx != 0 :
+            return
+        else:
+            self.ks[idx] = val
+            
+    def set_current_pt(self, idx, val):
+        """Set the current key to VAL based on recording index IDX.
+
+        If the input type is set to InputType.FIXED, only set the key if IDX is
+        equal to 0, otherwise silently discard it.
+
+        Assert for correct index bounds and input generation method.
+
+        """
+        assert self.pt_type == InputType.FIXED or (idx >= 0 and idx < len(self.pt))
+        assert self.input_gen == InputGeneration.RUN_TIME
+        if self.pt_type == InputType.FIXED and idx != 0 :
+            return
+        else:
+            self.pt[idx] = val
 
 class Profile():
     POIS_FN       = "POIS.npy"
