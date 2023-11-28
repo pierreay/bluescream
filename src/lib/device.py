@@ -142,8 +142,8 @@ class Device():
             in ASCII. It is readed as a "bytes" Python class.
 
             """
-            # NOTE: Get rid of 5 first k?\r\r\n and last 5 \r\n\r\r\n.
-            readed = ser.read(42)[5:-5]
+            # NOTE: Get rid of 5 first "k?\r\r\n0x" and last 5 "\r\n\r\r\n".
+            readed = ser.read(44)[7:-5]
             l.LOGGER.debug("ser -> {}".format(readed))
             # Discard next bytes to prepare for next read.
             discard = ser.read_until()
