@@ -112,6 +112,18 @@ class Device():
             self.subset.set_current_ks(idx, ks)
             self.subset.set_current_pt(idx, pt)
 
+    @staticmethod
+    def write_to_ser(ser, cmd):
+        """Write the command CMD to the serial port SER for our custom
+        firmware.
+
+        """
+        # NOTE: Needs to convert the string to bytes using .encode().
+        # NOTE: Needs "\n\n" at the end to actually sends the command.
+        l.LOGGER.debug("ser <- {}".format(cmd))
+        ser.write("{}\n\n".format(cmd).encode())
+        sleep(0.1)
+
     def configure_get_input(self):
         """Get input from the serial port.
 
@@ -146,17 +158,6 @@ class Device():
             assert(input_type == "k" or input_type == "p")
             l.LOGGER.info("Send {}={}".format(input_type, input))
             write_to_ser(ser, "{}:{}".format(input_type, input))
-
-        def write_to_ser(ser, cmd):
-            """Write the command CMD to the serial port SER for our custom
-            firmware.
-
-            """
-            # NOTE: Needs to convert the string to bytes using .encode().
-            # NOTE: Needs "\n\n" at the end to actually sends the command.
-            l.LOGGER.debug("ser <- {}".format(cmd))
-            ser.write("{}\n\n".format(cmd).encode())
-            sleep(0.1)
 
         l.LOGGER.info("Send p and k on serial port...")
         with serial.Serial(self.ser_port, self.baud) as ser:
