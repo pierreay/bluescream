@@ -128,18 +128,34 @@ class Dataset():
             sset.bad_entries = sset_dirsave.bad_entries
 
     def pickle_dump(self, force=False, unload=True, log=True):
+        """Dump the Dataset on the disk.
+
+        This function will create the saving directory if needed to save the
+        dataset. If FORCE is set to False [default], the function will ask for
+        confirmation to overwrite the dataset in the same directory.
+
+        The saving operation consist of dumping the input of all subsets. If
+        UNLOAD is set to True [default], the inputs and the traces will be
+        unloaded from the Dataset object. Once all done, the Dataset will be
+        pickled on disk.
+
+        """
+        # * Confirm the saving if needed and create the directory.
         if force == False and self.dir == self.dirsave:
             l.LOGGER.warning("save dataset to loaded directory")
             confirm = input("press [enter] to continue")
         self.create_dirsave()
+        # * Save the inputs of training set and unload if asked.
         if self.train_set is not None:
             self.train_set.dump_input(unload=unload)
             if unload is True:
                 self.train_set.unload_trace()
+        # * Save the inputs of attack set and unload if asked.
         if self.attack_set is not None:
             self.attack_set.dump_input(unload=unload)
             if unload is True:
                 self.attack_set.unload_trace()
+        # * Save the Dataset object once heavy data has been unloaded.
         with open(self.get_path(save=True), "wb") as f:
              pickle.dump(self, f)
              if log is True:
