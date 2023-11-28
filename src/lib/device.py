@@ -81,16 +81,8 @@ class Device():
 
     def configure(self, idx):
         l.LOGGER.info("Configure device for recording index #{}".format(idx))
-        # If the input should be generated at run time, get it from the device.
-        if self.subset.input_gen == dataset.InputGeneration.RUN_TIME:
-            # Get random numbers from serial port.
-            # TODO: Implement getting random numbers from serial port instead
-            #       of using a bunch of 1.
-            pt = np.array([1] * 16, dtype=np.uint8)
-            ks = np.array([1] * 16, dtype=np.uint8)
-            # Save those random numbers as plaintext and keys in our dataset.
-            self.subset.set_current_ks(idx, ks)
-            self.subset.set_current_pt(idx, pt)
+        # Configure the dataset input at runtime if needed.
+        self.configure_dataset_runtime(idx)
         # Send input on serial port.
         self.configure_ser(k=self.subset.get_current_ks(idx), p=self.subset.get_current_pt(idx))
         # Configure the RAND, EDIV, SKDM and IVM values.
@@ -105,6 +97,36 @@ class Device():
         # session key derivation (hence, after our recording and our
         # instrumentation).
         self.ivm  = 0x00000000
+
+    def configure_dataset_runtime(self, idx):
+        """If needed, configure the dataset input at run time.
+
+        IDX is the current recording index.
+
+        """
+        # If the input should be generated at run time, get it from the device.
+        if self.subset.input_gen == dataset.InputGeneration.RUN_TIME:
+            # Get random numbers from serial port.
+            ks, pt = self.configure_get_input()
+            # Save those random numbers as plaintext and keys in our dataset.
+            self.subset.set_current_ks(idx, ks)
+            self.subset.set_current_pt(idx, pt)
+
+    def configure_get_input(self):
+        """Get input from the serial port.
+
+        Use the serial port to get random numbers used as plaintext and key for
+        the current run.
+
+        Return a tuple composed of (KEY, PLAINTEXT) being both two 2D np.array
+        using "dtype=np.uint8".
+
+        """
+        # TODO: Implement getting random numbers from serial port instead
+        #       of using a bunch of 1.
+        ks = np.array([1] * 16, dtype=np.uint8)
+        pt = np.array([1] * 16, dtype=np.uint8)
+        return ks, pt
 
     def configure_ser(self, k, p):
         """Configure the input of our custom firmware using serial port.
