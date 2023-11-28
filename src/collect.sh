@@ -139,7 +139,7 @@ function init() {
     # Make sure the dataset is initialized.
     dataset_init $ENVRC_DATASET_RAW_PATH $ENVRC_SAMP_RATE
     # Initialize the radio daemon.
-    radio_init $OPT_LOGLEVEL
+    radio_init 40 $OPT_LOGLEVEL
 }
 
 # Clean and quit the script.
