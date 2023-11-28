@@ -134,10 +134,37 @@ class Device():
         using "dtype=np.uint8".
 
         """
-        # TODO: Implement getting random numbers from serial port instead
-        #       of using a bunch of 1.
-        ks = np.array([1] * 16, dtype=np.uint8)
-        pt = np.array([1] * 16, dtype=np.uint8)
+
+        def read_input_from_ser(ser):
+            """Read an input from the serial port SER.
+
+            An input is a hexadecimal number of 16 bytes sent as 32 hex digits
+            in ASCII. It is readed as a "bytes" Python class.
+
+            """
+            # NOTE: Get rid of 5 first k?\r\r\n and last 5 \r\n\r\r\n.
+            readed = ser.read(42)[5:-5]
+            l.LOGGER.debug("ser -> {}".format(readed))
+            # Discard next bytes to prepare for next read.
+            discard = ser.read_until()
+            return readed
+
+        def get_input_from_ser(ser, input_type):
+            """Get the input from serial port.
+
+            Send a command on the serial port SER allowing to get an input
+            based on INPUT_TYPE ["k" or "p"]. Read this input and return it as
+            "bytes".
+
+            """
+            assert(input_type == "k" or input_type == "p")
+            Device.write_to_ser(ser, "{}?".format(input_type))
+            return read_input_from_ser(ser)
+
+        l.LOGGER.info("Get p and k from serial port...")
+        with serial.Serial(self.ser_port, self.baud) as ser:
+            ks = utils.bytes_hex_to_npy_int(get_input_from_ser(ser, "k"))
+            pt = utils.bytes_hex_to_npy_int(get_input_from_ser(ser, "p"))
         return ks, pt
 
     def configure_ser(self, k, p):

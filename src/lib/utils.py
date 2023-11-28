@@ -6,6 +6,19 @@ import lib.load as load
 
 import numpy as np
 
+def bytes_hex_to_npy_int(input):
+    """Convert INPUT bytes representing an hexadecimal number in ASCII to a
+    Numpy array of uint8.
+
+    Example:
+    > bytes_hex_to_npy_int(b'bbaaaabb')
+    [187, 170, 170, 187]
+
+    """
+    assert type(input) == bytes
+    # NOTE: Remove unwanted quotes from bytes to string conversion.
+    return np.array([int(c) for c in bytearray.fromhex(str(input)[2:-1])], dtype=np.uint8)
+
 def str_hex_to_npy_int(str_hex):
     """Convert a string contain an hexadecimal number STR_HEX to a Numpy
     array containing integers. NOTE: The string should not be prefixed
