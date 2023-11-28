@@ -194,6 +194,12 @@ class Dataset():
 
 class Subset():
     """Train or attack subset."""
+
+    # Runtime variable for new inputs.
+    # Set to False at initialization and when saving inputs on disk.
+    # Set to True when inserting a new input at run time.
+    self.run_new_input = False
+
     def __init__(self, dataset, name, subtype, input_gen, nb_trace_wanted = 0):
         assert(subtype in SubsetType)
         assert(input_gen in InputGeneration)
@@ -302,16 +308,22 @@ class Subset():
 
     def dump_input(self, unload=True):
         assert(path.exists(self.get_path()))
+        # NOTE: We could add a mechanism here to only save if needed using the
+        # self.run_new_input flag.
+        # * Save plaintext input.
         if self.pt is not None:
             load.save_plaintexts(self.get_path(save=True), self.pt)
             if unload is True:
                 del self.pt
                 self.pt = None
+        # * Save key input.
         if self.ks is not None:
             load.save_keys(self.get_path(save=True), self.ks)
             if unload is True:
                 del self.ks
                 self.ks = None
+        # * Turn runtime dirty flags OFF.
+        self.run_new_input = False
 
     def prune_input(self, save=False):
         self.ks = load.prune_entry(self.ks, range(self.get_nb_trace_ondisk(save=save), len(self.ks)))
@@ -466,6 +478,7 @@ class Subset():
             return
         else:
             self.ks[idx] = val
+            self.run_new_input = True
             
     def set_current_pt(self, idx, val):
         """Set the current key to VAL based on recording index IDX.
@@ -482,6 +495,7 @@ class Subset():
             return
         else:
             self.pt[idx] = val
+            self.run_new_input = True
 
 class Profile():
     POIS_FN       = "POIS.npy"
