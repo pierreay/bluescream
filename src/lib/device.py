@@ -146,7 +146,7 @@ class Device():
         """
         def sub_input_to_ser(ser):
             """Submit input to the Nimble security database of our custom firmware."""
-            write_to_ser(ser, "input_sub")
+            Device.write_to_ser(ser, "input_sub")
 
         def write_input_to_ser(ser, input, input_type):
             """Write an input (a key or a plaintext) INPUT represented by a string
@@ -157,7 +157,7 @@ class Device():
             assert(type(input) == str)
             assert(input_type == "k" or input_type == "p")
             l.LOGGER.info("Send {}={}".format(input_type, input))
-            write_to_ser(ser, "{}:{}".format(input_type, input))
+            Device.write_to_ser(ser, "{}:{}".format(input_type, input))
 
         l.LOGGER.info("Send p and k on serial port...")
         with serial.Serial(self.ser_port, self.baud) as ser:
@@ -165,7 +165,7 @@ class Device():
             write_input_to_ser(ser, utils.npy_int_to_str_hex(k), "k")
             write_input_to_ser(ser, utils.npy_int_to_str_hex(p), "p")
             sub_input_to_ser(ser)
-            write_to_ser(ser, "input_dump") # NOTE: Keep it here because otherwise sub_input is not sent properly.
+            Device.write_to_ser(ser, "input_dump") # NOTE: Keep it here because otherwise sub_input is not sent properly.
 
     def execute(self):
         l.LOGGER.debug("Start preparing WHAD's sequences...")
