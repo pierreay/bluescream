@@ -198,7 +198,7 @@ class Subset():
     # Runtime variable for new inputs.
     # Set to False at initialization and when saving inputs on disk.
     # Set to True when inserting a new input at run time.
-    self.run_new_input = False
+    run_new_input = False
 
     def __init__(self, dataset, name, subtype, input_gen, nb_trace_wanted = 0):
         assert(subtype in SubsetType)
