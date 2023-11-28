@@ -119,6 +119,10 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx):
         except Exception as e:
             l.log_n_exit("error during whad instrumentation", 3, e, traceback=True)
     rad.save()
+    # NOTE: Here we save the entire dataset, but it is only useful for saving
+    # new inputs generated during run time when dset.sset.input_gen ==
+    # InputGeneration.RUN_TIME.
+    dset.pickle_dump(force=True)
 
 @cli.command()
 @click.argument("samp_rate", type=int)

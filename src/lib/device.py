@@ -89,8 +89,6 @@ class Device():
             pt = np.array([1] * 16, dtype=np.uint8)
             ks = np.array([1] * 16, dtype=np.uint8)
             # Save those random numbers as plaintext and keys in our dataset.
-            # TODO: Implement saving input on disk after modification by the
-            #       following functions only of recording was successfull:
             self.subset.set_current_ks(idx, ks)
             self.subset.set_current_pt(idx, pt)
         # Send input on serial port.
