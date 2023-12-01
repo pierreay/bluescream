@@ -133,7 +133,7 @@ function init() {
     trap quit INT
     # NOTE: Prevent the "There is no debugger connected to the PC after reboot".
     log_warn "Reinitialize devices in default state..."
-    ykush_reset
+    ykush_reset $OPT_YKUSH
     # Print and find our hardware setup.
     discover_setup
     # Make sure the dataset is initialized.
@@ -156,27 +156,6 @@ function quit() {
 function display_time() {
     duration=$SECONDS
     log_info "$(($duration / 60)) minutes ; $(($duration % 60)) seconds"
-}
-
-function ykush_reset() {
-    if [[ $OPT_YKUSH == 1 ]]; then
-        # Test that ykushcmd is available, otherwise, return immediately.
-        if ! type ykushcmd &> /dev/null; then
-            log_warn "Skip ykush reset because ykushcmd is not available!"
-            return 1
-        fi
-        log_info
-        log_info "=========== YKUSH RESET ==========="
-        log_info
-        log_info "power off ykush..."
-        sudo ykushcmd -d a
-        sleep 5 # Wait for shutdown.
-        log_info "power on ykush..."
-        sudo ykushcmd -u a
-        sleep 10 # Wait for power-up and booting.
-    else
-        log_warn "Skip ykush reset because it is not enable!"
-    fi
 }
 
 function reboot_if_needed() {
@@ -275,7 +254,7 @@ function collect_one_set() {
         log_info
         radio_instrument $OPT_LOGLEVEL $COLLECT_MODE $i
         if [[ $? == 1 ]]; then
-            ykush_reset
+            ykush_reset $OPT_YKUSH
             reboot_if_needed
             i=$(( $i - 1 ))
             continue
@@ -285,7 +264,7 @@ function collect_one_set() {
 
         if [[ $(( ($i+1) % 200 )) == 0 ]]; then
             log_warn "restart devices every 200 traces to prevent errors..."
-            ykush_reset
+            ykush_reset $OPT_YKUSH
         fi
     done
 }

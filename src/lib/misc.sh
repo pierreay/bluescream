@@ -35,3 +35,26 @@ EOF
     minicom -D $(find_nrf_com) -S $script >/dev/null 2>&1 &
     sleep 3
 }
+
+# Reset devices connected to YepKit YKush USB hub.$
+# $1 set to 1 perform the reset, otherwise, ignore and log warn [default = 1]
+function ykush_reset() {
+    if [[ ${1-1} == 1 ]]; then
+        # Test that ykushcmd is available, otherwise, return immediately.
+        if ! type ykushcmd &> /dev/null; then
+            log_warn "Skip ykush reset because ykushcmd is not available!"
+            return 1
+        fi
+        log_info
+        log_info "=========== YKUSH RESET ==========="
+        log_info
+        log_info "power off ykush..."
+        sudo ykushcmd -d a
+        sleep 5 # Wait for shutdown.
+        log_info "power on ykush..."
+        sudo ykushcmd -u a
+        sleep 10 # Wait for power-up and booting.
+    else
+        log_warn "Skip ykush reset because it is not enabled!"
+    fi
+}
