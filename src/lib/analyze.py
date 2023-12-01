@@ -204,12 +204,12 @@ def find_aes_configured(s, sr, nb_aes=1, starts_offset=0, plot=False):
 
     """
     # XXX: Find a better way to configure this function than modifying this place of the source code.
-    # First version of find_aes used for training set:
-    # starts, trigger = analyze.find_aes(arr, sr, 8.8e6, 9.5e6, nb_aes, 1e4, -0.5e-4, flip=True)
     # Second version of find_aes used for attack set:
     # starts, trigger = analyze.find_aes(arr, sr, 8.1e6, 8.5e6, nb_aes, 1e4, -0.5e-4, flip=False)
-    # Third version of find_aes used to train set using 10 MHz bandwidth:
-    starts = analyze.find_aes(s, sr, 2.9e6, 3.3e6, nb_aes=nb_aes, lp=1e4, offset=(-0.5e-4 * sr) + starts_offset, flip=True, plot=plot)
+    # * 10 MHz bandwidth:
+    # starts = analyze.find_aes(s, sr, 2.9e6, 3.3e6, nb_aes=nb_aes, lp=1e4, offset=(-0.5e-4 * sr) + starts_offset, flip=True, plot=plot)
+    # * 30 MHz bandwidth:
+    starts = analyze.find_aes(s, sr, 8.8e6, 9.5e6, nb_aes=nb_aes, lp=1e4, offset=(-0.5e-4 * sr) + starts_offset, flip=True, plot=plot)
     check_nb = len(starts) < (1.1 * nb_aes) and len(starts) > (0.8 * nb_aes)
     if check_nb is True:
         l.LOGGER.debug("#{} detected AES".format(len(starts)))
