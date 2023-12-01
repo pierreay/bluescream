@@ -93,7 +93,7 @@ function dataset_init() {
 # $7 is the stop option [default = 1 [stop after first trace]]
 # $8 is the force option [default = --no-force]
 function dataset_average() {
-    ./dataset.py --loglevel ${1-DEBUG} average --nb-aes 300 ${2-$ENVRC_DATASET_RAW_PATH} ${3-$ENVRC_DATASET_AVG_PATH} ${4-train} --template ${5--1} ${6---plot} --stop ${7-1} ${8---no-force} --jobs=-1
+    ./dataset.py --loglevel ${1-DEBUG} average --nb-aes 200 ${2-$ENVRC_DATASET_RAW_PATH} ${3-$ENVRC_DATASET_AVG_PATH} ${4-train} --template ${5--1} ${6---plot} --stop ${7-1} ${8---no-force} --jobs=-1
 }
 
 # Extract a desired AES of single traces from one subset.
@@ -108,7 +108,7 @@ function dataset_average() {
 # $9 is the index extraction option [default = 0 [first AES]]
 # $10 is the window around extracted segment [default = 0, use 4000 for broad AES extraction]
 function dataset_extract() {
-    ./dataset.py --loglevel ${1-DEBUG} extract --nb-aes 300 ${2-$ENVRC_DATASET_RAW_PATH} ${3-$ENVRC_DATASET_EXT_PATH} ${4-train} --template ${5--1} ${6---plot} --stop ${7-1} ${8---no-force} --jobs=-1 --idx ${9-0} --window ${10-0}
+    ./dataset.py --loglevel ${1-DEBUG} extract --nb-aes 200 ${2-$ENVRC_DATASET_RAW_PATH} ${3-$ENVRC_DATASET_EXT_PATH} ${4-train} --template ${5--1} ${6---plot} --stop ${7-1} ${8---no-force} --jobs=-1 --idx ${9-0} --window ${10-0}
 }
 
 # * attack.py
