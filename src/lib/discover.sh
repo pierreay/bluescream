@@ -11,6 +11,8 @@ function discover_setup() {
     echo "=== SDR ==="
     echo "BladeRF: " && SoapySDRUtil --probe="driver=bladerf" >/dev/null 2>&1 | grep get_serial
     echo "USRP: "    && SoapySDRUtil --probe="driver=uhd"     2>/dev/null     | grep mboard_serial
+    # SDRs server started:
+    echo "SDR server PID:" && pgrep --full "radio.*listen"
     # J-Link OB from nRF52 DK.
     echo "=== nRF52 DK ==="
     nrfjprog --com | grep VCOM0
