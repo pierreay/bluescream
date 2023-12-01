@@ -159,7 +159,9 @@ class Device():
             """
             assert(input_type == "k" or input_type == "p")
             Device.write_to_ser(ser, "{}?".format(input_type))
-            return read_input_from_ser(ser)
+            readed = read_input_from_ser(ser)
+            l.LOGGER.info("Got {}={}".format(input_type, readed))
+            return readed
 
         l.LOGGER.info("Get p and k from serial port...")
         with serial.Serial(self.ser_port, self.baud) as ser:
