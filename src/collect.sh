@@ -169,17 +169,6 @@ function reboot_if_needed() {
     fi
 }
 
-function radio_extract() {
-    # NOTE: -1 here is set according to the --nf-id, --ff-id, and --id
-    # specifications of the radio.py arguments.
-    if [[ $ENVRC_NF_ID != -1 ]]; then
-        ./radio.py --loglevel $OPT_LOGLEVEL --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_NF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
-    fi
-    if [[ $ENVRC_FF_ID != -1 ]]; then
-        ./radio.py --loglevel $OPT_LOGLEVEL --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 --no-plot --overwrite --exit-on-error
-    fi
-}
-
 function radio_save() {
     if [[ $ENVRC_NF_ID != -1 ]]; then
         cp $ENVRC_RADIO_DIR/raw_${ENVRC_NF_ID}_0.npy $SUBSET_WD/${i}_trace_nf.npy
@@ -259,7 +248,7 @@ function collect_one_set() {
             i=$(( $i - 1 ))
             continue
         fi
-        radio_extract
+        radio_extract $OPT_LOGLEVEL --no-plot --overwrite --exit-on-error
         radio_save
 
         if [[ $(( ($i+1) % 200 )) == 0 ]]; then

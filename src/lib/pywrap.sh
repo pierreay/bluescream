@@ -42,6 +42,22 @@ function radio_plot() {
     ./radio.py --dir ${1-$ENVRC_RADIO_DIR} plot ${2-$ENVRC_SAMP_RATE} --nf-id ${3-$ENVRC_NF_ID} --ff-id ${3-$ENVRC_FF_ID} --amplitude
 }
 
+# Arguments:
+# $1 is log level [INFO | DEBUG] [default = DEBUG].
+# $2 is plotting option [--plot | --no-plot] [default = --plot].
+# $3 is overwriting option [--overwrite | --no-overwrite] [default = --no-overwrite].
+# $4 is exit option [--exit-on-error | --no-exit-on-error] [default = --no-exit-on-error].
+function radio_extract() {
+    # NOTE: -1 here is set according to the --nf-id, --ff-id, and --id
+    # specifications of the radio.py arguments.
+    if [[ $ENVRC_NF_ID != -1 ]]; then
+        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_NF_ID --window 0.13 --offset 0.035 ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error}
+    fi
+    if [[ $ENVRC_FF_ID != -1 ]]; then
+        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error}
+    fi
+}
+
 function radio_quit() {
     ./radio.py quit
 }
