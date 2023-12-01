@@ -170,6 +170,7 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
 
     # * Results.
     libplot.plot_time_spec_sync_axis([sig_raw_ref], samp_rate=samp_rate, peaks=peaks, triggers=nf_triggers, cond=plot)
+    libplot.plot_time_spec_sync_axis([analyze.extract_time_window(sig_raw_ref, samp_rate, peaks[0], window, offset=offset)], samp_rate=samp_rate, cond=plot)    
     peak_detect_ok = len(peaks) == 1
     if peak_detect_ok is False:
         l.LOGGER.error("signal locating confusion: no or multiple peaks detected")
