@@ -50,12 +50,16 @@ function radio_plot() {
 function radio_extract() {
     # NOTE: -1 here is set according to the --nf-id, --ff-id, and --id
     # specifications of the radio.py arguments.
-    if [[ $ENVRC_NF_ID != -1 ]]; then
-        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_NF_ID --window 0.13 --offset 0.035 ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error}
-    fi
-    if [[ $ENVRC_FF_ID != -1 ]]; then
-        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error}
-    fi
+    # XXX: To refactor without duplicate.
+    # NOTE: Used with only NF OR FF.
+    # if [[ $ENVRC_NF_ID != -1 ]]; then
+    #     ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_NF_ID --window 0.13 --offset 0.035 ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error}
+    # fi
+    # if [[ $ENVRC_FF_ID != -1 ]]; then
+    #     ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error}
+    # fi
+    # NOTE: Used with both NF and FF, extracting NF based on FF extraction.
+    ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 --id $ENVRC_NF_ID ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error}
 }
 
 function radio_quit() {
