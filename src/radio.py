@@ -141,9 +141,16 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
     and extract the rough window for all specified raw traces.
 
     SAMP_RATE is the sampling rate used for both recording.
-    ID_REF is the radio index to use for extraction reference.
+    
+    ID_REF is the radio index to use for extraction reference. Set it to -1 to
+    ignore the extraction.
 
     """
+    if id_ref == -1:
+        exit(0)
+    else:
+        l.LOGGER.info("Extract RAW trace using ID #{}".format(id_ref))
+    
     # * Trigger(s) configuration.
     trg_bp_low          = [4e6]
     trg_bp_high         = [4.9e6]
