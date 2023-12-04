@@ -48,18 +48,22 @@ function radio_plot() {
 # $3 is overwriting option [--overwrite | --no-overwrite] [default = --no-overwrite].
 # $4 is exit option [--exit-on-error | --no-exit-on-error] [default = --no-exit-on-error].
 function radio_extract() {
-    # NOTE: -1 here is set according to the --nf-id, --ff-id, and --id
-    # specifications of the radio.py arguments.
-    # XXX: To refactor without duplicate.
-    # NOTE: Used with only NF OR FF.
-    # if [[ $ENVRC_NF_ID != -1 ]]; then
-    #     ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_NF_ID --window 0.13 --offset 0.035 ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error}
-    # fi
-    # if [[ $ENVRC_FF_ID != -1 ]]; then
-    #     ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error}
-    # fi
-    # NOTE: Used with both NF and FF, extracting NF based on FF extraction.
-    ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 --id $ENVRC_NF_ID ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error}
+    # NOTE: The "-1" from test's conditions means radio disabled. It is set
+    # according to the --nf-id, --ff-id, and --id specifications of the
+    # "radio.py" arguments.
+    # Warning about no NF-only extraction implemented.
+    if [[ $ENVRC_NF_ID != -1 && $ENVRC_FF_ID == -1 ]]; then
+        log_error "NF-only extraction is not implemented yet!"
+    # Extract FF-only.
+    elif [[ $ENVRC_NF_ID == -1 && $ENVRC_FF_ID != -1 ]]; then
+        # NOTE: Same parameters as command below except no "--id".
+        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error}
+    # Extract NF and FF based on FF extraction.
+    elif [[ $ENVRC_NF_ID != -1 && $ENVRC_FF_ID != -1 ]]; then
+        # NOTE: Same parameters as command above except "--id".
+        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error} --id $ENVRC_NF_ID
+    fi
+    
 }
 
 function radio_quit() {
