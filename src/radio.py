@@ -152,9 +152,15 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
         l.LOGGER.info("Extract RAW trace using ID #{}".format(id_ref))
     
     # * Trigger(s) configuration.
-    trg_bp_low          = [4e6]
-    trg_bp_high         = [4.9e6]
-    trg_lp              = 1e3
+    # NOTE: Parameters depending on the firmware configuration.
+    # - Parameters for 200 AES:
+    # trg_bp_low          = [4e6]
+    # trg_bp_high         = [4.9e6]
+    # trg_lp              = 1e3
+    # - Parameters for 1 AES:
+    trg_bp_low          = [7.5e6]
+    trg_bp_high         = [11.5e6]
+    trg_lp              = 1e4
     trg_peak_prominence = 3/4
     l.LOGGER.debug("peak search prominence={}".format(trg_peak_prominence))
 
