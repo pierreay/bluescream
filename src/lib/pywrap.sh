@@ -125,6 +125,12 @@ function dataset_extract() {
     ./dataset.py --loglevel ${1-DEBUG} extract --nb-aes 200 ${2-$ENVRC_DATASET_RAW_PATH} ${3-$ENVRC_DATASET_EXT_PATH} ${4-train} --template ${5--1} ${6---plot} --stop ${7-1} ${8---no-force} --jobs=-1 --idx ${9-0} --window ${10-0}
 }
 
+# Debug a dataset.
+# $1 is the dataset path [default = $ENVRC_DATASET_RAW_PATH].
+function dataset_debug() {
+    ./dataset.py debug ${1-$ENVRC_DATASET_RAW_PATH}
+}
+
 # * attack.py
 
 # Create a profile from a train subset.
