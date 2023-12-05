@@ -68,7 +68,7 @@ done
 # Counter of events (e.g. failures) before rebooting.
 REBOOT_CTR=0
 # Limit of events before rebooting.
-REBOOT_LIM=5
+REBOOT_LIM=10
 
 # * Subset
 
