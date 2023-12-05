@@ -51,19 +51,25 @@ function radio_extract() {
     # NOTE: The "-1" from test's conditions means radio disabled. It is set
     # according to the --nf-id, --ff-id, and --id specifications of the
     # "radio.py" arguments.
+    # NOTE: Parameters depending on the current firmware configuration.
+    # - Parameters for 200 AES:
+    # window=0.13
+    # offset=0.035
+    # Parameters for 1 AES:
+    window=0.005
+    offset=0.00
     # Warning about no NF-only extraction implemented.
     if [[ $ENVRC_NF_ID != -1 && $ENVRC_FF_ID == -1 ]]; then
         log_error "NF-only extraction is not implemented yet!"
     # Extract FF-only.
     elif [[ $ENVRC_NF_ID == -1 && $ENVRC_FF_ID != -1 ]]; then
         # NOTE: Same parameters as command below except no "--id".
-        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error}
+        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window ${window-0} --offset ${offset-0} ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error}
     # Extract NF and FF based on FF extraction.
     elif [[ $ENVRC_NF_ID != -1 && $ENVRC_FF_ID != -1 ]]; then
         # NOTE: Same parameters as command above except "--id".
-        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window 0.13 --offset 0.035 ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error} --id $ENVRC_NF_ID
+        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window ${window-0} --offset ${offset-0} ${2---plot} ${3---no-overwrite} ${3---no-exit-on-error} --id $ENVRC_NF_ID
     fi
-    
 }
 
 function radio_quit() {
