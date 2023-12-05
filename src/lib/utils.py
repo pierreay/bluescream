@@ -67,3 +67,13 @@ def list_array_to_2d_array(arr):
     elif isinstance(arr, list) and load.reshape_needed(arr):
         arr = load.reshape(arr)
     return np.array(arr, ndmin=2)
+
+def hamw(n):
+    """Return the Hamming Weight of the number N."""
+    # NOTE: Alternative implementation using str built-in class.
+    # return bin(n).count("1")
+    return int(n).bit_count()
+
+def hamd(n, m):
+    """Return the Hamming Distance between numbers N and M."""
+    return hamw(n ^ m)
