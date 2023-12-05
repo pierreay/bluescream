@@ -12,6 +12,7 @@ import lib.filters as filters
 import lib.plot as libplot
 import lib.debug as debug
 import lib.complex as complex
+import lib.utils as utils
 
 SMALL_SIZE = 8*4
 MEDIUM_SIZE = 10*4
@@ -208,6 +209,9 @@ def intermediate(pt, keyguess):
     return sbox[pt ^ keyguess]
 
 def print_result(bestguess,knownkey,pge):
+    # Hamming distance between all known subkeys and best guess subkeys.
+    hd = [utils.hamd(g, k) for g, k in zip(bestguess, knownkey)]
+    
     print("Best Key Guess: ", end=' ')
     for b in bestguess: print(" %02x "%b, end=' ')
     print("")
@@ -220,6 +224,10 @@ def print_result(bestguess,knownkey,pge):
     for b in pge: print("%03d "%b, end=' ')
     print("")
 
+    print("HD:             ", end=' ')
+    for hd_i in hd: print("%03d "% hd_i, end=' ')
+    print("")
+
     print("SUCCESS:        ", end=' ')
     tot = 0
     for g,r in list(zip(bestguess,knownkey)):
@@ -229,9 +237,10 @@ def print_result(bestguess,knownkey,pge):
         else:
             print("  0 ", end=' ')
     print("")
-    print("NUMBER OF CORRECT BYTES: %d"%tot)
-    print("PGE MEAN: %d"%np.mean(pge))
-    print("PGE MEDIAN: %d"%np.median(pge))
+    print("CORRECT BYTES: %d"%tot)
+    print("PGE MEAN:      %d"%np.mean(pge))
+    print("PGE MEDIAN:    %d"%np.median(pge))
+    print("HD SUM:        %d"%np.sum(hd))
 
 # * CHES20 UTILS
 
