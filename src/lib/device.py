@@ -309,3 +309,40 @@ class Device():
             self.central.stop()
             self.central.close()
             self.central = None
+
+class DeviceInput():
+    """Handle the different cases of generating and storing input.
+
+    - If the input has been generated at dataset initialization time, it will
+      send the input from the dataset to the serial port.
+
+    - If the input has to be generated during runtime, it will either:
+
+      1. Use the serial port to get a new input, store it in the dataset, and
+      resend it on the serial port to configure the device.
+
+      2. Use a pairing to get a new input, store it in the dataset, and do not
+      open a serial connection.
+
+    """
+
+    # Dataset.
+    dset = None
+    # Subset
+    sset = None
+
+    def __init__(self, dset, sset):
+        """TODO"""
+        assert type(dset) == dataset.Dataset
+        assert type(sset) == dataset.Subset
+        self.dset = dset
+        self.sset = sset
+
+    def get(self):
+        """Get a new input into the dataset based on configured methods."""
+        pass
+
+    def put(self):
+        """Put a new input into the device based on configured methods."""
+        pass
+        
