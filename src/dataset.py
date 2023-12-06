@@ -87,7 +87,6 @@ def init(outdir, samp_rate, force, input_gen_init, input_gen_run, input_src_seri
             # Input generation configurationg.
             input_gen, input_src = input_conf()
             # Create the subset.
-            import ipdb; ipdb.set_trace()
             dset.add_subset("train", dataset.SubsetType.TRAIN, input_gen, input_src, nb_trace_wanted=nb_trace_wanted_train)
             dset.add_subset("attack", dataset.SubsetType.ATTACK, input_gen, input_src, nb_trace_wanted=nb_trace_wanted_attack)
             # Save the dataset.
