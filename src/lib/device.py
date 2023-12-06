@@ -41,6 +41,9 @@ class Device():
     # Timeout limit used for the loops of this module [s].
     TIMEOUT = 30
 
+    # DeviceInput object handling input generation and source methods.
+    input = None
+
     def __enter__(self):
         return self
 
@@ -66,6 +69,7 @@ class Device():
         self.central.set_bd_address(self.bd_addr_src)
         self.time_start = time()
         self.time_elapsed = 0
+        self.input = DeviceInput(dataset, subset, ser_port, baud)
 
     def timeouted(self, raise_exc=False):
         """Return True if timeout is exceeded with RAISE_EXC set to False, or
@@ -81,120 +85,14 @@ class Device():
 
     def configure(self, idx):
         l.LOGGER.info("Configure device for recording index #{}".format(idx))
-        # Configure the dataset input at runtime if needed.
-        self.configure_dataset_runtime(idx)
-        # Send input on serial port.
-        self.configure_ser(k=self.subset.get_current_ks(idx), p=self.subset.get_current_pt(idx))
-        # Configure the RAND, EDIV, SKDM and IVM values.
-        # NOTE: RAND and EDIV values are hardcoded twice, here and in our
-        # custom firmware inside input.c.
-        self.rand = 0xdeadbeefdeadbeef
-        self.ediv = 0xdead
-        # NOTE: SKD_M can be kept set to 0 since we submitted a plaintext for
-        # our custom firmware.
-        self.skdm = 0x00000000
+        # Get the input, from the dataset, from the serial port, or from pairing.
+        self.input.get(idx)
+        # Put the input to the serial port if needed.
+        self.input.put(idx)
         # NOTE: IVM can be kept set to 0 since it will only be used after the
         # session key derivation (hence, after our recording and our
         # instrumentation).
-        self.ivm  = 0x00000000
-
-    def configure_dataset_runtime(self, idx):
-        """If needed, configure the dataset input at run time.
-
-        IDX is the current recording index.
-
-        """
-        # If the input should be generated at run time, get it from the device.
-        if self.subset.input_gen == dataset.InputGeneration.RUN_TIME:
-            # Get random numbers from serial port.
-            ks, pt = self.configure_get_input()
-            # Save those random numbers as plaintext and keys in our dataset.
-            self.subset.set_current_ks(idx, ks)
-            self.subset.set_current_pt(idx, pt)
-
-    @staticmethod
-    def write_to_ser(ser, cmd):
-        """Write the command CMD to the serial port SER for our custom
-        firmware.
-
-        """
-        # NOTE: Needs to convert the string to bytes using .encode().
-        # NOTE: Needs "\n\n" at the end to actually sends the command.
-        l.LOGGER.debug("ser <- {}".format(cmd))
-        ser.write("{}\n\n".format(cmd).encode())
-        sleep(0.1)
-
-    def configure_get_input(self):
-        """Get input from the serial port.
-
-        Use the serial port to get random numbers used as plaintext and key for
-        the current run.
-
-        Return a tuple composed of (KEY, PLAINTEXT) being both two 2D np.array
-        using "dtype=np.uint8".
-
-        """
-
-        def read_input_from_ser(ser):
-            """Read an input from the serial port SER.
-
-            An input is a hexadecimal number of 16 bytes sent as 32 hex digits
-            in ASCII. It is readed as a "bytes" Python class.
-
-            """
-            # NOTE: Get rid of 5 first "k?\r\r\n0x" and last 5 "\r\n\r\r\n".
-            readed = ser.read(44)[7:-5]
-            l.LOGGER.debug("ser -> {}".format(readed))
-            # Discard next bytes to prepare for next read.
-            discard = ser.read_until()
-            return readed
-
-        def get_input_from_ser(ser, input_type):
-            """Get the input from serial port.
-
-            Send a command on the serial port SER allowing to get an input
-            based on INPUT_TYPE ["k" or "p"]. Read this input and return it as
-            "bytes".
-
-            """
-            assert(input_type == "k" or input_type == "p")
-            Device.write_to_ser(ser, "{}?".format(input_type))
-            readed = read_input_from_ser(ser)
-            l.LOGGER.info("Got {}={}".format(input_type, readed))
-            return readed
-
-        l.LOGGER.info("Get p and k from serial port...")
-        with serial.Serial(self.ser_port, self.baud) as ser:
-            ks = utils.bytes_hex_to_npy_int(get_input_from_ser(ser, "k"))
-            pt = utils.bytes_hex_to_npy_int(get_input_from_ser(ser, "p"))
-        return ks, pt
-
-    def configure_ser(self, k, p):
-        """Configure the input of our custom firmware using serial port.
-
-        """
-        def sub_input_to_ser(ser):
-            """Submit input to the Nimble security database of our custom firmware."""
-            Device.write_to_ser(ser, "input_sub")
-
-        def write_input_to_ser(ser, input, input_type):
-            """Write an input (a key or a plaintext) INPUT represented by a string
-            containing an hexidecimal number to the serial port. INPUT_TYPE can be
-            set to 'p' or 'k'.
-
-            """
-            assert(type(input) == str)
-            assert(input_type == "k" or input_type == "p")
-            l.LOGGER.info("Send {}={}".format(input_type, input))
-            Device.write_to_ser(ser, "{}:{}".format(input_type, input))
-
-        l.LOGGER.info("Send p and k on serial port...")
-        with serial.Serial(self.ser_port, self.baud) as ser:
-            # Convert dataset to input for firmware over serial port and send it.
-            write_input_to_ser(ser, utils.npy_int_to_str_hex(k), "k")
-            write_input_to_ser(ser, utils.npy_int_to_str_hex(p), "p")
-            sub_input_to_ser(ser)
-            Device.write_to_ser(ser, "input_dump") # NOTE: Keep it here because otherwise sub_input is not sent properly.
+        self.ivm = 0x00000000
 
     def execute(self):
         l.LOGGER.debug("Start preparing WHAD's sequences...")
@@ -220,17 +118,17 @@ class Device():
             l.LOGGER.debug("More Data Bit=1")
             self.central.prepare(
                 BTLE_DATA()     / L2CAP_Hdr() / ATT_Hdr() / ATT_Read_Request(gatt_handle=3),
-                BTLE_DATA(MD=1) / BTLE_CTRL() / LL_ENC_REQ(rand=self.rand, ediv=self.ediv, skdm=self.skdm, ivm=self.ivm),
+                BTLE_DATA(MD=1) / BTLE_CTRL() / LL_ENC_REQ(rand=self.input.rand, ediv=self.input.ediv, skdm=self.input.skdm, ivm=self.ivm),
                 trigger=trgr_send_ll_enc_req
             )
             l.LOGGER.debug("nRF52_WHAD.central.prepare(ATT_Read_Request[gatt_handle=3]")
         else:
             l.LOGGER.debug("More Data Bit=0")
             self.central.prepare(
-                BTLE_DATA() / BTLE_CTRL() / LL_ENC_REQ(rand=self.rand, ediv=self.ediv, skdm=self.skdm, ivm=self.ivm),
+                BTLE_DATA() / BTLE_CTRL() / LL_ENC_REQ(rand=self.input.rand, ediv=self.input.ediv, skdm=self.input.skdm, ivm=self.ivm),
                 trigger=trgr_send_ll_enc_req
             )
-        l.LOGGER.debug("central.prepare(LL_ENC_REQ[rand=0x{:x}, ediv=0x{:x}, skdm=0x{:x}, ivm=0x{:x}])".format(self.rand, self.ediv, self.skdm, self.ivm))
+        l.LOGGER.debug("central.prepare(LL_ENC_REQ[rand=0x{:x}, ediv=0x{:x}, skdm=0x{:x}, ivm=0x{:x}])".format(self.input.rand, self.input.ediv, self.input.skdm, self.ivm))
 
         # When receiveing a LL_START_ENC_REQ packet, send an empty packet,
         # used to count the number of successful link encryption to know
@@ -328,21 +226,181 @@ class DeviceInput():
 
     # Dataset.
     dset = None
-    # Subset
+    # Subset.
     sset = None
+    # Serial port for getting and putting input.
+    ser_port = None
+    # Baudrate for serial port.
+    baud = None
+    # RAND used in the connection.
+    rand = None
+    # EDIV used in the connection.
+    ediv = None
+    # SKDM used in the connection.
+    skdm = None
 
-    def __init__(self, dset, sset):
-        """TODO"""
+    def __init__(self, dset, sset, ser_port, baud):
+        """Initialize the DeviceInput. It will later use the dataset's
+        parameters for input generation and input source.
+
+        """
         assert type(dset) == dataset.Dataset
         assert type(sset) == dataset.Subset
         self.dset = dset
         self.sset = sset
+        self.ser_port = ser_port
+        self.baud = baud
 
-    def get(self):
-        """Get a new input into the dataset based on configured methods."""
-        pass
+    @staticmethod
+    def write_to_ser(ser, cmd):
+        """Write the command CMD to the serial port SER for our custom
+        firmware.
 
-    def put(self):
-        """Put a new input into the device based on configured methods."""
-        pass
+        """
+        # NOTE: Needs to convert the string to bytes using .encode().
+        # NOTE: Needs "\n\n" at the end to actually sends the command.
+        l.LOGGER.debug("ser <- {}".format(cmd))
+        ser.write("{}\n\n".format(cmd).encode())
+        sleep(0.1)
+
+    def configure_dataset_runtime(self, idx):
+        """If needed, configure the dataset input at run time.
+
+        Get the input generated at run time by get it from the device.
+
+        IDX is the current recording index.
+
+        """
+        def configure_get_input():
+            """Get input from the serial port.
+
+            Use the serial port to get random numbers used as plaintext and key for
+            the current run.
+
+            Return a tuple composed of (KEY, PLAINTEXT) being both two 2D np.array
+            using "dtype=np.uint8".
+
+            """
+
+            def read_input_from_ser(ser):
+                """Read an input from the serial port SER.
+
+                An input is a hexadecimal number of 16 bytes sent as 32 hex digits
+                in ASCII. It is readed as a "bytes" Python class.
+
+                """
+                # NOTE: Get rid of 5 first "k?\r\r\n0x" and last 5 "\r\n\r\r\n".
+                readed = ser.read(44)[7:-5]
+                l.LOGGER.debug("ser -> {}".format(readed))
+                # Discard next bytes to prepare for next read.
+                discard = ser.read_until()
+                return readed
+
+            def get_input_from_ser(ser, input_type):
+                """Get the input from serial port.
+
+                Send a command on the serial port SER allowing to get an input
+                based on INPUT_TYPE ["k" or "p"]. Read this input and return it as
+                "bytes".
+
+                """
+                assert(input_type == "k" or input_type == "p")
+                DeviceInput.write_to_ser(ser, "{}?".format(input_type))
+                readed = read_input_from_ser(ser)
+                l.LOGGER.info("Got {}={}".format(input_type, readed))
+                return readed
+
+            l.LOGGER.info("Get p and k from serial port...")
+            with serial.Serial(self.ser_port, self.baud) as ser:
+                ks = utils.bytes_hex_to_npy_int(get_input_from_ser(ser, "k"))
+                pt = utils.bytes_hex_to_npy_int(get_input_from_ser(ser, "p"))
+            return ks, pt
+        
+        # Get random numbers from serial port.
+        ks, pt = configure_get_input()
+        # Save those random numbers as plaintext and keys in our dataset.
+        self.sset.set_current_ks(idx, ks)
+        self.sset.set_current_pt(idx, pt)
+
+    def configure_ser(self, k, p):
+        """Configure the input of our custom firmware using serial port.
+
+        """
+        def sub_input_to_ser(ser):
+            """Submit input to the Nimble security database of our custom firmware."""
+            DeviceInput.write_to_ser(ser, "input_sub")
+
+        def write_input_to_ser(ser, input, input_type):
+            """Write an input (a key or a plaintext) INPUT represented by a string
+            containing an hexidecimal number to the serial port. INPUT_TYPE can be
+            set to 'p' or 'k'.
+
+            """
+            assert(type(input) == str)
+            assert(input_type == "k" or input_type == "p")
+            l.LOGGER.info("Send {}={}".format(input_type, input))
+            DeviceInput.write_to_ser(ser, "{}:{}".format(input_type, input))
+
+        l.LOGGER.info("Send p and k on serial port...")
+        with serial.Serial(self.ser_port, self.baud) as ser:
+            # Convert dataset to input for firmware over serial port and send it.
+            write_input_to_ser(ser, utils.npy_int_to_str_hex(k), "k")
+            write_input_to_ser(ser, utils.npy_int_to_str_hex(p), "p")
+            sub_input_to_ser(ser)
+            DeviceInput.write_to_ser(ser, "input_dump") # NOTE: Keep it here because otherwise sub_input is not sent properly.
+
+    def get(self, idx):
+        """Get a new input into the dataset based on configured methods for
+        recording index IDX.
+
+        It will configure the RAND, the EDIV and the SKDM to use in the
+        connection parameters.
+
+        """
+        def set_fixed_input():
+            """This function configure our DeviceInput with a fixed and
+            hardcoded input composed of RAND, EDIV and SKDM.
+
+            """
+            # NOTE: RAND and EDIV values are hardcoded twice, here and in our
+            # custom firmware inside input.c.
+            self.rand = 0xdeadbeefdeadbeef
+            self.ediv = 0xdead
+            # NOTE: SKD_M can be kept set to 0 since we will submit a plaintext
+            # for our custom firmware.
+            self.skdm = 0x00000000
+        
+        # * If the input is already generated, we don't need to get it.
+        if self.sset.input_gen == dataset.InputGeneration.INIT_TIME:
+            # Set fixed input in the connection since the real input will be send over the serial port.
+            set_fixed_input()
+        # * If the input has to be get from the serial port and is hardcoded in the firmware...
+        elif self.sset.input_gen == dataset.InputGeneration.RUN_TIME and self.sset.input_src == dataset.InputSource.SERIAL:
+            # Configure the subset input from the serial port.
+            self.configure_dataset_runtime(idx)
+            # Set fixed input in the connection since the real input will be send over the serial port.
+            set_fixed_input()
+        # * If the input has to be get from a pairing...
+        elif self.sset.input_gen == dataset.InputGeneration.RUN_TIME and self.sset.input_src == dataset.InputSource.PAIRING:
+            # TODO: Pair with the target device.
+            # TODO: Store the EDIV in self.ediv, RAND in self.rand, and generate a SKDM in self.skdm.
+            raise Exception("Input generation through pairing has not been implemented yet!")
+        # Sanity-check for further execution.
+        assert self.rand != None and self.ediv != None and self.skdm != None
+
+    def put(self, idx):
+        """Put a new input into the device based on configured methods for
+        recording index IDX.
+
+        """
+        # If we should send to the serial port the input generated at
+        # initialization time or got from the serial port.
+        if self.sset.input_gen == dataset.InputGeneration.INIT_TIME or (
+                self.sset.input_gen == dataset.InputGeneration.RUN_TIME and self.sset.input_src == dataset.InputSource.SERIAL):
+            # Send real input on serial port.
+            self.configure_ser(k=self.sset.get_current_ks(idx), p=self.sset.get_current_pt(idx))
+        # If we should do nothing since the input will be carry in the
+        # connection parameters.
+        elif self.sset.input_gen == dataset.InputGeneration.RUN_TIME and self.sset.input_src == dataset.InputSource.PAIRING:
+            pass
         

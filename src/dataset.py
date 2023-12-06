@@ -75,7 +75,7 @@ def init(outdir, samp_rate, force, input_gen_init, input_gen_run, input_src_seri
             input_src = dataset.InputSource.PAIRING
         # Sanity-check of input generation and input source.
         if input_gen == dataset.InputGeneration.INIT_TIME and input_src != None:
-            l.LOGGER.warn("The input source will be ignored since input is generated at initialization time!")
+            l.LOGGER.warning("The input source will be ignored since input is generated at initialization time!")
         elif input_gen == dataset.InputGeneration.RUN_TIME and input_src == None:
             l.log_n_exit("Please, choose an input source method!", 1)
         return input_gen, input_src
