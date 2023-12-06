@@ -23,6 +23,7 @@ TraceType = Enum('TraceType', ['NF', 'FF'])
 SubsetType = Enum('SubsetType', ['TRAIN', 'ATTACK'])
 InputType = Enum('InputType', ['FIXED', 'VARIABLE'])
 InputGeneration = Enum('InputGeneration', ['RUN_TIME', 'INIT_TIME'])
+InputSource = Enum('InputSource', ['SERIAL', 'PAIRING'])
 
 # Global reference to a DatasetProcessing object used for the signal handler.
 DPROC = None
@@ -161,9 +162,8 @@ class Dataset():
              if log is True:
                  l.LOGGER.info("Dataset saved to '{}'".format(self.get_path(save=True)))
 
-    def add_subset(self, name, subtype, input_gen, nb_trace_wanted=0):
-        assert(subtype in SubsetType)
-        subset = Subset(self, name, subtype, input_gen, nb_trace_wanted)
+    def add_subset(self, name, subtype, input_gen, input_src, nb_trace_wanted=0):
+        subset = Subset(self, name, subtype, input_gen, input_src, nb_trace_wanted)
         if subtype == SubsetType.TRAIN:
             self.train_set = subset
         elif subtype == SubsetType.ATTACK:
@@ -200,13 +200,15 @@ class Subset():
     # Set to True when inserting a new input at run time.
     run_new_input = False
 
-    def __init__(self, dataset, name, subtype, input_gen, nb_trace_wanted = 0):
+    def __init__(self, dataset, name, subtype, input_gen, input_src, nb_trace_wanted = 0):
         assert(subtype in SubsetType)
         assert(input_gen in InputGeneration)
+        assert(input_src in InputSource)
         self.dataset = dataset
         self.name = name
         self.subtype = subtype
         self.input_gen = input_gen
+        self.input_src = input_src
         self.nb_trace_wanted = nb_trace_wanted
         self.load_trace_idx = None
         self.nf = None
