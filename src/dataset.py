@@ -40,9 +40,13 @@ def cli(log, loglevel):
               help="Generate plaintexts and keys at initialization instead of runtime.")
 @click.option("--input-gen-run/--no-input-gen-run", default=False,
               help="Generate plaintexts and keys at runtime instead of initialization time.")
+@click.option("--input-src-serial/--no-input-src-serial", default=False,
+              help="Generate plaintexts and keys by reading them on the serial port.")
+@click.option("--input-src-pairing/--no-input-src-pairing", default=False,
+              help="Generate plaintexts and keys by performing a pairing.")
 @click.option("--nb-trace-wanted-train", default=0, help="Number of wanted traces for train subset.")
 @click.option("--nb-trace-wanted-attack", default=0, help="Number of wanted traces for attack subset.")
-def init(outdir, samp_rate, force, input_gen_init, input_gen_run, nb_trace_wanted_train, nb_trace_wanted_attack):
+def init(outdir, samp_rate, force, input_gen_init, input_gen_run, input_src_serial, input_src_pairing, nb_trace_wanted_train, nb_trace_wanted_attack):
     """Initialize a dataset.
 
     Initialize a dataset in OUTDIR following given options.
@@ -50,19 +54,43 @@ def init(outdir, samp_rate, force, input_gen_init, input_gen_run, nb_trace_wante
     SAMP_RATE is the sampling rate used for both recording.
 
     """
+    def input_conf():
+        """Configurure the input generation. Return a tuple of
+        dataset.InputGeneration and dataset.InputSource. Internally use
+        variables of outer function with user switches.
+
+        """
+        input_gen, input_src = None, None
+        # Determine user-choice of input generation method.
+        if input_gen_init is True:
+            input_gen = dataset.InputGeneration.INIT_TIME
+        elif input_gen_run is True:
+            input_gen = dataset.InputGeneration.RUN_TIME
+        else:
+            l.log_n_exit("Please, choose an input generation method!", 1)
+        # Determine user-choice of input source method.
+        if input_src_serial is True:
+            input_src = dataset.InputSource.SERIAL
+        elif input_src_pairing is True:
+            input_src = dataset.InputSource.PAIRING
+        # Sanity-check of input generation and input source.
+        if input_gen == dataset.InputGeneration.INIT_TIME and input_src != None:
+            l.LOGGER.warn("The input source will be ignored since input is generated at initialization time!")
+        elif input_gen == dataset.InputGeneration.RUN_TIME and input_src == None:
+            l.log_n_exit("Please, choose an input source method!", 1)
+        return input_gen, input_src
+
     if path.exists(outdir):
         dset_path = dataset.Dataset.get_path_static(outdir)
         if not path.exists(dset_path) or force is True:
             dset = dataset.Dataset("tmp", outdir, samp_rate)
-            # Determine user-choice of input generation method.
-            if input_gen_init is True:
-                input_gen = dataset.InputGeneration.INIT_TIME
-            elif input_gen_run is True:
-                input_gen = dataset.InputGeneration.RUN_TIME
-            else:
-                l.log_n_exit("Please, choose an input generation method!", 1)
-            dset.add_subset("train", dataset.SubsetType.TRAIN, input_gen, nb_trace_wanted=nb_trace_wanted_train)
-            dset.add_subset("attack", dataset.SubsetType.ATTACK, input_gen, nb_trace_wanted=nb_trace_wanted_attack)
+            # Input generation configurationg.
+            input_gen, input_src = input_conf()
+            # Create the subset.
+            import ipdb; ipdb.set_trace()
+            dset.add_subset("train", dataset.SubsetType.TRAIN, input_gen, input_src, nb_trace_wanted=nb_trace_wanted_train)
+            dset.add_subset("attack", dataset.SubsetType.ATTACK, input_gen, input_src, nb_trace_wanted=nb_trace_wanted_attack)
+            # Save the dataset.
             dset.pickle_dump(force=True, log=True)
         else:
             l.log_n_exit("{} already exists!".format(dset_path), 1)
