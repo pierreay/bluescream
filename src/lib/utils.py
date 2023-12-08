@@ -22,6 +22,27 @@ def bytes_hex_to_npy_int(input):
     import ipdb; ipdb.set_trace()
     return np.array([int(c) for c in bytearray.fromhex(str(input)[2:-1])], dtype=np.uint8)
 
+def bytes_hex_to_npy_int2(x, len):
+    """Convert a number in X stored as bytes (hexadecimal in base 16) into a
+    Numpy array of uint8 (digits in base 10 between 0 and 255). For LEN, refer
+    to int_to_str_hex() documentation.
+
+    """
+    assert type(x) == bytes
+    # NOTE: Needs to specify length when using format, otherwise zeroes are not
+    # printed and bytearray will throw an error.
+    y = str_hex_to_npy_int(int_to_str_hex(bytes_hex_to_int_single(x), len))
+    assert type(y) == np.ndarray
+    return y
+
+def int_to_str_hex(x, len):
+    """Return an hexadecimal (base 16) representation contained in a string of
+    the X integer in base 10. LEN is the size of X in bytes and is required to
+    handle leading or trailing zeroes.
+
+    """
+    return "{:0{}x}".format(x, len * 2)
+
 def str_hex_to_npy_int(str_hex):
     """Convert a string contain an hexadecimal number STR_HEX to a Numpy
     array containing integers. NOTE: The string should not be prefixed
@@ -70,6 +91,16 @@ def list_array_to_2d_array(arr):
     elif isinstance(arr, list) and load.reshape_needed(arr):
         arr = load.reshape(arr)
     return np.array(arr, ndmin=2)
+
+def bytes_hex_to_int_single(x):
+    """Convert a number in X stored as bytes (hexadecimal in base 16) into a
+    single integer (digits in base 10).
+
+    """
+    assert type(x) == bytes
+    y = int("".join([f'{xi:02x}' for xi in x]), base=16)
+    assert type(y) == int
+    return y
 
 def hamw(n):
     """Return the Hamming Weight of the number N."""
