@@ -39,8 +39,8 @@ address and the inputs will be configured using the \$ENVRC_VICTIM_PORT dev
 port.
 
 Set -l to the desired Python LOGLEVEL [default = INFO].
-Set -r to reboot on repeated errors [default = False]
-Set -y to switch YKush on error [default = False]
+Set -r to reboot computer on repeated errors when key is not fixed [default = False]
+Set -y to reset YKush switch on error when key is not fixed [default = False]
 Set -f to restart collection from trace #0 [default = False].
 EOF
     exit 0
@@ -89,6 +89,9 @@ function collect_attack() {
     export COLLECT_NB="$ENVRC_WANTED_TRACE_ATTACK"
     export SUBSET_WD="$ENVRC_DATASET_RAW_PATH/attack"
     export KEY_FIXED=1
+    log_warn "Unconditionally disable YKush resetting and rebooting for fixed key!"
+    export OPT_REBOOT=0
+    export OPT_YKUSH=0
     export COLLECT_MODE=attack
     log_info
     log_info "=========== Attack set ==========="
