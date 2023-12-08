@@ -1,3 +1,6 @@
+# TODO: When using fixed key (in attack), do not pair except for index 0.
+# TODO: When using fixed key (in attack), save the RAND and the EDIV in the dataset for usage in index > 0.
+
 # Core modules.
 import enum
 import dataclasses
