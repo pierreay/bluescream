@@ -17,6 +17,9 @@ def bytes_hex_to_npy_int(input):
     """
     assert type(input) == bytes
     # NOTE: Remove unwanted quotes from bytes to string conversion.
+    # NOTE: Verify that this function is not fucked up if there is zeroes in
+    # the input. To prevent using it without verifying it, put a debug here.
+    import ipdb; ipdb.set_trace()
     return np.array([int(c) for c in bytearray.fromhex(str(input)[2:-1])], dtype=np.uint8)
 
 def str_hex_to_npy_int(str_hex):
