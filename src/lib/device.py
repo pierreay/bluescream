@@ -449,4 +449,9 @@ class DeviceInput():
         # connection parameters.
         elif self.sset.input_gen == dataset.InputGeneration.RUN_TIME and self.sset.input_src == dataset.InputSource.PAIRING:
             pass
-        
+
+    def __str__(self):
+        string = "rand=0x{:x}".format(self.rand)
+        string += "\nediv=0x{:x}".format(self.ediv)
+        string += "\nskdm=0x{:x}".format(self.skdm)
+        return string
