@@ -118,6 +118,10 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx):
             dev.execute()
         except Exception as e:
             l.log_n_exit("error during whad instrumentation", 3, e, traceback=True)
+        # Save the inputs used by device (NOTE: Only useful for runtime
+        # generated using pairing).
+        dev.save(idx)
+    # Save the radio capture after success.
     rad.save()
     # NOTE: Here we save the entire dataset, but it is only useful for saving
     # new inputs generated during run time when dset.sset.input_gen ==

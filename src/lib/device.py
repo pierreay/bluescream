@@ -17,7 +17,7 @@ import lib.log as l
 # External modules.
 import numpy as np
 try:
-    from scapy.all import BTLE_DATA, BTLE_ADV, ATT_Hdr, L2CAP_Hdr, ATT_Read_Request, BTLE_EMPTY_PDU, BTLE_CTRL, LL_ENC_REQ, LL_START_ENC_REQ, LL_REJECT_IND
+    from scapy.all import BTLE_DATA, BTLE_ADV, ATT_Hdr, L2CAP_Hdr, ATT_Read_Request, BTLE_EMPTY_PDU, BTLE_CTRL, LL_ENC_REQ, LL_ENC_RSP, LL_START_ENC_REQ, LL_REJECT_IND
     import whad
     from whad.ble import Central, ConnectionEventTrigger, ReceptionTrigger
     from whad.ble.profile import UUID
@@ -48,12 +48,26 @@ class Device():
     secdb = None
     # DeviceInput object handling input generation and source methods.
     input = None
+    # The received LL_ENC_RSP packet sent by the target device. Must be saved
+    # by a callback.
+    enc_rsp = None
 
     def __enter__(self):
         return self
 
     def __exit__(self, *args):
         self.close()
+
+    def __save_ll_enc_rsp(self, pkt):
+        """Callback filtering packets and saving every LL_ENC_RSP packets for
+        further processing. Will throw a DEBUG message for a saved packet.
+
+        """
+        if pkt.haslayer(LL_ENC_RSP):
+            # print(repr(pkt.metadata))
+            # pkt.show()
+            l.LOGGER.debug("Save the received LL_ENC_RSP packet!")
+            self.enc_rsp = pkt
 
     def __init__(self, ser_port, baud, bd_addr_src, bd_addr_dest, radio, dataset, subset):
         self.ser_port = ser_port
@@ -75,6 +89,8 @@ class Device():
             raise Exception("{}".format(e.__repr__()))
         l.LOGGER.info("Spoof bluetooth address: {}".format(self.bd_addr_src))
         self.central.set_bd_address(self.bd_addr_src)
+        # If we receive a LL_ENC_RSP packet, save it to parse the SKD later.
+        self.central.attach_callback(self.__save_ll_enc_rsp)
         self.time_start = time()
         self.time_elapsed = 0
         self.input = DeviceInput(self, dataset, subset, ser_port, baud)
@@ -236,6 +252,22 @@ class Device():
         # self.central.delete_sequence(trgr_send_ll_enc_req)
         # self.central.delete_sequence(trgr_recv_ll_start_enc_req)
         # self.central.delete_sequence(trgr_recv_ll_reject_ind)
+
+    def save(self, idx):
+        """Save necessary data from the device.
+
+        Get the used input for the AES (LTK for key, SKD for plaintext) and
+        save it inside our dataset. This functions if meant to be called after
+        a successfull instrumentation for recording index IDX.
+
+        """
+        # Get the SKDS and concatenate with SKDM.
+        skds = self.enc_rsp.lastlayer().fields["skds"]
+        l.LOGGER.debug("Received SKDS=0x{:x}".format(skds))
+        skd = skds << 64 | self.input.skdm
+        # Save the used key (LTK) and used plaintext (SKD) to our dataset.
+        self.subset.set_current_ks(idx, utils.bytes_hex_to_npy_int2(self.secentry.ltk.value, 16))
+        self.subset.set_current_pt(idx, utils.str_hex_to_npy_int(utils.int_to_str_hex(skd, 16)))
 
     def close(self):
         if self.central is not None:
