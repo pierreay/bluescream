@@ -68,7 +68,12 @@ done
 # Counter of events (e.g. failures) before rebooting.
 REBOOT_CTR=0
 # Limit of events before rebooting.
-REBOOT_LIM=10
+REBOOT_LIM=9
+
+# Counter of events (e.g. failures) before YKush reset.
+YKUSH_CTR=0
+# Limit of events before YKush reset.
+REBOOT_LIM=3
 
 # * Subset
 
@@ -161,6 +166,24 @@ function display_time() {
     log_info "$(($duration / 60)) minutes ; $(($duration % 60)) seconds"
 }
 
+# Reset the counters used for rebooting and resetting. Meant to be called after
+# a successful recording.
+function reset_error_counters() {
+    REBOOT_CTR=0
+    YKUSH_CTR=0
+}
+
+function ykush_reset_if_needed() {
+    if [[ $OPT_YKUSH == 1 ]]; then
+        # Update counter
+        YKUSH_CTR=$(( $YKUSH_CTR + 1 ))
+        # Reset if needed.
+        if [[ $YKUSH_CTR -ge $YKUSH_LIM ]]; then
+            ykush_reset $OPT_YKUSH
+        fi
+    fi
+}
+
 function reboot_if_needed() {
     if [[ $OPT_REBOOT == 1 ]]; then
         # Update counter
@@ -245,17 +268,22 @@ function collect_one_set() {
         log_info "=========== TRACE #$i -- KEY_FIXED=$KEY_FIXED -- SUBSET=$COLLECT_MODE ==========="
         log_info
         radio_instrument $OPT_LOGLEVEL $COLLECT_MODE $i
+        # On error...
         if [[ $? == 1 ]]; then
-            ykush_reset $OPT_YKUSH
+            ykush_reset_if_needed
             reboot_if_needed
             i=$(( $i - 1 ))
             continue
+        else
+            reset_error_counters
         fi
+        # TODO: Should we check errors of the following too? It will avoid of
+        # silently save traces of dozens of MB...
         radio_extract $OPT_LOGLEVEL --no-plot --overwrite --exit-on-error
         radio_save
 
         if [[ $(( ($i+1) % 200 )) == 0 ]]; then
-            log_warn "restart devices every 200 traces to prevent errors..."
+            log_warn "Restart devices every 200 traces to prevent errors..."
             ykush_reset $OPT_YKUSH
         fi
     done
