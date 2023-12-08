@@ -225,7 +225,7 @@ class MySoapySDR():
         return arr.view(np.float32).astype(np.int16).view(MySoapySDR.DTYPE)
 
     def __init__(self, fs, freq, idx = 0, enabled = True, duration = 1, dir = "/tmp"):
-        l.LOGGER.debug("MySoapySDR.__init__(fs={},freq={},idx={})".format(fs, freq, idx))
+        l.LOGGER.debug("MySoapySDR.__init__(fs={},freq={},idx={},enabled={},duration={},dir={})".format(fs, freq, idx, enabled, duration, dir))
         self.fs = fs
         self.freq = freq
         self.idx = idx
