@@ -123,9 +123,9 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx):
         dev.save(idx)
     # Save the radio capture after success.
     rad.save()
-    # NOTE: Here we save the entire dataset, but it is only useful for saving
-    # new inputs generated during run time when dset.sset.input_gen ==
-    # InputGeneration.RUN_TIME.
+    # NOTE: Here we save the entire dataset. In fact, it is useful for saving
+    # new inputs and pairing parameters generated during run time when
+    # dset.sset.input_gen == InputGeneration.RUN_TIME.
     dset.pickle_dump(force=True)
 
 @cli.command()

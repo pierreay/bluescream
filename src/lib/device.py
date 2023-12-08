@@ -1,6 +1,3 @@
-# TODO: When using fixed key (in attack), do not pair except for index 0.
-# TODO: When using fixed key (in attack), save the RAND and the EDIV in the dataset for usage in index > 0.
-
 # Core modules.
 import enum
 import dataclasses
@@ -146,7 +143,7 @@ class Device():
         l.LOGGER.debug("Disconnect...")
         conn.disconnect()
         l.LOGGER.info("Pairing done!")
-        
+
     def configure(self, idx):
         l.LOGGER.info("Configure device for recording index #{}".format(idx))
         # Get the input, from the dataset, from the serial port, or from pairing.
@@ -244,7 +241,7 @@ class Device():
                 raise Exception("The recording is already finished while we didn't received the encryption confirmation!")
             else:
                 self.radio.accept()
-                
+
             l.LOGGER.info("Disconnect from the target device")
             device.disconnect()
         else:
@@ -269,8 +266,9 @@ class Device():
         """Save necessary data from the device.
 
         Get the used input for the AES (LTK for key, SKD for plaintext) and
-        save it inside our dataset. This functions if meant to be called after
-        a successfull instrumentation for recording index IDX.
+        save it inside our dataset. Save also the security material generated
+        during the pairing for later usage. This functions if meant to be
+        called after a successfull instrumentation for recording index IDX.
 
         """
         # Get the SKDS and concatenate with SKDM.
@@ -280,6 +278,9 @@ class Device():
         # Save the used key (LTK) and used plaintext (SKD) to our dataset.
         self.subset.set_current_ks(idx, utils.bytes_hex_to_npy_int2(self.secentry.ltk.value, 16))
         self.subset.set_current_pt(idx, utils.str_hex_to_npy_int(utils.int_to_str_hex(skd, 16)))
+        # Save the security entry in the dataset object such that DeviceInput
+        # can reload it if needed.
+        self.subset.saved_secentry = self.secentry
 
     def close(self):
         if self.central is not None:
@@ -405,7 +406,7 @@ class DeviceInput():
                 ks = utils.bytes_hex_to_npy_int(get_input_from_ser(ser, "k"))
                 pt = utils.bytes_hex_to_npy_int(get_input_from_ser(ser, "p"))
             return ks, pt
-        
+
         # Get random numbers from serial port.
         ks, pt = configure_get_input()
         # Save those random numbers as plaintext and keys in our dataset.
@@ -474,7 +475,7 @@ class DeviceInput():
             # Generate a SKDM.
             self.skdm = int(secrets.token_hex(8), base=16)
             l.LOGGER.debug("Generated SKDM=0x{:016x}".format(self.skdm))
-        
+
         # * If the input is already generated, we don't need to get it.
         if self.sset.input_gen == dataset.InputGeneration.INIT_TIME:
             # Set fixed input in the connection since the real input will be send over the serial port.
@@ -487,9 +488,17 @@ class DeviceInput():
             set_fixed_input()
         # * If the input has to be get from a pairing...
         elif self.sset.input_gen == dataset.InputGeneration.RUN_TIME and self.sset.input_src == dataset.InputSource.PAIRING:
-            # Pair with the target device to generate inputs.
-            self.dev.__pair__()
-            # Set the generated input inside our class.
+            # Choose between new pairing or resuming inputs from last pairing.
+            # NOTE: We always want to pair at index 0 or if keys are variable
+            # (e.g. in train set).
+            if idx == 0 or self.sset.ks_type == dataset.InputType.VARIABLE:
+                # Pair with the target device to generate inputs.
+                self.dev.__pair__()
+            # Resume parameters from first pairing for a fixed key.
+            elif idx > 0 and self.sset.ks_type == dataset.InputType.FIXED:
+                l.LOGGER.info("Restore security material from last pairing")
+                self.dev.secentry = self.sset.saved_secentry
+            # Set the generated or resumed input inside our class.
             set_cryptomat_input()
         # Sanity-check for further execution.
         assert type(self.rand) == int and type(self.ediv) == int and type(self.skdm) == int
