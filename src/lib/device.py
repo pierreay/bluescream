@@ -412,7 +412,7 @@ class DeviceInput():
             # custom firmware inside input.c.
             self.rand = 0xdeadbeefdeadbeef
             self.ediv = 0xdead
-            # NOTE: SKD_M can be kept set to 0 since we will submit a plaintext
+            # NOTE: SKDM can be kept set to 0 since we will submit a plaintext
             # for our custom firmware.
             self.skdm = 0x00000000
         
