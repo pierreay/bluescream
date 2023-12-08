@@ -7,6 +7,7 @@ import random
 import os
 import struct
 import serial
+import secrets
 
 # Local modules.
 import lib.dataset as dataset
@@ -21,6 +22,7 @@ try:
     import whad
     from whad.ble import Central, ConnectionEventTrigger, ReceptionTrigger
     from whad.ble.profile import UUID
+    from whad.ble.bdaddr import BDAddress
     from whad.ble.stack.llm import START_ENC_REQ, REJECT_IND
     from whad.ble.stack.smp import CryptographicDatabase, Pairing, IOCAP_KEYBD_DISPLAY
     from whad.device import WhadDevice
@@ -46,6 +48,8 @@ class Device():
     hci = None
     # WHAD's security database used during pairing.
     secdb = None
+    # WHAD's security material get after pairing.
+    secentry = None
     # DeviceInput object handling input generation and source methods.
     input = None
     # The received LL_ENC_RSP packet sent by the target device. Must be saved
@@ -131,9 +135,14 @@ class Device():
             enc_key=True
         ))
         l.LOGGER.debug("Pairing successfull!")
-        l.LOGGER.debug(CryptographicDatabase.get(self.secdb))
+        # Get the relevant cryptographic material from crypto database.
+        # NOTE: We have to precise the random=True otherwise we will not get
+        # correct entry.
+        self.secentry = self.secdb.get(address=BDAddress(self.bd_addr_dest, random=True))
+        l.LOGGER.debug(self.secentry)
         l.LOGGER.debug("Disconnect...")
         conn.disconnect()
+        l.LOGGER.info("Pairing done!")
         
     def configure(self, idx):
         l.LOGGER.info("Configure device for recording index #{}".format(idx))
@@ -447,6 +456,21 @@ class DeviceInput():
             # NOTE: SKDM can be kept set to 0 since we will submit a plaintext
             # for our custom firmware.
             self.skdm = 0x00000000
+
+        def set_cryptomat_input():
+            """Configure our DeviceInput with a dynamic input coming from a
+            CryptographicMaterial from WHAD. It will get the RAND and the EDIV
+            from the cryptographic material and will generate the SKDM.
+
+            """
+            # Store the EDIV and RAND from security database.
+            assert type(self.dev.secentry.ltk.rand) == bytes
+            assert type(self.dev.secentry.ltk.ediv) == int
+            self.rand = utils.bytes_hex_to_int_single(self.dev.secentry.ltk.rand)
+            self.ediv = self.dev.secentry.ltk.ediv
+            # Generate a SKDM.
+            self.skdm = int(secrets.token_hex(8), base=16)
+            l.LOGGER.debug("Generated SKDM=0x{:016x}".format(self.skdm))
         
         # * If the input is already generated, we don't need to get it.
         if self.sset.input_gen == dataset.InputGeneration.INIT_TIME:
@@ -460,10 +484,12 @@ class DeviceInput():
             set_fixed_input()
         # * If the input has to be get from a pairing...
         elif self.sset.input_gen == dataset.InputGeneration.RUN_TIME and self.sset.input_src == dataset.InputSource.PAIRING:
-            # TODO: Store the EDIV in self.ediv, RAND in self.rand, and generate a SKDM in self.skdm.
+            # Pair with the target device to generate inputs.
             self.dev.__pair__()
-            raise Exception("Input generation through pairing has not been implemented yet!")
+            # Set the generated input inside our class.
+            set_cryptomat_input()
         # Sanity-check for further execution.
+        assert type(self.rand) == int and type(self.ediv) == int and type(self.skdm) == int
         assert self.rand != None and self.ediv != None and self.skdm != None
 
     def put(self, idx):
