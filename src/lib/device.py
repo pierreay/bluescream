@@ -22,6 +22,7 @@ try:
     from whad.ble import Central, ConnectionEventTrigger, ReceptionTrigger
     from whad.ble.profile import UUID
     from whad.ble.stack.llm import START_ENC_REQ, REJECT_IND
+    from whad.ble.stack.smp import CryptographicDatabase, Pairing, IOCAP_KEYBD_DISPLAY
     from whad.device import WhadDevice
 except ImportError as e: # Don't make these modules mandatory for running all the app.
     l.LOGGER.error("Can't import WHAD! Error: {}".format(e))
@@ -41,6 +42,10 @@ class Device():
     # Timeout limit used for the loops of this module [s].
     TIMEOUT = 30
 
+    # WHAD's central instantiated from an HCI dongle.
+    hci = None
+    # WHAD's security database used during pairing.
+    secdb = None
     # DeviceInput object handling input generation and source methods.
     input = None
 
@@ -58,20 +63,23 @@ class Device():
         self.radio = radio
         self.dataset = dataset
         self.subset = subset
-        l.LOGGER.info("Instantiate WHAD's central with uart0's dongle")
+        self.secdb = CryptographicDatabase()
         try:
+            l.LOGGER.info("Instantiate Central using dongle on UART0")
             self.central = Central(WhadDevice.create('uart0'))
+            l.LOGGER.info("Instantiate Central using dongle on HCI0")
+            self.hci = Central(WhadDevice.create('hci0'), security_database=self.secdb)
         except Exception as e:
-             # Because WHAD exceptions doesn't have descriptions, only names
-             # accessible through __repr__().
+             # NOTE: Use __repr__ because WHAD exceptions doesn't have
+             # descriptions, only names accessible through __repr__().
             raise Exception("{}".format(e.__repr__()))
         l.LOGGER.info("Spoof bluetooth address: {}".format(self.bd_addr_src))
         self.central.set_bd_address(self.bd_addr_src)
         self.time_start = time()
         self.time_elapsed = 0
-        self.input = DeviceInput(dataset, subset, ser_port, baud)
+        self.input = DeviceInput(self, dataset, subset, ser_port, baud)
 
-    def timeouted(self, raise_exc=False):
+    def __timeouted(self, raise_exc=False):
         """Return True if timeout is exceeded with RAISE_EXC set to False, or
         raise an Exception with RAISE_EXC set to True.
 
@@ -83,6 +91,34 @@ class Device():
         else:
             return timeouted
 
+    def __pair__(self):
+        """Establish a pairing with the target device.
+
+        This functions is meant to be used when generating inputs using a
+        pairing.
+
+        """
+        l.LOGGER.info("Pair with target device...")
+        l.LOGGER.debug("Connect...")
+        # NOTE: random=True is important otherwise no connection.
+        conn = self.hci.connect(self.bd_addr_dest, random=True)
+        # NOTE: Pairing parameters replicating the ones used by Mirage.
+        l.LOGGER.debug("Pair...")
+        conn.pairing(pairing=Pairing(
+            lesc=False,
+            mitm=False,
+            bonding=True,
+            iocap=IOCAP_KEYBD_DISPLAY,
+            sign_key=False,
+            id_key=False,
+            link_key=False,
+            enc_key=True
+        ))
+        l.LOGGER.debug("Pairing successfull!")
+        l.LOGGER.debug(CryptographicDatabase.get(self.secdb))
+        l.LOGGER.debug("Disconnect...")
+        conn.disconnect()
+        
     def configure(self, idx):
         l.LOGGER.info("Configure device for recording index #{}".format(idx))
         # Get the input, from the dataset, from the serial port, or from pairing.
@@ -165,7 +201,7 @@ class Device():
         if self.central.is_connected():
             l.LOGGER.debug("WHAD's central is connected to target device!")
             # Wait until the connection event we should start the radio.
-            while not self.timeouted(raise_exc=True) and not trgr_start_radio.triggered:
+            while not self.__timeouted(raise_exc=True) and not trgr_start_radio.triggered:
                 pass
             # The radio has been started too late if LL_START_ENC_REQ is
             # already received.
@@ -203,10 +239,14 @@ class Device():
 
     def close(self):
         if self.central is not None:
-            l.LOGGER.debug("Stop and close WHAD's central")
+            l.LOGGER.debug("Stop and close UART0 dongle...")
             self.central.stop()
             self.central.close()
             self.central = None
+            l.LOGGER.debug("Stop and close HCI dongle...")
+            self.hci.stop()
+            self.hci.close()
+            self.hci = None
 
 class DeviceInput():
     """Handle the different cases of generating and storing input.
@@ -224,6 +264,8 @@ class DeviceInput():
 
     """
 
+    # Device object that instantiated the DeviceInput.
+    dev = None
     # Dataset.
     dset = None
     # Subset.
@@ -239,13 +281,17 @@ class DeviceInput():
     # SKDM used in the connection.
     skdm = None
 
-    def __init__(self, dset, sset, ser_port, baud):
+    def __init__(self, dev, dset, sset, ser_port, baud):
         """Initialize the DeviceInput. It will later use the dataset's
-        parameters for input generation and input source.
+        parameters for input generation and input source. It also must know
+        about serial port and WHAD centrals to use them if needed to get/put
+        the inputs.
 
         """
+        assert type(dev) == Device
         assert type(dset) == dataset.Dataset
         assert type(sset) == dataset.Subset
+        self.dev = dev
         self.dset = dset
         self.sset = sset
         self.ser_port = ser_port
@@ -382,8 +428,8 @@ class DeviceInput():
             set_fixed_input()
         # * If the input has to be get from a pairing...
         elif self.sset.input_gen == dataset.InputGeneration.RUN_TIME and self.sset.input_src == dataset.InputSource.PAIRING:
-            # TODO: Pair with the target device.
             # TODO: Store the EDIV in self.ediv, RAND in self.rand, and generate a SKDM in self.skdm.
+            self.dev.__pair__()
             raise Exception("Input generation through pairing has not been implemented yet!")
         # Sanity-check for further execution.
         assert self.rand != None and self.ediv != None and self.skdm != None
