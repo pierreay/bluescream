@@ -479,6 +479,7 @@ class Subset():
         if self.ks_type == InputType.FIXED and idx != 0 :
             return
         else:
+            l.LOGGER.debug("Set subset {} ks index #{}: 0x{} / {}".format(self.subtype, idx, utils.npy_int_to_str_hex(val), val))
             self.ks[idx] = val
             self.run_new_input = True
             
@@ -496,6 +497,7 @@ class Subset():
         if self.pt_type == InputType.FIXED and idx != 0 :
             return
         else:
+            l.LOGGER.debug("Set subset {} pt index #{}: 0x{} / {}".format(self.subtype, idx, utils.npy_int_to_str_hex(val), val))
             self.pt[idx] = val
             self.run_new_input = True
 
