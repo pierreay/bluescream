@@ -73,7 +73,7 @@ REBOOT_LIM=9
 # Counter of events (e.g. failures) before YKush reset.
 YKUSH_CTR=0
 # Limit of events before YKush reset.
-REBOOT_LIM=3
+YKUSH_LIM=3
 
 # * Subset
 
