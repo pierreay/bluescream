@@ -166,6 +166,20 @@ function display_time() {
     log_info "$(($duration / 60)) minutes ; $(($duration % 60)) seconds"
 }
 
+# If an error has occurred during last function, switch YKush and/or reboot if
+# needed. Otherwise, reset the error counters.
+function check_errors() {
+    # Check the return code of the last function.
+    ret=$?
+    if [[ $ret != 0 ]]; then
+        ykush_reset_if_needed
+        reboot_if_needed
+    else
+        reset_error_counters
+    fi
+    return $ret
+}
+
 # Reset the counters used for rebooting and resetting. Meant to be called after
 # a successful recording.
 function reset_error_counters() {
@@ -175,23 +189,23 @@ function reset_error_counters() {
 
 function ykush_reset_if_needed() {
     if [[ $OPT_YKUSH == 1 ]]; then
-        # Update counter
-        YKUSH_CTR=$(( $YKUSH_CTR + 1 ))
         # Reset if needed.
         if [[ $YKUSH_CTR -ge $YKUSH_LIM ]]; then
             ykush_reset $OPT_YKUSH
         fi
+        # Update counter
+        YKUSH_CTR=$(( $YKUSH_CTR + 1 ))
     fi
 }
 
 function reboot_if_needed() {
     if [[ $OPT_REBOOT == 1 ]]; then
-        # Update counter
-        REBOOT_CTR=$(( $REBOOT_CTR + 1 ))
         # Reboot if needed.
         if [[ $REBOOT_CTR -ge $REBOOT_LIM ]]; then
             sudo reboot
         fi
+        # Update counter
+        REBOOT_CTR=$(( $REBOOT_CTR + 1 ))
     fi
 }
 
@@ -267,21 +281,29 @@ function collect_one_set() {
         log_info
         log_info "=========== TRACE #$i -- KEY_FIXED=$KEY_FIXED -- SUBSET=$COLLECT_MODE ==========="
         log_info
+
+        # Instrument and record.
         radio_instrument $OPT_LOGLEVEL $COLLECT_MODE $i
-        # On error...
-        if [[ $? == 1 ]]; then
-            ykush_reset_if_needed
-            reboot_if_needed
+        check_errors
+        if [[ $? != 0 ]]; then
+            log_warn "Restart the current recording!"
             i=$(( $i - 1 ))
             continue
-        else
-            reset_error_counters
         fi
-        # TODO: Should we check errors of the following too? It will avoid of
-        # silently save traces of dozens of MB...
+
+        # Extract the signal from the recording.
         radio_extract $OPT_LOGLEVEL --no-plot --overwrite --exit-on-error
+        check_errors
+        if [[ $? != 0 ]]; then
+            log_warn "Restart the current recording!"
+            i=$(( $i - 1 ))
+            continue
+        fi
+
+        # If success, save the extraction.
         radio_save
 
+        # Safety-restart.
         if [[ $(( ($i+1) % 200 )) == 0 ]]; then
             log_warn "Restart devices every 200 traces to prevent errors..."
             ykush_reset $OPT_YKUSH
