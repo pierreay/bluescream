@@ -101,9 +101,7 @@ function collect_attack() {
     export SUBSET_WD=$SUBSET_WD_ATTACK
     export KEY_FIXED=1
     export COLLECT_MODE=attack
-    log_warn "Unconditionally disable YKush resetting and rebooting for fixed key!"
-    export OPT_REBOOT=0
-    export OPT_YKUSH=0
+    disable_reset_reboot_if_needed 1
     log_info
     log_info "=========== Attack set ==========="
     log_info
@@ -142,10 +140,12 @@ function get_env_record_type() {
 # dataset.py file, and record last recording index directly in radio.py.
 function get_subset_recorded_traces_number() {
     pattern=$(get_env_record_type)
-    if [[ -d $SUBSET_WD ]]; then
-        echo $(ls $SUBSET_WD/ | grep $pattern | wc -l)
-    else
+    # Guard.
+    if [[ $# -lt 1 || ! -d "$1" ]]; then
+        log_error "No subset to get number of recorded traces!"
         echo 0
+    else
+        echo $(ls $1/ | grep $pattern | wc -l)
     fi
 }
 
@@ -170,15 +170,19 @@ function start_or_resume() {
 
 # Initialize the script.
 function init() {
-    # Catch INT signal to properly quit the SDR.
-    trap quit INT
-    # NOTE: Prevent the "There is no debugger connected to the PC after reboot".
+    # Check conditions and prevent reset/reboot if needed by modifying
+    # OPT_YKUSH and OPT_REBOOT.
+    disable_reset_reboot_if_needed
+    # NOTE: Added here to prevent the "There is no debugger connected to the PC
+    # after reboot".
     log_warn "Reinitialize devices in default state..."
     ykush_reset $OPT_YKUSH
     # Print and find our hardware setup.
     discover_setup
     # Make sure the dataset is initialized.
     dataset_init $ENVRC_DATASET_RAW_PATH $ENVRC_SAMP_RATE
+    # Catch INT signal to properly quit the SDR.
+    trap quit INT
     # Initialize the radio daemon.
     radio_init 40 $OPT_LOGLEVEL
 }
@@ -239,6 +243,30 @@ function reboot_if_needed() {
         fi
         # Update counter
         REBOOT_CTR=$(( $REBOOT_CTR + 1 ))
+    fi
+}
+
+# Output 1 if the attack subset contains some recordings, otherwise output 0.
+function subset_attack_started() {
+    nb_trace=$(get_subset_recorded_traces_number $SUBSET_WD_ATTACK)
+    if [[ $nb_trace -gt 0 ]]; then
+        echo 1
+    else
+        echo 0
+    fi
+}
+
+# Disable YKUSH reset and computer reboot using OPT_YKUSH and OPT_REBOOT
+# variable if either:
+# $1 is set to 1.
+# subset_attack_started() echo 1.
+function disable_reset_reboot_if_needed() {
+    disable_forced=${1-0}
+    attack_started=$(subset_attack_started)
+    if [[ $disable_forced == 1 || $attack_started == 1 ]]; then
+        log_warn "Disable YKush resetting and computer rebooting because a collection using fixed key will start / has started!"
+        export OPT_REBOOT=0
+        export OPT_YKUSH=0
     fi
 }
 
