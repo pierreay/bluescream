@@ -13,6 +13,13 @@ References:
   207 / 5 - USB Control via Direct Programming (Linux):
   https://www.minicircuits.com/softwaredownload/Prog_Manual-6-Programmable_Attenuator.pdf
 
+Add the following udev rules to allow running this module without root
+permissions:
+
+$ sudo cat << EOF > /etc/udev/rules.d/01-minicircuits.rules
+SUBSYSTEMS=="usb", ATTRS{idVendor}=="20ce", ATTRS{idProduct}=="0023", GROUP="users", MODE="0666"
+EOF
+
 """
 
 import usb.core
