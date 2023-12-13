@@ -39,8 +39,8 @@ address and the inputs will be configured using the \$ENVRC_VICTIM_PORT dev
 port.
 
 Set -l to the desired Python LOGLEVEL [default = INFO].
-Set -r to reboot computer on repeated errors when key is not fixed [default = False]
-Set -y to reset YKush switch on error when key is not fixed [default = False]
+Set -r to reboot computer on repeated errors. Ignored if key is fixed in target device [default = False]
+Set -y to reset YKush switch on repeated errors. Ignored if key is fixed in target device [default = False]
 Set -f to restart collection from trace #0 [default = False].
 EOF
     exit 0

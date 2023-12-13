@@ -238,7 +238,7 @@ class Device():
             # received an LL_START_ENC_REQ. The recording is maybe happening
             # too soon.
             if not trgr_recv_ll_start_enc_req.triggered:
-                raise Exception("The recording is already finished while we didn't received the encryption confirmation!")
+                raise Exception("The recording finished while we didn't received the encryption confirmation!")
             else:
                 self.radio.accept()
 
