@@ -48,12 +48,13 @@ function ykush_reset() {
         log_info
         log_info "=========== YKUSH RESET ==========="
         log_info
-        log_info "power off ykush..."
+        log_info "Power off YKush..."
         sudo ykushcmd -d a
         sleep 5 # Wait for shutdown.
-        log_info "power on ykush..."
+        log_info "Power on YKush..."
         sudo ykushcmd -u a
         sleep 10 # Wait for power-up and booting.
+        log_info "YKush reset done!"
     else
         log_warn "Skip ykush reset because it is not enabled!"
     fi
