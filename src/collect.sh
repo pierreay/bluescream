@@ -261,6 +261,12 @@ function subset_attack_started() {
 # $1 is set to 1.
 # subset_attack_started() echo 1.
 function disable_reset_reboot_if_needed() {
+    # NOTE: I used this function because the Nimble didn't had persistent
+    # storage, so resetting the board would have caused the lost of current
+    # pairing and security parameters. Now, persistent storage is enabled, so
+    # we don't need to disable reset/reboot if enabled at the command line.
+    return 0
+    # NOTE: I kept the original implementation here for reference, for now.
     disable_forced=${1-0}
     attack_started=$(subset_attack_started)
     if [[ $disable_forced == 1 || $attack_started == 1 ]]; then
