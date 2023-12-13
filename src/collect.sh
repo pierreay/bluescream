@@ -225,13 +225,18 @@ function radio_save() {
 # ** Script
 
 function collect_one_set() {
-    i_start=0
-    resume
-    SECONDS=0
-
     # Make sure output directory is created (/attack or /train) or do nothing
     # when resuming.
     mkdir -p $SUBSET_WD
+    # Clean subset directory if asked to restart, or set the start index based
+    # on previous recordings.
+    i_start=0
+    if [[ $OPT_RESTART == 1 ]]; then
+        clean
+    else
+        resume
+    fi
+    SECONDS=0
 
     for (( i = i_start; i < $COLLECT_NB; i++ ))
     do
