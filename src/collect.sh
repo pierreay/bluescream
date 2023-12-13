@@ -83,25 +83,25 @@ function collect_train() {
     export COLLECT_NB="$ENVRC_WANTED_TRACE_TRAIN"
     export SUBSET_WD="$ENVRC_DATASET_RAW_PATH/train"
     export KEY_FIXED=0
+    export COLLECT_MODE=train
     log_info
     log_info "=========== Training set ==========="
     log_info
-    export COLLECT_MODE=train
-    collect_one_set 2
+    collect_one_set
 }
 
 function collect_attack() {
     export COLLECT_NB="$ENVRC_WANTED_TRACE_ATTACK"
     export SUBSET_WD="$ENVRC_DATASET_RAW_PATH/attack"
     export KEY_FIXED=1
+    export COLLECT_MODE=attack
     log_warn "Unconditionally disable YKush resetting and rebooting for fixed key!"
     export OPT_REBOOT=0
     export OPT_YKUSH=0
-    export COLLECT_MODE=attack
     log_info
     log_info "=========== Attack set ==========="
     log_info
-    collect_one_set 2
+    collect_one_set
 }
 
 function clean() {
@@ -225,55 +225,12 @@ function radio_save() {
 # ** Script
 
 function collect_one_set() {
-    # * Options & Menu.
-    
     i_start=0
-
-    PS3='Please, enter your choice and press [ENTER]: '
-    opts=("New collection" "Resume collection" "Quit")
-
-    if [[ ! -z $1 ]]; then
-        opt=$1
-    else
-        opt=
-    fi
-
-    if [[ -z "$opt" ]]; then
-        select opt in "${opts[@]}"
-        do
-            case $opt in
-                ${opts[0]})
-                    clean
-                    break
-                    ;;
-                ${opts[1]})
-                    resume
-                    break
-                    ;;
-                ${opts[2]})
-                    exit
-                    ;;
-                *) log_error "Invalid option: $REPLY";;
-            esac
-        done
-    else
-        if [[ $opt == 1 ]]; then
-            clean
-        elif [[ $opt == 2 ]]; then
-            resume
-        else
-            exit
-        fi
-    fi
-
-    # * Profiling.
-
+    resume
     SECONDS=0
 
-    # * Collecting.
-
     # Make sure output directory is created (/attack or /train) or do nothing
-    # if resuming.
+    # when resuming.
     mkdir -p $SUBSET_WD
 
     for (( i = i_start; i < $COLLECT_NB; i++ ))
