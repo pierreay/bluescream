@@ -114,24 +114,51 @@ function clean() {
     fi
 }
 
-function resume() {
+# Get the current recording type (NF or FF). It will echo "trace_nf" for NF or
+# "trace_ff" for FF. If none is set, exit with an error message.
+function get_env_record_type() {
     # Choose which trace we should count.
-    # NOTE: A better implementation would be to use the query subcommand of the
-    # dataset.py file, and record last recording index directly in radio.py.
     if [[ $ENVRC_NF_ID != -1 ]]; then
-        pattern="trace_nf"
+        echo "trace_nf"
+    elif [[ $ENVRC_FF_ID != -1 ]]; then
+        echo "trace_ff"
     else
-        pattern="trace_ff"
+        log_error "No NF or FF IDs set!"
+        exit 1
     fi
-    # Get number of traces in current dataset.
+}
+
+# Get the number of currently recorded traces in a subset. It will echo the
+# number of traces [0 .. +INF].
+# Arguments:
+# $1 should be the path to the subset.
+# NOTE: A better implementation would be to use the query subcommand of the
+# dataset.py file, and record last recording index directly in radio.py.
+function get_subset_recorded_traces_number() {
+    pattern=$(get_env_record_type)
     if [[ -d $SUBSET_WD ]]; then
-        i_start=$(( $(ls $SUBSET_WD/ | grep $pattern | wc -l) - 1))
-        log_info "Resume collection at i=$i_start in $SUBSET_WD"
+        echo $(ls $SUBSET_WD/ | grep $pattern | wc -l)
+    else
+        echo 0
     fi
-    # If we detect -1 after resuming (hence the dataset is empty) or user ask
-    # restart, set it to 0 to start from scratch.
-    if [[ $i_start == -1 || $OPT_RESTART == 1 ]]; then
-        i_start=0
+}
+
+# Ensure the subset directory is created, then clean existing traces or compute
+# the last recording index based on user choice.
+# Side-effects:
+# - Set the i_start variable in case of resuming.
+function start_or_resume() {
+    # Make sure output directory is created (/attack or /train) or do nothing
+    # when resuming.
+    mkdir -p $SUBSET_WD
+    # Clean subset directory if asked to restart, or set the start index based
+    # on previous recordings.
+    if [[ $OPT_RESTART == 1 ]]; then
+        clean
+        log_info "Start collection at i=$i_start in $SUBSET_WD"
+    else
+        i_start=$(get_subset_recorded_traces_number $SUBSET_WD)
+        log_info "Resume collection at i=$i_start in $SUBSET_WD"
     fi
 }
 
@@ -225,17 +252,9 @@ function radio_save() {
 # ** Script
 
 function collect_one_set() {
-    # Make sure output directory is created (/attack or /train) or do nothing
-    # when resuming.
-    mkdir -p $SUBSET_WD
-    # Clean subset directory if asked to restart, or set the start index based
-    # on previous recordings.
+    # Initialize the subset and collection index.
     i_start=0
-    if [[ $OPT_RESTART == 1 ]]; then
-        clean
-    else
-        resume
-    fi
+    start_or_resume # Will set the "i_start" accordingly.
     SECONDS=0
 
     for (( i = i_start; i < $COLLECT_NB; i++ ))
@@ -271,6 +290,10 @@ function collect_one_set() {
             ykush_reset $OPT_YKUSH
         fi
     done
+
+    log_info
+    log_info "=========== COLLECTION DONE -- SUBSET=$COLLECT_MODE ==========="
+    log_info
 }
 
 # * Script
