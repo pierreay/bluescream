@@ -4,6 +4,12 @@ source ./lib/log.sh
 source ./lib/misc.sh
 source ./lib/pywrap.sh
 
+# * Global variables
+
+# Path of train and attack subsets.
+SUBSET_WD_TRAIN="$ENVRC_DATASET_RAW_PATH/train"
+SUBSET_WD_ATTACK="$ENVRC_DATASET_RAW_PATH/attack"
+
 # * Arguments
 
 # Reset getopts.
@@ -81,7 +87,7 @@ YKUSH_LIM=3
 
 function collect_train() {
     export COLLECT_NB="$ENVRC_WANTED_TRACE_TRAIN"
-    export SUBSET_WD="$ENVRC_DATASET_RAW_PATH/train"
+    export SUBSET_WD=$SUBSET_WD_TRAIN
     export KEY_FIXED=0
     export COLLECT_MODE=train
     log_info
@@ -92,7 +98,7 @@ function collect_train() {
 
 function collect_attack() {
     export COLLECT_NB="$ENVRC_WANTED_TRACE_ATTACK"
-    export SUBSET_WD="$ENVRC_DATASET_RAW_PATH/attack"
+    export SUBSET_WD=$SUBSET_WD_ATTACK
     export KEY_FIXED=1
     export COLLECT_MODE=attack
     log_warn "Unconditionally disable YKush resetting and rebooting for fixed key!"
