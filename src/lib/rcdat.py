@@ -25,6 +25,8 @@ EOF
 import usb.core
 import usb.util
 
+import lib.log as l
+
 class RCDAT():
     """Mini-Circuits RCDAT."""
 
@@ -68,16 +70,18 @@ class RCDAT():
         self.cmd_send("*:FIRMWARE?")
         self.firmware_name = self.cmd_recv()
 
+        # Safety-check.
+        assert self.dev is not None
+
     def cmd_send(self, cmd):
         """Send the command CMD representing by a string to the device."""
-        assert self.dev is not None
         assert type(cmd) == str
         # Send the command CMD to endpoint address 1.
+        l.LOGGER.debug("Send command: {}".format(cmd))
         self.dev.write(1, cmd)
 
     def cmd_recv(self):
         """Return the response to the previous command as a string."""
-        assert self.dev is not None
         # Read a buffer a 64 bytes.
         resp = ""
         buf = self.dev.read(0x81, 64)
@@ -88,10 +92,35 @@ class RCDAT():
             i = i + 1
         return resp
 
+    def attenuation_set(self, val):
+        """Set the attenuation of the attenuator to VAL. VAL should be an
+        integer or a float between 0 and 110.
+
+        On succes, return 0. On error, return 1.
+
+        """
+        assert type(val) == int or type(val) == float
+        assert val >= 0 and val <= 110
+        l.LOGGER.debug("Set attenuation to {}".format(val))
+        # Set attenuation of channel 1 (unique channel).
+        self.cmd_send("*:CHAN:1:SETATT:{:.2f};".format(val))
+        # Handle the return code.
+        ret = int(self.cmd_recv())
+        if ret == 1:
+            return 0
+        else:
+            return 1
+
+    def attenuation_get(self):
+        """Return the attenuation value for the default channel."""
+        self.cmd_send("*:ATT?")
+        return self.cmd_recv()
+
     def __str__(self):
+        """Print informations about current RCDAT instance."""
         str = "Model number: {}\n".format(self.model_number)
         str += "Serial number: {}\n".format(self.serial_number)
-        str += "Firmware name: {}\n".format(self.firmware_name)
+        str += "Firmware name: {}".format(self.firmware_name)
         return str
 
 if __name__ == "__main__":
@@ -99,27 +128,11 @@ if __name__ == "__main__":
     rcdat = RCDAT()
     # Print its informations.
     print(rcdat)
+    # Set an attenuation value to unique channel.
+    ret = rcdat.attenuation_set(5)
+    # Print return code.
+    print(ret)
+    # Get all channels attenuation.
+    print(rcdat.attenuation_get())
     # Exit.
     exit(0)
-    
-    # Set attenuation of channel 1 to 11.25 dB.
-    dev.write(1, "*:CHAN:1:SETATT:11.25;")
-    # Get the command response.
-    resp = dev.read(0x81, 64)
-    # Convert the command response.
-    i = 1
-    AttResp = ""
-    while (resp[i] < 255 and resp[i] > 0):
-        AttResp = AttResp + chr(resp[i])
-        i = i + 1
-    print(AttResp)
-
-    # Get all channels attenuation.
-    dev.write(1,"*:ATT?")
-    resp = dev.read(0x81,64)
-    i = 1
-    AttResp = ""
-    while (resp[i] < 255 and resp[i] > 0):
-        AttResp = AttResp + chr(resp[i])
-        i = i + 1
-    print(AttResp)
