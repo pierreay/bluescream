@@ -137,8 +137,9 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx):
 @click.option("--offset", type=float, default=0, help="Offset applied to extracted window in seconds.")
 @click.option("--id", type=int, multiple=True, help="Radio indexes on which apply trace extraction (in addition to ID_REF). Can be specified multiple time.")
 @click.option("--exit-on-error/--no-exit-on-error", default=False, help="If true, exit with error on bad AES detection instead of saving a bad trace.")
-@click.option("--config", default="200_aes", help="Select the extractor configuration [200_aes | 1_aes | 1_aes_weak]")
-def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_error, config):
+@click.option("--config", default="200_aes", help="Select the extractor configuration [200_aes | 1_aes | 1_aes_weak].")
+@click.option("--save", default="", help="If set to a file path, save the ID_REF extracted signal as .npy file. Ignored if --overwrite is set to False.")
+def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_error, config, save):
     """Extract RAW traces from DIR.
 
     Extract a rough window around interesting signals from just-recorded RAW
@@ -225,6 +226,10 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
             sig_raw = analyze.extract_time_window(sig_raw, samp_rate, peak, window, offset=offset)
             l.LOGGER.info("overwrite extracted signal #{} in {}".format(idx, DIR))
             load.save_raw_trace(sig_raw, DIR, idx, 0)
+            # * Handle --save switch.
+            if save != "" and idx == id_ref:
+                l.LOGGER.info("Save extracted I/Q from reference signal to {}".format(save))
+                np.save(save, sig_raw)
     else:
         l.LOGGER.info("ignore overwrite for extracted signal(s)")
 
