@@ -25,7 +25,15 @@ EOF
 import usb.core
 import usb.util
 
-import lib.log as l
+# NOTE: Allows to import "log" module using rcdat.py as a library or as a
+# standalone.
+try:
+    import lib.log as l
+except ModuleNotFoundError as e:
+    try:
+        import log as l
+    except Exception as e:
+        print(e)
 
 class RCDAT():
     """Mini-Circuits RCDAT."""
