@@ -162,10 +162,15 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
     # trg_bp_high         = [4.9e6]
     # trg_lp              = 1e3
     # - Parameters for 1 AES:
+    # trg_bp_low          = [7.5e6]
+    # trg_bp_high         = [11.5e6]
+    # trg_lp              = 1e4
+    # trg_peak_prominence = 3/4
+    # - Parameters for 1 AES at distance and using attenuator:
     trg_bp_low          = [7.5e6]
     trg_bp_high         = [11.5e6]
     trg_lp              = 1e4
-    trg_peak_prominence = 3/4
+    trg_peak_prominence = 2/4
     l.LOGGER.debug("peak search prominence={}".format(trg_peak_prominence))
 
     # * Loading.
