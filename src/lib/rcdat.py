@@ -5,6 +5,9 @@ interrupts.
 
 References:
 
+- Datasheet:
+  https://www.minicircuits.com/pdfs/RCDAT-6000-110.pdf
+
 - Code example from "Programming Examples and Troubleshooting" at page 25 /
   2.1.2 (g) - Multi-Channel Programmable Attenuators:
   https://www.minicircuits.com/softwaredownload/Prog_Examples_Troubleshooting.pdf
