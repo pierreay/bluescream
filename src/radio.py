@@ -250,5 +250,16 @@ def plot(samp_rate, amplitude, phase, nf_id, ff_id):
     if phase is True:
         libplot.plot_time_spec_sync_axis(s_arr, samp_rate, comp=complex.CompType.PHASE)
 
+@cli.command()
+@click.argument("samp_rate", type=int)
+@click.argument("file", type=click.Path())
+def plot_file(samp_rate, file):
+    """Plot a trace from FILE.
+
+    SAMP_RATE is the sampling rate used for the recording.
+
+    """
+    libplot.plot_time_spec_sync_axis([soapysdr.MySoapySDR.numpy_load(file)], samp_rate, comp=complex.CompType.AMPLITUDE)
+
 if __name__ == "__main__":
     cli()
