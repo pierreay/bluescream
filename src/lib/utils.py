@@ -2,9 +2,11 @@
 
 First created to implement type conversion helper functions."""
 
-import lib.load as load
+import math
 
 import numpy as np
+
+import lib.load as load
 
 def bytes_hex_to_npy_int(input):
     """Convert INPUT bytes representing an hexadecimal number in ASCII to a
@@ -111,3 +113,18 @@ def hamw(n):
 def hamd(n, m):
     """Return the Hamming Distance between numbers N and M."""
     return hamw(n ^ m)
+
+def db2m(db):
+    """Convert an attenuation [dB] to distance [meters] using Free Space Path
+    Loss (FSPL) equation.
+
+    """
+    # NOTE: Assume using 2.4 GHz band.
+    return 10 ** ((db - 20 * math.log10(2.4e9) + 147.55) / 20)
+
+def m2db(m):
+    """Convert a distance [meters] to an attenuation [dB] using Free Space Path
+    Loss (FSPL) equation.
+
+    """
+    return 20 * math.log10(m) + 20 * math.log10(2.4e9) - 147.55
