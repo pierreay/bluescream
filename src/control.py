@@ -17,9 +17,7 @@ def cli(log, loglevel):
 @click.argument("att", type=int)
 def set_attenuation(att):
     """Set the RCDAT atenuation to ATT in dB."""
-    l.LOGGER.info("Set the attenuation to {} dB".format(att))
-    att_total = att + 10
-    l.LOGGER.info("Total attenuation is {} dB equivalent to {:.3f} meters of distance".format(att_total, utils.db2m(att_total)))
+    l.LOGGER.info("Set the programmable attenuation to {} dB".format(att))
     rcdat_ctrl = rcdat.RCDAT()
     ret = rcdat_ctrl.attenuation_set(att)
     if ret != 0:
