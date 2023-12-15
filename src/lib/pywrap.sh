@@ -47,6 +47,7 @@ function radio_plot() {
 # $2 is plotting option [--plot | --no-plot] [default = --plot].
 # $3 is overwriting option [--overwrite | --no-overwrite] [default = --no-overwrite].
 # $4 is exit option [--exit-on-error | --no-exit-on-error] [default = --no-exit-on-error].
+# $5: --config value.
 function radio_extract() {
     # NOTE: The "-1" from test's conditions means radio disabled. It is set
     # according to the --nf-id, --ff-id, and --id specifications of the
@@ -64,11 +65,11 @@ function radio_extract() {
     # Extract FF-only.
     elif [[ $ENVRC_NF_ID == -1 && $ENVRC_FF_ID != -1 ]]; then
         # NOTE: Same parameters as command below except no "--id".
-        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window ${window-0} --offset ${offset-0} ${2---plot} ${3---no-overwrite} ${4---no-exit-on-error}
+        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window ${window-0} --offset ${offset-0} ${2---plot} ${3---no-overwrite} ${4---no-exit-on-error} --config ${5-"200_aes"}
     # Extract NF and FF based on FF extraction.
     elif [[ $ENVRC_NF_ID != -1 && $ENVRC_FF_ID != -1 ]]; then
         # NOTE: Same parameters as command above except "--id".
-        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window ${window-0} --offset ${offset-0} ${2---plot} ${3---no-overwrite} ${4---no-exit-on-error} --id $ENVRC_NF_ID
+        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window ${window-0} --offset ${offset-0} ${2---plot} ${3---no-overwrite} ${4---no-exit-on-error} --id $ENVRC_NF_ID --config ${5-"200_aes"}
     fi
 }
 

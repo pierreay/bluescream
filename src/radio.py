@@ -137,7 +137,8 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx):
 @click.option("--offset", type=float, default=0, help="Offset applied to extracted window in seconds.")
 @click.option("--id", type=int, multiple=True, help="Radio indexes on which apply trace extraction (in addition to ID_REF). Can be specified multiple time.")
 @click.option("--exit-on-error/--no-exit-on-error", default=False, help="If true, exit with error on bad AES detection instead of saving a bad trace.")
-def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_error):
+@click.option("--config", default="200_aes", help="Select the extractor configuration [200_aes | 1_aes | 1_aes_weak]")
+def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_error, config):
     """Extract RAW traces from DIR.
 
     Extract a rough window around interesting signals from just-recorded RAW
@@ -156,21 +157,26 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
         l.LOGGER.info("Extract RAW trace using ID #{}".format(id_ref))
     
     # * Trigger(s) configuration.
-    # NOTE: Parameters depending on the firmware configuration.
-    # - Parameters for 200 AES:
-    # trg_bp_low          = [4e6]
-    # trg_bp_high         = [4.9e6]
-    # trg_lp              = 1e3
-    # - Parameters for 1 AES:
-    # trg_bp_low          = [7.5e6]
-    # trg_bp_high         = [11.5e6]
-    # trg_lp              = 1e4
-    # trg_peak_prominence = 3/4
-    # - Parameters for 1 AES at distance and using attenuator:
-    trg_bp_low          = [7.5e6]
-    trg_bp_high         = [11.5e6]
-    trg_lp              = 1e4
-    trg_peak_prominence = 0.4
+    # Parameters for clean 200 AES.
+    if config == "200_aes":
+        trg_bp_low          = [4e6]
+        trg_bp_high         = [4.9e6]
+        trg_lp              = 1e3
+        trg_peak_prominence = 3/4
+    # Parameters for clean 1 AES.
+    elif config == "1_aes":
+        trg_bp_low          = [7.5e6]
+        trg_bp_high         = [11.5e6]
+        trg_lp              = 1e4
+        trg_peak_prominence = 3/4
+    # Parameters for 1 AES at distance and using attenuator.
+    elif config == "1_aes_weak":
+        trg_bp_low          = [7.5e6]
+        trg_bp_high         = [11.5e6]
+        trg_lp              = 1e4
+        trg_peak_prominence = 0.4
+    else:
+        l.log_n_exit("Bad config selection!", 1)
     l.LOGGER.debug("peak search prominence={}".format(trg_peak_prominence))
 
     # * Loading.
