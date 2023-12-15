@@ -55,8 +55,8 @@ class Device():
     # The received LL_ENC_RSP packet sent by the target device. Must be saved
     # by a callback.
     enc_rsp = None
-    # If we received a LL_REJECT_IND during the connection [True | False].
-    reject_ind = False
+    # Count of LL_REJECT_IND received packets.
+    reject_ind_cnt = 0
 
     def __enter__(self):
         return self
@@ -65,16 +65,11 @@ class Device():
         self.close()
 
     def __alert_ll_reject_ind(self, pkt):
-        """Callback alerting if a LL_REJECT_IND is received
-
-        Set the "self.reject_ind" to True.
-
-        """
-        if pkt.haslayer(LL_REJECT_IND) and self.reject_ind is False:
-            # print(repr(pkt.metadata))
-            # pkt.show()
-            l.LOGGER.error("LL_REJECT_IND received!")
-            self.reject_ind = True
+        """Callback alerting if more than a single LL_REJECT_IND is received."""
+        if pkt.haslayer(LL_REJECT_IND):
+            self.reject_ind_cnt += 1
+            if self.reject_ind_cnt > 1:
+                l.LOGGER.error("LL_REJECT_IND received!")
 
     def __save_ll_enc_rsp(self, pkt):
         """Callback filtering packets and saving every LL_ENC_RSP packets for
