@@ -1,5 +1,6 @@
 export ENVRC_VICTIM_ADDR="C2:3E:54:84:5C:4C"
 export ENVRC_ATTACKER_ADDR="CA:FE:CA:FE:CA:FE"
+export ENVRC_ATTACKER_ADDR="$(source ./lib/discover.sh && find_hci_addr)"
 export ENVRC_NF_ID=-1
 export ENVRC_FF_ID=0
 export ENVRC_WANTED_TRACE_TRAIN=500
