@@ -3,6 +3,8 @@
 The RCDAT is a single-channel programmable attenuator controllable using USB
 interrupts.
 
+Using it introduce 9 to 10 dB of insertion loss.
+
 References:
 
 - Datasheet:
