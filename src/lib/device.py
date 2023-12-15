@@ -55,12 +55,26 @@ class Device():
     # The received LL_ENC_RSP packet sent by the target device. Must be saved
     # by a callback.
     enc_rsp = None
+    # If we received a LL_REJECT_IND during the connection [True | False].
+    reject_ind = False
 
     def __enter__(self):
         return self
 
     def __exit__(self, *args):
         self.close()
+
+    def __alert_ll_reject_ind(self, pkt):
+        """Callback alerting if a LL_REJECT_IND is received
+
+        Set the "self.reject_ind" to True.
+
+        """
+        if pkt.haslayer(LL_REJECT_IND) and self.reject_ind is False:
+            # print(repr(pkt.metadata))
+            # pkt.show()
+            l.LOGGER.error("LL_REJECT_IND received!")
+            self.reject_ind = True
 
     def __save_ll_enc_rsp(self, pkt):
         """Callback filtering packets and saving every LL_ENC_RSP packets for
@@ -95,6 +109,7 @@ class Device():
         self.central.set_bd_address(self.bd_addr_src)
         # If we receive a LL_ENC_RSP packet, save it to parse the SKD later.
         self.central.attach_callback(self.__save_ll_enc_rsp)
+        self.central.attach_callback(self.__alert_ll_reject_ind)
         self.time_start = time()
         self.time_elapsed = 0
         self.input = DeviceInput(self, dataset, subset, ser_port, baud)
