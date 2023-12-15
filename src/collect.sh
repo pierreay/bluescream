@@ -313,7 +313,7 @@ function collect_one_set() {
         fi
 
         # Extract the signal from the recording.
-        radio_extract $OPT_LOGLEVEL --no-plot --overwrite --exit-on-error
+        radio_extract $OPT_LOGLEVEL --no-plot --overwrite --exit-on-error $ENVRC_EXTRACT_CONFIG
         check_errors
         if [[ $? != 0 ]]; then
             log_warn "Restart the current recording!"

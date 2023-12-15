@@ -157,20 +157,20 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
         l.LOGGER.info("Extract RAW trace using ID #{}".format(id_ref))
     
     # * Trigger(s) configuration.
-    # Parameters for clean 200 AES.
     if config == "200_aes":
+        l.LOGGER.info("Select extraction config for clean 200 AES")
         trg_bp_low          = [4e6]
         trg_bp_high         = [4.9e6]
         trg_lp              = 1e3
         trg_peak_prominence = 3/4
-    # Parameters for clean 1 AES.
     elif config == "1_aes":
+        l.LOGGER.info("Select extraction config for clean 1 AES")
         trg_bp_low          = [7.5e6]
         trg_bp_high         = [11.5e6]
         trg_lp              = 1e4
         trg_peak_prominence = 3/4
-    # Parameters for 1 AES at distance and using attenuator.
     elif config == "1_aes_weak":
+        l.LOGGER.info("Select extraction config for 1 AES at distance using attenuator")
         trg_bp_low          = [7.5e6]
         trg_bp_high         = [11.5e6]
         trg_lp              = 1e4

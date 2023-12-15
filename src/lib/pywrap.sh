@@ -65,11 +65,11 @@ function radio_extract() {
     # Extract FF-only.
     elif [[ $ENVRC_NF_ID == -1 && $ENVRC_FF_ID != -1 ]]; then
         # NOTE: Same parameters as command below except no "--id".
-        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window ${window-0} --offset ${offset-0} ${2---plot} ${3---no-overwrite} ${4---no-exit-on-error} --config ${5-"200_aes"}
+        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window ${window-0} --offset ${offset-0} ${2---plot} ${3---no-overwrite} ${4---no-exit-on-error} --config ${5-$ENVRC_EXTRACT_CONFIG}
     # Extract NF and FF based on FF extraction.
     elif [[ $ENVRC_NF_ID != -1 && $ENVRC_FF_ID != -1 ]]; then
         # NOTE: Same parameters as command above except "--id".
-        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window ${window-0} --offset ${offset-0} ${2---plot} ${3---no-overwrite} ${4---no-exit-on-error} --id $ENVRC_NF_ID --config ${5-"200_aes"}
+        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR extract $ENVRC_SAMP_RATE $ENVRC_FF_ID --window ${window-0} --offset ${offset-0} ${2---plot} ${3---no-overwrite} ${4---no-exit-on-error} --id $ENVRC_NF_ID --config ${5-$ENVRC_EXTRACT_CONFIG}
     fi
 }
 
