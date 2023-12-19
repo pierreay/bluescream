@@ -2,6 +2,10 @@
 
 Git-annex repository of datasets for the Screaming Channels on BLE project.
 
+* Datasets
+
+- 231213_single-cable_raw :: The firmware is close as stock -- only using AES software and increased TX power. We use a pairing to generate keys, with Butterfly and WHAD on the attacker side. We attacked the amplitude of the signal received at 2.548 GHz during the legitimate BLE transmission emitted when a connection is started. We do not used any averaging  or instrumeted AES repetitions -- only offline triggering and trace alignment. We were able to retrieve 5 bytes of the key with a very low PGE.
+
 * Organization
 
 # TODO: Write the organization of the dataset here.
