@@ -1,0 +1,3 @@
+[submodule "231213_single-cable_raw/submodules/screaming_channels_ble"]
+	path = 231213_single-cable_raw/submodules/screaming_channels_ble
+	url = git@github.com:pierreay/screaming_channels_ble.git
