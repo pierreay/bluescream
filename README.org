@@ -1,0 +1,7 @@
+* About
+
+Git-annex repository of datasets for the Screaming Channels on BLE project.
+
+* Organization
+
+# TODO: Write the organization of the dataset here.
