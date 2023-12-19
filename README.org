@@ -8,4 +8,35 @@ Git-annex repository of datasets for the Screaming Channels on BLE project.
 
 * Organization
 
-# TODO: Write the organization of the dataset here.
+# TODO: Write the organization of the dataset here based on this manually written list:
+
+- [X] Create a reproducible backup:
+  - ~/storage/datasets
+    - [X] .git
+    - [X] .git/annex
+    - [X] .gitignore ignoring attack/* and train/*
+    - [X] README.org
+    - [X] date_name_process/
+      - [X] attack.tar.bz2
+      - [X] train.tar.bz2
+      - [X] profile/
+      - [X] dataset.pyc
+      - [X] firmware/
+        - [X] nimble.hex
+        - [X] butterfly.hex
+      - [X] log/
+        - [X] attack.log
+      - [X] scripts/
+        - [X] reproduce.sh
+      - [X] pics/
+        - [X] profile.png
+        - [X] profile_poi_1.png
+        - [X] profile_poi_2.png
+        - [X] attack_trace.png
+        - [X] attack_align.png
+      - [X] submodules/
+        - [X] screaming_channels_ble
+        - [X] screaming_channels_nimble
+        - [X] butterfly
+        - [X] whad
+
