@@ -59,3 +59,13 @@ function ykush_reset() {
         log_warn "Skip ykush reset because it is not enabled!"
     fi
 }
+
+# Display a tree of a dataset.
+# $1 is the path of the dataset [default = $ENVRC_DATASET_RAW_PATH]
+function dataset_tree() {
+    tree -alh -I "??_trace_ff.npy" -I "???_trace_ff.npy" -I "????_trace_ff.npy" -I "?????_trace_ff.npy" \
+              -I "??_trace_nf.npy" -I "???_trace_nf.npy" -I "????_trace_nf.npy" -I "?????_trace_nf.npy" \
+              ${1-$ENVRC_DATASET_RAW_PATH}
+    echo "Number of npy files in train  : $(ls ${1-$ENVRC_DATASET_RAW_PATH}/train | grep '.*.npy' | wc -l)"
+    echo "Number of npy files in attack : $(ls ${1-$ENVRC_DATASET_RAW_PATH}/attack | grep '.*.npy' | wc -l)"
+}
