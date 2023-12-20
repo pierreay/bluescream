@@ -135,7 +135,11 @@ def debug(indir, subset, outdir):
     INDIR is the path of a directory containing a dataset.
 
     """
+    # Handy variables for debugging.
     dproc = dataset.DatasetProcessing(indir, subset, outdir)
+    dset = dproc.dset
+    sset = dproc.dset.get_subset(subset)
+    prof = dproc.dset.profile
     # * Scratchpad:
     print(dproc)
     from IPython import embed; embed()
