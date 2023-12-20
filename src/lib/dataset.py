@@ -5,6 +5,7 @@ import os
 from os import path
 from enum import Enum
 import numpy as np
+import matplotlib.pyplot as plt
 import pickle
 import signal
 import sys
@@ -552,12 +553,26 @@ class Profile():
         self.MEAN_TRACE = np.load(path.join(self.get_path(), Profile.MEAN_TRACE_FN))
 
     def plot(self, delim=False):
-        # Simple plot of the profile.
-        if delim is False:
-            libplot.plot_simple(self.MEAN_TRACE)
-        # Advanced plot. Print the delimiters using the FF trace #0.
+        # Code taken from attack.py:find_pois().
+        # Plot the POIs.
+        plt.subplots_adjust(hspace = 1)
+        plt.subplot(2, 1, 1)
+        plt.xlabel("samples")
+        plt.ylabel("r")
+        for i, snr in enumerate(self.RS):
+            plt.plot(snr, label="subkey %d"%i)
+        for bnum in range(16):
+            plt.plot(self.POIS[bnum], self.RS[bnum][self.POIS[bnum]], '*')
+        # Plot the mean trace.
+        plt.subplot(2, 1, 2)
+        plt.plot(self.MEAN_TRACE)
+        plt.xlabel("samples")
+        plt.ylabel("mean trace")
+        plt.show()
+
+        # Advanced plot by printing the delimiters using the FF trace #0.
         # NOTE: This part imply that profile has been built with FF and not NF.
-        else:
+        if delim is not False:
             if self.dataset.train_set.ff is None:
                 self.dataset.train_set.load_trace(0, nf=False, ff=True, check=True)
             libplot.plot_time_spec_sync_axis(self.dataset.train_set.ff[0:1], samp_rate=self.dataset.samp_rate, peaks=[self.POINT_START, self.POINT_END])
