@@ -240,6 +240,7 @@ def print_result(bestguess,knownkey,pge):
     print("CORRECT BYTES: %d"%tot)
     print("PGE MEAN:      %d"%np.mean(pge))
     print("PGE MEDIAN:    %d"%np.median(pge))
+    print("PGE MAX:       %d"%np.max(pge))
     print("HD SUM:        %d"%np.sum(hd))
 
 # * CHES20 UTILS
