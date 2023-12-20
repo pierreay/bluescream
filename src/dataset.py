@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# FIXME: Information lost between subset for several processing.
+# XXX: Information lost between subset for several processing.
 # 
 # When using two different processing commands, e.g. average for training
 # subset and extralign for attack subset, then we lost information stored
