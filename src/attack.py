@@ -867,6 +867,23 @@ def aes(pt, key):
 
     return ct
 
+# Wrapper to call the Histogram Enumeration Library for key-ranking
+def rank():
+    print("")
+    print("Starting key ranking using HEL")
+
+    import ctypes
+    from Crypto.Cipher import AES
+
+    from python_hel import hel
+
+    known_key = np.array(KEYS[0], dtype=ctypes.c_ubyte).tolist()
+
+    merge = 2
+    bins = 512
+
+    rank_min, rank_rounded, rank_max, time_rank = hel.rank(LOG_PROBA, known_key, merge, bins)
+
 # Wrapper to call the Histogram Enumeration Library for key-enumeration
 def bruteforce(bit_bound_end):
     print("")
@@ -1036,6 +1053,7 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
             variable)
 
     if BRUTEFORCE and not found:
+        rank()
         bruteforce(BIT_BOUND_END)
 
 
