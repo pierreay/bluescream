@@ -149,6 +149,10 @@ class MySoapySDRs():
         """Get the number of currently registed SDRs."""
         return len(self.sdrs)
 
+    def get_signal(self, idx):
+        """Return the receveid signal of the registered radio IDX."""
+        return self.sdrs[idx].rx_signal
+
 class MySoapySDR():
     """SoapySDR controlled radio.
 
