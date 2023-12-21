@@ -282,7 +282,11 @@ def plot_file(samp_rate, file):
 @click.argument("samp_rate", type=float)
 @click.option("--duration", type=float, default=0.5, help="Duration of the recording.")
 @click.option("--save", default="", help="If set to a file path, save the recorded signal as .npy file without custom dtype.")
-def record(freq, samp_rate, duration, save):
+@click.option("--norm/--no-norm", default=False, help="Normalize the recording before saving.")
+@click.option("--amplitude/--no-amplitude", default=False, help="Extract only the amplitude of the signal.")
+@click.option("--phase/--no-phase", default=False, help="Extract only the phase of the signal.")
+# TODO: Add a --plot option that vill use plot_file() function.
+def record(freq, samp_rate, duration, save, norm, amplitude, phase):
     """Record a trace without any instrumentation.
 
     It will automatically use the first found radio with ID 0.
@@ -304,10 +308,31 @@ def record(freq, samp_rate, duration, save):
         # Save the radio capture.
         rad.accept()
         rad.save(reinit=False)
-        # * Handle --save switch.
-        if save != "":
-            l.LOGGER.info("Additional save of recorded I/Q to {}".format(save))
-            np.save(save, rad.get_signal(rad_id))
+        # If requested, get the recorded signal for an additional save.
+        sig = rad.get_signal(rad_id)
+    # Save the signal as requested.
+    if save != "":
+        if amplitude is True:
+            l.LOGGER.info("Get the amplitude of the recorded signal")
+            sig = complex.get_comp(sig, complex.CompType.AMPLITUDE)
+        elif phase is True:
+            l.LOGGER.info("Get the phase of the recorded signal")
+            sig = complex.get_comp(sig, complex.CompType.PHASE)
+        else:
+            l.LOGGER.info("Keep I/Q of the recorded signal")
+        # Safety-check between options and nature of signal.
+        sig_is_iq = complex.is_iq(sig)
+        assert sig_is_iq == (amplitude is False and phase is False)
+        # NOTE: Normalize after getting the correct component.
+        if norm is True:
+            l.LOGGER.info("Normalize the recorded signal")
+            sig = analyze.normalize(sig, arr_complex=sig_is_iq)
+            # If signal was complex before normalization, we must convert the
+            # polar representation to cartesian representation before saving.
+            if sig_is_iq is True:
+                sig = complex.p2r(sig[0], sig[1])
+        l.LOGGER.info("Additional save of recorded signal to: {}".format(save))
+        np.save(save, sig)
 
 if __name__ == "__main__":
     cli()
