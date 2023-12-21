@@ -150,8 +150,14 @@ class MySoapySDRs():
         return len(self.sdrs)
 
     def get_signal(self, idx):
-        """Return the receveid signal of the registered radio IDX."""
-        return self.sdrs[idx].rx_signal
+        """Return the receveid signal of radio indexed by IDX.
+
+        The returned signal will be I/Q represented using np.complex64 numbers.
+
+        """
+        sig = MySoapySDR.dtype_to_complex64(self.sdrs[idx].rx_signal)
+        assert sig.dtype == np.complex64, "Returned signal should be complex numbers!"
+        return sig
 
 class MySoapySDR():
     """SoapySDR controlled radio.
