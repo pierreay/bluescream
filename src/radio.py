@@ -315,25 +315,7 @@ def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag):
     libplot.plot_time_spec_sync_axis([sig], samp_rate, comp=comp, cond=plot_flag)
     # Save the signal as requested.
     if save != "":
-        if amplitude is True:
-            l.LOGGER.info("Get the amplitude of the recorded signal")
-            sig = complex.get_comp(sig, complex.CompType.AMPLITUDE)
-        elif phase is True:
-            l.LOGGER.info("Get the phase of the recorded signal")
-            sig = complex.get_comp(sig, complex.CompType.PHASE)
-        else:
-            l.LOGGER.info("Keep I/Q of the recorded signal")
-        # Safety-check between options and nature of signal.
-        sig_is_iq = complex.is_iq(sig)
-        assert sig_is_iq == (amplitude is False and phase is False)
-        # NOTE: Normalize after getting the correct component.
-        if norm is True:
-            l.LOGGER.info("Normalize the recorded signal")
-            sig = analyze.normalize(sig, arr_complex=sig_is_iq)
-            # If signal was complex before normalization, we must convert the
-            # polar representation to cartesian representation before saving.
-            if sig_is_iq is True:
-                sig = complex.p2r(sig[0], sig[1])
+        sig = analyze.process_iq(sig, amplitude=amplitude, phase=phase, norm=norm, log=True)
         l.LOGGER.info("Additional save of recorded signal to: {}".format(save))
         np.save(save, sig)
 

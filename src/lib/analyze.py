@@ -584,3 +584,54 @@ def shift(sig, shift):
         sig = sig[:shift]
         sig = np.insert(sig, 0, np.zeros(-shift, dtype=sig.dtype))
     return sig
+
+def process_iq(sig, amplitude=False, phase=False, norm=False, log=False):
+    """Return a processed signal depending on basic parameters.
+
+    By default, all processing are disabled.
+
+    :param sig: Signal to process (np.complex64).
+
+    :param amplitude: If set to True, process and return only the amplitude
+    component (np.float32).
+
+    :param phase: If set to True, process and return only the phase component
+    (np.float32).
+
+    :param norm: If set to True, normalize the signal.
+
+    :param log: If set to True, log processing to the user.
+
+    :returns: The processed signal in I/Q (np.complex64) if both AMPLITUDE and
+    PHASE are False, otherwise the specified component (np.float32).
+
+    """
+    if amplitude is True:
+        if log is True:
+            l.LOGGER.info("Get the amplitude of the processed signal")
+        sig = complex.get_comp(sig, complex.CompType.AMPLITUDE)
+    elif phase is True:
+        if log is True:
+            l.LOGGER.info("Get the phase of the processed signal")
+        sig = complex.get_comp(sig, complex.CompType.PHASE)
+    else:
+        if log is True:
+            l.LOGGER.info("Keep I/Q of the processed signal")
+    # Safety-check between options and nature of signal.
+    sig_is_iq = complex.is_iq(sig)
+    assert sig_is_iq == (amplitude is False and phase is False)
+    # NOTE: Normalize after getting the correct component.
+    if norm is True:
+        if log is True:
+            l.LOGGER.info("Normalize the processed signal")
+        sig = analyze.normalize(sig, arr_complex=sig_is_iq)
+        # If signal was complex before normalization, we must convert the polar
+        # representation to cartesian representation before returning.
+        if sig_is_iq is True:
+            sig = complex.p2r(sig[0], sig[1])
+    # Safety-check of signal type.
+    if amplitude is False and phase is False:
+        assert complex.is_iq(sig) == True, "Bad signal type after processing!"
+    else:
+        assert complex.is_iq(sig) == False, "Bad signal type after processing!"
+    return sig
