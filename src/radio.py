@@ -285,8 +285,8 @@ def plot_file(samp_rate, file):
 @click.option("--norm/--no-norm", default=False, help="Normalize the recording before saving.")
 @click.option("--amplitude/--no-amplitude", default=False, help="Extract only the amplitude of the signal.")
 @click.option("--phase/--no-phase", default=False, help="Extract only the phase of the signal.")
-# TODO: Add a --plot option that vill use plot_file() function.
-def record(freq, samp_rate, duration, save, norm, amplitude, phase):
+@click.option("--plot/--no-plot", "plot_flag", default=True, help="Plot the recorded signal.")
+def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag):
     """Record a trace without any instrumentation.
 
     It will automatically use the first found radio with ID 0.
@@ -308,8 +308,11 @@ def record(freq, samp_rate, duration, save, norm, amplitude, phase):
         # Save the radio capture.
         rad.accept()
         rad.save(reinit=False)
-        # If requested, get the recorded signal for an additional save.
+        # Get the recorded signal for an additional save or plot.
         sig = rad.get_signal(rad_id)
+    # Plot the signal as requested [amplitude by default].
+    comp = complex.CompType.PHASE if phase is True else complex.CompType.AMPLITUDE
+    libplot.plot_time_spec_sync_axis([sig], samp_rate, comp=comp, cond=plot_flag)
     # Save the signal as requested.
     if save != "":
         if amplitude is True:
