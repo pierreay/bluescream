@@ -88,10 +88,10 @@ class MySoapySDRs():
         for sdr in self.sdrs:
             sdr.accept()
 
-    def save(self, dir = None):
+    def save(self, dir = None, reinit = True):
         l.LOGGER.debug("MySoapySDRs.save(dir={})".format(dir))
         for sdr in self.sdrs:
-            sdr.save(dir)
+            sdr.save(dir, reinit=reinit)
 
     def disable(self):
         for sdr in self.sdrs:
@@ -307,15 +307,24 @@ class MySoapySDR():
             self.accepted = True
             self.rx_signal = np.concatenate((self.rx_signal, self.rx_signal_candidate))
 
-    def save(self, dir = None):
+    def save(self, dir = None, reinit = True):
+        """Save the last accepted recording on disk.
+
+        The saved .npy file will use the MySoapySDR.DTYPE data type.
+
+        :param reinit: If set to False, do not re-initialize the radio for a
+        next recording. MySoapySDR.reinit() should be called manually later.
+
+        """
         if dir is None:
             dir = self.dir
         if self.enabled is True and self.accepted is True:
             dir = path.expanduser(dir)
             l.LOGGER.info("save recording of radio #{} into directory {}".format(self.idx, dir))
             load.save_raw_trace(self.rx_signal, dir, self.idx, 0)
-            # Re-initialize for further recordings.
-            self.reinit()
+            # Re-initialize for further recordings if requested [default].
+            if reinit is True:
+                self.reinit()
 
     def reinit(self):
         """Re-initialize the recording state and buffers such that a new
