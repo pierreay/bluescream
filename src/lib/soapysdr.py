@@ -226,8 +226,9 @@ class MySoapySDR():
 
     def __init__(self, fs, freq, idx = 0, enabled = True, duration = 1, dir = "/tmp"):
         l.LOGGER.debug("MySoapySDR.__init__(fs={},freq={},idx={},enabled={},duration={},dir={})".format(fs, freq, idx, enabled, duration, dir))
-        self.fs = fs
-        self.freq = freq
+        # NOTE: Automatically convert floats to integers (allows using scentific notation, e.g. e6 or e9).
+        self.fs = int(fs)
+        self.freq = int(freq)
         self.idx = idx
         self.enabled = enabled
         # Default duration if nothing is specified during self.record().
