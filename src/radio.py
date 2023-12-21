@@ -138,7 +138,7 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx):
 @click.option("--id", type=int, multiple=True, help="Radio indexes on which apply trace extraction (in addition to ID_REF). Can be specified multiple time.")
 @click.option("--exit-on-error/--no-exit-on-error", default=False, help="If true, exit with error on bad AES detection instead of saving a bad trace.")
 @click.option("--config", default="200_aes", help="Select the extractor configuration [200_aes | 1_aes | 1_aes_weak].")
-@click.option("--save", default="", help="If set to a file path, save the ID_REF extracted signal as .npy file. Ignored if --overwrite is set to False.")
+@click.option("--save", default="", help="If set to a file path, save the ID_REF extracted signal as .npy file without custom dtype. Ignored if --overwrite is set to False.")
 def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_error, config, save):
     """Extract RAW traces from DIR.
 
@@ -276,6 +276,38 @@ def plot_file(samp_rate, file):
 
     """
     libplot.plot_time_spec_sync_axis([soapysdr.MySoapySDR.numpy_load(file)], samp_rate, comp=complex.CompType.AMPLITUDE)
+
+@cli.command()
+@click.argument("freq", type=float)
+@click.argument("samp_rate", type=float)
+@click.option("--duration", type=float, default=0.5, help="Duration of the recording.")
+@click.option("--save", default="", help="If set to a file path, save the recorded signal as .npy file without custom dtype.")
+def record(freq, samp_rate, duration, save):
+    """Record a trace without any instrumentation.
+
+    It will automatically use the first found radio with ID 0.
+
+    FREQ is the center frequency of the recording.
+    SAMP_RATE is the sampling rate used for the recording.
+
+    """
+    rad_id=0
+    # Initialize the radio as requested.
+    with soapysdr.MySoapySDRs() as rad:
+        try:
+            rad.register(soapysdr.MySoapySDR(samp_rate, freq, rad_id, duration=duration, dir=DIR))
+        except Exception as e:
+            l.log_n_exit("Error during radio initialization", 1, e)
+        # Initialize the driver.
+        rad.open()
+        rad.record(duration)
+        # Save the radio capture.
+        rad.accept()
+        rad.save(reinit=False)
+        # * Handle --save switch.
+        if save != "":
+            l.LOGGER.info("Additional save of recorded I/Q to {}".format(save))
+            np.save(save, rad.get_signal(rad_id))
 
 if __name__ == "__main__":
     cli()
