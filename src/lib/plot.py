@@ -212,7 +212,7 @@ def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, c
         ax_freq = plot_freq(samp_rate, s, ax_time, subplot_idx + 1, triggers)
         if peaks is not None:
             plot_peaks(peaks, ax_freq, samp_rate)
-    show_fullscreen()
+    plt.show()
 
 def plot_metadata_balance(ks, pt):
     """Take 2D np.array of KS keys and PT plaintexts, show a boxplot of imbalance"""
