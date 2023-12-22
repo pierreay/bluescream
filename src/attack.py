@@ -1021,11 +1021,14 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
     PROFILE.load()
     
 
-    if PLOT:
-        # Plot the attack trace and its delimiters.
-        libplot.plot_time_spec_sync_axis(DATASET.attack_set.ff[0:1], samp_rate=DATASET.samp_rate, peaks=[START_POINT, END_POINT])
-        # Plot the profile and its delimiters.
-        PROFILE.plot(delim=True)
+    # NOTE: Disable those plots as they are not so useful in their current
+    # setup. The goal was to vizualise the profile and attack traces with the
+    # delimiters of start and end points.
+    # if PLOT:
+    #     # Plot the attack trace and its delimiters.
+    #     libplot.plot_time_spec_sync_axis(DATASET.attack_set.ff[0:1], samp_rate=DATASET.samp_rate, peaks=[START_POINT, END_POINT])
+    #     # Plot the profile and its delimiters.
+    #     PROFILE.plot(delim=True)
 
     if align:
         TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
