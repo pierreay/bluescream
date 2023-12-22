@@ -594,7 +594,7 @@ class Profile():
 
         # Advanced plot by printing the delimiters using the FF trace #0.
         # NOTE: This part imply that profile has been built with FF and not NF.
-        if delim is not False:
+        if delim is not False and self.dataset.train_set.get_nb_trace_ondisk() > 0:
             if self.dataset.train_set.ff is None:
                 self.dataset.train_set.load_trace(0, nf=False, ff=True, check=True)
             libplot.plot_time_spec_sync_axis(self.dataset.train_set.ff[0:1], samp_rate=self.dataset.samp_rate, peaks=[self.POINT_START, self.POINT_END])
