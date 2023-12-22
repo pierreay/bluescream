@@ -384,8 +384,8 @@ def align(template, target, sr, ignore=True, log=False):
     # +++===+++++++++
     # +++++++===+++++ -> shift > 0 -> shift left target -> shrink template from right or pad target to right
     # ===++++++++++++ -> shift < 0 -> shift right target -> shrink template from left or pad target to left
-    assert(template.shape == target.shape)
-    assert(template.ndim == 1 and target.ndim == 1)
+    assert template.shape == target.shape, "Traces to align should have the same length!"
+    assert template.ndim == 1 and target.ndim == 1, "Traces to align should be 1D-ndarray!"
     # Compute the cross-correlation and find shift across amplitude.
     lpf_freq     = sr / 4
     template_lpf = filters.butter_lowpass_filter(complex.get_amplitude(template), lpf_freq, sr)
