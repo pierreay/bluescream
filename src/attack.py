@@ -869,13 +869,18 @@ def aes(pt, key):
 
 # Wrapper to call the Histogram Enumeration Library for key-ranking
 def rank():
+    # Perform key ranking only if HEL is installed.
+    try:
+        from python_hel import hel
+    except Exception as e:
+        l.LOGGER.error("Can't import HEL and perform key ranking!")
+        return
+    
     print("")
     print("Starting key ranking using HEL")
 
     import ctypes
     from Crypto.Cipher import AES
-
-    from python_hel import hel
 
     known_key = np.array(KEYS[0], dtype=ctypes.c_ubyte).tolist()
 
@@ -1055,8 +1060,10 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
     found = run_attack(attack_algo, average_bytes, num_pois, pooled_cov,
             variable)
 
+    # Always rank if HEL is available.
+    rank()
+    
     if BRUTEFORCE and not found:
-        rank()
         bruteforce(BIT_BOUND_END)
 
 
