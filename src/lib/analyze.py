@@ -117,7 +117,7 @@ def normalize_zscore(arr, set=False):
     assert arr.dtype == np.float32 or arr.dtype == np.float64
     mu = np.average(arr) if set is False else np.average(arr, axis=0)
     std = np.std(arr) if set is False else np.std(arr, axis=0)
-    if std != 0:
+    if set is True or std != 0:
         arr = (arr - mu) / std
     return arr
 
