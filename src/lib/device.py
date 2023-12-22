@@ -262,22 +262,26 @@ class Device():
     def save(self, idx):
         """Save necessary data from the device.
 
-        Get the used input for the AES (LTK for key, SKD for plaintext) and
-        save it inside our dataset. Save also the security material generated
-        during the pairing for later usage. This functions if meant to be
-        called after a successfull instrumentation for recording index IDX.
+        This functions if meant to be called after a successfull
+        instrumentation for recording index IDX.
+
+        If the input generation method is pairing at runtime, this function
+        will get the used input for the AES (LTK for key, SKD for plaintext)
+        and save it inside our dataset. Save also the security material
+        generated during the pairing for later usage.
 
         """
-        # Get the SKDS and concatenate with SKDM.
-        skds = self.enc_rsp.lastlayer().fields["skds"]
-        l.LOGGER.debug("Received SKDS=0x{:x}".format(skds))
-        skd = skds << 64 | self.input.skdm
-        # Save the used key (LTK) and used plaintext (SKD) to our dataset.
-        self.subset.set_current_ks(idx, utils.bytes_hex_to_npy_int2(self.secentry.ltk.value, 16))
-        self.subset.set_current_pt(idx, utils.str_hex_to_npy_int(utils.int_to_str_hex(skd, 16)))
-        # Save the security entry in the dataset object such that DeviceInput
-        # can reload it if needed.
-        self.subset.saved_secentry = self.secentry
+        if self.subset.input_gen == dataset.InputGeneration.RUN_TIME and self.subset.input_src == dataset.InputSource.PAIRING:
+            # Get the SKDS and concatenate with SKDM.
+            skds = self.enc_rsp.lastlayer().fields["skds"]
+            l.LOGGER.debug("Received SKDS=0x{:x}".format(skds))
+            skd = skds << 64 | self.input.skdm
+            # Save the used key (LTK) and used plaintext (SKD) to our dataset.
+            self.subset.set_current_ks(idx, utils.bytes_hex_to_npy_int2(self.secentry.ltk.value, 16))
+            self.subset.set_current_pt(idx, utils.str_hex_to_npy_int(utils.int_to_str_hex(skd, 16)))
+            # Save the security entry in the dataset object such that DeviceInput
+            # can reload it if needed.
+            self.subset.saved_secentry = self.secentry
 
     def close(self):
         if self.central is not None:
