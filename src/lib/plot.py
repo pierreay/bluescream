@@ -138,7 +138,8 @@ def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, c
       instead of time in seconds.
 
     """
-    assert type(s_arr) == list or (type(s_arr) == np.ndarray and s_arr.ndim == 2)
+    assert type(s_arr) == list or type(s_arr) == np.ndarray, "Not a list or an array!"
+    assert type(s_arr) == np.ndarray and s_arr.ndim == 2 if type(s_arr) == list is False else True, "Bad dimensions for Numpy array!"
     # NOTE: Tried to implement a non-blocking version of this function, but
     # when using plt.plot(block=False) and re-entering this function again for
     # another plot, both plots are plotted on same figure.
