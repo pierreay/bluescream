@@ -203,9 +203,9 @@ class Subset():
     run_new_input = False
 
     def __init__(self, dataset, name, subtype, input_gen, input_src, nb_trace_wanted = 0):
-        assert(subtype in SubsetType)
-        assert(input_gen in InputGeneration)
-        assert(input_src in InputSource)
+        assert subtype in SubsetType, "Bad subset type!"
+        assert input_gen in InputGeneration, "Bad input generation value!"
+        assert input_src in InputSource if input_gen == InputGeneration.RUN_TIME else True, "Bad input source method when generation is set to RUN_TIME!"
         self.dataset = dataset
         self.name = name
         self.subtype = subtype
