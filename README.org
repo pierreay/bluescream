@@ -19,35 +19,39 @@ Git-annex repository of datasets for the Screaming Channels on BLE project.
 
 * Organization
 
-# TODO: Write the organization of the dataset here based on this manually written list:
+Here is an example of a complete dataset stored after an attack:
 
-- [X] Create a reproducible backup:
-  - ~/storage/datasets
-    - [X] .git
-    - [X] .git/annex
-    - [X] .gitignore ignoring attack/* and train/*
-    - [X] README.org
-    - [X] date_name_process/
-      - [X] attack.tar.bz2
-      - [X] train.tar.bz2
-      - [X] profile/
-      - [X] dataset.pyc
-      - [X] firmware/
-        - [X] nimble.hex
-        - [X] butterfly.hex
-      - [X] log/
-        - [X] attack.log
-      - [X] scripts/
-        - [X] reproduce.sh
-      - [X] pics/
-        - [X] profile.png
-        - [X] profile_poi_1.png
-        - [X] profile_poi_2.png
-        - [X] attack_trace.png
-        - [X] attack_align.png
-      - [X] submodules/
-        - [X] screaming_channels_ble
-        - [X] screaming_channels_nimble
-        - [X] butterfly
-        - [X] whad
+#+begin_src bash :results output :exports results :eval never
+tree -alh -I "attack/" -I "train/" -L 2 231213_single-cable_raw
+#+end_src
 
+#+RESULTS:
+#+begin_example
+[4.0K]  231213_single-cable_raw             # Dataset collected the 23-12-13 contaning no processing (RAW) using a cable and a single AES
+├── [5.6G]  attack.tar                      # Attack subset archive.
+├── [360K]  dataset.pyc                     # Dataset Python object.
+├── [4.0K]  firmware                        # Firmware used for the attacker and the victim.
+│   ├── [310K]  butterly.hex                # Firmware of the attacker (Butterfly).
+│   └── [417K]  nimble.hex                  # Firmware of the victim (Nimble).
+├── [4.0K]  log                             # Output of used scripts.
+│   ├── [5.6K]  attack_1.log                # Results of first attack.
+│   └── [2.1K]  attack_2.log                # Results of second attack.
+├── [4.0K]  pics                            # Images of the process (pictures or screenshots).
+│   ├── [317K]  attack_align.png            # Alignment of traces during the attack.
+│   ├── [484K]  attack_trace.png            # Trace used during the attack.
+│   ├── [413K]  poi_1.png                   # Profile for the POI #1.
+│   ├── [544K]  poi_2.png                   # Profile for the POI #2.
+│   └── [483K]  profile.png                 # Correlation for all key bytes during the profiling.
+├── [4.0K]  profile                         # Profile Numpy traces.
+│   └── [ XXK]  *.npy
+├── [4.0K]  scripts                         # Scripts used for the processing / the attack.
+│   └── [ 743]  reproduce.sh                # Reproduce the attack.
+├── [4.0K]  submodules                      # Git submodules used to keep track of source code for collection / attack / firmware.
+│   ├── [4.0K]  butterfly                   # Sources for the attacker firmware.
+│   ├── [4.0K]  screaming_channels_ble      # Sources for the collection / attack code.
+│   ├── [4.0K]  screaming_channels_nimble   # Sources for the victim firmware.
+│   └── [4.0K]  whad                        # Sources for the library used in our instrumentation code.
+└── [ 50G]  train.tar                       # Train subset archive used for to create the profile.
+
+10 directories, 20 files
+#+end_example
