@@ -93,7 +93,10 @@ function dataset_init() {
     # NOTE: Dataset name is taken from lib/dataset.py/Dataset.FILENAME variable.
     if [[ ! -f ${1-$ENVRC_DATASET_RAW_PATH}/dataset.pyc ]]; then
         log_info "Initialize a dataset in ${1-$ENVRC_DATASET_RAW_PATH}..."
-        ./dataset.py init ${1-$ENVRC_DATASET_RAW_PATH} ${2-$ENVRC_SAMP_RATE} ${3---input-gen-run} ${4---input-src-pairing} --nb-trace-wanted-train 65536 --nb-trace-wanted-attack 16384
+        # NOTE: Used when using balanced generator to generate inputs:
+        ./dataset.py init ${1-$ENVRC_DATASET_RAW_PATH} ${2-$ENVRC_SAMP_RATE} ${3---input-gen-init} --nb-trace-wanted-train 65536 --nb-trace-wanted-attack 16384
+        # NOTE: Used when using pairing to generate inputs:
+        # ./dataset.py init ${1-$ENVRC_DATASET_RAW_PATH} ${2-$ENVRC_SAMP_RATE} ${3---input-gen-run} ${4---input-src-pairing} --nb-trace-wanted-train 65536 --nb-trace-wanted-attack 16384
     else
         log_info "Dataset already initialized in ${1-$ENVRC_DATASET_RAW_PATH}!"
     fi
