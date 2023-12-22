@@ -120,7 +120,7 @@ def plot_time_compare_n(arr):
 
 # * Special plot for analysis
 
-def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, cond=True, comp=complex.CompType.AMPLITUDE, norm=False, xtime=True):
+def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, cond=True, comp=complex.CompType.AMPLITUDE, norm=False, xtime=True, title=""):
     """Plot signals using synchronized time and frequency domains.
 
     Plot signals contained in the S_ARR 2D np.ndarray or list containing 1D
@@ -136,6 +136,7 @@ def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, c
     - NORM can be set to True to normalize each signals individually.
     - XTIME can be set to False to always display sample index on the X axis
       instead of time in seconds.
+    - TITLE can be set to a string to set a plot title.
 
     """
     assert type(s_arr) == list or type(s_arr) == np.ndarray, "Not a list or an array!"
@@ -151,24 +152,27 @@ def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, c
     if norm is True:
         s_arr = analyze.normalize(s_arr)
     SUBPLOT_NB = len(s_arr) * 2
-    XLABEL = "Time [s]" if xtime is True else "Samples #"
+    XLABEL = "Time [s]" if xtime is True else "Sample [#]"
     def plot_init(nsamples, duration, nb = 1):
+        plt.suptitle(title)
         t = np.linspace(0, duration, nsamples)
         plt.subplots_adjust(hspace = 1)
         ax_time = plt.subplot(SUBPLOT_NB, 1, nb)
         return t, ax_time
 
-    def plot_time(t, data, ax_time, label, title=""):
+    def plot_time(t, data, ax_time, label):
         if xtime is True:
             ax_time.plot(t, data, label = label, lw = 0.7)
         else:
             ax_time.plot(data, label = label, lw = 0.7)
         ax_time.legend(loc="upper right")
-        plt.title("Time-Domain [{}]".format(title))
         plt.xlabel(XLABEL)
-        plt.ylabel("Amplitude")
+        if comp == complex.CompType.AMPLITUDE:
+            plt.ylabel("Amplitude")
+        else:
+            plt.ylabel("Phase")
         secax = ax_time.secondary_xaxis('top', functions=(lambda x: x - ax_time.get_xlim()[0], lambda x: x))
-        secax.set_xlabel("Time (relative to zoom) [s]")
+        secax.set_xlabel("Relative time [s]")
         secax.ticklabel_format(scilimits=(0,0))
 
     def plot_freq(fs, data, ax_time, nb = 1, triggers = None):
@@ -178,7 +182,6 @@ def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, c
             for idx in list(range(triggers.nb_composed())):
                 ax_specgram.axhline(y=triggers.bandpass_low[idx], color='b', label = "trg(idx={}).bandpass_low".format(idx), lw = 0.3)
                 ax_specgram.axhline(y=triggers.bandpass_high[idx], color='b', label = "trg(idx={}).bandpass_high".format(idx), lw = 0.3)
-        plt.title("Spectrogram")
         plt.xlabel(XLABEL)
         plt.ylabel("Frequency [Hz]")
         return ax_specgram
@@ -312,3 +315,4 @@ class PlotOnce():
 
     def off(self):
         self.state = False
+ 
