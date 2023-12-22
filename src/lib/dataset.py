@@ -20,7 +20,8 @@ import lib.complex as complex
 import lib.analyze as analyze
 import lib.utils as utils
 
-TraceType = Enum('TraceType', ['NF', 'FF'])
+# NOTE: start=0 because used to index tuples returning (traces_nf, traces_ff).
+TraceType = Enum('TraceType', ['NF', 'FF'], start=0)
 SubsetType = Enum('SubsetType', ['TRAIN', 'ATTACK'])
 InputType = Enum('InputType', ['FIXED', 'VARIABLE'])
 InputGeneration = Enum('InputGeneration', ['RUN_TIME', 'INIT_TIME'])
@@ -233,13 +234,14 @@ class Subset():
             self.pt_type = InputType.VARIABLE
             self.ks_type = InputType.FIXED
 
+    # NOTE: The get_trace_from_disk() is a modified copy of this function.
     def load_trace(self, idx=-1, nf=True, ff=True, check=False, start_point=0, end_point=0):
         """Load the on-disk traces into memory.
 
         The loading will put the traces in the self.nf and self.ff
         variables. For scripting conveniance, the functions also returns
-        references to the loaded trace(s). The trace(s) are loaded into a 2D
-        np.ndarray.
+        references to the loaded trace(s) in a tuple composed of (self.nf,
+        self.ff). The trace(s) are loaded into a 2D np.ndarray.
 
         IDX can be -1 for all traces, an INT for a specific trace index, or
         a RANGE for a range of traces. If using a RANGE, please use range(0, x)
@@ -274,6 +276,43 @@ class Subset():
         assert self.nf is None or self.nf.ndim == 2
         assert self.ff is None or self.ff.ndim == 2
         return self.nf, self.ff
+
+    # NOTE: This function is a modified copy of the load_trace() function. It
+    # should be worth to refactor the twos to use get_trace_from_disk() inside
+    # load_trace().
+    def get_trace_from_disk(self, idx=-1, nf=True, ff=True, check=False, start_point=0, end_point=0):
+        """Get a trace from the disk without altering the Dataset object.
+
+        Compared from the load_trace() function, which is used to load one or a
+        bunch of trace(s) in dataset for a further processing, this function
+        will only return a trace from the disk without changing the loaded
+        traces inside the dataset.
+
+        For the parameters and the returned objects, refers to the load_trace()
+        function.
+
+        """
+        assert(path.exists(self.get_path()))
+        if isinstance(idx, int) and idx == -1:
+            load_nf, load_ff = load.load_all_traces(self.get_path(), nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point)
+        elif isinstance(idx, int):
+            load_nf, load_ff = load.load_pair_trace(self.get_path(), idx, nf=nf, ff=ff)
+            load_nf = None if load_nf is None else load.truncate(load_nf, start_point, end_point)
+            load_ff = None if load_ff is None else load.truncate(load_ff, start_point, end_point)
+        elif isinstance(idx, range):
+            load_nf, load_ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point)
+        # NOTE: Always return 2D np.ndarray.
+        load_nf = utils.list_array_to_2d_array(load_nf)
+        load_ff = utils.list_array_to_2d_array(load_ff)
+        if check is True:
+            if nf is True and load_nf is None:
+                raise Exception("Can't load NF trace!")
+            if ff is True and load_ff is None:
+                raise Exception("Can't load FF trace!")
+        # Check dimensions.
+        assert load_nf is None or load_nf.ndim == 2
+        assert load_ff is None or load_ff.ndim == 2
+        return load_nf, load_ff
 
     def unload_trace(self):
         """Delete and forget references about any loaded trace(s) from disk."""
