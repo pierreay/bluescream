@@ -129,8 +129,9 @@ function dataset_extract() {
 
 # Debug a dataset.
 # $1 is the dataset path [default = $ENVRC_DATASET_RAW_PATH].
+# $2 is the subset [train | attack] [default = train].
 function dataset_debug() {
-    ./dataset.py debug ${1-$ENVRC_DATASET_RAW_PATH}
+    ./dataset.py debug ${1-$ENVRC_DATASET_RAW_PATH} --subset ${2-train}
 }
 
 # * attack.py

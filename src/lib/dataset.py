@@ -502,6 +502,18 @@ class Subset():
             self.pt[idx] = val
             self.run_new_input = True
 
+    def overview(self, base = 0, nb = 5):
+        """Overview a small numbers of Far-Field (FF) traces from the subset.
+
+        :param base: Index of first trace to plot.
+
+        :param nb: Number of traces plot.
+
+        """
+        self.load_trace(range(base, base + nb), nf=False, ff=True)
+        assert self.ff is not None and type (self.ff) == np.ndarray and self.ff.ndim == 2
+        libplot.plot_time_spec_sync_axis(self.ff)
+
 class Profile():
     POIS_FN       = "POIS.npy"
     RS_FN         = "PROFILE_RS.npy"
