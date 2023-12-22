@@ -75,3 +75,11 @@ function dataset_tree() {
     echo "Number of npy files in train  : $(ls ${1-$ENVRC_DATASET_RAW_PATH}/train | grep '.*.npy' | wc -l)"
     echo "Number of npy files in attack : $(ls ${1-$ENVRC_DATASET_RAW_PATH}/attack | grep '.*.npy' | wc -l)"
 }
+
+# Archive the traces from the train and attack subsets.
+# $1 is the path of the dataset [default = $ENVRC_DATASET_RAW_PATH]
+function dataset_archive() {
+    cd ${1-$ENVRC_DATASET_RAW_PATH}
+    tar cvf train.tar train
+    tar cvf attack.tar attack
+}
