@@ -1,3 +1,5 @@
+# -*- mode: shell-script; -*-
+
 export ENVRC_DURATION=0.1
 
 export ENVRC_VICTIM_ADDR="C2:3E:54:84:5C:4C"
@@ -17,4 +19,5 @@ export ENVRC_DATASET_RAW_PATH="$ENVRC_DATASET_PATH/231222_single-cable-balanced_
 # export ENVRC_WANTED_TRACE_ATTACK=100
 
 export ENVRC_EXTRACT_CONFIG="1_aes"
+
 export ENVRC_DATASET_INPUT="BALANCED"
