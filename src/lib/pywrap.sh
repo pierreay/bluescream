@@ -83,8 +83,8 @@ function radio_all() {
 
 # * dataset.py
 
-# Initialize a dataset in $1 using sample rate $2. Silently do nothing if
-# dataset already exists.
+# Initialize a dataset. Silently do nothing if dataset already exists. Choose
+# the input generation method based on the ENVRC_DATASET_INPUT global variable.
 # $1 is the dataset directory [default = $ENVRC_DATASET_RAW_PATH]
 # $2 is the sample rate [default = $ENVRC_SAMP_RATE]
 # $3 is the input generation method [default = --input-gen-run]
@@ -92,11 +92,16 @@ function radio_all() {
 function dataset_init() {
     # NOTE: Dataset name is taken from lib/dataset.py/Dataset.FILENAME variable.
     if [[ ! -f ${1-$ENVRC_DATASET_RAW_PATH}/dataset.pyc ]]; then
-        log_info "Initialize a dataset in ${1-$ENVRC_DATASET_RAW_PATH}..."
-        # NOTE: Used when using balanced generator to generate inputs:
-        ./dataset.py init ${1-$ENVRC_DATASET_RAW_PATH} ${2-$ENVRC_SAMP_RATE} ${3---input-gen-init} --nb-trace-wanted-train 65536 --nb-trace-wanted-attack 16384
-        # NOTE: Used when using pairing to generate inputs:
-        # ./dataset.py init ${1-$ENVRC_DATASET_RAW_PATH} ${2-$ENVRC_SAMP_RATE} ${3---input-gen-run} ${4---input-src-pairing} --nb-trace-wanted-train 65536 --nb-trace-wanted-attack 16384
+        log_info "Initialize a dataset using the '$ENVRC_DATASET_INPUT' input generation in ${1-$ENVRC_DATASET_RAW_PATH}..."
+        # Use the balanced generator to generate inputs:
+        if [[ $ENVRC_DATASET_INPUT == "BALANCED" ]]; then
+            ./dataset.py init ${1-$ENVRC_DATASET_RAW_PATH} ${2-$ENVRC_SAMP_RATE} ${3---input-gen-init} --nb-trace-wanted-train 65536 --nb-trace-wanted-attack 16384
+        # Use the pairing to generate inputs:
+        elif [[ $ENVRC_DATASET_INPUT == "PAIRING" ]]; then
+            ./dataset.py init ${1-$ENVRC_DATASET_RAW_PATH} ${2-$ENVRC_SAMP_RATE} ${3---input-gen-run} ${4---input-src-pairing} --nb-trace-wanted-train 65536 --nb-trace-wanted-attack 16384
+        else
+            log_error "Unknown input generation method!"
+        fi
     else
         log_info "Dataset already initialized in ${1-$ENVRC_DATASET_RAW_PATH}!"
     fi
