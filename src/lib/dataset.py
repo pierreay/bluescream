@@ -551,17 +551,15 @@ class Subset():
         :param plot: Select the plot type [0 = plot_time_spec_sync_axis | 1 = plot_time_overwrite]
 
         """
-        # Select the plotting function.
-        assert plot == 0 or plot == 1, "Bad plot selection!"
-        if plot == 0:
-            plot_fn = libplot.plot_time_spec_sync_axis
-        elif plot == 1:
-            plot_fn = libplot.plot_time_overwrite
         # Load the requested trace.
         self.load_trace(range(base, base + nb), nf=False, ff=True)
         assert self.ff is not None and type (self.ff) == np.ndarray and self.ff.ndim == 2
-        # Plot the loaded traces.
-        plot_fn(self.ff)
+        # Select the plotting function and plot the loaded traces.
+        if plot == 0:
+            libplot.plot_time_spec_sync_axis(self.ff, xtime=False)
+        elif plot == 1:
+            libplot.plot_time_overwrite(self.ff)
+        assert plot == 0 or plot == 1, "Bad plot selection!"
 
 class Profile():
     POIS_FN       = "POIS.npy"
