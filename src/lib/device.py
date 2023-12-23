@@ -31,10 +31,10 @@ except ImportError as e: # Don't make these modules mandatory for running all th
 
 # * Globals
 
-# Reaper:
+# Validated on Reaper. But the Saren configuration seems to work as well.
 START_RADIO_CONN_EVENT = 4
 LL_ENC_REQ_CONN_EVENT = 6
-# Saren: 
+# Validated on Saren.
 START_RADIO_CONN_EVENT = 6
 LL_ENC_REQ_CONN_EVENT = 6
 
