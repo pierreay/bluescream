@@ -20,6 +20,18 @@ function eval_cond() {
     return 0
 }
 
+# $1 is the question message.
+# Return 1 if YES, 0 if NO.
+function yes-no() {
+    echo "$1"
+    select yn in "Yes" "No"; do
+        case $yn in
+            Yes ) return 1; break;;
+            No )  return 0; break;;
+        esac
+    done
+}
+
 # * Firmware
 
 # Compile and flash the Nimble firmware from another git repository.
@@ -86,4 +98,12 @@ function dataset_archive() {
     cd ${1-$ENVRC_DATASET_RAW_PATH}
     tar cvf train.tar train
     tar cvf attack.tar attack
+}
+
+function dataset_erase() {
+    yes-no "Erase the entire dataset at '${1-$ENVRC_DATASET_RAW_PATH}'?"
+    if [[ $? == 1 ]]; then
+        echo rm -rf ${1-$ENVRC_DATASET_RAW_PATH}/*
+        rm -rf ${1-$ENVRC_DATASET_RAW_PATH}/*
+    fi
 }
