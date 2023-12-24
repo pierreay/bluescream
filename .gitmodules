@@ -10,6 +10,9 @@
 [submodule "231213_single-cable_raw/submodules/whad"]
 	path = 231213_single-cable_raw/submodules/whad
 	url = git@github.com:pierreay/whad.git
+[submodule "231222_single-cable-balanced_raw/submodules/screaming_channels_nimble"]
+	path = 231222_single-cable-balanced_raw/submodules/screaming_channels_nimble
+	url = git@github.com:pierreay/screaming_channels_nimble.git
 [submodule "231223_single-1m-pair_raw/submodules/screaming_channels_nimble"]
 	path = 231223_single-1m-pair_raw/submodules/screaming_channels_nimble
 	url = git@github.com:pierreay/screaming_channels_nimble.git
