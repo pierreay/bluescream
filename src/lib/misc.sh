@@ -136,20 +136,28 @@ function dataset_archive_nimble() {
     # * Create the tag associated with the dataset inside the current repo.
     log_info "Create the dataset tag inside the Nimble repository..."
     cd "$nimble_path"
-    # If tag has already be created, delete it and replace it with a new one.
+    # If tag has already be created locally, delete it.
     git tag | grep "$dataset_name"
     if [[ $? == 0 ]]; then
         git tag -d "$dataset_name"
     fi
+    # If tag has already be created globally, delete it.
+    git fetch --tags
+    git tag | grep "$dataset_name"
+    if [[ $? == 0 ]]; then
+        git tag -d "$dataset_name"
+    fi
+    git push --tags --force
+    # Replace the tag with the new one.
     git tag $dataset_name
     git push --tags
     # * Archive the submodule and checkout the tag.
     cd "$dataset_path"
     log_info "Create the Nimble submodule..."
     SUBMODULE_DIR=submodules
-    mkdir -p $SUBMODULE_DIR && cd $SUBMODULE_DIR && git submodule add git@github.com:pierreay/screaming_channels_nimble.git
+    mkdir -p $SUBMODULE_DIR && cd $SUBMODULE_DIR && git submodule add --force git@github.com:pierreay/screaming_channels_nimble.git
     # Fetch tags and checkout the tag used for the dataset.
-    cd screaming_channels_nimble && git fetch --tags
+    cd screaming_channels_nimble && git fetch --tags --force
     git checkout $dataset_name
     # Return.
     cd "$call_dir"
