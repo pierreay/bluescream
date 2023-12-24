@@ -36,7 +36,7 @@ function yes-no() {
 
 # Compile and flash the Nimble firmware from another git repository.
 function firmware_compile_flash() {
-    (cd ~/git/screaming_channels_nimble && make all)
+    (cd "$ENVRC_NIMBLE_PATH" && make all)
 }
 
 # Usage: firmware_set_mode [train | attack] >/dev/null 2>&1
