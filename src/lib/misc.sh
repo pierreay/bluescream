@@ -100,10 +100,20 @@ function dataset_archive() {
     tar cvf attack.tar attack
 }
 
+# Erase all file inside a dataset.
+# $1 is the dataset path [default = $ENVRC_DATASET_RAW_PATH].
 function dataset_erase() {
-    yes-no "Erase the entire dataset at '${1-$ENVRC_DATASET_RAW_PATH}'?"
+    target=${1-$ENVRC_DATASET_RAW_PATH}
+    if [[ -z "$target" ]]; then
+        log_error "No valid dataset has been provided for erasing!"
+        return 1
+    fi
+    yes-no "Erase the entire dataset at '$target'?"
     if [[ $? == 1 ]]; then
-        echo rm -rf ${1-$ENVRC_DATASET_RAW_PATH}/*
-        rm -rf ${1-$ENVRC_DATASET_RAW_PATH}/*
+        echo rm -r "$target"/*
+        rm -r "$target"/*
+    fi
+}
+
     fi
 }
