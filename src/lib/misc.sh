@@ -115,5 +115,42 @@ function dataset_erase() {
     fi
 }
 
+# Archive the Nimble firmware in the dataset.
+# It will copy the binary ".hex" from "/tmp" and create the associated submodule.
+# $1 is the dataset path [default = $ENVRC_DATASET_RAW_PATH].
+function dataset_archive_nimble() {
+    call_dir=$(pwd)
+    # Save ENVRC variables before moving.
+    dataset_path="${1-$ENVRC_DATASET_RAW_PATH}"
+    dataset_name=$(basename $(realpath "$dataset_path"))
+    nimble_path="$ENVRC_NIMBLE_PATH"
+    if [[ -z "$dataset_path" ]]; then
+        log_error "No dataset path!"
+        return 1
     fi
+    # * Archive the firwmare.
+    cd "$dataset_path"
+    log_info "Export the Nimble firmware..."
+    FIRMWARE_DIR=firmware
+    mkdir -p $FIRMWARE_DIR && (cd $FIRMWARE_DIR && make -f "$nimble_path"/Makefile export)
+    # * Create the tag associated with the dataset inside the current repo.
+    log_info "Create the dataset tag inside the Nimble repository..."
+    cd "$nimble_path"
+    # If tag has already be created, delete it and replace it with a new one.
+    git tag | grep "$dataset_name"
+    if [[ $? == 0 ]]; then
+        git tag -d "$dataset_name"
+    fi
+    git tag $dataset_name
+    git push --tags
+    # * Archive the submodule and checkout the tag.
+    cd "$dataset_path"
+    log_info "Create the Nimble submodule..."
+    SUBMODULE_DIR=submodules
+    mkdir -p $SUBMODULE_DIR && cd $SUBMODULE_DIR && git submodule add git@github.com:pierreay/screaming_channels_nimble.git
+    # Fetch tags and checkout the tag used for the dataset.
+    cd screaming_channels_nimble && git fetch --tags
+    git checkout $dataset_name
+    # Return.
+    cd "$call_dir"
 }
