@@ -72,8 +72,12 @@ function dataset_tree() {
     tree -alh -I "??_trace_ff.npy" -I "???_trace_ff.npy" -I "????_trace_ff.npy" -I "?????_trace_ff.npy" \
               -I "??_trace_nf.npy" -I "???_trace_nf.npy" -I "????_trace_nf.npy" -I "?????_trace_nf.npy" \
               ${1-$ENVRC_DATASET_RAW_PATH}
-    echo "Number of npy files in train  : $(ls ${1-$ENVRC_DATASET_RAW_PATH}/train | grep '.*.npy' | wc -l)"
-    echo "Number of npy files in attack : $(ls ${1-$ENVRC_DATASET_RAW_PATH}/attack | grep '.*.npy' | wc -l)"
+    if [[ -d "${1-$ENVRC_DATASET_RAW_PATH}/train" ]]; then
+        echo "Number of npy files in train  : $(ls ${1-$ENVRC_DATASET_RAW_PATH}/train | grep '.*.npy' | wc -l)"
+    fi
+    if [[ -d "${1-$ENVRC_DATASET_RAW_PATH}/attack" ]]; then
+        echo "Number of npy files in attack : $(ls ${1-$ENVRC_DATASET_RAW_PATH}/attack | grep '.*.npy' | wc -l)"
+    fi
 }
 
 # Archive the traces from the train and attack subsets.
