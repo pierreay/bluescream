@@ -399,6 +399,8 @@ class Subset():
         ks_nb = self.nb_trace_wanted if self.ks_type == InputType.VARIABLE else 1
         self.pt = np.zeros((pt_nb, 16), dtype=np.uint8)
         self.ks = np.zeros((ks_nb, 16), dtype=np.uint8)
+        # NOTE: To double the size of an input array, one can use:
+        # self.pt = np.concatenate((self.pt, np.zeros(self.pt.shape, dtype=np.uint8)))
 
     def init_input_init_time(self):
         """Generate the input when InputGeneration has been set to INIT_TIME."""
