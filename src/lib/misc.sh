@@ -95,9 +95,11 @@ function dataset_tree() {
 # Archive the traces from the train and attack subsets.
 # $1 is the path of the dataset [default = $ENVRC_DATASET_RAW_PATH]
 function dataset_archive() {
+    call_dir=$(pwd)
     cd ${1-$ENVRC_DATASET_RAW_PATH}
     tar cvf train.tar train
     tar cvf attack.tar attack
+    cd "$call_dir"
 }
 
 # Erase all file inside a dataset.
