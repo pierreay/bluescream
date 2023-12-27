@@ -81,9 +81,9 @@ function ykush_reset() {
 # Display a tree of a dataset.
 # $1 is the path of the dataset [default = $ENVRC_DATASET_RAW_PATH]
 function dataset_tree() {
-    tree -alh -I "??_trace_ff.npy" -I "???_trace_ff.npy" -I "????_trace_ff.npy" -I "?????_trace_ff.npy" \
-              -I "??_trace_nf.npy" -I "???_trace_nf.npy" -I "????_trace_nf.npy" -I "?????_trace_nf.npy" \
-              ${1-$ENVRC_DATASET_RAW_PATH}
+    tree -L 2 -alh -I "??_trace_ff.npy" -I "???_trace_ff.npy" -I "????_trace_ff.npy" -I "?????_trace_ff.npy" \
+                   -I "??_trace_nf.npy" -I "???_trace_nf.npy" -I "????_trace_nf.npy" -I "?????_trace_nf.npy" \
+                   ${1-$ENVRC_DATASET_RAW_PATH}
     if [[ -d "${1-$ENVRC_DATASET_RAW_PATH}/train" ]]; then
         echo "Number of npy files in train  : $(ls ${1-$ENVRC_DATASET_RAW_PATH}/train | grep '.*.npy' | wc -l)"
     fi
