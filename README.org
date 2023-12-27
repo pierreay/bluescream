@@ -16,6 +16,10 @@ Git-annex repository of datasets for the Screaming Channels on BLE project.
   attack subset. Just like =231213_single-cable_raw=, but with an antenna and
   with 1m of theoretical distance (40 dB of attenuation = real distance of 30
   cm + 10 dB of insertion loss of the attenuator).
+- =231223_single-1m-pair_raw= :: This dataset contains 32k FF traces for the
+  attack subset. Recording used an antenna with 1m of theoretical distance like
+  the =231220_single-1m-rand_raw= dataset. The inputs were generated using a 
+  pairing. There were no instrumentation of the AES nor repetitions.
 
 * Organization
 
