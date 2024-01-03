@@ -614,7 +614,7 @@ class Profile():
             self.attach_path(fp)
 
     def get_path(self, save=False):
-        """Return the path of the Profile.
+        """Return the absolute path of the Profile.
 
         Assert that the dirname of the returned path exists.
 
@@ -623,11 +623,11 @@ class Profile():
         # dataset path.
         if self.dataset is not None:
             assert self.dataset.dir is not None and path.exists(self.dataset.dir)
-            return path.join(self.dataset.dir, self.dir)
+            return path.abspath(path.join(self.dataset.dir, self.dir))
         # If a full path is registered, return it.
         elif self.fp is not None:
             assert path.exists(path.dirname(self.fp))
-            return self.fp
+            return path.abspath(self.fp)
         else:
             assert False, "Profile has not been configured correctly!"
 
