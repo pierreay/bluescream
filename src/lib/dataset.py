@@ -572,7 +572,8 @@ class Profile():
     # Full path of the profile directory. Arbitrary if not linked to a parent
     # dataset, otherwise set according to self.dataset.dir.
     fp = None
-    
+
+    # Profile's filenames.
     POIS_FN       = "POIS.npy"
     RS_FN         = "PROFILE_RS.npy"
     RZS_FN        = "PROFILE_RZS.npy"
@@ -580,6 +581,19 @@ class Profile():
     STDS_FN       = "PROFILE_STDS.npy"
     COVS_FN       = "PROFILE_COVS.npy"
     MEAN_TRACE_FN = "PROFILE_MEAN_TRACE.npy"
+
+    # Profile's data.
+    POIS        = None
+    RS          = None
+    RZS         = None
+    MEANS       = None
+    STDS        = None
+    COVS        = None
+    MEAN_TRACE  = None
+    # Starting point used in original trace.
+    POINT_START = None
+    # Ending point used in original trace.
+    POINT_END   = None
     
     def __init__(self, dataset = None, fp = None):
         """Initialize a profile.
@@ -593,16 +607,6 @@ class Profile():
         assert dataset is None if fp is not None else True
 
         # Attach a dataset if needed.
-        # Profile data.
-        self.POIS = None
-        self.RS = None
-        self.RZS = None
-        self.MEANS = None
-        self.STDS = None
-        self.COVS = None
-        self.MEAN_TRACE = None
-        self.POINT_START = None # Starting point used in original trace.
-        self.POINT_END   = None # Ending point used in original trace.
         if dataset is not None:
             self.attach_dataset(dataset)
         # Attach a full path if needed.
