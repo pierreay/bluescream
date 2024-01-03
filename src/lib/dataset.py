@@ -679,7 +679,9 @@ class Profile():
    
     def __str__(self):
         string = "profile:\n"
+        string += "- dataset: {}\n".format(self.dataset)
         string += "- dir: {}\n".format(self.dir)
+        string += "- fp: {}\n".format(self.fp)
         string += "- get_path(): {}\n".format(self.get_path())
         if self.POIS is not None:
             string += "- pois shape: {}\n".format(self.POIS.shape)
