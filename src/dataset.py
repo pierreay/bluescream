@@ -146,6 +146,19 @@ def debug(indir, subset, outdir):
 
 @cli.command()
 @click.argument("indir", type=click.Path())
+def debug_profile(indir):
+    """Debug a profile.
+
+    INDIR is the path of a directory containing a profile.
+
+    """
+    prof = dataset.Profile(fp=indir)
+    prof.load()
+    print(prof)
+    from IPython import embed; embed()
+
+@cli.command()
+@click.argument("indir", type=click.Path())
 @click.argument("outdir", type=click.Path())
 @click.argument("subset", type=str)
 @click.option("--nb-aes", default=1, help="Number of AES in the trace.")
