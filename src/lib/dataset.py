@@ -581,23 +581,18 @@ class Profile():
     COVS_FN       = "PROFILE_COVS.npy"
     MEAN_TRACE_FN = "PROFILE_MEAN_TRACE.npy"
     
-    def __init__(self, dataset = None, path = None):
+    def __init__(self, dataset = None, fp = None):
         """Initialize a profile.
 
-        Set EITHER the DATASET parameter to a Dataset reference or the PATH
+        Set EITHER the DATASET parameter to a Dataset reference or the FP
         parameter to a full valid path.
 
         """
-        # Safety-check of using either DATASET or PATH.
-        assert path is None if dataset is not None else True
-        assert dataset is None if path is not None else True
+        # Safety-check of using either DATASET or FP.
+        assert fp is None if dataset is not None else True
+        assert dataset is None if fp is not None else True
 
         # Attach a dataset if needed.
-        self.dir = "profile"   # Fixed subdirectory.
-        self.dataset = dataset # Parent. Don't need to save the subset as the
-                               # subset is always train for a profile.
-        # TODO: Attach a raw path if needed.
-        
         # Profile data.
         self.POIS = None
         self.RS = None
@@ -608,6 +603,11 @@ class Profile():
         self.MEAN_TRACE = None
         self.POINT_START = None # Starting point used in original trace.
         self.POINT_END   = None # Ending point used in original trace.
+        if dataset is not None:
+            self.attach_dataset(dataset)
+        # Attach a full path if needed.
+        elif fp is not None:
+            self.attach_path(fp)
 
     def get_path(self, save=False):
         assert self.dataset.dir is not None
@@ -674,6 +674,22 @@ class Profile():
         if self.POINT_END:
             string += "- profile end point: {}\n".format(self.POINT_END)
         return string
+
+    def attach_dataset(self, dataset):
+        """Attach a dataset to the Profile."""
+        assert dataset is not None and type(dataset) == Dataset
+        assert self.dataset is None, "Cannot attach a new dataset while a dataset is still attached!"
+        assert self.fp is None, "Cannot attach a new dataset while a full path is already set!"
+        self.dir = "profile"   # Fixed subdirectory.
+        self.dataset = dataset # Parent. Don't need to save the subset as the
+                               # subset is always train for a profile.
+
+    def attach_path(self, fp):
+        """Attach a full path to the Profile."""
+        assert path.exists(fp)
+        assert self.dataset is None, "Cannot attach a new path while a dataset is still attached!"
+        assert self.fp is None, "Cannot attach a new path while a full path is already set!"
+        self.fp = fp
 
 class DatasetProcessing():
     """Processing workflow using a Dataset.
