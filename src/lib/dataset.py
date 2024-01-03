@@ -564,6 +564,15 @@ class Subset():
         assert plot == 0 or plot == 1, "Bad plot selection!"
 
 class Profile():
+    # Reference to the parent dataset (used to resolve path). Can be None.
+    dataset = None
+    # Name of the (sub)directory containing the profile if linked to a parent
+    # dataset.
+    dir = None
+    # Full path of the profile directory. Arbitrary if not linked to a parent
+    # dataset, otherwise set according to self.dataset.dir.
+    fp = None
+    
     POIS_FN       = "POIS.npy"
     RS_FN         = "PROFILE_RS.npy"
     RZS_FN        = "PROFILE_RZS.npy"
@@ -572,10 +581,17 @@ class Profile():
     COVS_FN       = "PROFILE_COVS.npy"
     MEAN_TRACE_FN = "PROFILE_MEAN_TRACE.npy"
     
-    def __init__(self, dataset):
+    def __init__(self, dataset = None, path = None):
+        # Safety-check of dataset and path reference usage.
+        assert path is None if dataset is not None
+        assert dataset is None if path is not None
+
+        # Attach a dataset if needed.
         self.dir = "profile"   # Fixed subdirectory.
         self.dataset = dataset # Parent. Don't need to save the subset as the
                                # subset is always train for a profile.
+        # TODO: Attach a raw path if needed.
+        
         # Profile data.
         self.POIS = None
         self.RS = None
@@ -588,6 +604,7 @@ class Profile():
         self.POINT_END   = None # Ending point used in original trace.
 
     def get_path(self, save=False):
+        assert self.dataset.dir is not None
         return path.join(self.dataset.dir, self.dir)
 
     # Store useful information about the profile, to be used for comparing profiles,
