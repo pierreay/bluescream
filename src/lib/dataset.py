@@ -614,13 +614,25 @@ class Profile():
             self.attach_path(fp)
 
     def get_path(self, save=False):
-        assert self.dataset.dir is not None
-        return path.join(self.dataset.dir, self.dir)
+        """Return the path of the Profile.
 
-    # Store useful information about the profile, to be used for comparing profiles,
-    # or for profiled correlation and template attacks.
+        Assert that the dirname of the returned path exists.
+
+        """
+        # If a dataset is attached to the profile, return a path based on the
+        # dataset path.
+        if self.dataset is not None:
+            assert self.dataset.dir is not None and path.exists(self.dataset.dir)
+            return path.join(self.dataset.dir, self.dir)
+        # If a full path is registered, return it.
+        elif self.fp is not None:
+            assert path.exists(path.dirname(self.fp))
+            return self.fp
+        else:
+            assert False, "Profile has not been configured correctly!"
+
     def save(self):
-        assert(path.exists(self.dataset.dir))
+        """Store traces and points from the Profile."""
         os.makedirs(self.get_path(), exist_ok=True)
         np.save(path.join(self.get_path(), Profile.POIS_FN), self.POIS)
         np.save(path.join(self.get_path(), Profile.RS_FN), self.RS)
