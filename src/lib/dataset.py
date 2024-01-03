@@ -582,9 +582,15 @@ class Profile():
     MEAN_TRACE_FN = "PROFILE_MEAN_TRACE.npy"
     
     def __init__(self, dataset = None, path = None):
-        # Safety-check of dataset and path reference usage.
-        assert path is None if dataset is not None
-        assert dataset is None if path is not None
+        """Initialize a profile.
+
+        Set EITHER the DATASET parameter to a Dataset reference or the PATH
+        parameter to a full valid path.
+
+        """
+        # Safety-check of using either DATASET or PATH.
+        assert path is None if dataset is not None else True
+        assert dataset is None if path is not None else True
 
         # Attach a dataset if needed.
         self.dir = "profile"   # Fixed subdirectory.
