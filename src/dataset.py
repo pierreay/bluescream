@@ -232,6 +232,21 @@ if __name__ == "__main__":
 
 # * Deprectated
 
+# XXX: Started to implement the following function but finally, I'll try
+# another approach.
+# @cli.command()
+# @click.argument("indir", type=click.Path())
+# def register_profile(indir):
+#     """Register the on-disk profile inside a dataset.
+
+#     INDIR is the path of a directory containing a dataset.
+
+#     """
+#     # Handy variables for debugging.
+#     dset = dataset.Dataset.pickle_load(indir, quit_on_error=True)
+#     from IPython import embed; embed()
+#     # TODO: To implement.
+
 # @cli.command()
 # @click.argument("indir", type=click.Path())
 # @click.argument("outdir", type=click.Path())
