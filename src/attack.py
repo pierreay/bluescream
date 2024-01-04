@@ -81,9 +81,11 @@ TRACES_TEST = None
 TRACES_PROFILE = None
 LOG_PROBA = None
 
-def load_data(subset):
+def load_data(subset, forced_profile = None):
     """Load the data (keys, plaintexts, traces) into global variables. Must be
     called at the beginning of each @cli.command().
+
+    :param forced_profile: If set to a path, use the profile under this directory.
 
     """
     global DATASET, SUBSET, PROFILE, PLAINTEXTS, KEYS, FIXED_KEY, TRACES, CIPHERTEXTS, NUM_TRACES, START_POINT, END_POINT, NORM, NORM2
@@ -98,7 +100,14 @@ def load_data(subset):
     assert(DATASET)
     SUBSET = DATASET.get_subset(subset)
     SUBSET.load_trace(range(0, NUM_TRACES), nf=False, ff=True, start_point=START_POINT, end_point=END_POINT)
-    PROFILE = DATASET.get_profile()
+    # Load the profile from the dataset or a standalone one.
+    if forced_profile is None or forced_profile == "":
+        l.LOGGER.info("Load the dataset's profile")
+        PROFILE = DATASET.get_profile()
+    else:
+        l.LOGGER.info("Load the forced profile from {}".format(forced_profile))
+        PROFILE = dataset.Profile(fp=forced_profile)
+        PROFILE.load()
     PLAINTEXTS                  = SUBSET.pt
     KEYS                        = SUBSET.ks
     FIXED_KEY                   = load.is_key_fixed(SUBSET.get_path())
@@ -1012,8 +1021,10 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
               help="Average poi-window to poi+window samples.")
 @click.option("--align/--no-align", default=False, show_default=True,
              help="Align the attack traces with the profile before to attack.")
+@click.option("--profile", default="", type=click.Path(), show_default=True,
+             help="If specified, use the profile from this directory.")
 def attack(variable, pois_algo, num_pois, poi_spacing,
-           attack_algo, k_fold, average_bytes, pooled_cov, window, align):
+           attack_algo, k_fold, average_bytes, pooled_cov, window, align, profile):
     """
     Template attack or profiled correlation attack.
 
@@ -1021,7 +1032,7 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
     template.
     """
     global PROFILE, TRACES
-    load_data(dataset.SubsetType.ATTACK)
+    load_data(dataset.SubsetType.ATTACK, profile)
     assert(PROFILE)
     PROFILE.load()
     
