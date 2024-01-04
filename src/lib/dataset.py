@@ -679,7 +679,7 @@ class Profile():
    
     def __str__(self):
         string = "profile:\n"
-        string += "- dataset: {}\n".format(self.dataset)
+        string += "- dataset: {}\n".format(self.dataset is not None)
         string += "- dir: {}\n".format(self.dir)
         string += "- fp: {}\n".format(self.fp)
         string += "- get_path(): {}\n".format(self.get_path())
