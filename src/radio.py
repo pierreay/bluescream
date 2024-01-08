@@ -267,7 +267,7 @@ def plot(samp_rate, amplitude, phase, nf_id, ff_id):
         libplot.plot_time_spec_sync_axis(s_arr, samp_rate, comp=complex.CompType.PHASE)
 
 @cli.command()
-@click.argument("samp_rate", type=int)
+@click.argument("samp_rate", type=float)
 @click.argument("file", type=click.Path())
 def plot_file(samp_rate, file):
     """Plot a trace from FILE.
