@@ -4,6 +4,9 @@ Git-annex repository of datasets for the Screaming Channels on BLE project.
 
 * Datasets
 
+Those directories contains full or partials datasets recorded using our
+=collect.sh= script.
+
 - =231213_single-cable_raw= :: The firmware is close as stock -- only using AES
   software and increased TX power. We use a pairing to generate keys, with
   Butterfly and WHAD on the attacker side. We attacked the amplitude of the
@@ -26,6 +29,14 @@ Git-annex repository of datasets for the Screaming Channels on BLE project.
   attack subset. Recording used an antenna with 1m of theoretical distance like
   the =231220_single-1m-rand_raw= dataset. The inputs were generated using a 
   pairing. There were no instrumentation of the AES nor repetitions.
+
+* Recordings
+
+Those directories contains various signals used in experiments.
+
+- [[file:240108_advertisement][240108_advertisement]] :: BLE advertisement recorded on channel 37 at 2.402 GHz
+  using a coaxial cable in anechoic box. Used to demodulate data from the
+  recording and compare with the reported data from the sniffer.
 
 * Organization
 
