@@ -269,13 +269,15 @@ def plot(samp_rate, amplitude, phase, nf_id, ff_id):
 @cli.command()
 @click.argument("samp_rate", type=float)
 @click.argument("file", type=click.Path())
-def plot_file(samp_rate, file):
+@click.option("--npy/--no-npy", type=bool, default="False", help="If set to true, assume FILE is a regular Numpy array instead of a custom dtype one produced by soapysdr.py")
+def plot_file(samp_rate, file, npy):
     """Plot a trace from FILE.
 
     SAMP_RATE is the sampling rate used for the recording.
 
     """
-    libplot.plot_time_spec_sync_axis([soapysdr.MySoapySDR.numpy_load(file)], samp_rate, comp=complex.CompType.AMPLITUDE)
+    sig = soapysdr.MySoapySDR.numpy_load(file) if npy is False else np.load(file)
+    libplot.plot_time_spec_sync_axis([sig], samp_rate, comp=complex.CompType.AMPLITUDE)
 
 @cli.command()
 @click.argument("freq", type=float)
