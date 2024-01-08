@@ -293,10 +293,13 @@ class MySoapySDR():
         if self.enabled:
             l.LOGGER.info("start record for radio #{} during {:.2}s".format(self.idx, duration))
             samples = int(duration * self.fs)
+            # XXX: Adjust rx_buff_len dynamically based on the duration/number
+            # of samples.
             # NOTE: Increasing this limits will prevent overflow or underruns,
             # but will also increase the minimal recording time (relative to
             # the sampling rate). Good values are between 2^20 for small
             # recordings (e.g. 0.1 s) and 2^24 for large recordings (e.g. 3 s).
+            rx_buff_len = pow(2, 24)
             rx_buff = np.array([0] * rx_buff_len, MySoapySDR.DTYPE)
             self.rx_signal_candidate = np.array([0], MySoapySDR.DTYPE)
             while len(self.rx_signal_candidate) < samples:
