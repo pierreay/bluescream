@@ -234,11 +234,13 @@ class MySoapySDR():
         assert(arr[arr.imag > np.iinfo(np.int16).max].shape == (0,))
         return arr.view(np.float32).astype(np.int16).view(MySoapySDR.DTYPE)
 
-    def __init__(self, fs, freq, idx = 0, enabled = True, duration = 1, dir = "/tmp"):
-        l.LOGGER.debug("MySoapySDR.__init__(fs={},freq={},idx={},enabled={},duration={},dir={})".format(fs, freq, idx, enabled, duration, dir))
+    def __init__(self, fs, freq, idx = 0, enabled = True, duration = 1, dir = "/tmp", gain = 76):
+        l.LOGGER.debug("MySoapySDR.__init__(fs={},freq={},idx={},enabled={},duration={},dir={},gain={})".format(fs, freq, idx, enabled, duration, dir, gain))
+        assert gain >= 0, "Gain should be positive!"
         # NOTE: Automatically convert floats to integers (allows using scentific notation, e.g. e6 or e9).
         self.fs = int(fs)
         self.freq = int(freq)
+        self.gain = int(gain)
         self.idx = idx
         self.enabled = enabled
         # Default duration if nothing is specified during self.record().
@@ -262,7 +264,7 @@ class MySoapySDR():
             self.sdr = SoapySDR.Device(results[idx])
             self.sdr.setSampleRate(SoapySDR.SOAPY_SDR_RX, 0, fs)
             self.sdr.setFrequency(SoapySDR.SOAPY_SDR_RX, 0, freq)
-            self.sdr.setGain(SoapySDR.SOAPY_SDR_RX, 0, 76)
+            self.sdr.setGain(SoapySDR.SOAPY_SDR_RX, 0, gain)
             self.sdr.setAntenna(SoapySDR.SOAPY_SDR_RX, 0, "TX/RX")
 
     def open(self):

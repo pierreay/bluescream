@@ -288,7 +288,8 @@ def plot_file(samp_rate, file, npy):
 @click.option("--amplitude/--no-amplitude", default=False, help="Extract only the amplitude of the signal.")
 @click.option("--phase/--no-phase", default=False, help="Extract only the phase of the signal.")
 @click.option("--plot/--no-plot", "plot_flag", default=True, help="Plot the recorded signal.")
-def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag):
+@click.option("--gain", type=int, default=76, help="Gain for the SDR.")
+def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag, gain):
     """Record a trace without any instrumentation.
 
     It will automatically use the first found radio with ID 0.
@@ -301,7 +302,7 @@ def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag):
     # Initialize the radio as requested.
     with soapysdr.MySoapySDRs() as rad:
         try:
-            rad.register(soapysdr.MySoapySDR(samp_rate, freq, rad_id, duration=duration, dir=DIR))
+            rad.register(soapysdr.MySoapySDR(samp_rate, freq, rad_id, duration=duration, dir=DIR, gain=gain))
         except Exception as e:
             l.log_n_exit("Error during radio initialization", 1, e)
         # Initialize the driver.
