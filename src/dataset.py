@@ -245,7 +245,7 @@ if __name__ == "__main__":
 #     # Handy variables for debugging.
 #     dset = dataset.Dataset.pickle_load(indir, quit_on_error=True)
 #     from IPython import embed; embed()
-#     # TODO: To implement.
+#     # XXX: To implement.
 
 # @cli.command()
 # @click.argument("indir", type=click.Path())
