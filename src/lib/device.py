@@ -31,12 +31,13 @@ except ImportError as e: # Don't make these modules mandatory for running all th
 
 # * Globals
 
+# TODO: Allows *_CONN_EVENT to be configured by the host.
 # Validated on Reaper. But the Saren configuration seems to work as well.
 START_RADIO_CONN_EVENT = 4
 LL_ENC_REQ_CONN_EVENT = 6
 # Validated on Saren.
-START_RADIO_CONN_EVENT = 6
-LL_ENC_REQ_CONN_EVENT = 6
+# START_RADIO_CONN_EVENT = 6
+# LL_ENC_REQ_CONN_EVENT = 6
 
 HOP_INTERVAL = 56
 # Channel map of 0x300 => channels 8-9 => frequencies 2.420 GHz and 2.422 GHz.
