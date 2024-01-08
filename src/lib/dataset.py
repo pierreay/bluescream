@@ -194,6 +194,20 @@ class Dataset():
         # Can be None.
         return self.profile
 
+    def is_able_to_instrument(self, subset, idx):
+        """Check if this dataset is able to be instrumented for the specified configuration.
+
+        :param subset: Subset reference.
+
+        :param idx: Instrumentation index.
+
+        """
+        # Check length of inputs based on initialized data.
+        if idx >= len(subset.pt):
+            raise Exception("Requested index {} is higher than plaintext array of subset '{}'!".format(idx, subset.name))
+        if idx >= len(subset.ks):
+            raise Exception("Requested index {} is higher then keys array of subset '{}'!".format(idx, subset.name))
+
 class Subset():
     """Train or attack subset."""
 
@@ -563,6 +577,16 @@ class Subset():
             libplot.plot_time_overwrite(self.ff)
         assert plot == 0 or plot == 1, "Bad plot selection!"
 
+    @staticmethod
+    # NOTE: Untested method. Can be used inside Dataset.get_subset().
+    def get_subtype_from_str(subtype):
+        """Get the SubsetType enumeration value from a string."""
+        assert subtype == "train" or subtype == "attack", "Bad subtype string!"
+        if subtype == "train":
+            return SubsetType.TRAIN
+        elif subtype == "attack":
+            return SubsetType.ATTACK
+        
 class Profile():
     # Reference to the parent dataset (used to resolve path). Can be None.
     dataset = None

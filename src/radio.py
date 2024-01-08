@@ -106,6 +106,12 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx):
     dset = dataset.Dataset.pickle_load(indir, quit_on_error=True)
     sset = dset.get_subset(subset)
 
+    # Perform optionally sanity-check about user request.
+    try:
+        dset.is_able_to_instrument(sset, idx)
+    except Exception as e:
+        l.log_n_exit("Can't instrument current index, exit!", code=1, e=e)
+
     # Initialize the radio client.
     rad = soapysdr.MySoapySDRsClient(enabled=radio)
 
