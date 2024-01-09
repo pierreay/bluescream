@@ -331,5 +331,14 @@ def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag, g
         l.LOGGER.info("Additional save of recorded signal to: {}".format(save))
         np.save(save, sig)
 
+# XXX: Maybe create a radio/debug() command, just as dataset/debug(), to load
+# signals and tamper with them easily?
+@cli.command()
+@click.argument("file")
+def to_numpy(file):
+    """Store a signal recorded in our custom dtype to Numpy format in FILE."""
+    np.save(file, load.load_raw_trace(DIR, 0, 0, log=True))
+    l.LOGGER.info("Signal saved in {}".format(file))
+
 if __name__ == "__main__":
     cli()
