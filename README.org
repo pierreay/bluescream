@@ -36,7 +36,12 @@ Those directories contains various signals used in experiments.
 
 - [[file:240108_advertisement][240108_advertisement]] :: BLE advertisement recorded on channel 37 at 2.402 GHz
   using a coaxial cable in anechoic box. Used to demodulate data from the
-  recording and compare with the reported data from the sniffer.
+  recording and compare with the reported data from the sniffer. Results:
+  demodulation successful with GR, partially successful with custom Python
+  script.
+- [[file:240109_leakage_for_demod/][240109_leakage_for_demod]] :: Recording of BLE channel + AES leak to try
+  demodulating it. Same hardware setup as =240108_advertisement=. Provides
+  =whadsniff= logs as well.
 
 * Organization
 
