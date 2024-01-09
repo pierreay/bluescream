@@ -41,7 +41,8 @@ def cli(dir, log, loglevel):
 @click.option("--duration", type=float, default=0.5, help="Duration of the recording.")
 @click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
 @click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
-def listen(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id):
+@click.option("--gain", type=int, default=76, help="Gain for the SDR.")
+def listen(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id, gain):
     """Initialize the radio and listen for commands.
     
     This commands will put our radio module in server mode, where the radio is
@@ -55,10 +56,10 @@ def listen(freq_nf, freq_ff, samp_rate, duration, nf_id, ff_id):
         # Initialize the radios individually.
         try:
             if nf_id != -1:
-                rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, nf_id, duration=duration, dir=DIR)
+                rad_nf = soapysdr.MySoapySDR(samp_rate, freq_nf, nf_id, duration=duration, dir=DIR, gain=gain)
                 rad.register(rad_nf)
             if ff_id != -1:
-                rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, ff_id, duration=duration, dir=DIR)
+                rad_ff = soapysdr.MySoapySDR(samp_rate, freq_ff, ff_id, duration=duration, dir=DIR, gain=gain)
                 rad.register(rad_ff)
         except Exception as e:
             l.log_n_exit("Error during radio initialization", 1, e)
