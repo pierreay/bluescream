@@ -11,7 +11,7 @@ export ENVRC_ATTACKER_ADDR="CA:FE:CA:FE:CA:FE"
 export ENVRC_NF_ID=-1
 export ENVRC_FF_ID=0
 
-export ENVRC_DATASET_RAW_PATH="$ENVRC_DATASET_PATH/231222_single-cable-balanced_raw"
+# export ENVRC_DATASET_RAW_PATH="$ENVRC_DATASET_PATH/231222_single-cable-balanced_raw"
 # export ENVRC_DATASET_AVG_PATH="$ENVRC_DATASET_PATH/tmp_avg"
 # export ENVRC_DATASET_EXT_PATH="$ENVRC_DATASET_PATH/tmp_ext"
 
