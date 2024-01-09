@@ -100,7 +100,7 @@ class Device():
         try:
             l.LOGGER.info("Instantiate Central using dongle on UART0")
             self.central = Central(WhadDevice.create('uart0'))
-            # NEXT: Don't instantiate HCI if not needed.
+            # NEXT: Don't instantiate and stop HCI if not needed.
             l.LOGGER.info("Instantiate Central using dongle on HCI0")
             self.hci = Central(WhadDevice.create('hci0'), security_database=self.secdb)
         except Exception as e:
