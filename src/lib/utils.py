@@ -5,6 +5,7 @@ First created to implement type conversion helper functions."""
 import math
 
 import numpy as np
+from scipy.constants import c
 
 import lib.load as load
 
@@ -148,3 +149,10 @@ def snr(sig, sr, idx):
     sig_avg = np.average(sig[idx - window:idx + window])
     noise_avg = np.average(sig)
     return sig_avg / noise_avg
+
+def far_field(D, fc):
+    """Compute the far-field distance for an antenna Diameter D (m) and
+    frequency FC (Hertz).
+
+    """
+    return (2 * pow(D, 2)) / (c / fc)
