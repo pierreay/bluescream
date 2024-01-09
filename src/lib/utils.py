@@ -128,3 +128,23 @@ def m2db(m):
 
     """
     return 20 * math.log10(m) + 20 * math.log10(2.4e9) - 147.55
+
+def snr(sig, sr, idx):
+    """Compute the SNR of a signal portion based on a position.
+
+    A window will be applied around the position defined by IDX to defining the
+    signal portion.
+
+    :param sig: Signal.
+
+    :param: sr: Signal's sampling rate.
+
+    :param idx: Index of the subsignal to consider.
+
+    :return: The signal-to-noise ratio (raw, not in dB).
+
+    """
+    window = int(1e-4 * sr)
+    sig_avg = np.average(sig[idx - window:idx + window])
+    noise_avg = np.average(sig)
+    return sig_avg / noise_avg

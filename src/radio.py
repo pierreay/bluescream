@@ -17,6 +17,7 @@ import lib.filters as filters
 import lib.triggers as triggers
 import lib.soapysdr as soapysdr
 import lib.complex as complex
+import lib.utils as utils
 
 def exit_on_cond(cond, ret=1):
     if cond is True:
@@ -217,6 +218,7 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
         l.LOGGER.info("peak position={:.2f}%".format(peak_position))
         if peak_position < 25 or peak_position > 75:
             l.LOGGER.warning("maybe increase recording time to center the aes on the recording")
+    l.LOGGER.info("SNR={:.2}".format(utils.snr(sig_raw_ref, samp_rate, peaks[0])))
 
     # * Extraction.
     if overwrite:
