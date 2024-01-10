@@ -206,7 +206,11 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
     l.LOGGER.debug("peak search prominence={}".format(trg_peak_prominence))
 
     # * Loading.
-    sig_raw_ref = analyze.normalize(complex.get_amplitude(load.load_raw_trace(DIR, id_ref, 0)))
+    # sig_raw_ref = analyze.normalize(complex.get_amplitude(load.load_raw_trace(DIR, id_ref, 0)))
+    # NOTE: I didn't use the normalized version anymore because it helps to
+    # distinguish between real signal / noise by looking at amplitude value,
+    # while it doesn't decrease extraction accuracy.
+    sig_raw_ref = complex.get_amplitude(load.load_raw_trace(DIR, id_ref, 0))
 
     # * Triggering.
     assert(len(trg_bp_low) == len(trg_bp_high))
