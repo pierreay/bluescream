@@ -303,7 +303,7 @@ def plot_file(samp_rate, file, npy):
 
     """
     sig = soapysdr.MySoapySDR.numpy_load(file) if npy is False else np.load(file)
-    libplot.plot_time_spec_sync_axis([sig], samp_rate, comp=complex.CompType.AMPLITUDE)
+    libplot.plot_time_spec_sync_axis([sig], samp_rate, comp=complex.CompType.AMPLITUDE, title=file)
 
 @cli.command()
 @click.argument("freq", type=float)
