@@ -203,9 +203,9 @@ class Dataset():
 
         """
         # Check length of inputs based on initialized data.
-        if idx >= len(subset.pt):
+        if idx >= len(subset.pt) and subset.input_gen != InputGeneration.RUN_TIME:
             raise Exception("Requested index {} is higher than plaintext array of subset '{}'!".format(idx, subset.name))
-        if idx >= len(subset.ks):
+        if idx >= len(subset.ks) and subset.input_gen != InputGeneration.RUN_TIME:
             raise Exception("Requested index {} is higher then keys array of subset '{}'!".format(idx, subset.name))
 
 class Subset():
