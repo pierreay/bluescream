@@ -228,14 +228,14 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
         libplot.plot_time_spec_sync_axis([analyze.extract_time_window(sig_raw_ref, samp_rate, peaks[0], window, offset=offset)], samp_rate=samp_rate, cond=plot)    
     peak_detect_ok = len(peaks) == 1
     if peak_detect_ok is False:
-        l.LOGGER.error("signal locating confusion: no or multiple peaks detected")
+        l.LOGGER.error("Signal localization confusion because no or multiple peaks are detected!")
         exit_on_cond(exit_on_error)
     else:
         peak_position = (peaks[0] / len(sig_raw_ref)) * 100
-        l.LOGGER.info("peak position={:.2f}%".format(peak_position))
-        if peak_position < 25 or peak_position > 75:
-            l.LOGGER.warning("maybe increase recording time to center the aes on the recording")
-    l.LOGGER.info("SNR={:.2}".format(utils.snr(sig_raw_ref, samp_rate, peaks[0])))
+        l.LOGGER.info("Peak position={:.2f}%".format(peak_position))
+        l.LOGGER.info("Peak SNR={:.2}".format(utils.snr(sig_raw_ref, samp_rate, peaks[0])))
+        if peak_position < 15 or peak_position > 85:
+            l.LOGGER.warning("Peak is located at recording's boundaries")
 
     # * Extraction.
     if overwrite:
