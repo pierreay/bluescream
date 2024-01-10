@@ -220,22 +220,32 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
     # ** Trigger indexes.
     peaks = signal.find_peaks(nf_triggers.get(0).signal, distance=samp_rate/10, prominence=trg_peak_prominence)
     peaks = peaks[0]
-    l.LOGGER.info("number of detected peaks={}".format(len(peaks)))
+    l.LOGGER.info("Number of detected peaks={}".format(len(peaks)))
 
-    # * Results.
-    libplot.plot_time_spec_sync_axis([sig_raw_ref], samp_rate=samp_rate, peaks=peaks, triggers=nf_triggers, cond=plot)
-    if len(peaks) > 0:
-        libplot.plot_time_spec_sync_axis([analyze.extract_time_window(sig_raw_ref, samp_rate, peaks[0], window, offset=offset)], samp_rate=samp_rate, cond=plot)    
+    # * Logging based on results.
     peak_detect_ok = len(peaks) == 1
     if peak_detect_ok is False:
         l.LOGGER.error("Signal localization confusion because no or multiple peaks are detected!")
-        exit_on_cond(exit_on_error)
     else:
         peak_position = (peaks[0] / len(sig_raw_ref)) * 100
-        l.LOGGER.info("Peak position={:.2f}%".format(peak_position))
-        l.LOGGER.info("Peak SNR={:.2}".format(utils.snr(sig_raw_ref, samp_rate, peaks[0])))
+        snr = utils.snr(sig_raw_ref, samp_rate, peaks[0])
+        avg = int(utils.avg_window(sig_raw_ref, samp_rate, peaks[0]))
+        l.LOGGER.info("Peak: Position={:.2f}% ; SNR={:.2} ; Avg={}".format(peak_position, snr, avg))
         if peak_position < 15 or peak_position > 85:
-            l.LOGGER.warning("Peak is located at recording's boundaries")
+            l.LOGGER.warning("Peak is located at recording's boundaries, bad connection event?")
+        if snr < 1.6:
+            l.LOGGER.warning("Peak SNR is inferior to 1.6, poor signal?")
+        if avg < 1300:
+            l.LOGGER.warning("Peak value is inferior to 1300, noise?")
+
+    # Plotting based on results.
+    libplot.plot_time_spec_sync_axis([sig_raw_ref], samp_rate=samp_rate, peaks=peaks, triggers=nf_triggers, cond=plot)
+    if len(peaks) > 0:
+        libplot.plot_time_spec_sync_axis([analyze.extract_time_window(sig_raw_ref, samp_rate, peaks[0], window, offset=offset)], samp_rate=samp_rate, cond=plot)
+
+    # Exit based on results.
+    if peak_detect_ok is False:
+        exit_on_cond(exit_on_error)
 
     # * Extraction.
     if overwrite:
