@@ -31,14 +31,6 @@ except ImportError as e: # Don't make these modules mandatory for running all th
 
 # * Globals
 
-# TODO: Allows *_CONN_EVENT to be configured by the host.
-# Validated on Reaper. But the Saren configuration seems to work as well.
-START_RADIO_CONN_EVENT = 4
-LL_ENC_REQ_CONN_EVENT = 6
-# Validated on Saren.
-# START_RADIO_CONN_EVENT = 6
-# LL_ENC_REQ_CONN_EVENT = 6
-
 HOP_INTERVAL = 56
 # Channel map of 0x300 => channels 8-9 => frequencies 2.420 GHz and 2.422 GHz.
 CHANNEL_MAP = 0x00000300
@@ -91,6 +83,7 @@ class Device():
             self.enc_rsp = pkt
 
     def __init__(self, cfg, ser_port, baud, bd_addr_src, bd_addr_dest, radio, dset, sset):
+        self.cfg = DeviceConfig(cfg)
         self.ser_port = ser_port
         self.baud = baud
         self.bd_addr_src = bd_addr_src
@@ -183,8 +176,8 @@ class Device():
         # At specified connection event, send an empty packet, used to
         # inform the radio to start recording at a precise connection
         # event.
-        l.LOGGER.info("Connection event for starting the recording: {}".format(START_RADIO_CONN_EVENT))
-        trgr_start_radio = ConnectionEventTrigger(START_RADIO_CONN_EVENT)
+        l.LOGGER.info("Connection event for starting the recording: {}".format(self.cfg.start_radio_conn_event))
+        trgr_start_radio = ConnectionEventTrigger(self.cfg.start_radio_conn_event)
         self.central.prepare(
             BTLE_DATA() / BTLE_EMPTY_PDU(),
             trigger=trgr_start_radio
@@ -195,8 +188,8 @@ class Device():
         # connection event as the ENC_RSP, excepting to have the
         # ATT_Read_Response during AES processing. If you set the MD bit
         # before, the connection events will be separated.
-        l.LOGGER.info("Connection event for sending the LL_ENC_REQ request: {}".format(LL_ENC_REQ_CONN_EVENT))
-        trgr_send_ll_enc_req = ConnectionEventTrigger(LL_ENC_REQ_CONN_EVENT)
+        l.LOGGER.info("Connection event for sending the LL_ENC_REQ request: {}".format(self.cfg.ll_enc_req_conn_event))
+        trgr_send_ll_enc_req = ConnectionEventTrigger(self.cfg.ll_enc_req_conn_event)
         l.LOGGER.info("Procedure interleaving enabled: {}".format(PROCEDURE_INTERLEAVING))
         if PROCEDURE_INTERLEAVING:
             l.LOGGER.debug("More Data Bit=1")
@@ -308,6 +301,23 @@ class Device():
                 self.hci.close()
                 self.hci = None
 
+class DeviceConfig:
+    """Configuration for the Device class."""
+
+    # Connection event number when to start the radio.
+    start_radio_conn_event = None
+    # Connection event number for when sending the LL_ENC_REQ packet.
+    ll_enc_req_conn_event = None
+
+    def __init__(self, cfg):
+        """Initialize a DeviceConfig.
+
+        :param cfg: Dictionnary representing the TOML configuration.
+
+        """
+        self.start_radio_conn_event = cfg["device"]["start_radio_conn_event"]
+        self.ll_enc_req_conn_event = cfg["device"]["ll_enc_req_conn_event"]
+                
 class DeviceInput():
     """Handle the different cases of generating and storing input.
 
