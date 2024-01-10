@@ -5,7 +5,12 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy import signal
 import click
-import tomllib
+
+try:
+    import tomllib
+# NOTE: For Python <= 3.11:
+except ModuleNotFoundError as e:
+    import tomli as tomllib
 
 import lib.dataset as dataset
 import lib.debug
