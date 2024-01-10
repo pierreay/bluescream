@@ -29,6 +29,11 @@ Those directories contains full or partials datasets recorded using our
   attack subset. Recording used an antenna with 1m of theoretical distance like
   the =231220_single-1m-rand_raw= dataset. The inputs were generated using a 
   pairing. There were no instrumentation of the AES nor repetitions.
+- [[file:240110_single-leak-pairing-1m-lna_raw/][240110_single-leak-pairing-1m-lna_raw]] ::
+  - 16k FF traces for attack.
+  - Antenna at 1m of real distance with LNA.
+  - Input generated using pairing from light/non-instrumented firmware.
+  - No repetitions.
 
 * Recordings
 
