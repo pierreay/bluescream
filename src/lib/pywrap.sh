@@ -8,9 +8,6 @@
 # $1 is sleeping time for radio initialization [default = 20].
 # $2 is loglevel [default = DEBUG].
 function radio_init() {
-    # Clean the FIFO file to ensure no commands left from previous runs.
-    # NOTE: FIFO name is living in lib/soapysdr.py:FIFO_PATH.
-    rm -rf /tmp/soapysdr.fifo
     ./radio.py --dir $ENVRC_RADIO_DIR --loglevel ${2-DEBUG} listen $ENVRC_NF_FREQ $ENVRC_FF_FREQ $ENVRC_SAMP_RATE --nf-id $ENVRC_NF_ID --ff-id $ENVRC_FF_ID --duration=$ENVRC_DURATION &
     sleep ${1-20} # Wait for SDR's driver initialization.
 }

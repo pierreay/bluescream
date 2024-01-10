@@ -115,12 +115,19 @@ class MySoapySDRs():
 
         def __create_fifo():
             """Create the named pipe (FIFO)."""
+            # Remove previously created FIFO.
+            try:
+                os.remove(FIFO_PATH)
+            except Exception as e:
+                if not isinstance(e, FileNotFoundError):
+                    raise e
             # Create the named pipe (FIFO).
             try:
                 os.mkfifo(FIFO_PATH)
             except OSError as oe:
-                if oe.errno != errno.EEXIST:
-                    raise
+                raise
+                # if oe.errno != errno.EEXIST:
+                #     raise
 
         # Create the FIFO.
         __create_fifo()
