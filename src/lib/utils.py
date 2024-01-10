@@ -150,6 +150,25 @@ def snr(sig, sr, idx):
     noise_avg = np.average(sig)
     return sig_avg / noise_avg
 
+def avg_window(sig, sr, idx):
+    """Compute the average value of a signal amplitude based on a position.
+
+    A window will be applied around the position defined by IDX to defining the
+    signal portion.
+
+    :param sig: Signal.
+
+    :param: sr: Signal's sampling rate.
+
+    :param idx: Index of the subsignal to consider.
+
+    :return: The average signal amplitude value.
+
+    """
+    window = int(1e-4 * sr)
+    sig_avg = np.average(sig[idx - window:idx + window])
+    return sig_avg
+
 def far_field(D, fc):
     """Compute the far-field distance for an antenna Diameter D (m) and
     frequency FC (Hertz).
