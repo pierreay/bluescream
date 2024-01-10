@@ -52,6 +52,8 @@ class Device():
 
     # WHAD's central instantiated from an HCI dongle.
     hci = None
+    # Set to true if self.hci needs to be used.
+    hci_is_needed = False
     # WHAD's security database used during pairing.
     secdb = None
     # WHAD's security material get after pairing.
@@ -96,13 +98,16 @@ class Device():
         self.radio = radio
         self.dataset = dataset
         self.subset = subset
+        # Do we need to use an HCI dongle?
+        if self.subset.input_src == dataset.InputSource.PAIRING:
+            self.hci_is_needed = True
         self.secdb = CryptographicDatabase()
         try:
             l.LOGGER.info("Instantiate Central using dongle on UART0")
             self.central = Central(WhadDevice.create('uart0'))
-            # NEXT: Don't instantiate and stop HCI if not needed.
-            l.LOGGER.info("Instantiate Central using dongle on HCI0")
-            self.hci = Central(WhadDevice.create('hci0'), security_database=self.secdb)
+            if self.hci_is_needed is True:
+                l.LOGGER.info("Instantiate Central using dongle on HCI0")
+                self.hci = Central(WhadDevice.create('hci0'), security_database=self.secdb)
         except Exception as e:
              # NOTE: Use __repr__ because WHAD exceptions doesn't have
              # descriptions, only names accessible through __repr__().
@@ -135,6 +140,7 @@ class Device():
         pairing.
 
         """
+        assert self.hci is not None, "HCI dongle has not been instantiated!"
         l.LOGGER.info("Pair with target device...")
         l.LOGGER.debug("Connect...")
         # NOTE: random=True is important otherwise no connection.
@@ -296,10 +302,11 @@ class Device():
             self.central.stop()
             self.central.close()
             self.central = None
-            l.LOGGER.debug("Stop and close HCI dongle...")
-            self.hci.stop()
-            self.hci.close()
-            self.hci = None
+            if self.hci_is_needed is True:
+                l.LOGGER.debug("Stop and close HCI dongle...")
+                self.hci.stop()
+                self.hci.close()
+                self.hci = None
 
 class DeviceInput():
     """Handle the different cases of generating and storing input.
