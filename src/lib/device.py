@@ -90,14 +90,14 @@ class Device():
             l.LOGGER.debug("Save the received LL_ENC_RSP packet!")
             self.enc_rsp = pkt
 
-    def __init__(self, ser_port, baud, bd_addr_src, bd_addr_dest, radio, dataset, subset):
+    def __init__(self, cfg, ser_port, baud, bd_addr_src, bd_addr_dest, radio, dset, sset):
         self.ser_port = ser_port
         self.baud = baud
         self.bd_addr_src = bd_addr_src
         self.bd_addr_dest = bd_addr_dest
         self.radio = radio
-        self.dataset = dataset
-        self.subset = subset
+        self.dataset = dset
+        self.subset = sset
         # Do we need to use an HCI dongle?
         if self.subset.input_src == dataset.InputSource.PAIRING:
             self.hci_is_needed = True
@@ -119,7 +119,7 @@ class Device():
         self.central.attach_callback(self.__alert_ll_reject_ind)
         self.time_start = time()
         self.time_elapsed = 0
-        self.input = DeviceInput(self, dataset, subset, ser_port, baud)
+        self.input = DeviceInput(self, dset, sset, ser_port, baud)
 
     def __timeouted(self, raise_exc=False):
         """Return True if timeout is exceeded with RAISE_EXC set to False, or
