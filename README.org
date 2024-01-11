@@ -47,6 +47,8 @@ Those directories contains various signals used in experiments.
 - [[file:240109_leakage_for_demod/][240109_leakage_for_demod]] :: Recording of BLE channel + AES leak to try
   demodulating it. Same hardware setup as =240108_advertisement=. Provides
   =whadsniff= logs as well.
+- [[file:240111_leakage_for_demod_low_sr][240111_leakage_for_demod_low_sr]] :: Same as =240109_leakage_for_demod= but with
+  lower sample rate.
 
 * Organization
 
