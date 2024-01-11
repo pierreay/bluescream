@@ -49,6 +49,10 @@ Those directories contains various signals used in experiments.
   =whadsniff= logs as well.
 - [[file:240111_leakage_for_demod_low_sr][240111_leakage_for_demod_low_sr]] :: Same as =240109_leakage_for_demod= but with
   lower sample rate.
+- [[file:240111_gio_firmware_leak][240111_gio_firmware_leak]] :: Recording using Giovanni's firmware. Modified
+  version to only output fixed payload in the modulated packet. The TX is ON
+  sending modulated fixed packets with a bunch of AES, then no CPU activity,
+  and another bunch of AES.
 
 * Organization
 
