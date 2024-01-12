@@ -249,7 +249,7 @@ class Subset():
             self.ks_type = InputType.FIXED
 
     # NOTE: The get_trace_from_disk() is a modified copy of this function.
-    def load_trace(self, idx=-1, nf=True, ff=True, check=False, start_point=0, end_point=0):
+    def load_trace(self, idx=-1, nf=True, ff=True, check=False, start_point=0, end_point=0, log=False):
         """Load the on-disk traces into memory.
 
         The loading will put the traces in the self.nf and self.ff
@@ -267,7 +267,10 @@ class Subset():
         during loading the traces. If END_POINT is set to different from 0, use it
         as end index during loading the traces.
 
+        :param log: Set to True to enable logging.
+
         """
+        l.LOGGER.info("Load traces (nf={}, ff={}) from {} subset...".format(nf, ff, self.name))
         assert(path.exists(self.get_path()))
         if isinstance(idx, int) and idx == -1:
             self.nf, self.ff = load.load_all_traces(self.get_path(), nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point)
