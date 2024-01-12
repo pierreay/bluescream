@@ -50,12 +50,12 @@ function radio_extract() {
     # according to the --nf-id, --ff-id, and --id specifications of the
     # "radio.py" arguments.
     # NOTE: Parameters depending on the current firmware configuration.
-    # - Parameters for 200 AES:
-    # window=0.13
-    # offset=0.035
+    # - Parameters for 100 AES:
+    window=0.07
+    offset=0.000
     # Parameters for 1 AES:
-    window=0.005
-    offset=0.00
+    # window=0.005
+    # offset=0.00
     # Warning about no NF-only extraction implemented.
     if [[ $ENVRC_NF_ID != -1 && $ENVRC_FF_ID == -1 ]]; then
         log_error "NF-only extraction is not implemented yet!"
@@ -117,7 +117,7 @@ function dataset_init() {
 # $7 is the stop option [default = 1 [stop after first trace]]
 # $8 is the force option [default = --no-force]
 function dataset_average() {
-    ./dataset.py --loglevel ${1-DEBUG} average --nb-aes 200 ${2-$ENVRC_DATASET_RAW_PATH} ${3-$ENVRC_DATASET_AVG_PATH} ${4-train} --template ${5--1} ${6---plot} --stop ${7-1} ${8---no-force} --jobs=-1
+    ./dataset.py --loglevel ${1-DEBUG} average --nb-aes 100 ${2-$ENVRC_DATASET_RAW_PATH} ${3-$ENVRC_DATASET_AVG_PATH} ${4-train} --template ${5--1} ${6---plot} --stop ${7-1} ${8---no-force} --jobs=-1
 }
 
 # Extract a desired AES of single traces from one subset.
