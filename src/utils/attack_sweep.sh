@@ -21,9 +21,9 @@ num_traces=1000
 for (( i = $start; i <= $stop; i += $step ))
 do
     end=$(( $i + $template_length ))
-    echo "=============="
-    echo -n "start=$i;"
-    echo "end=$end"
+    log_info "=============="
+    log_info "start=$i"
+    log_info "end=$end"
     # NOTE: Discard stderr because of tqdm progress bar.
     ./attack.py --no-log --no-plot --norm --dataset-path $dataset_dir --start-point $i --end-point $end --num-traces $num_traces attack --attack-algo pcc --profile $profile_dir --num-pois $poi_num --poi-spacing $poi_spacing --variable $variable --align 2>/dev/null | grep "CORRECT\|PGE\|rounded"
 done
@@ -37,8 +37,8 @@ start=73837
 end=$(( $start + $template_length ))
 for (( i = 100; i <= 16000; i += $((i / 10)) ))
 do
-    echo "=============="
-    echo "num-traces=$i"
+    log_info "=============="
+    log_info "num-traces=$i"
     # NOTE: Discard stderr because of tqdm progress bar.
     ./attack.py --no-log --no-plot --norm --dataset-path $dataset_dir --start-point $start --end-point $end --num-traces $i attack --attack-algo pcc --profile $profile_dir --num-pois $poi_num --poi-spacing $poi_spacing --variable $variable --align 2>/dev/null | grep "CORRECT\|PGE\|rounded"
 done
