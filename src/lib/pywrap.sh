@@ -96,6 +96,9 @@ function dataset_init() {
         # Use the pairing to generate inputs:
         elif [[ $ENVRC_DATASET_INPUT == "PAIRING" ]]; then
             ./dataset.py init ${1-$ENVRC_DATASET_RAW_PATH} ${2-$ENVRC_SAMP_RATE} ${3---input-gen-run} ${4---input-src-pairing} --nb-trace-wanted-train $ENVRC_WANTED_TRACE_TRAIN --nb-trace-wanted-attack $ENVRC_WANTED_TRACE_ATTACK
+        # Use the random from Nimble to generate inputs:
+        elif [[ $ENVRC_DATASET_INPUT == "SERIAL" ]]; then
+            ./dataset.py init ${1-$ENVRC_DATASET_RAW_PATH} ${2-$ENVRC_SAMP_RATE} ${3---input-gen-run} ${4---input-src-serial} --nb-trace-wanted-train $ENVRC_WANTED_TRACE_TRAIN --nb-trace-wanted-attack $ENVRC_WANTED_TRACE_ATTACK
         else
             log_error "Unknown input generation method!"
         fi
