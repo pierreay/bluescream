@@ -34,6 +34,8 @@ Those directories contains full or partials datasets recorded using our
   - Antenna at 1m of real distance with LNA.
   - Input generated using pairing from light/non-instrumented firmware.
   - No repetitions.
+  - Attacked using profile from =231222_single-cable-balanced_raw=, no better
+    than key rank of 2^123.
 
 * Recordings
 
