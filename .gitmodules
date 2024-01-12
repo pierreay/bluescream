@@ -16,3 +16,6 @@
 [submodule "231223_single-1m-pair_raw/submodules/screaming_channels_nimble"]
 	path = 231223_single-1m-pair_raw/submodules/screaming_channels_nimble
 	url = git@github.com:pierreay/screaming_channels_nimble.git
+[submodule "240110_single-leak-pairing-1m-lna_raw/submodules/screaming_channels_nimble"]
+	path = 240110_single-leak-pairing-1m-lna_raw/submodules/screaming_channels_nimble
+	url = git@github.com:pierreay/screaming_channels_nimble.git
