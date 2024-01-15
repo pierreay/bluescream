@@ -270,7 +270,8 @@ class Subset():
         :param log: Set to True to enable logging.
 
         """
-        l.LOGGER.info("Load traces (nf={}, ff={}) from {} subset...".format(nf, ff, self.name))
+        if log is True:
+            l.LOGGER.info("Load traces (nf={}, ff={}) from {} subset...".format(nf, ff, self.name))
         assert(path.exists(self.get_path()))
         if isinstance(idx, int) and idx == -1:
             self.nf, self.ff = load.load_all_traces(self.get_path(), nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point)
@@ -1020,7 +1021,7 @@ class DatasetProcessing():
         # * Load the trace to process.
         # NOTE: We choose to always load traces one by one since raw traces can
         # be large (> 30 MB).
-        sset.load_trace(i, nf=False, ff=True, check=True)
+        sset.load_trace(i, nf=False, ff=True, check=True, log=False)
         # * Apply the processing and get the resulting trace.
         # NOTE: ff can be None if the processing fails.
         ff = self.process_fn(dset, sset, plot, args)
