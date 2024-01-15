@@ -102,8 +102,9 @@ def load_data(subset, forced_profile = None):
     SUBSET.load_trace(range(0, NUM_TRACES), nf=False, ff=True, start_point=START_POINT, end_point=END_POINT)
     # Load the profile from the dataset or a standalone one.
     if forced_profile is None or forced_profile == "":
-        l.LOGGER.info("Load the dataset's profile")
         PROFILE = DATASET.get_profile()
+        if PROFILE is not None:
+            l.LOGGER.info("Load the dataset's profile")
     else:
         l.LOGGER.info("Load the forced profile from {}".format(forced_profile))
         PROFILE = dataset.Profile(fp=forced_profile)
