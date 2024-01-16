@@ -340,19 +340,19 @@ def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag, g
     """
     rad_id=0
     # Initialize the radio as requested.
-    with soapysdr.MySoapySDRs() as rad:
-        try:
-            rad.register(soapysdr.MySoapySDR(samp_rate, freq, rad_id, duration=duration, dir=DIR, gain=gain))
-        except Exception as e:
-            l.log_n_exit("Error during radio initialization", 1, e)
-        # Initialize the driver.
-        rad.open()
-        rad.record(duration)
-        # Save the radio capture.
-        rad.accept()
-        rad.save(reinit=False)
-        # Get the recorded signal for an additional save or plot.
-        sig = rad.get_signal(rad_id)
+    try:
+        with soapysdr.MySoapySDR(fs=samp_rate, freq=freq, idx=rad_id, duration=duration, dir=DIR, gain=gain) as rad:
+            # Initialize the driver.
+            rad.open()
+            # Perform the recording.
+            rad.record()
+            # Save the radio capture on disk.
+            rad.accept()
+            rad.save(reinit=False)
+            # Save the radio capture outside the radio for an additional save or plot.
+            sig = rad.get_signal()
+    except Exception as e:
+        l.log_n_exit("Error during radio instrumentation", 1, e)
     # Plot the signal as requested [amplitude by default].
     comp = complex.CompType.PHASE if phase is True else complex.CompType.AMPLITUDE
     libplot.plot_time_spec_sync_axis([sig], samp_rate, comp=comp, cond=plot_flag)
