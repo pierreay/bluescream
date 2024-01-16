@@ -5,6 +5,7 @@ import numpy as np
 from matplotlib import pyplot as plt
 from scipy import signal
 import click
+import time
 
 try:
     import tomllib
@@ -363,55 +364,33 @@ def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag, g
         np.save(save, sig)
 
 @cli.command()
-@click.argument("freq", type=float)
-@click.argument("samp_rate", type=float)
-@click.option("--duration", type=float, default=0.5, help="Duration of the recording.")
 @click.option("--save", default="", help="If set to a file path, save the recorded signal as .npy file without custom dtype.")
 @click.option("--norm/--no-norm", default=False, help="Normalize the recording before saving.")
 @click.option("--amplitude/--no-amplitude", default=False, help="Extract only the amplitude of the signal.")
 @click.option("--phase/--no-phase", default=False, help="Extract only the phase of the signal.")
 @click.option("--plot/--no-plot", "plot_flag", default=True, help="Plot the recorded signal.")
-@click.option("--gain", type=int, default=76, help="Gain for the SDR.")
-@click.option("--client/--no-client", type=bool, default=False, help="If set to True, act as a client and connect to a running MySoapySDR server.")
-def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag, gain, client):
-    """Record a trace without any instrumentation.
+def client(save, norm, amplitude, phase, plot_flag):
+    """Record a signal by connecting to the running and configured SDR server.
 
     It will automatically use the first found radio with ID 0.
 
-    FREQ is the center frequency of the recording.
-    SAMP_RATE is the sampling rate used for the recording.
-
     """
     rad_id=0
-    # Initialize the radio as requested.
-    if client is False:
-        try:
-            with soapysdr.MySoapySDR(fs=samp_rate, freq=freq, idx=rad_id, duration=duration, dir=DIR, gain=gain) as rad:
-                # Initialize the driver.
-                rad.open()
-                # Perform the recording.
-                rad.record()
-                # Save the radio capture on disk.
-                rad.accept()
-                rad.save(reinit=False)
-                # Save the radio capture outside the radio for an additional save or plot.
-                sig = rad.get_signal()
-        except Exception as e:
-            l.log_n_exit("Error during radio instrumentation", 1, e)
-    # Connect the SDR server as requested.
-    elif client is True:
-        rad = soapysdr.MySoapySDRsClient()
-        # Record and save the signal.
-        rad.record()
-        rad.accept()
-        rad.save()
-        # Save the radio capture outside the radio for an additional save or plot.
-        # NOTE: Not especially efficient since we use the disk as buffer here,
-        # but the SDR client cannot receive data from the SDR server currently.
-        sig = load.load_raw_trace(dir=DIR, rad_idx=rad_id, rec_idx=0, log=False)
+    rad = soapysdr.MySoapySDRsClient()
+    # Record and save the signal.
+    rad.record()
+    rad.accept()
+    rad.save()
+    # NOTE: MySoapySDRsClient.save() is not synchronous, then wait enough for signal to be saved.
+    time.sleep(1)
+    # NOTE: Following code duplicated from `record()'.
+    # Save the radio capture outside the radio for an additional save or plot.
+    # NOTE: Not especially efficient since we use the disk as buffer here,
+    # but the SDR client cannot receive data from the SDR server currently.
+    sig = load.load_raw_trace(dir=DIR, rad_idx=rad_id, rec_idx=0, log=False)
     # Plot the signal as requested [amplitude by default].
     comp = complex.CompType.PHASE if phase is True else complex.CompType.AMPLITUDE
-    libplot.plot_time_spec_sync_axis([sig], samp_rate, comp=comp, cond=plot_flag)
+    libplot.plot_time_spec_sync_axis([sig], comp=comp, cond=plot_flag, xtime=False)
     # Save the signal as requested.
     if save != "":
         sig = analyze.process_iq(sig, amplitude=amplitude, phase=phase, norm=norm, log=True)
