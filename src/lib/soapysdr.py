@@ -185,8 +185,19 @@ class MySoapySDR():
     # To not waste space but get ride of int <-> float casting/rescaling? Since
     # we need float anyway for signal processing...
 
+    # Default length (power of 2) of RX temporary buffer. This length
+    # corresponds to the number of samples.
+    RX_BUFF_LEN_EXP = 20
+    # Lower bound of RX temporary buffer. Using dtype of a tuple of uint16, a
+    # length of 2^20 ~= 4 MB.
+    RX_BUFF_LEN_EXP_LB = 20
+    # Upper bound of RX temporary buffer. 2^28 ~= 1 GB.
+    RX_BUFF_LEN_EXP_UB = 28
+
     # * Variables.
 
+    # RX temporary buffer allocated at runtime.
+    rx_buff = None
     # * Static functions.
 
     @staticmethod
@@ -274,6 +285,50 @@ class MySoapySDR():
             self.sdr.setFrequency(SoapySDR.SOAPY_SDR_RX, 0, freq)
             self.sdr.setGain(SoapySDR.SOAPY_SDR_RX, 0, gain)
             self.sdr.setAntenna(SoapySDR.SOAPY_SDR_RX, 0, "TX/RX")
+            # Initialize the RX buffer with a sufficient size to hold the
+            # default duration.
+            self._rx_buff_init(min(int(np.log2(self.duration * self.fs)) + 1, self.RX_BUFF_LEN_EXP_UB))
+
+    def _rx_buff_init(self, rx_buff_len_exp = RX_BUFF_LEN_EXP):
+        """Initialize the RX buffer.
+
+        Allocate memory for the RX buffer based on parameters. This allocation
+        can take up to a few seconds for GB of allocation, hence we try to only
+        allocate once.
+
+        :param rx_buff_len_exp: Exponent used for the power of 2 defining
+        memory allocation chunk size.
+
+        """
+        assert self.rx_buff is None
+        assert type(rx_buff_len_exp) == int, "Length of RX buffer should be an integer!"
+        assert rx_buff_len_exp <= self.RX_BUFF_LEN_EXP_UB, "Bad RX buffer exponent value!"
+        assert rx_buff_len_exp >= self.RX_BUFF_LEN_EXP_LB, "Bad RX buffer exponent value!"
+        l.LOGGER.debug("Allocate memory for RX buffer...")
+        self.rx_buff = np.array([0] * pow(2, rx_buff_len_exp), MySoapySDR.DTYPE)
+
+    def _rx_buff_deinit(self):
+        """Deinitialize the RX buffer.
+
+        Deallocate memory for the RX buffer and set it to None.
+
+        """
+        assert self.rx_buff is not None
+        del self.rx_buff
+        self.rx_buff = None
+
+    def rx_buff_config(self, rx_buff_len_exp):
+        """Reconfigure the RX buffer size.
+
+        It will de-initialize the previsouly initialized RX buffer and
+        re-initializing it with the new size.
+
+        :param rx_buffer_len_exp: Length used in `_rx_buff_init()'.
+
+        """
+        assert self.rx_buff is not None
+        self._rx_buff_deinit()
+        self._rx_buff_init(rx_buff_len_exp)
 
     def open(self):
         # Initialize the SoapySDR streams.
@@ -296,27 +351,38 @@ class MySoapySDR():
             self.sdr.closeStream(self.rx_stream)
             l.LOGGER.debug("MySoapySDR(idx={}).close().leave".format(self.idx))
 
-    def record(self, duration = None):
+    def record(self, duration = None, log = True):
         # Choose default duration configured during __init__ if None is given.
         if duration is None:
             duration = self.duration
         if self.enabled:
-            l.LOGGER.info("start record for radio #{} during {:.2}s".format(self.idx, duration))
-            samples = int(duration * self.fs)
-            # XXX: Adjust rx_buff_len dynamically based on the duration/number
-            # of samples.
-            # NOTE: Increasing this limits will prevent overflow or underruns,
-            # but will also increase the minimal recording time (relative to
-            # the sampling rate). Good values are between 2^20 for small
-            # recordings (e.g. 0.1 s) and 2^24 for large recordings (e.g. 3 s).
-            rx_buff_len = pow(2, 20)
-            rx_buff = np.array([0] * rx_buff_len, MySoapySDR.DTYPE)
+            # Initialize the buffer (0-length) that will contains the final
+            # recorded signal from this function.
             self.rx_signal_candidate = np.array([0], MySoapySDR.DTYPE)
+            # Number of samples requested to read.
+            samples = int(duration * self.fs)
+            # Number of samples that can fit in the RX buffer.
+            rx_buff_len = len(self.rx_buff)
+            if log is True:
+                l.LOGGER.info("Radio #{} start recording for {:.2}s...".format(self.idx, duration))
             while len(self.rx_signal_candidate) < samples:
-                sr = self.sdr.readStream(self.rx_stream, [rx_buff], rx_buff_len, timeoutUs=10000000)
-                if sr.ret == rx_buff_len and sr.flags == 1 << 2:
-                    self.rx_signal_candidate = np.concatenate((self.rx_signal_candidate, rx_buff))
-            l.LOGGER.debug("MySoapySDR(idx={}).record().leave".format(self.idx))
+                # Number of samples that the readStream() function will try to
+                # read from the SDR. It is equal to the minimum between: 1)
+                # Number of samples needed to fullfil our buffer with the
+                # requested number of samples. 2) Size of RX buffer. If the
+                # requested number of samples is higher than the size of the RX
+                # buffer, the RX buffer will be re-used after saving the first
+                # bunch of samples into the `self.rx_signal_candidate'
+                # variable.
+                readStream_len = min(samples - len(self.rx_signal_candidate), rx_buff_len)
+                assert readStream_len <= len(self.rx_buff)
+                sr = self.sdr.readStream(self.rx_stream, [self.rx_buff], readStream_len, timeoutUs=int(1e7))
+                if sr.ret == readStream_len and sr.flags == 1 << 2:
+                    # Only save part of `RX buffer' containing the captured
+                    # signal inside the `Candidate buffer'.
+                    self.rx_signal_candidate = np.concatenate((self.rx_signal_candidate, self.rx_buff[:readStream_len]))
+            if log is True:
+                l.LOGGER.info("Radio #{} finished recording!".format(self.idx))
         else:
             time.sleep(duration)
 
