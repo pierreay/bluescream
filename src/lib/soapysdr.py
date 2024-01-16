@@ -198,6 +198,15 @@ class MySoapySDR():
 
     # RX temporary buffer allocated at runtime.
     rx_buff = None
+
+    # * Context manager functions.
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        self.close()
+
     # * Static functions.
 
     @staticmethod
@@ -438,6 +447,7 @@ class MySoapySDR():
         sig = MySoapySDR.dtype_to_complex64(self.rx_signal)
         assert sig.dtype == np.complex64, "Signal should be complex numbers!"
         return sig
+
 class MySoapySDRsClient():
     """Control a MySoapySDRs object living in another process.
 
