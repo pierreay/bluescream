@@ -42,9 +42,9 @@ def cli(dir, log, loglevel):
     DIR = path.expanduser(dir)
 
 @cli.command()
-@click.argument("freq_nf", type=int)
-@click.argument("freq_ff", type=int)
-@click.argument("samp_rate", type=int)
+@click.argument("freq_nf", type=float)
+@click.argument("freq_ff", type=float)
+@click.argument("samp_rate", type=float)
 @click.option("--duration", type=float, default=0.5, help="Duration of the recording.")
 @click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
 @click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
