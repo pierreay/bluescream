@@ -75,12 +75,21 @@ class MySoapySDRs():
 
         """
         l.LOGGER.debug("MySoapySDRs.record(duration={}).enter".format(duration))
-        thr = [None] * len(self.sdrs)
-        for idx, sdr in enumerate(self.sdrs):
-            thr[idx] = Thread(target=sdr.record, args=(duration,))
-            thr[idx].start()
-        for sdr in self.sdrs:
-            thr[idx].join()
+        # Use multi-threaded implementation.
+        if len(self.sdrs) > 1:
+            # XXX: Should we switch to processes instead of threads to counter
+            # the GIL? But maybe it can be slower to spawn?
+            l.LOGGER.debug("Start threads for multiple SDRs recording...")
+            thr = [None] * len(self.sdrs)
+            for idx, sdr in enumerate(self.sdrs):
+                thr[idx] = Thread(target=sdr.record, args=(duration,))
+                thr[idx].start()
+            l.LOGGER.debug("Wait threads for multiple SDRs recording...")
+            for sdr in self.sdrs:
+                thr[idx].join()
+        # Don't use multi-threading if only one recording is needed.
+        elif len(self.sdrs) == 1:
+            self.sdrs[0].record(duration)
         l.LOGGER.debug("MySoapySDRs.record(duration={}).exit".format(duration))
 
     def accept(self):
