@@ -174,7 +174,9 @@ class MySoapySDR():
     4. Deinitialize: close()
 
     """
-    # * Custom dtype
+    # * Constants.
+    
+    # Custom dtype.
     # It is used to match the CS16 type of SoapySDR, allowing to save disk
     # space but requires conversion happening in this module, since Numpy can
     # only work with np.complex64 using float32.
@@ -182,6 +184,10 @@ class MySoapySDR():
     # XXX: May be simpler to use np.float16?
     # To not waste space but get ride of int <-> float casting/rescaling? Since
     # we need float anyway for signal processing...
+
+    # * Variables.
+
+    # * Static functions.
 
     @staticmethod
     def numpy_save(file, arr):
@@ -253,8 +259,9 @@ class MySoapySDR():
         # Recording buffers.
         self.rx_signal = None
         self.rx_signal_candidate = None
-        # Initialize the SDR driver.
+        # Long operations.
         if self.enabled:
+            # Initialize the SDR driver.
             results = SoapySDR.Device.enumerate()
             # Check result of device detection and requested index.
             if len(results) == 0:
