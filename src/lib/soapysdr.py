@@ -296,7 +296,22 @@ class MySoapySDR():
             self.sdr.setAntenna(SoapySDR.SOAPY_SDR_RX, 0, "TX/RX")
             # Initialize the RX buffer with a sufficient size to hold the
             # default duration.
-            self._rx_buff_init(min(int(np.log2(self.duration * self.fs)) + 1, self.RX_BUFF_LEN_EXP_UB))
+            self._rx_buff_init(self._rx_buff_len_exp_auto(self.duration * self.fs))
+
+    @staticmethod
+    def _rx_buff_len_exp_auto(nsamples):
+        """Compute an automatic RX buffer length.
+
+        :param nsamples: The number of samples that the SDR is configured to
+        record.
+
+        :return: The according rx_buff_len_exp value.
+
+        """
+        candidate = int(np.log2(nsamples)) + 1
+        candidate = min(candidate, MySoapySDR.RX_BUFF_LEN_EXP_UB)
+        candidate = max(candidate, MySoapySDR.RX_BUFF_LEN_EXP_LB)
+        return candidate
 
     def _rx_buff_init(self, rx_buff_len_exp = RX_BUFF_LEN_EXP):
         """Initialize the RX buffer.
@@ -313,7 +328,7 @@ class MySoapySDR():
         assert type(rx_buff_len_exp) == int, "Length of RX buffer should be an integer!"
         assert rx_buff_len_exp <= self.RX_BUFF_LEN_EXP_UB, "Bad RX buffer exponent value!"
         assert rx_buff_len_exp >= self.RX_BUFF_LEN_EXP_LB, "Bad RX buffer exponent value!"
-        l.LOGGER.debug("Allocate memory for RX buffer...")
+        l.LOGGER.debug("Allocate 2^{} dtype-elements in memory for RX buffer...".format(rx_buff_len_exp))
         self.rx_buff = np.array([0] * pow(2, rx_buff_len_exp), MySoapySDR.DTYPE)
 
     def _rx_buff_deinit(self):
