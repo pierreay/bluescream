@@ -157,14 +157,8 @@ class MySoapySDRs():
         return len(self.sdrs)
 
     def get_signal(self, idx):
-        """Return the receveid signal of radio indexed by IDX.
-
-        The returned signal will be I/Q represented using np.complex64 numbers.
-
-        """
-        sig = MySoapySDR.dtype_to_complex64(self.sdrs[idx].rx_signal)
-        assert sig.dtype == np.complex64, "Returned signal should be complex numbers!"
-        return sig
+        """Return the receveid signal of radio indexed by IDX."""
+        return self.sdrs[idx].get_signal()
 
 class MySoapySDR():
     """SoapySDR controlled radio.
@@ -362,6 +356,15 @@ class MySoapySDR():
         l.LOGGER.info("disable radio #{}".format(self.idx))
         self.enabled = False
 
+    def get_signal(self):
+        """Return the receveid signal.
+
+        The returned signal will be I/Q represented using np.complex64 numbers.
+
+        """
+        sig = MySoapySDR.dtype_to_complex64(self.rx_signal)
+        assert sig.dtype == np.complex64, "Signal should be complex numbers!"
+        return sig
 class MySoapySDRsClient():
     """Control a MySoapySDRs object living in another process.
 
