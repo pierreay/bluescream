@@ -41,6 +41,9 @@ Those directories contains full or partials datasets recorded using our
   - Antenna at 1m of real distance with LNA.
   - Input generated using random from serial port using instrumented firmware.
   - 100 AES repetitions.
+- [[file:240112_multi-leak-insub-1m-lna_avg/][240112_multi-leak-insub-1m-lna_avg]] ::
+  - Average of its RAW dataset.
+  - Contains 3 profiles with correlation around 0.25 using different number of POIs.
 
 * Recordings
 
