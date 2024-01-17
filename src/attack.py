@@ -1048,6 +1048,7 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
     #     PROFILE.plot(delim=True)
 
     if align:
+        TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=TRACES[0], tqdm_log=True)
         TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
 
     if not FIXED_KEY and variable != "hw_p" and variable != "p":
