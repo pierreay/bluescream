@@ -60,9 +60,17 @@ Those directories contains various signals used in experiments.
 - [[file:240111_leakage_for_demod_low_sr][240111_leakage_for_demod_low_sr]] :: Same as =240109_leakage_for_demod= but with
   lower sample rate.
 - [[file:240111_gio_firmware_leak][240111_gio_firmware_leak]] :: Recording using Giovanni's firmware. Modified
-  version to only output fixed payload in the modulated packet. The TX is ON
-  sending modulated fixed packets with a bunch of AES, then no CPU activity,
-  and another bunch of AES.
+  version to only output fixed payload in the modulated packet (BUT with random
+  address and whitening enabled). The TX is ON sending modulated fixed packets
+  with a bunch of AES, then no CPU activity, and another bunch of AES.
+- [[file:240116_gio_firmware_leak_2][240116_gio_firmware_leak_2]] ::
+  - Modified version of Giovanni firmware output the following pattern on the
+    radio with constant time : TX OFF, TX ON, TX ON + AES.
+  - Address and payloads are constants =0x0f=.
+  - In =whiten_on=, whitening is enabled =RADIO_PCNF1_WHITEEN_Enabled=.
+  - In =whiten_off=, whitening is disabled =RADIO_PCNF1_WHITEEN_Disabled=.
+  - Multiples sample rates are tried.
+  - Multiples frequencies should be tried but not recorded yet.
 
 * Organization
 
