@@ -164,7 +164,7 @@ def load_keys(dir):
     if path.exists(path.join(dir, DATASET_NPY_INPUT_KEY)):
         return np.load(path.join(dir, DATASET_NPY_INPUT_KEY))
     else:
-        l.LOGGER.warning("no loaded key(s)")
+        l.LOGGER.warning("No loaded key(s) for {}".format(dir))
         return None
 
 def load_plaintexts(dir):
@@ -172,7 +172,7 @@ def load_plaintexts(dir):
     if path.exists(path.join(dir, DATASET_NPY_INPUT_PLAINTEXT)):
         return np.load(path.join(dir, DATASET_NPY_INPUT_PLAINTEXT))
     else:
-        l.LOGGER.warning("no loaded plaintext(s)")
+        l.LOGGER.warning("No loaded plaintext(s) for {}".format(dir))
         return None
 
 def save_keys(dir, k):
