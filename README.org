@@ -37,10 +37,10 @@ Those directories contains full or partials datasets recorded using our
   - Attacked using profile from =231222_single-cable-balanced_raw=, no better
     than key rank of 2^123.
 - [[file:240112_multi-leak-insub-1m-lna_raw/][240112_multi-leak-insub-1m-lna_raw]] ::
-  - 64k FF traces for train/profile.
+  - 64k FF traces for train/profile with 100 AES repetitions.
+  - PROG: 16k FF traces for attack with 200 AES repetitions.
   - Antenna at 1m of real distance with LNA.
   - Input generated using random from serial port using instrumented firmware.
-  - 100 AES repetitions.
 - [[file:240112_multi-leak-insub-1m-lna_avg/][240112_multi-leak-insub-1m-lna_avg]] ::
   - Average of its RAW dataset.
   - Contains 3 profiles with correlation around 0.25 using different number of POIs.
