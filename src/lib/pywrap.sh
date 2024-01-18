@@ -50,9 +50,12 @@ function radio_extract() {
     # according to the --nf-id, --ff-id, and --id specifications of the
     # "radio.py" arguments.
     # NOTE: Parameters depending on the current firmware configuration.
-    # - Parameters for 100 AES:
-    window=0.07
+    # - Parameters for 300 AES:
+    window=0.2
     offset=0.000
+    # - Parameters for 100 AES:
+    # window=0.07
+    # offset=0.000
     # Parameters for 1 AES:
     # window=0.005
     # offset=0.00
