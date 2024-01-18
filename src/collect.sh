@@ -47,7 +47,7 @@ port.
 Set -l to the desired Python LOGLEVEL [default = INFO].
 Set -r to reboot computer on repeated errors. Ignored if key is fixed in target device [default = False]
 Set -y to reset YKush switch on repeated errors. Ignored if key is fixed in target device [default = False]
-Set -f to restart collection from trace #0 [default = False].
+Set -f to restart collection from trace #0 without reinitializing the dataset [default = False].
 EOF
     exit 0
 }
