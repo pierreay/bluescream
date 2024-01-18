@@ -155,7 +155,7 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, config, radio
     dset.pickle_dump(force=True)
 
 @cli.command()
-@click.argument("samp_rate", type=int)
+@click.argument("samp_rate", type=float)
 @click.argument("id_ref", type=int)
 @click.option("--plot/--no-plot", default=True, help="Plot a summary of the processing.")
 @click.option("--overwrite/--no-overwrite", default=False, help="Overwrite the original RAW traces with extracted window.")
@@ -275,7 +275,7 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
         l.LOGGER.info("ignore overwrite for extracted signal(s)")
 
 @cli.command()
-@click.argument("samp_rate", type=int)
+@click.argument("samp_rate", type=float)
 @click.option("--amplitude/--no-amplitude", default=True, help="Plot the amplitude of the traces.")
 @click.option("--phase/--no-phase", default=False, help="Plot the phase of the traces.")
 @click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
