@@ -339,6 +339,14 @@ function collect_one_set() {
 # * Script
 
 init
-collect_train
-collect_attack
+
+# Start collections only if wanted number of trace is superior to 0.
+if [[ $ENVRC_WANTED_TRACE_TRAIN -gt 0 ]]; then
+    collect_train
+fi
+
+if [[ $ENVRC_WANTED_TRACE_ATTACK -gt 0 ]]; then
+    collect_attack
+fi
+
 quit
