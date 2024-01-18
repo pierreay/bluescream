@@ -145,8 +145,8 @@ class Dataset():
         """
         # * Confirm the saving if needed and create the directory.
         if force == False and self.dir == self.dirsave:
-            l.LOGGER.warning("save dataset to loaded directory")
-            confirm = input("press [enter] to continue")
+            l.LOGGER.warning("Try to overwrite the loaded dataset by saving a new one?")
+            confirm = input("Press [ENTER] to continue, C^c to abort!")
         self.create_dirsave()
         # * Save the inputs of training set and unload if asked.
         if self.train_set is not None:
