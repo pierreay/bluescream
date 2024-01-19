@@ -280,7 +280,8 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
 @click.option("--phase/--no-phase", default=False, help="Plot the phase of the traces.")
 @click.option("--nf-id", default=-1, help="Enable and associate radio index to near-field (NF) recording.")
 @click.option("--ff-id", default=-1, help="Enable and associate radio index to far-field (FF) recording.")
-def plot(samp_rate, amplitude, phase, nf_id, ff_id):
+@click.option("--fast/--no-fast", default=False, help="Decimate the signal to speed-up plotting.")
+def plot(samp_rate, amplitude, phase, nf_id, ff_id, fast):
     """Plot RAW traces from DIR.
 
     SAMP_RATE is the sampling rate used for both recording.
@@ -303,9 +304,9 @@ def plot(samp_rate, amplitude, phase, nf_id, ff_id):
     s_arr = np.asarray(load.truncate_min(s_arr))
     # Plot the result.
     if amplitude is True:
-        libplot.plot_time_spec_sync_axis(s_arr, samp_rate, comp=complex.CompType.AMPLITUDE)
+        libplot.plot_time_spec_sync_axis(s_arr, samp_rate, comp=complex.CompType.AMPLITUDE, fast=fast)
     if phase is True:
-        libplot.plot_time_spec_sync_axis(s_arr, samp_rate, comp=complex.CompType.PHASE)
+        libplot.plot_time_spec_sync_axis(s_arr, samp_rate, comp=complex.CompType.PHASE, fast=fast)
 
 @cli.command()
 @click.argument("samp_rate", type=float)

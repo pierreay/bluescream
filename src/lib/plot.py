@@ -3,6 +3,7 @@
 from os import path
 import numpy as np
 import matplotlib.pyplot as plt
+from scipy import signal
 
 import lib.log as l
 import lib.analyze as analyze
@@ -120,7 +121,7 @@ def plot_time_compare_n(arr):
 
 # * Special plot for analysis
 
-def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, cond=True, comp=complex.CompType.AMPLITUDE, norm=False, xtime=True, title=""):
+def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, cond=True, comp=complex.CompType.AMPLITUDE, norm=False, xtime=True, title="", fast=False):
     """Plot signals using synchronized time and frequency domains.
 
     Plot signals contained in the S_ARR 2D np.ndarray or list containing 1D
@@ -137,6 +138,7 @@ def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, c
     - XTIME can be set to False to always display sample index on the X axis
       instead of time in seconds.
     - TITLE can be set to a string to set a plot title.
+    - FALSE can be to True to speed-up plotting by decimating the signal.
 
     """
     assert type(s_arr) == list or type(s_arr) == np.ndarray, "Not a list or an array!"
@@ -153,6 +155,14 @@ def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, c
         s_arr = analyze.normalize(s_arr)
     SUBPLOT_NB = len(s_arr) * 2
     XLABEL = "Time [s]" if xtime is True else "Sample [#]"
+
+    # Decimate signal if needed to increase plotting speed.
+    if fast is True:
+        factor = int(samp_rate / 1e6)
+        l.LOGGER.info("Perform signal decimation using {} as factor".format(factor))
+        s_arr = signal.decimate(s_arr, factor)
+        samp_rate /= factor
+    
     def plot_init(nsamples, duration, nb = 1):
         plt.suptitle(title)
         t = np.linspace(0, duration, nsamples)
