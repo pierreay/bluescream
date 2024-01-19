@@ -38,11 +38,11 @@ Those directories contains full or partials datasets recorded using our
     than key rank of 2^123.
 - [[file:240112_multi-leak-insub-1m-lna_raw/][240112_multi-leak-insub-1m-lna_raw]] ::
   - 64k FF traces for train/profile with 100 AES repetitions.
-  - PROG: 16k FF traces for attack with 200 AES repetitions.
+  - 16k FF traces for attack with 300 AES repetitions.
   - Antenna at 1m of real distance with LNA.
   - Input generated using random from serial port using instrumented firmware.
 - [[file:240112_multi-leak-insub-1m-lna_avg/][240112_multi-leak-insub-1m-lna_avg]] ::
-  - Average of its RAW dataset.
+  - Average of its RAW dataset (=train= and =attack=).
   - Contains 3 profiles with correlation around 0.25 using different number of POIs.
 
 * Recordings
