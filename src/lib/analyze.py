@@ -349,12 +349,22 @@ def extract(s, starts, length=0, end_offset=0):
     assert(s.ndim == 1)
     # Extract a fixed length.
     if length > 0:
-        # NOTE: Didn't check for length overflow before implementing the following.
         length += end_offset
         extracted = np.zeros((len(starts), length), dtype=s.dtype)
         for i in range(len(starts)):
             condition = np.zeros((len(s)), dtype=s.dtype)
-            condition[int(starts[i]):int(starts[i] + length)] = 1
+            # Lower and upper bounds of condition signal for extraction.
+            li = int(starts[i])
+            ui = int(starts[i] + length)
+            # If upper bound is out of bound, do not extract the signal which
+            # would be too short -- just let it initialized to 0.
+            if ui >= len(s):
+                continue
+            # Sanity-check of bounds.
+            assert li >= 0
+            assert ui < len(s)
+            # Process to the extraction.
+            condition[li:ui] = 1
             extracted[i] = np.copy(np.extract(condition, s))
         return extracted
     # Extract a variable length.
