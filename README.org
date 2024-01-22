@@ -47,7 +47,7 @@ Those directories contains full or partials datasets recorded using our
   - Attacked using different number of traces, different number of POIS, different
     algo (PCC & PDF).
   - Best attack using 6000 traces, 1 POI, PCC, leading to 2^59 key rank.
-    Profile is 64k * 100 and Attack is 6k * 300.
+    Profile is =64k * 100= and Attack is =6k * 300=.
 
 * Recordings
 
