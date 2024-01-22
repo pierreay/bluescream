@@ -57,7 +57,17 @@ print("y_pge={}".format(y_pge))
 
 # * Plot
 
+# Use GGPlot style.
+plt.style.use("ggplot")
+
 def myplot(x, y, param_dict, smooth=False):
+    """Plot y over x.
+
+    :param smooth: Smooth the X data if True.
+
+    :param param_dict: Dictionnary of parameters for plt.plot().
+
+    """
     if smooth is True:
         spl = make_interp_spline(x, y, k=3)
         x_smooth = np.linspace(min(x), max(x), 300)
