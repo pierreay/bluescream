@@ -43,6 +43,9 @@ with open(FILE, 'r') as csvfile:
         # Skip header.
         if i == 0:
             continue
+        # Skip not completed rows when .sh script is running.
+        if row[1] == "":
+            continue
         # Get data. Index is the column number. Do not index higher than NCOL.
         x_nb.append(int(float(row[0])))
         y_kr.append(int(float(row[1])))
