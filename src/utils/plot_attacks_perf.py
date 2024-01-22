@@ -11,6 +11,7 @@ from scipy.interpolate import make_interp_spline, BSpline
 
 # CSV file name.
 FILE="attack_results.csv"
+OUTFILE="attack_results.png"
 
 # Number of columns inside the CSV file.
 NCOL=0
@@ -99,3 +100,4 @@ plt.legend(loc="upper right")
 # General:
 
 plt.show()
+plt.savefig(OUTFILE)
