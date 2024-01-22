@@ -55,7 +55,8 @@ print("x_nb={}".format(x_nb))
 print("y_kr={}".format(y_kr))
 print("y_pge={}".format(y_pge))
 
-# * Key rank plot
+# * Plot
+
 def myplot(x, y, param_dict, smooth=False):
     if smooth is True:
         spl = make_interp_spline(x, y, k=3)
@@ -65,16 +66,26 @@ def myplot(x, y, param_dict, smooth=False):
         y = y_smooth
     plt.plot(x, y, **param_dict)
 
-plt.plot(x_nb, y_kr, "-*")
+# General:
+
+plt.title('Key rank and PGE median vs. Trace number')
 plt.xlabel('Number of traces')
+
+# Key rank:
+
+myplot(x_nb, y_kr, {"color": "blue", "label": "Key rank"}, smooth=True)
 plt.ylabel('Log2(Key rank)')
-plt.title('Key rank vs. Trace number')
-plt.show()
+# plt.ylim(top=128, bottom=0)
+plt.legend(loc="upper left")
 
-# * PGE plot
+# PGE:
 
-plt.plot(x_nb, y_pge, "-*")
-plt.xlabel('Number of traces')
+plt.twinx()
+myplot(x_nb, y_pge, {"color": "red", "label": "PGE"}, smooth=True)
 plt.ylabel('Median(PGE)')
-plt.title('PGE vs. Trace number')
+# plt.ylim(top=256, bottom=0)
+plt.legend(loc="upper right")
+
+# General:
+
 plt.show()
