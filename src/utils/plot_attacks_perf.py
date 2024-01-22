@@ -59,7 +59,7 @@ print("y_pge={}".format(y_pge))
 # * Plot
 
 # Use GGPlot style.
-plt.style.use("ggplot")
+# plt.style.use("ggplot")
 
 def myplot(x, y, param_dict, smooth=False):
     """Plot y over x.
