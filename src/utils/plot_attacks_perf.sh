@@ -1,3 +1,7 @@
+#!/bin/bash
+
+# * About
+
 # Perform multiple attacks and store the results in a CSV file.
 
 # * Configuration
@@ -14,7 +18,7 @@ PROFILE="$DATASET"/profile_pois_1
 # Write header.
 echo "trace_nb;log2(key_rank);correct_bytes;pge_median" > "$OUTFILE"
 
-function iterate {
+function iterate() {
     i_start=$1
     i_step=$2
     i_end=$3
