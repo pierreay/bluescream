@@ -15,7 +15,7 @@ PROFILE="$DATASET"/profile_pois_1
 echo "trace_nb;log2(key_rank);correct_bytes;pge_median" > "$OUTFILE"
 
 # Iteration over number of traces.
-for num_traces in $(seq 100 10 200); do
+for num_traces in $(seq 10 100 15000); do
     # Write number of traces.
     echo -n "$num_traces;" | tee -a "$OUTFILE"
 
