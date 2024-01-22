@@ -48,7 +48,14 @@ function iterate() {
 }
 
 # Progressive steps.
+
+# 25 minutes version:
 iterate 10 10 100
 iterate 100 100 1000
 iterate 1000 200 2000
 iterate 2000 500 $((15000 + 1))
+
+# XXX minutes version:
+iterate 10 10 1000
+iterate 1000 100 10000
+iterate 10000 250 $((15000 + 1))
