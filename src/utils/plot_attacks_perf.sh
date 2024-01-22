@@ -21,7 +21,7 @@ echo "trace_nb;log2(key_rank);correct_bytes;pge_median" > "$OUTFILE"
 function iterate() {
     i_start=$1
     i_step=$2
-    i_end=$3
+    i_end=$(($3 - 1 ))
     # Iteration over number of traces.
     for num_traces in $(seq $i_start $i_step $i_end); do
         # Write number of traces.
