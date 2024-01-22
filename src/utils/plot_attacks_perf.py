@@ -84,7 +84,7 @@ plt.xlabel('Number of traces')
 
 # Key rank:
 
-myplot(x_nb, y_kr, {"color": "blue", "label": "Key rank"}, smooth=True)
+myplot(x_nb, y_kr, {"color": "blue", "label": "Key rank", "marker": "."}, smooth=True)
 plt.ylabel('Log2(Key rank)')
 # plt.ylim(top=128, bottom=0)
 plt.legend(loc="upper left")
@@ -92,12 +92,12 @@ plt.legend(loc="upper left")
 # PGE:
 
 plt.twinx()
-myplot(x_nb, y_pge, {"color": "red", "label": "PGE"}, smooth=True)
+myplot(x_nb, y_pge, {"color": "red", "label": "PGE", "marker": "."}, smooth=True)
 plt.ylabel('Median(PGE)')
 # plt.ylim(top=256, bottom=0)
 plt.legend(loc="upper right")
 
 # General:
 
-plt.show()
+# plt.show()
 plt.savefig(OUTFILE)
