@@ -5,6 +5,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
+from scipy.interpolate import make_interp_spline, BSpline
 
 # * Configuration
 
@@ -52,6 +53,14 @@ print("y_kr={}".format(y_kr))
 print("y_pge={}".format(y_pge))
 
 # * Key rank plot
+def myplot(x, y, param_dict, smooth=False):
+    if smooth is True:
+        spl = make_interp_spline(x, y, k=3)
+        x_smooth = np.linspace(min(x), max(x), 300)
+        y_smooth = spl(x_smooth)
+        x = x_smooth
+        y = y_smooth
+    plt.plot(x, y, **param_dict)
 
 plt.plot(x_nb, y_kr, "-*")
 plt.xlabel('Number of traces')
