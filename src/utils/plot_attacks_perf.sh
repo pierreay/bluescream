@@ -3,29 +3,29 @@
 # * Configuration
 
 # Output CSV file for Python.
-outfile="attack_results.csv"
+OUTFILE="attack_results.csv"
 # Dataset path.
-dataset="/home/drac/storage/dataset/240112_multi-leak-insub-1m-lna_avg"
+DATASET="/home/drac/storage/dataset/240112_multi-leak-insub-1m-lna_avg"
 # Profile path.
-profile="$dataset"/profile_pois_1
+PROFILE="$DATASET"/profile_pois_1
 
 # * CSV building
 
 # Write header.
-echo "trace_nb;log2(key_rank);correct_bytes;pge_median" > "$outfile"
+echo "trace_nb;log2(key_rank);correct_bytes;pge_median" > "$OUTFILE"
 
 # Iteration over number of traces.
 for num_traces in $(seq 100 10 200); do
     # Write number of traces.
-    echo -n "$num_traces;" | tee -a "$outfile"
+    echo -n "$num_traces;" | tee -a "$OUTFILE"
 
     # Attack and extract:
     # 1) The key rank
     # 2) The correct number of bytes.
     # 3) The median of the PGE
-    ./attack.py --no-log --no-plot --norm --dataset-path "$dataset" \
+    ./attack.py --no-log --no-plot --norm --dataset-path "$DATASET" \
                 --start-point 740 --end-point 1140 --num-traces $num_traces attack \
-                --attack-algo pcc --profile "$profile" \
+                --attack-algo pcc --profile "$PROFILE" \
                 --num-pois 1 --poi-spacing 2 --variable p_xor_k --align 2>/dev/null \
         | grep -E 'actual rounded|CORRECT|MEDIAN' \
         | cut -f 2 -d ':' \
@@ -33,7 +33,7 @@ for num_traces in $(seq 100 10 200); do
         | tr '[\n]' '[;]' \
         | sed 's/2^//' \
         | sed 's/;$//' \
-        | tee -a "$outfile"
+        | tee -a "$OUTFILE"
 
-    echo "" | tee -a "$outfile"
+    echo "" | tee -a "$OUTFILE"
 done
