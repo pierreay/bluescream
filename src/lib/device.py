@@ -18,7 +18,7 @@ import lib.log as l
 # External modules.
 import numpy as np
 try:
-    from scapy.all import BTLE_DATA, BTLE_ADV, ATT_Hdr, L2CAP_Hdr, ATT_Read_Request, ATT_Read_Multiple_Request, BTLE_EMPTY_PDU, BTLE_CTRL, LL_ENC_REQ, LL_ENC_RSP, LL_START_ENC_REQ, LL_REJECT_IND
+    from scapy.all import BTLE_DATA, BTLE_ADV, ATT_Hdr, L2CAP_Hdr, ATT_Read_Request, ATT_Read_Multiple_Request, ATT_Find_Information_Request, BTLE_EMPTY_PDU, BTLE_CTRL, LL_ENC_REQ, LL_ENC_RSP, LL_START_ENC_REQ, LL_REJECT_IND
     import whad
     from whad.ble import Central, ConnectionEventTrigger, ReceptionTrigger
     from whad.ble.profile import UUID
@@ -326,8 +326,14 @@ class DeviceConfig:
         if self.procedure_interleaving is True:
             if cfg["procedure_interleaving_method"] == "att_read_request":
                 self.procedure_interleaving_method = ATT_Read_Request(gatt_handle=3)
-            elif cfg["procedure_interleaving_method"] == "att_read_multiple_request":
+            elif cfg["procedure_interleaving_method"] == "att_read_multiple_request_2":
                 self.procedure_interleaving_method = ATT_Read_Multiple_Request(handles=[3, 3])
+            elif cfg["procedure_interleaving_method"] == "att_read_multiple_request_3":
+                self.procedure_interleaving_method = ATT_Read_Multiple_Request(handles=[3, 3, 3])
+            elif cfg["procedure_interleaving_method"] == "att_read_multiple_request_4":
+                self.procedure_interleaving_method = ATT_Read_Multiple_Request(handles=[3, 3, 3, 3])
+            elif cfg["procedure_interleaving_method"] == "att_find_information_request":
+                self.procedure_interleaving_method = ATT_Find_Information_Request()
                 
 class DeviceInput():
     """Handle the different cases of generating and storing input.
