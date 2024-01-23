@@ -29,13 +29,6 @@ try:
 except ImportError as e: # Don't make these modules mandatory for running all the app.
     l.LOGGER.error("Can't import WHAD! Error: {}".format(e))
 
-# * Globals
-
-HOP_INTERVAL = 56
-# Channel map of 0x300 => channels 8-9 => frequencies 2.420 GHz and 2.422 GHz.
-CHANNEL_MAP = 0x00000300
-PROCEDURE_INTERLEAVING = False
-
 # * Classes
 
 class Device():
@@ -190,8 +183,8 @@ class Device():
         # before, the connection events will be separated.
         l.LOGGER.info("Connection event for sending the LL_ENC_REQ request: {}".format(self.cfg.ll_enc_req_conn_event))
         trgr_send_ll_enc_req = ConnectionEventTrigger(self.cfg.ll_enc_req_conn_event)
-        l.LOGGER.info("Procedure interleaving enabled: {}".format(PROCEDURE_INTERLEAVING))
-        if PROCEDURE_INTERLEAVING:
+        l.LOGGER.info("Procedure interleaving enabled: {}".format(self.cfg.procedure_interleaving))
+        if self.cfg.procedure_interleaving is True:
             l.LOGGER.debug("More Data Bit=1")
             self.central.prepare(
                 BTLE_DATA()     / L2CAP_Hdr() / ATT_Hdr() / ATT_Read_Request(gatt_handle=3),
@@ -236,8 +229,8 @@ class Device():
         # 1. Use increased hop interval. Decreasing it speed-up the connection.
         # 2. Set channel map to 0x300 which corresponds to channel 8-9.
         l.LOGGER.info("Connect to target device...")
-        l.LOGGER.debug("Connection parameters: address={}, random=False, hop_interval={}, channel_map=0x{:x}, timeout={}".format(self.bd_addr_dest, HOP_INTERVAL, CHANNEL_MAP, self.TIMEOUT))
-        device = self.central.connect(self.bd_addr_dest, random=False, hop_interval=HOP_INTERVAL, channel_map=CHANNEL_MAP, timeout=self.TIMEOUT)
+        l.LOGGER.debug("Connection parameters: address={}, random=False, hop_interval={}, channel_map=0x{:x}, timeout={}".format(self.bd_addr_dest, self.cfg.hop_interval, self.cfg.channel_map, self.TIMEOUT))
+        device = self.central.connect(self.bd_addr_dest, random=False, hop_interval=self.cfg.hop_interval, channel_map=self.cfg.channel_map, timeout=self.TIMEOUT)
 
         if self.central.is_connected():
             l.LOGGER.debug("WHAD's central is connected to target device!")
@@ -308,6 +301,12 @@ class DeviceConfig:
     start_radio_conn_event = None
     # Connection event number for when sending the LL_ENC_REQ packet.
     ll_enc_req_conn_event = None
+    # Hop interval.
+    hop_interval = None
+    # Channel map.
+    channel_map = None
+    # Procedure interleaving flag.
+    procedure_interleaving = None
 
     def __init__(self, cfg):
         """Initialize a DeviceConfig.
@@ -317,6 +316,9 @@ class DeviceConfig:
         """
         self.start_radio_conn_event = cfg["start_radio_conn_event"]
         self.ll_enc_req_conn_event = cfg["ll_enc_req_conn_event"]
+        self.hop_interval = cfg["hop_interval"]
+        self.channel_map = cfg["channel_map"]
+        self.procedure_interleaving = cfg["procedure_interleaving"]
                 
 class DeviceInput():
     """Handle the different cases of generating and storing input.

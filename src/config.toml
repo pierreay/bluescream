@@ -3,14 +3,23 @@
 [device.example]
 start_radio_conn_event = 1
 ll_enc_req_conn_event = 2
+hop_interval = 56
+channel_map = 0x00000300       # Map of 0x300 -> BLE channels 8-9 -> Frequencies 2.420-2.422 GHz.
+procedure_interleaving = false # Implies to set the More Data Bit (MDB) to 1 and sent ATT_Read_Request before LL_ENC_REQ.
 
 [device.fast]
 start_radio_conn_event = 4
 ll_enc_req_conn_event = 6
+hop_interval = 56
+channel_map = 0x00000300
+procedure_interleaving = false
 
 [device.slow]
 start_radio_conn_event = 6
 ll_enc_req_conn_event = 6
+hop_interval = 56
+channel_map = 0x00000300
+procedure_interleaving = false
 
 # * radio.extract
 
