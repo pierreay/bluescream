@@ -4,9 +4,9 @@ export ENVRC_DURATION=0.1
 
 export ENVRC_VICTIM_ADDR="C2:3E:54:84:5C:4C"
 # Find HCI address of legitimate HCI dongle:
-# export ENVRC_ATTACKER_ADDR="$(source ./lib/discover.sh && find_hci_addr)"
+export ENVRC_ATTACKER_ADDR="$(source ./lib/discover.sh && find_hci_addr)"
 # Use hardcoded address from the instrumented target firmware:
-export ENVRC_ATTACKER_ADDR="CA:FE:CA:FE:CA:FE"
+# export ENVRC_ATTACKER_ADDR="CA:FE:CA:FE:CA:FE"
 
 export ENVRC_NF_ID=-1
 export ENVRC_FF_ID=0
@@ -20,4 +20,4 @@ export ENVRC_FF_ID=0
 
 export ENVRC_EXTRACT_CONFIG="1_aes"
 
-export ENVRC_DATASET_INPUT="BALANCED"
+export ENVRC_DATASET_INPUT="PAIRING"
