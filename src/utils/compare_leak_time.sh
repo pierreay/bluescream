@@ -19,7 +19,7 @@ export SR=24e6
 echo "$(date)" > output.log
 
 # Don't modify project's configuration file.
-SCRIPT_CONFIG_FILE="/tmp/$(basename ENVRC_CONFIG_FILE)"
+SCRIPT_CONFIG_FILE="/tmp/$(basename $ENVRC_CONFIG_FILE)"
 cp "$ENVRC_CONFIG_FILE" $SCRIPT_CONFIG_FILE
 
 # ** Instrumentation functions
