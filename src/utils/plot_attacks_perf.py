@@ -11,7 +11,7 @@ from scipy.interpolate import make_interp_spline, BSpline
 
 # CSV file name.
 FILE="attack_results.csv"
-OUTFILE="attack_results.png"
+OUTFILE="attack_results.pdf"
 
 # Number of columns inside the CSV file.
 NCOL=0
