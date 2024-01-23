@@ -239,9 +239,10 @@ def extract(samp_rate, id_ref, plot, overwrite, id, exit_on_error, config, save)
             l.LOGGER.warning("Peak value is inferior to 1300, noise?")
 
     # Plotting based on results.
-    libplot.plot_time_spec_sync_axis([sig_raw_ref], samp_rate=samp_rate, peaks=peaks, triggers=nf_triggers, cond=plot)
     if len(peaks) > 0:
-        libplot.plot_time_spec_sync_axis([analyze.extract_time_window(sig_raw_ref, samp_rate, peaks[0], window, offset=offset)], samp_rate=samp_rate, cond=plot)
+        for idx, peak in enumerate(peaks):
+            libplot.plot_time_spec_sync_axis([analyze.extract_time_window(sig_raw_ref, samp_rate, peak, window, offset=offset)], samp_rate=samp_rate, cond=plot, title="Peak #{}".format(idx))
+    libplot.plot_time_spec_sync_axis([sig_raw_ref], samp_rate=samp_rate, peaks=peaks, triggers=nf_triggers, cond=plot)
 
     # Exit based on results.
     if peak_detect_ok is False:
