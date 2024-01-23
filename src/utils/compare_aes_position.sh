@@ -95,7 +95,27 @@ function compare_hop_intervals() {
 
 }
 
-compare_hop_intervals
+# compare_hop_intervals
+
+# *** Compare procedure interleaving (More Data Bit)
+
+function compare_procedure_interleaving() {
+    config start_radio_conn_event 1
+    config ll_enc_req_conn_event 16
+    config hop_interval 56
+
+    config procedure_interleaving false
+    for i in $(seq 1 1 5); do
+        instrument
+    done
+
+    config procedure_interleaving true
+    for i in $(seq 1 1 5); do
+        instrument
+    done
+}
+
+compare_procedure_interleaving
 
 # ** Deinit
 
