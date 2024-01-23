@@ -1,5 +1,6 @@
 """DSP functions (e.g. filters, decimation)."""
 
+import matplotlib.pyplot as plt
 import numpy as np
 import scipy.signal as signal
 from scipy.signal import butter, lfilter
@@ -85,3 +86,29 @@ def envelope_square(sig, window):
     # plt.plot(env)
     # plt.show()
     return env
+
+def remove_noise(sig, threshold=-1):
+    """Signal without noise.
+
+    Return a signal without its noise. To do so, set samples under a specified
+    threshold to 0.
+
+    :param sig: Input signal.
+
+    :param threshold: Threshold to distinguish signal from noise. If unset,
+    autocompute it.
+
+    :return: Output signal.
+
+    """
+    # Estimate threshold separating signal and noise if not specified.
+    if threshold == -1:
+        threshold = max(sig) / 1.5
+    # Set samples under threshold to 0.
+    out = np.where(sig > threshold, sig, 0)
+    # NOTE: DEBUG
+    plt.plot(sig)
+    plt.plot(out)
+    plt.axhline(threshold)
+    plt.show()
+    return out
