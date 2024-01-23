@@ -18,7 +18,7 @@ import lib.log as l
 # External modules.
 import numpy as np
 try:
-    from scapy.all import BTLE_DATA, BTLE_ADV, ATT_Hdr, L2CAP_Hdr, ATT_Read_Request, BTLE_EMPTY_PDU, BTLE_CTRL, LL_ENC_REQ, LL_ENC_RSP, LL_START_ENC_REQ, LL_REJECT_IND
+    from scapy.all import BTLE_DATA, BTLE_ADV, ATT_Hdr, L2CAP_Hdr, ATT_Read_Request, ATT_Read_Multiple_Request, BTLE_EMPTY_PDU, BTLE_CTRL, LL_ENC_REQ, LL_ENC_RSP, LL_START_ENC_REQ, LL_REJECT_IND
     import whad
     from whad.ble import Central, ConnectionEventTrigger, ReceptionTrigger
     from whad.ble.profile import UUID
@@ -183,19 +183,19 @@ class Device():
         # before, the connection events will be separated.
         l.LOGGER.info("Connection event for sending the LL_ENC_REQ request: {}".format(self.cfg.ll_enc_req_conn_event))
         trgr_send_ll_enc_req = ConnectionEventTrigger(self.cfg.ll_enc_req_conn_event)
-        l.LOGGER.info("Procedure interleaving enabled: {}".format(self.cfg.procedure_interleaving))
+        l.LOGGER.info("Procedure interleaving: {}".format(self.cfg.procedure_interleaving))
+        l.LOGGER.info("More data bit: MD={}".format(self.cfg.more_data_bit))
         if self.cfg.procedure_interleaving is True:
-            l.LOGGER.debug("More Data Bit=1")
+            l.LOGGER.info("Procedure interleaving method: {}".format(self.cfg.procedure_interleaving_method.name))
             self.central.prepare(
-                BTLE_DATA()     / L2CAP_Hdr() / ATT_Hdr() / ATT_Read_Request(gatt_handle=3),
-                BTLE_DATA(MD=1) / BTLE_CTRL() / LL_ENC_REQ(rand=self.input.rand, ediv=self.input.ediv, skdm=self.input.skdm, ivm=self.ivm),
+                BTLE_DATA()     / L2CAP_Hdr() / ATT_Hdr() / self.cfg.procedure_interleaving_method,
+                BTLE_DATA(MD=self.cfg.more_data_bit) / BTLE_CTRL() / LL_ENC_REQ(rand=self.input.rand, ediv=self.input.ediv, skdm=self.input.skdm, ivm=self.ivm),
                 trigger=trgr_send_ll_enc_req
             )
             l.LOGGER.debug("nRF52_WHAD.central.prepare(ATT_Read_Request[gatt_handle=3]")
         else:
-            l.LOGGER.debug("More Data Bit=0")
             self.central.prepare(
-                BTLE_DATA() / BTLE_CTRL() / LL_ENC_REQ(rand=self.input.rand, ediv=self.input.ediv, skdm=self.input.skdm, ivm=self.ivm),
+                BTLE_DATA(MD=self.cfg.more_data_bit) / BTLE_CTRL() / LL_ENC_REQ(rand=self.input.rand, ediv=self.input.ediv, skdm=self.input.skdm, ivm=self.ivm),
                 trigger=trgr_send_ll_enc_req
             )
         l.LOGGER.debug("central.prepare(LL_ENC_REQ[rand=0x{:x}, ediv=0x{:x}, skdm=0x{:x}, ivm=0x{:x}])".format(self.input.rand, self.input.ediv, self.input.skdm, self.ivm))
@@ -305,8 +305,12 @@ class DeviceConfig:
     hop_interval = None
     # Channel map.
     channel_map = None
+    # More Data Bit.
+    more_data_bit = None
     # Procedure interleaving flag.
     procedure_interleaving = None
+    # Procedure interleaving request (Scapy).
+    procedure_interleaving_method = None
 
     def __init__(self, cfg):
         """Initialize a DeviceConfig.
@@ -318,7 +322,13 @@ class DeviceConfig:
         self.ll_enc_req_conn_event = cfg["ll_enc_req_conn_event"]
         self.hop_interval = cfg["hop_interval"]
         self.channel_map = cfg["channel_map"]
+        self.more_data_bit = cfg["more_data_bit"]
         self.procedure_interleaving = cfg["procedure_interleaving"]
+        if self.procedure_interleaving is True:
+            if cfg["procedure_interleaving_method"] == "att_read_request":
+                self.procedure_interleaving_method = ATT_Read_Request(gatt_handle=3)
+            elif cfg["procedure_interleaving_method"] == "att_read_multiple_request":
+                self.procedure_interleaving_method = ATT_Read_Multiple_Request(handles=[3, 3])
                 
 class DeviceInput():
     """Handle the different cases of generating and storing input.
