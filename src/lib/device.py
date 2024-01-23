@@ -192,7 +192,6 @@ class Device():
                 BTLE_DATA(MD=self.cfg.more_data_bit) / BTLE_CTRL() / LL_ENC_REQ(rand=self.input.rand, ediv=self.input.ediv, skdm=self.input.skdm, ivm=self.ivm),
                 trigger=trgr_send_ll_enc_req
             )
-            l.LOGGER.debug("nRF52_WHAD.central.prepare(ATT_Read_Request[gatt_handle=3]")
         else:
             self.central.prepare(
                 BTLE_DATA(MD=self.cfg.more_data_bit) / BTLE_CTRL() / LL_ENC_REQ(rand=self.input.rand, ediv=self.input.ediv, skdm=self.input.skdm, ivm=self.ivm),
