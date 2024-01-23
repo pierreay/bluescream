@@ -172,8 +172,9 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx, c
 @click.option("--id", type=int, multiple=True, help="Radio indexes on which apply trace extraction (in addition to ID_REF). Can be specified multiple time.")
 @click.option("--exit-on-error/--no-exit-on-error", default=False, help="If true, exit with error on bad AES detection instead of saving a bad trace.")
 @click.option("--config", default="1_aes", help="Select the extractor configuration based on radio.extract.NAME in the configuration file.")
-@click.option("--save", default="", help="If set to a file path, save the ID_REF extracted signal as .npy file without custom dtype. Ignored if --overwrite is set to False.")
-def extract(samp_rate, id_ref, plot, overwrite, id, exit_on_error, config, save):
+@click.option("--save", default="", type=click.Path(), help="If set to a file path, save the ID_REF extracted signal as .npy file without custom dtype. Ignored if --overwrite is set to False.")
+@click.option("--corr", default="", type=click.Path(), help="If set to a file path, cross-correlate the results against the signal.")
+def extract(samp_rate, id_ref, plot, overwrite, id, exit_on_error, config, save, corr):
     """Extract RAW traces from DIR.
 
     Extract a rough window around interesting signals from just-recorded RAW
@@ -222,6 +223,19 @@ def extract(samp_rate, id_ref, plot, overwrite, id, exit_on_error, config, save)
     peaks = peaks[0]
     l.LOGGER.info("Number of detected peaks={}".format(len(peaks)))
 
+    # Compute cross-correlation if specified.
+    if corr != "":
+        for idx, peak in enumerate(peaks):
+            corr_ref = np.abs(np.load(corr))
+            corr_ref = analyze.normalize(corr_ref)
+            corr_test = analyze.extract_time_window(sig_raw_ref, samp_rate, peak, window, offset=offset)
+            corr_test = analyze.normalize(corr_test)
+            # NOTE: DEBUG
+            # libplot.plot_time_spec_sync_axis([corr_ref], samp_rate=samp_rate, title="corr_ref")
+            # libplot.plot_time_spec_sync_axis([corr_test], samp_rate=samp_rate, title="corr_test")
+            corr_output = signal.correlate(corr_ref, corr_test)
+            l.LOGGER.info("Correation for peak #{}: min={};max={};median={};mean={}".format(idx, int(np.min(corr_output)), int(np.max(corr_output)), int(np.median(corr_output)), int(np.mean(corr_output))))
+            
     # * Logging based on results.
     peak_detect_ok = len(peaks) == 1
     if peak_detect_ok is False:
