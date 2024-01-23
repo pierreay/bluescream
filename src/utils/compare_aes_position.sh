@@ -20,12 +20,13 @@ export SR=24e6
 
 echo "$(date)" > output.log
 
-# ** Instrumentation loop
+# ** Instrumentation functions
 
-function config_instrument() {
-    conn_event="$1"
-    echo "conn_event=$conn_event" | tee -a output.log
-    sed -i "s/ll_enc_req_conn_event = .*/ll_enc_req_conn_event = $conn_event/g" "$ENVRC_CONFIG_FILE"
+function config() {
+    param_name="$1"
+    param_value="$2"
+    echo "$1=$2" | tee -a output.log
+    sed -i "s/$1 = .*/$1 = $2/g" "$ENVRC_CONFIG_FILE"
 }
 
 function instrument() {
@@ -37,25 +38,35 @@ function instrument() {
     cat /tmp/radio-extract.log | grep -E "Position|ERROR" >> output.log
 }
 
-config_instrument 6
-for i in $(seq 1 1 5); do
-    instrument
-done
+# ** Instrumentation script
 
-config_instrument 9
-for i in $(seq 1 1 5); do
-    instrument
-done
+# *** Vary connection events
 
-config_instrument 12
-for i in $(seq 1 1 5); do
-    instrument
-done
+function compare_connection_events() {
+    config start_radio_conn_event 1
+    
+    config ll_enc_req_conn_event 6
+    for i in $(seq 1 1 5); do
+        instrument
+    done
 
-config_instrument 16
-for i in $(seq 1 1 5); do
-    instrument
-done
+    config ll_enc_req_conn_event 9
+    for i in $(seq 1 1 5); do
+        instrument
+    done
+
+    config ll_enc_req_conn_event 12
+    for i in $(seq 1 1 5); do
+        instrument
+    done
+
+    config ll_enc_req_conn_event 16
+    for i in $(seq 1 1 5); do
+        instrument
+    done
+}
+
+# compare_connection_events
 
 # ** Deinit
 
