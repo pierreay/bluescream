@@ -315,8 +315,8 @@ class DeviceConfig:
         :param cfg: Dictionnary representing the TOML configuration.
 
         """
-        self.start_radio_conn_event = cfg["device"]["start_radio_conn_event"]
-        self.ll_enc_req_conn_event = cfg["device"]["ll_enc_req_conn_event"]
+        self.start_radio_conn_event = cfg["start_radio_conn_event"]
+        self.ll_enc_req_conn_event = cfg["ll_enc_req_conn_event"]
                 
 class DeviceInput():
     """Handle the different cases of generating and storing input.

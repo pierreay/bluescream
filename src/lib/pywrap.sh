@@ -8,7 +8,7 @@
 # $1 is sleeping time for radio initialization [default = 20].
 # $2 is loglevel [default = DEBUG].
 function radio_init() {
-    ./radio.py --dir $ENVRC_RADIO_DIR --loglevel ${2-DEBUG} listen $ENVRC_NF_FREQ $ENVRC_FF_FREQ $ENVRC_SAMP_RATE --nf-id $ENVRC_NF_ID --ff-id $ENVRC_FF_ID --duration=$ENVRC_DURATION &
+    ./radio.py --dir $ENVRC_RADIO_DIR --loglevel ${2-DEBUG} --config $ENVRC_CONFIG_FILE listen $ENVRC_NF_FREQ $ENVRC_FF_FREQ $ENVRC_SAMP_RATE --nf-id $ENVRC_NF_ID --ff-id $ENVRC_FF_ID --duration=$ENVRC_DURATION &
     sleep ${1-20} # Wait for SDR's driver initialization.
 }
 
@@ -23,7 +23,7 @@ function radio_instrument() {
     # of Device class, such that WHAD/Butterfly do not finish in a bad
     # state. We use a timeout of 30s in our device.py, so we use a timeout of
     # 60s here to double check it.
-    timeout --signal=SIGINT 60 python3 ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR instrument $ENVRC_DATASET_RAW_PATH ${2-train} $ENVRC_ATTACKER_ADDR $ENVRC_VICTIM_ADDR $ENVRC_VICTIM_PORT $ENVRC_CONFIG_FILE --idx ${3-0} $4
+    timeout --signal=SIGINT 60 python3 ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR --config $ENVRC_CONFIG_FILE instrument $ENVRC_DATASET_RAW_PATH ${2-train} $ENVRC_ATTACKER_ADDR $ENVRC_VICTIM_ADDR $ENVRC_VICTIM_PORT --idx ${3-0} --config $ENVRC_DEVICE_CONFIG $4
     if [[ $? -ge 1 ]]; then
         return 1
     fi
@@ -36,7 +36,7 @@ function radio_instrument() {
 # $4 is --ff-id [default = $ENVRC_FF_ID]
 # Default is to plot amplitude of recorded signal.
 function radio_plot() {
-    ./radio.py --dir ${1-$ENVRC_RADIO_DIR} plot ${2-$ENVRC_SAMP_RATE} --nf-id ${3-$ENVRC_NF_ID} --ff-id ${3-$ENVRC_FF_ID} --amplitude
+    ./radio.py --dir ${1-$ENVRC_RADIO_DIR} --config $ENVRC_CONFIG_FILE plot ${2-$ENVRC_SAMP_RATE} --nf-id ${3-$ENVRC_NF_ID} --ff-id ${3-$ENVRC_FF_ID} --amplitude
 }
 
 # Arguments:
@@ -55,11 +55,11 @@ function radio_extract() {
     # Extract FF-only.
     elif [[ $ENVRC_NF_ID == -1 && $ENVRC_FF_ID != -1 ]]; then
         # NOTE: Same parameters as command below except no "--id".
-        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR $ENVRC_CONFIG_FILE extract $ENVRC_SAMP_RATE $ENVRC_FF_ID ${2---plot} ${3---no-overwrite} ${4---no-exit-on-error} --config ${5-$ENVRC_EXTRACT_CONFIG}
+        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR --config $ENVRC_CONFIG_FILE extract $ENVRC_SAMP_RATE $ENVRC_FF_ID ${2---plot} ${3---no-overwrite} ${4---no-exit-on-error} --config ${5-$ENVRC_EXTRACT_CONFIG}
     # Extract NF and FF based on FF extraction.
     elif [[ $ENVRC_NF_ID != -1 && $ENVRC_FF_ID != -1 ]]; then
         # NOTE: Same parameters as command above except "--id".
-        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR $ENVRC_CONFIG_FILE extract $ENVRC_SAMP_RATE $ENVRC_FF_ID ${2---plot} ${3---no-overwrite} ${4---no-exit-on-error} --id $ENVRC_NF_ID --config ${5-$ENVRC_EXTRACT_CONFIG}
+        ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR --config $ENVRC_CONFIG_FILE extract $ENVRC_SAMP_RATE $ENVRC_FF_ID ${2---plot} ${3---no-overwrite} ${4---no-exit-on-error} --id $ENVRC_NF_ID --config ${5-$ENVRC_EXTRACT_CONFIG}
     fi
 }
 

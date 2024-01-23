@@ -40,7 +40,7 @@ DIR = None
 # * Command-line interface
 
 @click.group(context_settings={'show_default': True})
-@click.argument("config", type=click.Path())
+@click.option("--config", type=click.Path(), default="config.toml", help="Path of the TOML configuration file.")
 @click.option("--dir", type=click.Path(), default="/tmp", help="Temporary directory used to hold raw recording.")
 @click.option("--log/--no-log", default=True, help="Enable or disable logging.")
 @click.option("--loglevel", default="DEBUG", help="Set the logging level.")
@@ -113,7 +113,8 @@ def quit():
 @click.argument("ser_port")
 @click.option("--radio/--no-radio", default=True, help="Enable or disable the radio recording (instrument only).")
 @click.option("--idx", default=0, help="Current recording index to get correct dataset's inputs.")
-def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx):
+@click.option("--config", default="example", help="Select the device configuration based on device.NAME in the configuration file.")
+def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx, config):
     """Instrument the device and record RAW traces to DIR.
 
     Trigger the target device and store the RAW recording of the communication
@@ -145,7 +146,7 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx):
     rad = soapysdr.MySoapySDRsClient(enabled=radio)
 
     # Initalize the device.
-    with device.Device(cfg=CONFIG, ser_port=ser_port, baud=115200, bd_addr_src=bd_addr_src, bd_addr_dest=bd_addr_dest, radio=rad, dset=dset, sset=sset) as dev:
+    with device.Device(cfg=CONFIG["device"][config], ser_port=ser_port, baud=115200, bd_addr_src=bd_addr_src, bd_addr_dest=bd_addr_dest, radio=rad, dset=dset, sset=sset) as dev:
         # Configure everything related to current trace index.
         dev.configure(idx)
         # Perform the instrumentation and the recording.

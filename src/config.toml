@@ -1,0 +1,55 @@
+# * device
+
+[device.example]
+start_radio_conn_event = 1
+ll_enc_req_conn_event = 2
+
+[device.fast]
+start_radio_conn_event = 4
+ll_enc_req_conn_event = 6
+
+[device.slow]
+start_radio_conn_event = 6
+ll_enc_req_conn_event = 6
+
+# * radio.extract
+
+[radio.extract.example]
+window = 0.1               # Extracted window, automatically compute if nothing specified [s].
+offset = 0.0               # Offset applied to extracted window [s].
+trg_bp_low = [1e6]         # Low cutoff frequency of the bandpass filter for the trigger signal.
+trg_bp_high = [2e6]        # High cutoff frequency of the bandpass filter for the trigger signal.
+trg_lp = 1e4               # Cutoff frequency of the lowpass filter for the trigger signal.
+trg_peak_prominence = 0.75 # Fractional of the peak prominence search.
+
+[radio.extract.1_aes]
+window = 0.005
+offset = 0.000
+trg_bp_low = [7.5e6]
+trg_bp_high = [11.5e6]
+trg_lp = 1e4
+trg_peak_prominence = 0.75
+
+[radio.extract.1_aes_weak]
+window = 0.005
+offset = 0.000
+trg_bp_low = [7.5e6]
+trg_bp_high = [11.5e6]
+trg_lp = 1e4
+trg_peak_prominence = 0.40
+
+[radio.extract.100_aes]
+window = 0.07
+offset = 0.000
+trg_bp_low = [4e6]
+trg_bp_high = [4.9e6]
+trg_lp = 1e3
+trg_peak_prominence = 0.75
+
+[radio.extract.300_aes]
+window = 0.2
+offset = 0.000
+trg_bp_low = [4e6]
+trg_bp_high = [4.9e6]
+trg_lp = 1e3
+trg_peak_prominence = 0.75
