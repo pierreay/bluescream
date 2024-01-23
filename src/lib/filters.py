@@ -107,8 +107,8 @@ def remove_noise(sig, threshold=-1):
     # Set samples under threshold to 0.
     out = np.where(sig > threshold, sig, 0)
     # NOTE: DEBUG
-    plt.plot(sig)
-    plt.plot(out)
-    plt.axhline(threshold)
-    plt.show()
+    # plt.plot(sig)
+    # plt.plot(out)
+    # plt.axhline(threshold)
+    # plt.show()
     return out
