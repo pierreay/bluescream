@@ -10,7 +10,7 @@
 # set -e
 source env.sh
 
-export SR=24e6
+export SR=30e6
 
 # * Script
 

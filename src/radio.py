@@ -234,7 +234,7 @@ def extract(samp_rate, id_ref, plot, overwrite, id, exit_on_error, config, save,
             # libplot.plot_time_spec_sync_axis([corr_ref], samp_rate=samp_rate, title="corr_ref")
             # libplot.plot_time_spec_sync_axis([corr_test], samp_rate=samp_rate, title="corr_test")
             corr_output = signal.correlate(corr_ref, corr_test)
-            l.LOGGER.info("Correation for peak #{}: min={};max={};median={};mean={}".format(idx, int(np.min(corr_output)), int(np.max(corr_output)), int(np.median(corr_output)), int(np.mean(corr_output))))
+            l.LOGGER.info("Correlation for peak #{}: min={};max={};median={};mean={}".format(idx, int(np.min(corr_output)), int(np.max(corr_output)), int(np.median(corr_output)), int(np.mean(corr_output))))
             
     # * Logging based on results.
     peak_detect_ok = len(peaks) == 1
