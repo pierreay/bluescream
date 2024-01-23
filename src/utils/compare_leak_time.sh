@@ -55,8 +55,8 @@ print("%={:.4f}".format(nsample / len(sig) * 100))
 print("µs={:.4f}".format(nsample / $SR * 1e6))
 EOF
         # Print correlation with AES leak.
-        ./radio.py --dir "$ENVRC_RADIO_DIR" --config "$SCRIPT_CONFIG_FILE" extract $SR 0 --no-plot --no-overwrite --no-exit-on-error --config 1_aes_weak --corr ../data/signals/2.548GHz_30Msps_AES_BLE_clean_leak_single.npy \
-            | grep Correlation | tee -a output.log
+        ./radio.py --dir "$ENVRC_RADIO_DIR" --config "$SCRIPT_CONFIG_FILE" extract $SR 0 --no-plot --no-overwrite --no-exit-on-error --config 1_aes_weak --corr ../data/signals/2.548GHz_30Msps_AES_BLE_clean_leak_single.npy 2>&1 \
+            | grep -E "Number|Correlation" | tee -a output.log
     fi
     # Quit radio.
     ./radio.py quit
