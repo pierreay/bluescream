@@ -26,19 +26,35 @@ import lib.soapysdr as soapysdr
 import lib.complex as complex
 import lib.utils as utils
 
+# * Helper functions
+
 def exit_on_cond(cond, ret=1):
     if cond is True:
         exit(ret)
 
+# * Global variables
+
+CONFIG = None
 DIR = None
 
+# * Command-line interface
+
 @click.group(context_settings={'show_default': True})
+@click.argument("config", type=click.Path())
 @click.option("--dir", type=click.Path(), default="/tmp", help="Temporary directory used to hold raw recording.")
 @click.option("--log/--no-log", default=True, help="Enable or disable logging.")
 @click.option("--loglevel", default="DEBUG", help="Set the logging level.")
-def cli(dir, log, loglevel):
-    """Signal recording utility."""
-    global DIR
+def cli(config, dir, log, loglevel):
+    """Signal recording utility.
+
+    CONFIG is the configuation file.
+
+    """
+    global CONFIG, DIR
+    # Load the configuration file.
+    with open(config, "rb") as f:
+        CONFIG = tomllib.load(f)
+    # Set the temporary directory.
     l.configure(log, loglevel)
     DIR = path.expanduser(dir)
 
@@ -95,10 +111,9 @@ def quit():
 @click.argument("bd_addr_src")
 @click.argument("bd_addr_dest")
 @click.argument("ser_port")
-@click.argument("config", type=click.Path())
 @click.option("--radio/--no-radio", default=True, help="Enable or disable the radio recording (instrument only).")
 @click.option("--idx", default=0, help="Current recording index to get correct dataset's inputs.")
-def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, config, radio, idx):
+def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx):
     """Instrument the device and record RAW traces to DIR.
 
     Trigger the target device and store the RAW recording of the communication
@@ -115,13 +130,7 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, config, radio
 
     SER_PORT is the serial port of the target device to connect to.
 
-    CONFIG is the configuation file.
-
-    """
-    # Load the configuration file.
-    with open(config, "rb") as f:
-        cfg = tomllib.load(f)
-    
+    """    
     # Load the dataset.
     dset = dataset.Dataset.pickle_load(indir, quit_on_error=True)
     sset = dset.get_subset(subset)
@@ -136,7 +145,7 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, config, radio
     rad = soapysdr.MySoapySDRsClient(enabled=radio)
 
     # Initalize the device.
-    with device.Device(cfg=cfg, ser_port=ser_port, baud=115200, bd_addr_src=bd_addr_src, bd_addr_dest=bd_addr_dest, radio=rad, dset=dset, sset=sset) as dev:
+    with device.Device(cfg=CONFIG, ser_port=ser_port, baud=115200, bd_addr_src=bd_addr_src, bd_addr_dest=bd_addr_dest, radio=rad, dset=dset, sset=sset) as dev:
         # Configure everything related to current trace index.
         dev.configure(idx)
         # Perform the instrumentation and the recording.
@@ -159,13 +168,11 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, config, radio
 @click.argument("id_ref", type=int)
 @click.option("--plot/--no-plot", default=True, help="Plot a summary of the processing.")
 @click.option("--overwrite/--no-overwrite", default=False, help="Overwrite the original RAW traces with extracted window.")
-@click.option("--window", type=float, default=0.1, help="Extracted window in seconds, automatically compute if nothing specified.")
-@click.option("--offset", type=float, default=0, help="Offset applied to extracted window in seconds.")
 @click.option("--id", type=int, multiple=True, help="Radio indexes on which apply trace extraction (in addition to ID_REF). Can be specified multiple time.")
 @click.option("--exit-on-error/--no-exit-on-error", default=False, help="If true, exit with error on bad AES detection instead of saving a bad trace.")
-@click.option("--config", default="200_aes", help="Select the extractor configuration [200_aes | 1_aes | 1_aes_weak].")
+@click.option("--config", default="1_aes", help="Select the extractor configuration based on radio.extract.NAME in the configuration file.")
 @click.option("--save", default="", help="If set to a file path, save the ID_REF extracted signal as .npy file without custom dtype. Ignored if --overwrite is set to False.")
-def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_error, config, save):
+def extract(samp_rate, id_ref, plot, overwrite, id, exit_on_error, config, save):
     """Extract RAW traces from DIR.
 
     Extract a rough window around interesting signals from just-recorded RAW
@@ -182,29 +189,16 @@ def extract(samp_rate, id_ref, plot, overwrite, window, offset, id, exit_on_erro
         exit(0)
     else:
         l.LOGGER.info("Extract RAW trace using ID #{}".format(id_ref))
-    
-    # * Trigger(s) configuration.
-    if config == "200_aes":
-        l.LOGGER.info("Select extraction config for clean 200 AES")
-        trg_bp_low          = [4e6]
-        trg_bp_high         = [4.9e6]
-        trg_lp              = 1e3
-        trg_peak_prominence = 3/4
-    elif config == "1_aes":
-        l.LOGGER.info("Select extraction config for clean 1 AES")
-        trg_bp_low          = [7.5e6]
-        trg_bp_high         = [11.5e6]
-        trg_lp              = 1e4
-        trg_peak_prominence = 3/4
-    elif config == "1_aes_weak":
-        l.LOGGER.info("Select extraction config for 1 AES at distance using attenuator")
-        trg_bp_low          = [7.5e6]
-        trg_bp_high         = [11.5e6]
-        trg_lp              = 1e4
-        trg_peak_prominence = 0.4
-    else:
-        l.log_n_exit("Bad config selection!", 1)
-    l.LOGGER.debug("peak search prominence={}".format(trg_peak_prominence))
+
+    # Get the configuration for AES extraction.
+    window              = CONFIG["radio"]["extract"][config]["window"]
+    offset              = CONFIG["radio"]["extract"][config]["offset"]
+    trg_bp_low          = CONFIG["radio"]["extract"][config]["trg_bp_low"]
+    trg_bp_high         = CONFIG["radio"]["extract"][config]["trg_bp_high"]
+    trg_lp              = CONFIG["radio"]["extract"][config]["trg_lp"]
+    trg_peak_prominence = CONFIG["radio"]["extract"][config]["trg_peak_prominence"]
+    l.LOGGER.debug("Configuration: {}".format(config))
+    l.LOGGER.debug("Peak search prominence={}".format(trg_peak_prominence))
 
     # * Loading.
     # sig_raw_ref = analyze.normalize(complex.get_amplitude(load.load_raw_trace(DIR, id_ref, 0)))
