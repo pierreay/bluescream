@@ -1,5 +1,6 @@
 """DSP functions (e.g. filters, decimation)."""
 
+import numpy as np
 import scipy.signal as signal
 from scipy.signal import butter, lfilter
 
@@ -56,3 +57,31 @@ def remove_dc(s):
     """Remove the DC component of a signal in time-domain by substracting the
     mean."""
     return s - np.mean(s)
+
+def envelope_square(sig, window):
+    """Squared envelop detector.
+
+    Get a signal amplitude envelope using a square signal.
+
+    :param sig: Input signal (must be magnitude / float).
+    
+    :param window: Number of samples to use as square window.
+
+    :return: A square signal representing the amplitude envelop.
+
+    """
+    assert type(sig) == np.ndarray, "Input signal should be Numpy array!"
+    assert sig.dtype == np.float32 or sig.dtype == np.float64, "Input data type should be amplitude/float!"
+    env = np.zeros_like(sig)
+    window = 200
+    idx_start = 0
+    while idx_start < len(sig):
+        idx_end = idx_start + window
+        if idx_end < len(sig):
+            env[idx_start:idx_end] = np.max(sig[idx_start:idx_end])
+        idx_start += window
+    # NOTE: DEBUG:
+    # plt.plot(sig)
+    # plt.plot(env)
+    # plt.show()
+    return env
