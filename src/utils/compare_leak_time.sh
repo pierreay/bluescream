@@ -32,6 +32,7 @@ function config() {
 }
 
 function instrument() {
+    echo "-------" >> output.log
     # Init radio.
     ./radio.py --dir "$ENVRC_RADIO_DIR" --loglevel DEBUG --config "$SCRIPT_CONFIG_FILE" listen "$ENVRC_NF_FREQ" "$ENVRC_FF_FREQ" "$SR" --nf-id $ENVRC_NF_ID --ff-id $ENVRC_FF_ID --duration=4 --gain=76 &
     sleep 20
@@ -67,18 +68,45 @@ EOF
 # *** Compare procedure interleaving methods
 
 function compare_procedure_interleaving_methods() {
+    echo "=======" >> output.log
     config start_radio_conn_event 1
     config ll_enc_req_conn_event 16
     config hop_interval 56
 
+    echo "=======" >> output.log
     config more_data_bit 0
     config procedure_interleaving false
-    # for i in $(seq 1 1 1); do instrument; done
+    for i in $(seq 1 1 5); do instrument; done
 
+    echo "=======" >> output.log
     config more_data_bit 1
     config procedure_interleaving true
     config procedure_interleaving_method \"att_read_request\"
-    for i in $(seq 1 1 1); do instrument; done
+    for i in $(seq 1 1 5); do instrument; done
+
+    echo "=======" >> output.log
+    config more_data_bit 1
+    config procedure_interleaving true
+    config procedure_interleaving_method \"att_read_multiple_request_2\"
+    for i in $(seq 1 1 5); do instrument; done
+
+    echo "=======" >> output.log
+    config more_data_bit 1
+    config procedure_interleaving true
+    config procedure_interleaving_method \"att_read_multiple_request_3\"
+    for i in $(seq 1 1 5); do instrument; done
+
+    echo "=======" >> output.log
+    config more_data_bit 1
+    config procedure_interleaving true
+    config procedure_interleaving_method \"att_read_multiple_request_4\"
+    for i in $(seq 1 1 5); do instrument; done
+
+    echo "=======" >> output.log
+    config more_data_bit 1
+    config procedure_interleaving true
+    config procedure_interleaving_method \"att_find_information_request\"
+    for i in $(seq 1 1 5); do instrument; done
 }
 
 compare_procedure_interleaving_methods
