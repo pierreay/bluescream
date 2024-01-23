@@ -392,9 +392,13 @@ def client(save, norm, amplitude, phase, plot_flag):
         sig = analyze.process_iq(sig, amplitude=amplitude, phase=phase, norm=norm, log=True)
         l.LOGGER.info("Additional save of recorded signal to: {}".format(save))
         np.save(save, sig)
+
+@cli.command()
+def debug():
+    """Debug currently recorded radio signals."""
+    sig = load.load_raw_trace(DIR, 0, 0, log=True)
+    from IPython import embed; embed()
         
-# XXX: Maybe create a radio/debug() command, just as dataset/debug(), to load
-# signals and tamper with them easily?
 @cli.command()
 @click.argument("file")
 def to_numpy(file):
