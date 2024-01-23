@@ -44,7 +44,7 @@ function instrument() {
 
 # ** Instrumentation script
 
-# *** Vary connection events
+# *** Compare connection events
 
 function compare_connection_events() {
     config start_radio_conn_event 1
@@ -71,6 +71,31 @@ function compare_connection_events() {
 }
 
 # compare_connection_events
+
+# *** Compare hop intervals
+
+function compare_hop_intervals() {
+    config start_radio_conn_event 1
+    config ll_enc_req_conn_event 16
+    
+    config hop_interval 40
+    for i in $(seq 1 1 3); do
+        instrument
+    done
+
+    config hop_interval 56
+    for i in $(seq 1 1 3); do
+        instrument
+    done
+
+    config hop_interval 72
+    for i in $(seq 1 1 3); do
+        instrument
+    done
+
+}
+
+compare_hop_intervals
 
 # ** Deinit
 
