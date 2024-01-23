@@ -36,7 +36,7 @@ function instrument() {
     ./radio.py --dir "$ENVRC_RADIO_DIR" --loglevel DEBUG --config "$SCRIPT_CONFIG_FILE" listen "$ENVRC_NF_FREQ" "$ENVRC_FF_FREQ" "$SR" --nf-id $ENVRC_NF_ID --ff-id $ENVRC_FF_ID --duration=4 --gain=76 &
     sleep 20
     # Instrument.
-    ./radio.py --dir "$ENVRC_RADIO_DIR" --config "$SCRIPT_CONFIG_FILE" instrument "$ENVRC_DATASET_RAW_PATH" train "$ENVRC_ATTACKER_ADDR" "$ENVRC_VICTIM_ADDR" "$ENVRC_VICTIM_PORT" --idx 0 --config example # --procedure-interleaving-method="$procedure_interleaving_method"
+    ./radio.py --dir "$ENVRC_RADIO_DIR" --config "$SCRIPT_CONFIG_FILE" instrument "$ENVRC_DATASET_RAW_PATH" train "$ENVRC_ATTACKER_ADDR" "$ENVRC_VICTIM_ADDR" "$ENVRC_VICTIM_PORT" --idx 0 --config example
     if [[ $? != 0 ]]; then
         echo "INSTRUMENTATION ERROR" | tee -a output.log
     else
