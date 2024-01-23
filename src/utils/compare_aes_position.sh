@@ -33,9 +33,13 @@ function instrument() {
     ./radio.py --dir "$ENVRC_RADIO_DIR" --loglevel DEBUG listen "$ENVRC_NF_FREQ" "$ENVRC_FF_FREQ" "$SR" --nf-id $ENVRC_NF_ID --ff-id $ENVRC_FF_ID --duration=4 --gain=76 & # >/dev/null 2>&1 &
     sleep 15
     ./radio.py --dir "$ENVRC_RADIO_DIR" instrument "$ENVRC_DATASET_RAW_PATH" train "$ENVRC_ATTACKER_ADDR" "$ENVRC_VICTIM_ADDR" "$ENVRC_VICTIM_PORT" --idx 0 --config example # >/dev/null 2>&1
+    if [[ $? != 0 ]]; then
+        echo "INSTRUMENTATION ERROR" > /tmp/radio-extract.log
+    else
+        ./radio.py --dir "$ENVRC_RADIO_DIR" extract "$SR" 0 --no-plot --no-overwrite --no-exit-on-error --config 1_aes_weak 2>&1 | tee /tmp/radio-extract.log
+        cat /tmp/radio-extract.log | grep -E "Position|ERROR" >> output.log
+    fi
     ./radio.py quit # >/dev/null 2>&1
-    ./radio.py --dir "$ENVRC_RADIO_DIR" extract "$SR" 0 --no-plot --no-overwrite --no-exit-on-error --config 1_aes_weak 2>&1 | tee /tmp/radio-extract.log
-    cat /tmp/radio-extract.log | grep -E "Position|ERROR" >> output.log
 }
 
 # ** Instrumentation script
