@@ -4,6 +4,9 @@ First created to implement type conversion helper functions."""
 
 import math
 
+import lib.complex as complex
+import lib.filters as filters
+
 import numpy as np
 from scipy.constants import c
 
@@ -165,6 +168,20 @@ def avg_window(sig, sr, idx):
     window = int(1e-4 * sr)
     sig_avg = np.average(sig[idx - window:idx + window])
     return sig_avg
+
+def nsample_signal_over_noise(sig, window=1000, max_divider=1.5):
+    """Compute the number of samples where a signal is received over the noise.
+
+    :param sig: Input signal.
+
+    :param window: Window used to perform discrete computations.
+
+    :param max_divider: Maximum amplitude divider used to estimate noise level.
+
+    """
+    sig_amp = complex.get_amplitude(sig)
+    sig_env = filters.remove_noise(filters.envelope_square(sig_amp, window=window), threshold=max(sig_amp / max_divider))
+    return np.sum(np.where(sig_env > 0, 1, 0))
 
 def far_field(D, fc):
     """Compute the far-field distance for an antenna Diameter D (m) and
