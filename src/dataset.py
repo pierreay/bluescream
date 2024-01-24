@@ -14,13 +14,13 @@ from matplotlib import pyplot as plt
 from scipy import signal
 import click
 
+import lib.plot as libplot
 import lib.utils as utils
 import lib.debug as libdebug
 import lib.analyze as analyze
 import lib.load as load
 import lib.device as device
 import lib.log as l
-import lib.plot as libplot
 import lib.filters as filters
 import lib.triggers as triggers
 import lib.dataset as dataset
