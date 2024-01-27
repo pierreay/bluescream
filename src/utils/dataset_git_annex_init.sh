@@ -50,6 +50,6 @@ git config annex.adviceNoSshCaching false
 # Do not lock files.
 git annex config --set annex.addunlocked true
 # Do not add dotfiles to .git by default.
-git annex config --set annex.dotfiles tru
+git annex config --set annex.dotfiles true
 # Add files under 1 MB to .git, above to .git/annex.
 git annex config --set annex.largefiles 'largerthan=1mb'
