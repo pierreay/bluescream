@@ -52,8 +52,8 @@ Those directories contains full or partials datasets recorded using our
   - 16k FF traces for attack with no repetitions.
   - Wi-Fi antenna at 10 cm of distance with LNA.
   - Input generated using pairing from light and non-instrumented firmware.
-  - Best attack using 12k traces leading to key rank of 2^114 using the
-  - 64k * 100 at 1m profile.
+  - Best attack using 12k traces leading to key rank of 2^114 using the 64k *
+    100 at 1m profile.
 - [[file:240126_300-leak-insub-10cm-lna_raw][240126_300-leak-insub-10cm-lna_raw]] ::
   - TODO: 64k FF traces for train/profile with 300 AES repetitions.
   - TODO: 16k FF traces for attack with 300 AES repetitions.
