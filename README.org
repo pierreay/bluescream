@@ -84,6 +84,12 @@ Those directories contains various signals used in experiments.
   - In =whiten_off=, whitening is disabled =RADIO_PCNF1_WHITEEN_Disabled=.
   - Multiples sample rates are tried.
   - Multiples frequencies should be tried but not recorded yet.
+- [[file:240130_carrier_or_mod_soft_or_hard/][240130_carrier_or_mod_soft_or_hard]] ::
+  - Built upon =240116_gio_firmware_leak_2=, but with following pattern: TX OFF,
+    TX ON, Software AES, Hardware AES.
+  - =tx-mod= indicate TX ON corresponds to modulated carrier with constant packets.
+  - =tx-carrier= indicate TX ON corresponds to non-modulated constant carrier.
+  - Two sample rates: $8e6$ and $20e6$.
 
 * Organization
 
