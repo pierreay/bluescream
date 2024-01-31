@@ -3,6 +3,7 @@
 from os import path
 import numpy as np
 import matplotlib.pyplot as plt
+from matplotlib.widgets import Button, Slider
 from scipy import signal
 
 import lib.log as l
@@ -326,3 +327,108 @@ class PlotOnce():
     def off(self):
         self.state = False
  
+class PlotShrink():
+    """Plot data and visually skrink them.
+
+    Plot data in temporal and frequency domain and interactively shrink the data.
+
+    Typical use case:
+
+    pltshrk = PlotShrink(data)
+    # The user will visually shrink the data.
+    pltshrk.plot()
+    # Get the result.
+    data = pltshrk.get_data()
+
+    """
+    # Plotted data (e.g. numpy ND array).
+    data = None
+    # Matplotlib main figure (from plt.subplots()).
+    fig = None
+    # Matplotlib axis for temporal plot (from plt.subplots()).
+    axampl = None
+    # Matplotlib axis for frequential plot (from plt.subplots()).
+    axspec = None
+    # Integer defining the current lower bound of the data.
+    lb = None
+    # Integer defining the current uper bound of the data.
+    ub = None
+
+    def __init__(self, data):
+        """Initialize the data and the bounds."""
+        self.data = data
+        self.lb = 0
+        self.ub = len(data)
+
+    def update(self):
+        """Clear plots and redraw them using current bounds."""
+        # Clear the axis from last plots.
+        self.axampl.clear()
+        self.axspec.clear()
+        # Plot the data using new lower bound.
+        self.axampl.plot(self.data[self.lb:self.ub])
+        self.axspec.specgram(self.data[self.lb:self.ub])
+        # Redraw the figure.
+        self.fig.canvas.draw()
+
+    def update_lb(self, val):
+        """Update plots with new lower bound."""
+        # Save new bound.
+        self.lb = int(val)
+        # Update plots.
+        self.update()
+
+    def update_ub(self, val):
+        """Update plots with new upper bound."""
+        # Save new bound.
+        self.ub = int(val)
+        # Update plots.
+        self.update()
+    
+    def plot(self):
+        """Start the plot for interactive shrink."""
+        # Create the figure and plot the data.
+        self.fig, (self.axampl, self.axspec) = plt.subplots(nrows=2, ncols=1)
+        self.axampl.plot(self.data)
+        self.axampl.set_xlabel('Sample [#]')
+        self.axampl.set_ylabel('Amplitude')
+        self.axspec.specgram(self.data)
+        self.axspec.set_xlabel('Sample [#]')
+        self.axspec.set_ylabel('Frequency [Ratio]')
+
+        # Adjust the main plot to make room for the sliders.
+        self.fig.subplots_adjust(bottom=0.25)
+
+        # Make two horizontal sliders.
+        # Dimensions: [left, bottom, width, height]
+        axlb = self.fig.add_axes([0.25, 0.14, 0.65, 0.03])
+        axub = self.fig.add_axes([0.25, 0.07, 0.65, 0.03])
+        lb_slider = Slider(
+            ax=axlb,
+            label='Lower bound index',
+            valmin=0,
+            valmax=len(self.data),
+            valinit=0,
+        )
+        ub_slider = Slider(
+            ax=axub,
+            label='Upper bound index',
+            valmin=0,
+            valmax=len(self.data),
+            valinit=len(self.data),
+        )
+
+        # Register the update function with each slider.
+        lb_slider.on_changed(self.update_lb)
+        ub_slider.on_changed(self.update_ub)
+
+        # Start interactive plot.
+        plt.show()
+
+    def get_data(self):
+        """Get the shrinked data from the object."""
+        return self.get_data_from(self.data)
+    
+    def get_data_from(self, data):
+        """Get the skrinked data from external data but with current bounds."""
+        return data[self.lb:self.ub]
