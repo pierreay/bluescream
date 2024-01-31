@@ -92,6 +92,17 @@ Those directories contains various signals used in experiments.
   - =tx-mod= indicate TX ON corresponds to modulated carrier with constant packets.
   - =tx-carrier= indicate TX ON corresponds to non-modulated constant carrier.
   - Two sample rates: $8e6$ and $20e6$.
+- [[file:240131_with_aes_ecb_hard/][240131_with_aes_ecb_hard]] ::
+  - Build upon =240130_carrier_or_mod_soft_or_hard=, but with following pattern:
+    1) TX OFF
+    2) TX ON with carrier only
+    3) AES-ECB software implemented by TinyAES from the NordicSDK
+    4) AES-ECB hardware by the ECB periph of the nRF52
+    5) AES-CCM hardware by the CCM periph of the nRF52
+  - Use 3 sampling rates:
+    1) 8 Msps
+    2) 20 Msps
+    3) 56 Msps
 
 * Organization
 
