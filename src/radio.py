@@ -340,8 +340,9 @@ def plot_file(samp_rate, file, npy):
 @click.option("--amplitude/--no-amplitude", default=False, help="Extract only the amplitude of the signal.")
 @click.option("--phase/--no-phase", default=False, help="Extract only the phase of the signal.")
 @click.option("--plot/--no-plot", "plot_flag", default=True, help="Plot the recorded signal.")
+@click.option("--cut/--no-cut", "cut_flag", default=True, help="Cut the recorded signal.")
 @click.option("--gain", type=int, default=76, help="Gain for the SDR.")
-def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag, gain):
+def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag, cut_flag, gain):
     """Record a trace without any instrumentation.
 
     It will automatically use the first found radio with ID 0.
@@ -365,9 +366,16 @@ def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag, g
             sig = rad.get_signal()
     except Exception as e:
         l.log_n_exit("Error during radio instrumentation", 1, e)
-    # Plot the signal as requested [amplitude by default].
+    # Choose component based on user choice for plot (amplitude by default).
     comp = complex.CompType.PHASE if phase is True else complex.CompType.AMPLITUDE
-    libplot.plot_time_spec_sync_axis([sig], samp_rate, comp=comp, cond=plot_flag)
+    # Cut the signal as requested.
+    if cut_flag is True:
+        pltshrk = libplot.PlotShrink(complex.get_comp(sig, comp))
+        pltshrk.plot()
+        sig = pltshrk.get_data_from(sig)
+    # Plot the signal as requested.
+    if plot_flag:
+        libplot.plot_time_spec_sync_axis([sig], samp_rate, comp=comp, cond=plot_flag)
     # Save the signal as requested.
     if save != "":
         sig = analyze.process_iq(sig, amplitude=amplitude, phase=phase, norm=norm, log=True)
