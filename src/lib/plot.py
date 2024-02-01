@@ -245,9 +245,9 @@ def plot_metadata_balance(ks, pt):
 # * User interaction
 
 class SignalPlot():
-    """Class representing a plot of a signal.
+    """Plot of a signal.
 
-    It allows to easily plot the different components of a signal (amplitude,
+    Allows to easily plot the different components of a signal (amplitude,
     phase) in both time and frequency domains in a uniform way depending on its
     type.
 
@@ -257,9 +257,15 @@ class SignalPlot():
     # Subplot index for phase plots.
     IDX_BASE_PHASE = 2
 
+    # Signal to plot [np.ndarray].
+    sig = None
+    # Number of rows [integer].
+    nrows = None
+    # Number of columns [integer].
+    ncols = None
+
     def __init__(self, sig):
-        assert type(sig) == np.ndarray, "sig should be a numpy array"
-        # Signal to plot.
+        assert type(sig) == np.ndarray, "SIG should be a numpy array (np.ndarray)!"
         self.sig = sig
         # Compute the number of columns and rows depending on the signal type.
         self.nrows = 2
