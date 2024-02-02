@@ -1,0 +1,4 @@
+# -*- mode: shell-script; -*-
+
+# Allow to import SoapySDR installed from source using Stow.
+export PYTHONPATH="/usr/local/lib/python3.11/site-packages/"
