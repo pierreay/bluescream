@@ -366,16 +366,14 @@ def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag, c
             sig = rad.get_signal()
     except Exception as e:
         l.log_n_exit("Error during radio instrumentation", 1, e)
-    # Choose component based on user choice for plot (amplitude by default).
-    comp = complex.CompType.PHASE if phase is True else complex.CompType.AMPLITUDE
     # Cut the signal as requested.
     if cut_flag is True:
-        pltshrk = libplot.PlotShrink(complex.get_comp(sig, comp))
+        pltshrk = libplot.PlotShrink(complex.get_comp(sig, complex.CompType.PHASE if phase is True else complex.CompType.AMPLITUDE))
         pltshrk.plot()
         sig = pltshrk.get_data_from(sig)
     # Plot the signal as requested.
     if plot_flag:
-        libplot.plot_time_spec_sync_axis([sig], samp_rate, comp=comp, cond=plot_flag)
+        libplot.SignalQuadPlot(sig, duration=duration, sr=samp_rate, fc=freq).plot()
     # Save the signal as requested.
     if save != "":
         sig = analyze.process_iq(sig, amplitude=amplitude, phase=phase, norm=norm, log=True)
