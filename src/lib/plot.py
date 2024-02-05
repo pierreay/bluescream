@@ -315,7 +315,16 @@ class SignalQuadPlot():
 
     def __plot_phase(self):
         """Plot the phase of the signal in time and frequency domains in a vertical way."""
-        sig = complex.get_phase(self.sig)
+        # NOTE: Phase rotation without filtering from expe/240201/56msps.py:
+        # Compute unwraped (remove modulos) instantaneous phase.
+        sig = np.unwrap(np.angle(self.sig))
+        # Set the signal relative to 0.
+        sig = [sig[i] - sig[0] for i in range(len(sig))]
+        # Compute the phase rotation of instantenous phase.
+        # NOTE: Manually add first [0] sample.
+        sig = [0] + [sig[i] - sig[i - 1] for i in range(1, len(sig), 1)]
+        # Convert back to np.ndarray.
+        sig = np.array(sig)
         if self.sync is True:
             self.ax_phase_time.plot(self.t, sig)
             self.ax_phase_freq.set_xlabel("Time [s]")
@@ -324,7 +333,7 @@ class SignalQuadPlot():
             self.ax_phase_time.set_xlabel("Sample [#]")
             self.ax_phase_freq.set_xlabel("Sample [#]")
         self.ax_phase_freq.specgram(sig, NFFT=NFFT, Fs=self.sr, Fc=self.fc)
-        self.ax_phase_time.set_ylabel("Phase [Radian]")
+        self.ax_phase_time.set_ylabel("Phase rotation [Radian]")
         self.ax_phase_freq.set_ylabel("Frequency [Hz]")
 
     def plot(self, block=True):
