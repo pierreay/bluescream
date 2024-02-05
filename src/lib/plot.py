@@ -309,7 +309,7 @@ class SignalQuadPlot():
             self.ax_ampl_time.plot(sig)
             self.ax_ampl_time.set_xlabel("Sample [#]")
             self.ax_ampl_freq.set_xlabel("Sample [#]")
-        self.ax_ampl_freq.specgram(sig, NFFT=NFFT, Fs=self.sr, Fc=self.fc)
+        self.ax_ampl_freq.specgram(self.sig, NFFT=NFFT, Fs=self.sr, Fc=self.fc, sides="twosided", mode="magnitude")
         self.ax_ampl_time.set_ylabel("Amplitude [ADC value]")
         self.ax_ampl_freq.set_ylabel("Frequency [Hz]")
 
