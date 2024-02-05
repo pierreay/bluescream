@@ -346,6 +346,7 @@ class SignalQuadPlot():
         if self.sync is True:
             # NOTE: len(self.sig) == self.duration * self.sr
             self.t = np.linspace(0, self.duration, len(self.sig))
+            assert len(self.t) == len(self.sig), "Bad length matching between time vector and signal!"
             # NOTE: For plt.specgram():
             # - If Fs is not set, it will generates an x-axis of "len(self.sig) / 2".
             # - If Fs is set, it will generates an x-axis of "duration * sampling rate".
