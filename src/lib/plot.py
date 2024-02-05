@@ -244,59 +244,116 @@ def plot_metadata_balance(ks, pt):
 
 # * User interaction
 
-class SignalPlot():
-    """Plot of a signal.
+class SignalQuadPlot():
+    """Quad plot of a signal.
 
-    Allows to easily plot the different components of a signal (amplitude,
-    phase) in both time and frequency domains in a uniform way depending on its
-    type.
+    Plot the amplitude and the phase of a signal in both time and frequency
+    domains. The phase is only plotted if the signal is complex.
 
     """
-    # Subplot index for amplitude plots.
-    IDX_BASE_AMP = 1
-    # Subplot index for phase plots.
-    IDX_BASE_PHASE = 2
+    # Signal variables.
 
     # Signal to plot [np.ndarray].
     sig = None
+    # Duration of the plotted signal [s].
+    duration = None
+    # Sampling rate of the plotted signal [Msps].
+    sr = None
+    # Center frequency of the plotted signal [Hz].
+    fc = None
+
+    # Plotting variables.
+
     # Number of rows [integer].
     nrows = None
     # Number of columns [integer].
     ncols = None
+    # If we sould use a shared x axis accross plot [bool].
+    sync = False
+    # Time vector used for shared x axis [np.ndarray].
+    t = None
+    # Amplitude time-domain axes [Matplotlib Axes].
+    ax_ampl_time = None
+    # Amplitude frequency-domain axes [Matplotlib Axes].
+    ax_ampl_freq = None
+    # Phase time-domain axes [Matplotlib Axes].
+    ax_phase_time = None
+    # Phase frequency-domain axes [Matplotlib Axes].
+    ax_phase_freq = None
 
-    def __init__(self, sig):
-        assert type(sig) == np.ndarray, "SIG should be a numpy array (np.ndarray)!"
+    def __init__(self, sig, duration = None, sr = None, fc = None):
+        assert type(sig) == np.ndarray, "sig should be a numpy array (np.ndarray)!"
         self.sig = sig
+        self.duration = duration
+        self.sr = sr
+        self.fc = fc
         # Compute the number of columns and rows depending on the signal type.
         self.nrows = 2
         self.ncols = 2 if complex.is_iq(self.sig) else 1
+        # Use a shared x-axis only if duration and sampling rates are available
+        # for time vector creation.
+        if self.duration is not None and self.sr is not None:
+            self.sync = True
+        else:
+            # NOTE: Do not allows to set only one without the other.
+            self.duration = None
+            self.sr = None
 
     def __plot_amp(self):
         """Plot the amplitude of the signal in time and frequency domains in a vertical way."""
         sig = complex.get_amplitude(self.sig)
-        plt.subplot(self.nrows, self.ncols, SignalPlot.IDX_BASE_AMP)
-        plt.plot(sig)
-        plt.title("Amplitude")
-        plt.subplot(self.nrows, self.ncols, SignalPlot.IDX_BASE_AMP + self.ncols)
-        plt.specgram(sig, NFFT=NFFT)
+        if self.sync is True:
+            self.ax_ampl_time.plot(self.t, sig)
+            self.ax_ampl_freq.set_xlabel("Time [s]")
+        else:
+            self.ax_ampl_time.plot(sig)
+            self.ax_ampl_time.set_xlabel("Sample [#]")
+            self.ax_ampl_freq.set_xlabel("Sample [#]")
+        self.ax_ampl_freq.specgram(sig, NFFT=NFFT, Fs=self.sr, Fc=self.fc)
+        self.ax_ampl_time.set_ylabel("Amplitude [ADC value]")
+        self.ax_ampl_freq.set_ylabel("Frequency [Hz]")
 
     def __plot_phase(self):
         """Plot the phase of the signal in time and frequency domains in a vertical way."""
         sig = complex.get_phase(self.sig)
-        plt.subplot(self.nrows, self.ncols, SignalPlot.IDX_BASE_PHASE)
-        plt.plot(sig)
-        plt.title("Phase")
-        plt.subplot(self.nrows, self.ncols, SignalPlot.IDX_BASE_PHASE + self.ncols)
-        plt.specgram(sig, NFFT=NFFT)
+        if self.sync is True:
+            self.ax_phase_time.plot(self.t, sig)
+            self.ax_phase_freq.set_xlabel("Time [s]")
+        else:
+            self.ax_phase_time.plot(sig)
+            self.ax_phase_time.set_xlabel("Sample [#]")
+            self.ax_phase_freq.set_xlabel("Sample [#]")
+        self.ax_phase_freq.specgram(sig, NFFT=NFFT, Fs=self.sr, Fc=self.fc)
+        self.ax_phase_time.set_ylabel("Phase [Radian]")
+        self.ax_phase_freq.set_ylabel("Frequency [Hz]")
 
     def plot(self, block=True):
-        """Plot the different components of a signal. If BLOCK is set to False,
-        do not block the program execution while plotting."""
-        if complex.is_iq(self.sig):
-            self.__plot_amp()
+        """Plot the different components of a signal.
+
+        :param block: If set to False, do not block the program execution while
+        plotting.
+
+        """
+        assert self.nrows == 2, "Bad nrows value"
+        assert self.ncols == 1 or self.ncols == 2, "Bad ncols value"
+        # Create the plot layout.
+        sharex = "col" if self.sync is True else None
+        if self.ncols == 1:
+            self.fig, (self.ax_ampl_time, self.ax_ampl_freq) = plt.subplots(nrows=self.nrows, ncols=self.ncols, sharex=sharex)
+        elif self.ncols == 2:
+            self.fig, ((self.ax_ampl_time, self.ax_phase_time), (self.ax_ampl_freq, self.ax_phase_freq)) = plt.subplots(nrows=self.nrows, ncols=self.ncols, sharex=sharex)
+        # Generate a time vector if duration is given for shared x axis plotting.
+        if self.sync is True:
+            # NOTE: len(self.sig) == self.duration * self.sr
+            self.t = np.linspace(0, self.duration, len(self.sig))
+            # NOTE: For plt.specgram():
+            # - If Fs is not set, it will generates an x-axis of "len(self.sig) / 2".
+            # - If Fs is set, it will generates an x-axis of "duration * sampling rate".
+        self.__plot_amp()
+        if self.ncols == 2:
             self.__plot_phase()
-        else:
-            self.__plot_amp()
+        # Enable tight_layout for larger plots.
+        plt.tight_layout()
         plt.show(block=block)
 
 def select(candidate):
