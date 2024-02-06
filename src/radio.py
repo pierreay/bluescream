@@ -367,6 +367,7 @@ def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag, c
     except Exception as e:
         l.log_n_exit("Error during radio instrumentation", 1, e)
     # Cut the signal as requested.
+    # TODO: Adjust the "duration" variable after the skrink because otherwise, the plot is wrong.
     if cut_flag is True:
         pltshrk = libplot.PlotShrink(complex.get_comp(sig, complex.CompType.PHASE if phase is True else complex.CompType.AMPLITUDE))
         pltshrk.plot()
