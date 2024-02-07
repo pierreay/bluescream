@@ -255,12 +255,12 @@ class SignalQuadPlot():
 
     # Signal to plot [np.ndarray].
     sig = None
-    # Duration of the plotted signal [s].
-    duration = None
     # Sampling rate of the plotted signal [Msps].
     sr = None
     # Center frequency of the plotted signal [Hz].
     fc = None
+    # Duration of the plotted signal [s].
+    duration = None
 
     # Plotting variables.
 
@@ -281,23 +281,21 @@ class SignalQuadPlot():
     # Phase frequency-domain axes [Matplotlib Axes].
     ax_phase_freq = None
 
-    def __init__(self, sig, duration = None, sr = None, fc = None):
+    def __init__(self, sig, sr = None, fc = None):
         assert type(sig) == np.ndarray, "sig should be a numpy array (np.ndarray)!"
         self.sig = sig
-        self.duration = duration
         self.sr = sr
         self.fc = fc
+        # Compute the duration of the signal if possible.
+        if sr is not None:
+            self.duration = len(sig) / sr
         # Compute the number of columns and rows depending on the signal type.
         self.nrows = 2
         self.ncols = 2 if complex.is_iq(self.sig) else 1
-        # Use a shared x-axis only if duration and sampling rates are available
-        # for time vector creation.
-        if self.duration is not None and self.sr is not None:
+        # Use a shared x-axis only if duration is available for time vector
+        # creation.
+        if self.duration is not None:
             self.sync = True
-        else:
-            # NOTE: Do not allows to set only one without the other.
-            self.duration = None
-            self.sr = None
 
     def __plot_amp(self):
         """Plot the amplitude of the signal in time and frequency domains in a vertical way."""
@@ -355,9 +353,8 @@ class SignalQuadPlot():
             self.fig, (self.ax_ampl_time, self.ax_ampl_freq) = plt.subplots(nrows=self.nrows, ncols=self.ncols, sharex=sharex)
         elif self.ncols == 2:
             self.fig, ((self.ax_ampl_time, self.ax_phase_time), (self.ax_ampl_freq, self.ax_phase_freq)) = plt.subplots(nrows=self.nrows, ncols=self.ncols, sharex=sharex)
-        # Generate a time vector if duration is given for shared x axis plotting.
+        # Generate a time vector if shared x-axis is required.
         if self.sync is True:
-            # NOTE: len(self.sig) == self.duration * self.sr
             self.t = np.linspace(0, self.duration, len(self.sig))
             assert len(self.t) == len(self.sig), "Bad length matching between time vector and signal!"
             # NOTE: For plt.specgram():
