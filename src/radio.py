@@ -255,7 +255,9 @@ def extract(samp_rate, id_ref, plot, overwrite, id, exit_on_error, config, save,
     # Plotting based on results.
     if len(peaks) > 0:
         for idx, peak in enumerate(peaks):
-            libplot.plot_time_spec_sync_axis([analyze.extract_time_window(sig_raw_ref, samp_rate, peak, window, offset=offset)], samp_rate=samp_rate, cond=plot, title="Peak #{}".format(idx))
+            # libplot.plot_time_spec_sync_axis([analyze.extract_time_window(sig_raw_ref, samp_rate, peak, window, offset=offset)], samp_rate=samp_rate, cond=plot, title="Peak #{}".format(idx))
+            sigtoplot = analyze.extract_time_window(load.load_raw_trace(DIR, rad_idx=0, rec_idx=0), samp_rate, peak, window, offset=offset)
+            libplot.SignalQuadPlot(sigtoplot, duration=len(sigtoplot) / samp_rate, sr=samp_rate, fc=2.530e9).plot()
     libplot.plot_time_spec_sync_axis([sig_raw_ref], samp_rate=samp_rate, peaks=peaks, triggers=nf_triggers, cond=plot)
 
     # Exit based on results.
