@@ -257,7 +257,7 @@ def extract(samp_rate, id_ref, plot, overwrite, id, exit_on_error, config, save,
         for idx, peak in enumerate(peaks):
             # libplot.plot_time_spec_sync_axis([analyze.extract_time_window(sig_raw_ref, samp_rate, peak, window, offset=offset)], samp_rate=samp_rate, cond=plot, title="Peak #{}".format(idx))
             sigtoplot = analyze.extract_time_window(load.load_raw_trace(DIR, rad_idx=0, rec_idx=0), samp_rate, peak, window, offset=offset)
-            libplot.SignalQuadPlot(sigtoplot, duration=len(sigtoplot) / samp_rate, sr=samp_rate, fc=2.530e9).plot()
+            libplot.SignalQuadPlot(sigtoplot, sr=samp_rate, fc=2.530e9).plot()
     libplot.plot_time_spec_sync_axis([sig_raw_ref], samp_rate=samp_rate, peaks=peaks, triggers=nf_triggers, cond=plot)
 
     # Exit based on results.
@@ -379,14 +379,13 @@ def record(freq, samp_rate, duration, save, norm, amplitude, phase, plot_flag, c
     except Exception as e:
         l.log_n_exit("Error during radio instrumentation", 1, e)
     # Cut the signal as requested.
-    # TODO: Adjust the "duration" variable after the skrink because otherwise, the plot is wrong.
     if cut_flag is True:
-        pltshrk = libplot.PlotShrink(complex.get_comp(sig, complex.CompType.PHASE if phase is True else complex.CompType.AMPLITUDE))
+        pltshrk = libplot.PlotShrink(sig)
         pltshrk.plot()
-        sig = pltshrk.get_data_from(sig)
+        sig = pltshrk.get_signal_from(sig)
     # Plot the signal as requested.
     if plot_flag:
-        libplot.SignalQuadPlot(sig, duration=duration, sr=samp_rate, fc=freq).plot()
+        libplot.SignalQuadPlot(sig, sr=samp_rate, fc=freq).plot()
     # Save the signal as requested.
     if save != "":
         sig = analyze.process_iq(sig, amplitude=amplitude, phase=phase, norm=norm, log=True)
