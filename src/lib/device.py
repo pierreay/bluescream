@@ -33,7 +33,7 @@ except ImportError as e: # Don't make these modules mandatory for running all th
 
 class Device():
     # Timeout limit used for the loops of this module [s].
-    TIMEOUT = 30
+    TIMEOUT = 20
 
     # WHAD's central instantiated from an HCI dongle.
     hci = None

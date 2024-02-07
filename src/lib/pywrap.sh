@@ -21,9 +21,9 @@ function radio_init() {
 function radio_instrument() {
     # NOTE: Send a SIGINT signal such that Python goes through the __exit__()
     # of Device class, such that WHAD/Butterfly do not finish in a bad
-    # state. We use a timeout of 30s in our device.py, so we use a timeout of
-    # 60s here to double check it.
-    timeout --signal=SIGINT 60 python3 ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR --config $ENVRC_CONFIG_FILE instrument $ENVRC_DATASET_RAW_PATH ${2-train} $ENVRC_ATTACKER_ADDR $ENVRC_VICTIM_ADDR $ENVRC_VICTIM_PORT --idx ${3-0} --config $ENVRC_DEVICE_CONFIG $4
+    # state. We use a timeout of 20s in our device.py, so we use a timeout of
+    # 30s here to double check it.
+    timeout --signal=SIGINT 30 python3 ./radio.py --loglevel ${1-DEBUG} --dir $ENVRC_RADIO_DIR --config $ENVRC_CONFIG_FILE instrument $ENVRC_DATASET_RAW_PATH ${2-train} $ENVRC_ATTACKER_ADDR $ENVRC_VICTIM_ADDR $ENVRC_VICTIM_PORT --idx ${3-0} --config $ENVRC_DEVICE_CONFIG $4
     if [[ $? -ge 1 ]]; then
         return 1
     fi
