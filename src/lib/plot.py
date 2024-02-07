@@ -338,11 +338,16 @@ class SignalQuadPlot():
         self.ax_phase_time.set_ylabel("Phase rotation [Radian]")
         self.ax_phase_freq.set_ylabel("Frequency [Hz]")
 
-    def plot(self, block=True):
+    def plot(self, block=True, save=None, title=None):
         """Plot the different components of a signal.
 
         :param block: If set to False, do not block the program execution while
         plotting.
+
+        :param save: If set to a file path, use this to save the plot instead
+        of interactive display.
+
+        :param title: If set to a string, use it as plot title.
 
         """
         assert self.nrows == 2, "Bad nrows value"
@@ -365,7 +370,13 @@ class SignalQuadPlot():
             self.__plot_phase()
         # Enable tight_layout for larger plots.
         plt.tight_layout()
-        plt.show(block=block)
+        # Add the title if needed.
+        if title is not None and title != "":
+            self.fig.suptitle(title)
+        if save is None or save == "":
+            plt.show(block=block)
+        else:
+            plt.savefig(save, dpi=600)
 
 def select(candidate):
     global USER_SELECT
