@@ -10,9 +10,9 @@ procedure_interleaving = false # Implies to set the desired request before LL_EN
 procedure_interleaving_method = "att_read_request"
 
 [device.fast]
-start_radio_conn_event = 4
-ll_enc_req_conn_event = 6
-hop_interval = 56
+start_radio_conn_event = 1
+ll_enc_req_conn_event = 2
+hop_interval = 15
 channel_map = 0x00000300
 more_data_bit = 0
 procedure_interleaving = false
@@ -36,6 +36,14 @@ trg_bp_low = [1e6]         # Low cutoff frequency of the bandpass filter for the
 trg_bp_high = [2e6]        # High cutoff frequency of the bandpass filter for the trigger signal.
 trg_lp = 1e4               # Cutoff frequency of the lowpass filter for the trigger signal.
 trg_peak_prominence = 0.75 # Fractional of the peak prominence search.
+
+[radio.extract.1_aes_ff_antenna_8msps]
+window = 0.00025
+offset = -0.00005
+trg_bp_low = [2e6]
+trg_bp_high = [3e6]
+trg_lp = 1e4
+trg_peak_prominence = 0.40
 
 [radio.extract.1_aes]
 window = 0.005
