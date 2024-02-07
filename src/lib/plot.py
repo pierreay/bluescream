@@ -402,46 +402,54 @@ class PlotOnce():
         self.state = False
  
 class PlotShrink():
-    """Plot data and visually skrink them.
+    """Plot signal and visually skrink it.
 
-    Plot data in temporal and frequency domain and interactively shrink the data.
+    Plot the amplitude of a signal in temporal and frequency domain and interactively shrink the signal.
 
     Typical use case:
 
-    pltshrk = PlotShrink(data)
-    # The user will visually shrink the data.
+    pltshrk = PlotShrink(signal)
+    # The user will visually shrink the signal.
     pltshrk.plot()
     # Get the result.
-    data = pltshrk.get_data()
+    signal = pltshrk.get_signal()
 
     """
-    # Plotted data (e.g. numpy ND array).
-    data = None
+    # Plotted signal (numpy ND array of complex numbers).
+    signal = None
     # Matplotlib main figure (from plt.subplots()).
     fig = None
     # Matplotlib axis for temporal plot (from plt.subplots()).
     axampl = None
     # Matplotlib axis for frequential plot (from plt.subplots()).
     axspec = None
-    # Integer defining the current lower bound of the data.
+    # Integer defining the current lower bound of the signal.
     lb = None
-    # Integer defining the current uper bound of the data.
+    # Integer defining the current uper bound of the signal.
     ub = None
 
-    def __init__(self, data):
-        """Initialize the data and the bounds."""
-        self.data = data
+    def __init__(self, signal):
+        """Initialize the signal and the bounds.
+
+        The signal must be complex.
+
+        """
+        # Sanity-check.
+        assert type(signal) == np.ndarray
+        assert signal.dtype == np.complex64
+        # Initialization.
+        self.signal = signal
         self.lb = 0
-        self.ub = len(data)
+        self.ub = len(signal)
 
     def update(self):
         """Clear plots and redraw them using current bounds."""
         # Clear the axis from last plots.
         self.axampl.clear()
         self.axspec.clear()
-        # Plot the data using new lower bound.
-        self.axampl.plot(self.data[self.lb:self.ub])
-        self.axspec.specgram(self.data[self.lb:self.ub])
+        # Plot the signal using new lower bound.
+        self.axampl.plot(complex.get_amplitude(self.signal[self.lb:self.ub]))
+        self.axspec.specgram(self.signal[self.lb:self.ub], NFFT=NFFT, sides="twosided", mode="magnitude")
         # Redraw the figure.
         self.fig.canvas.draw()
 
@@ -461,12 +469,12 @@ class PlotShrink():
     
     def plot(self):
         """Start the plot for interactive shrink."""
-        # Create the figure and plot the data.
+        # Create the figure and plot the signal.
         self.fig, (self.axampl, self.axspec) = plt.subplots(nrows=2, ncols=1)
-        self.axampl.plot(self.data)
+        self.axampl.plot(complex.get_amplitude(self.signal))
         self.axampl.set_xlabel('Sample [#]')
         self.axampl.set_ylabel('Amplitude')
-        self.axspec.specgram(self.data)
+        self.axspec.specgram(self.signal, NFFT=NFFT, sides="twosided", mode="magnitude")
         self.axspec.set_xlabel('Sample [#]')
         self.axspec.set_ylabel('Frequency [Ratio]')
 
@@ -481,15 +489,15 @@ class PlotShrink():
             ax=axlb,
             label='Lower bound index',
             valmin=0,
-            valmax=len(self.data),
+            valmax=len(self.signal),
             valinit=0,
         )
         ub_slider = Slider(
             ax=axub,
             label='Upper bound index',
             valmin=0,
-            valmax=len(self.data),
-            valinit=len(self.data),
+            valmax=len(self.signal),
+            valinit=len(self.signal),
         )
 
         # Register the update function with each slider.
@@ -499,10 +507,10 @@ class PlotShrink():
         # Start interactive plot.
         plt.show()
 
-    def get_data(self):
-        """Get the shrinked data from the object."""
-        return self.get_data_from(self.data)
+    def get_signal(self):
+        """Get the shrinked signal from the object."""
+        return self.get_signal_from(self.signal)
     
-    def get_data_from(self, data):
-        """Get the skrinked data from external data but with current bounds."""
-        return data[self.lb:self.ub]
+    def get_signal_from(self, signal):
+        """Get the skrinked signal from external signal but with current bounds."""
+        return signal[self.lb:self.ub]
