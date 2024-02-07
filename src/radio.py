@@ -165,6 +165,7 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx, c
     dset.pickle_dump(force=True)
 
 @cli.command()
+@click.argument("freq", type=float)
 @click.argument("samp_rate", type=float)
 @click.argument("id_ref", type=int)
 @click.option("--plot/--no-plot", default=True, help="Plot a summary of the processing.")
@@ -174,13 +175,14 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx, c
 @click.option("--config", default="1_aes", help="Select the extractor configuration based on radio.extract.NAME in the configuration file.")
 @click.option("--save", default="", type=click.Path(), help="If set to a file path, save the ID_REF extracted signal as .npy file without custom dtype. Ignored if --overwrite is set to False.")
 @click.option("--corr", default="", type=click.Path(), help="If set to a file path, cross-correlate the results against the signal.")
-def extract(samp_rate, id_ref, plot, overwrite, id, exit_on_error, config, save, corr):
+def extract(freq, samp_rate, id_ref, plot, overwrite, id, exit_on_error, config, save, corr):
     """Extract RAW traces from DIR.
 
     Extract a rough window around interesting signals from just-recorded RAW
     traces. It uses one raw trace as reference to find the interesting signal
     and extract the rough window for all specified raw traces.
 
+    FREQ is the center frequency of the recording.
     SAMP_RATE is the sampling rate used for both recording.
     
     ID_REF is the radio index to use for extraction reference. Set it to -1 to
@@ -257,7 +259,7 @@ def extract(samp_rate, id_ref, plot, overwrite, id, exit_on_error, config, save,
         for idx, peak in enumerate(peaks):
             # libplot.plot_time_spec_sync_axis([analyze.extract_time_window(sig_raw_ref, samp_rate, peak, window, offset=offset)], samp_rate=samp_rate, cond=plot, title="Peak #{}".format(idx))
             sigtoplot = analyze.extract_time_window(load.load_raw_trace(DIR, rad_idx=0, rec_idx=0), samp_rate, peak, window, offset=offset)
-            libplot.SignalQuadPlot(sigtoplot, sr=samp_rate, fc=2.530e9).plot()
+            libplot.SignalQuadPlot(sigtoplot, sr=samp_rate, fc=freq).plot()
     libplot.plot_time_spec_sync_axis([sig_raw_ref], samp_rate=samp_rate, peaks=peaks, triggers=nf_triggers, cond=plot)
 
     # Exit based on results.
