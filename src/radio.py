@@ -324,14 +324,24 @@ def plot(samp_rate, amplitude, phase, nf_id, ff_id, fast):
 @click.argument("samp_rate", type=float)
 @click.argument("file", type=click.Path())
 @click.option("--npy/--no-npy", type=bool, default="False", help="If set to true, assume FILE is a regular Numpy array instead of a custom dtype one produced by soapysdr.py")
-def plot_file(samp_rate, file, npy):
+@click.option("--cut/--no-cut", "cut_flag", default=False, help="Cut the recorded signal.")
+@click.option("--save", default="", help="If set to a file path, save the recorded signal as .npy file without custom dtype.")
+def plot_file(samp_rate, file, npy, cut_flag, save):
     """Plot a trace from FILE.
 
     SAMP_RATE is the sampling rate used for the recording.
 
     """
     sig = soapysdr.MySoapySDR.numpy_load(file) if npy is False else np.load(file)
-    libplot.plot_time_spec_sync_axis([sig], samp_rate, comp=complex.CompType.AMPLITUDE, title=file)
+    if cut_flag is True:
+        pltshrk = libplot.PlotShrink(sig)
+        pltshrk.plot()
+        sig = pltshrk.get_signal_from(sig)
+    libplot.SignalQuadPlot(sig, sr=samp_rate).plot()
+    # Save the signal as requested.
+    if save != "":
+        l.LOGGER.info("Additional save of plotted signal to: {}".format(save))
+        np.save(save, sig)
 
 @cli.command()
 @click.argument("freq", type=float)
