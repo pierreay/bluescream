@@ -80,6 +80,7 @@ TRACES_REDUCED = None
 TRACES_TEST = None
 TRACES_PROFILE = None
 LOG_PROBA = None
+COMPTYPE = None
 
 def load_data(subset, forced_profile = None):
     """Load the data (keys, plaintexts, traces) into global variables. Must be
@@ -116,7 +117,7 @@ def load_data(subset, forced_profile = None):
     KEYS, PLAINTEXTS, _, TRACES = load.reduce_entry_all_dataset(KEYS, PLAINTEXTS, None, TRACES, NUM_TRACES)
     PLAINTEXTS                  = PLAINTEXTS.tolist()
     KEYS                        = KEYS.tolist()
-    TRACES                      = complex.get_amplitude(TRACES)
+    TRACES                      = complex.get_comp(TRACES, COMPTYPE)
     if NORM or NORM2:
         TRACES = analyze.normalize_zscore(TRACES, NORM2)
     assert(isinstance(PLAINTEXTS, list))
@@ -162,8 +163,9 @@ def load_data(subset, forced_profile = None):
               help="Choose ch1, ch2, eg, or mr")
 @click.option("--loglevel", default="DEBUG", help="Logging level.")
 @click.option("--log/--no-log", default=True, help="Enable or disable logging.")
+@click.option("--comptype", default="AMPLITUDE", help="Choose between amplitude [AMPLITUDE] or phase rotation [PHASE_ROT].")
 def cli(dataset_path, num_traces, start_point, end_point, plot, save_images, wait, num_key_bytes,
-        bruteforce, bit_bound_end, name, average, norm, norm2, mimo, loglevel, log):
+        bruteforce, bit_bound_end, name, average, norm, norm2, mimo, loglevel, log, comptype):
     """
     Run an attack against previously collected traces.
 
@@ -171,7 +173,7 @@ def cli(dataset_path, num_traces, start_point, end_point, plot, save_images, wai
     apply to all attacks; see the individual attacks' documentation for
     attack-specific options.
     """
-    global SAVE_IMAGES, PLOT, GWAIT, NUM_KEY_BYTES, BRUTEFORCE, BIT_BOUND_END, NUM_TRACES, START_POINT, END_POINT, NORM, NORM2, DATASET_PATH
+    global SAVE_IMAGES, PLOT, GWAIT, NUM_KEY_BYTES, BRUTEFORCE, BIT_BOUND_END, NUM_TRACES, START_POINT, END_POINT, NORM, NORM2, DATASET_PATH, COMPTYPE
     l.configure(log, loglevel)
     SAVE_IMAGES = save_images
     PLOT = plot
@@ -187,6 +189,7 @@ def cli(dataset_path, num_traces, start_point, end_point, plot, save_images, wai
     NORM = norm
     NORM2 = norm2
     DATASET_PATH = dataset_path
+    COMPTYPE = comptype
 
 # * CCS18 UTILS (from ChipWhisper)
 
