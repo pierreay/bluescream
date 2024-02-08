@@ -18,6 +18,13 @@ USER_SELECT = None
 
 # * Matplotlib wrappers
 
+def enable_latex_fonts():
+    """Use LaTeX for text rendering."""
+    plt.rcParams.update({
+        "text.usetex": True,
+        "font.family": "Computer Modern"
+    })
+
 def show_fullscreen():
     """Show the current plot in fullscreen."""
     plt.get_current_fig_manager().full_screen_toggle()
