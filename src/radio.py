@@ -255,7 +255,7 @@ def extract(freq, samp_rate, id_ref, plot, overwrite, id, exit_on_error, config,
             l.LOGGER.warning("Peak value is inferior to 1300, noise?")
 
     # Plotting based on results.
-    if len(peaks) > 0:
+    if len(peaks) > 0 and plot is True:
         for idx, peak in enumerate(peaks):
             # libplot.plot_time_spec_sync_axis([analyze.extract_time_window(sig_raw_ref, samp_rate, peak, window, offset=offset)], samp_rate=samp_rate, cond=plot, title="Peak #{}".format(idx))
             sigtoplot = analyze.extract_time_window(load.load_raw_trace(DIR, rad_idx=0, rec_idx=0), samp_rate, peak, window, offset=offset)
