@@ -20,7 +20,7 @@ from enum import Enum
 import lib.analyze as analyze
 
 # Enumeration of components type of a signal.
-CompType = Enum('CompType', ['AMPLITUDE', 'PHASE'])
+CompType = Enum('CompType', ['AMPLITUDE', 'PHASE', 'PHASE_ROT'])
 
 def is_iq(s):
     """Return True is the signal S is composed of IQ samples, False otherwise."""
@@ -60,22 +60,51 @@ def get_phase(traces):
     else:
         return traces
 
+def get_phase_rot(trace):
+    """Get the phase rotation of one or multiple traces."""
+    dtype_in = np.complex64
+    dtype_out = np.float32
+    assert type(trace) == np.ndarray
+    assert trace.dtype == dtype_in
+    if trace.ndim == 1:
+        # NOTE: Phase rotation from expe/240201/56msps.py without filter:
+        # Compute unwraped (remove modulos) instantaneous phase.
+        trace = np.unwrap(np.angle(trace))
+        # Set the signal relative to 0.
+        trace = [trace[i] - trace[0] for i in range(len(trace))]
+        # Compute the phase rotation of instantenous phase.
+        # NOTE: Manually add first [0] sample.
+        trace = [0] + [trace[i] - trace[i - 1] for i in range(1, len(trace), 1)]
+        # Convert back to np.ndarray.
+        trace = np.array(trace, dtype=dtype_out)
+        assert trace.dtype == dtype_out
+        return trace
+    elif trace.ndim == 2:
+        trace_rot = np.empty_like(trace, dtype=dtype_out)
+        for ti, tv in enumerate(trace):
+            trace_rot[ti] = get_phase_rot(tv)
+        return trace_rot
+
 def get_comp(traces, comp):
     """Get a choosen component.
 
     Return the choosen component of signals contained in the 1D or 2D ndarray
-    TRACES according to COMP set to CompType.AMPLITUDE or CompType.PHASE.
+    TRACES according to COMP set to CompType.AMPLITUDE, CompType.PHASE or
+    CompType.PHASE_ROT.
 
     If the signals contained in TRACES are already of the given component, this
     function will do nothing.
 
     """
-    assert type(traces) == np.ndarray, "traces should be numpy array"
-    assert comp in CompType, "comp is set to a bad value instead of the enum"
-    if comp == CompType.AMPLITUDE:
+    assert type(traces) == np.ndarray, "Traces should be numpy array"
+    assert (type(comp) == str or comp in CompType), "COMP is set to a bad type or bad enum value!"
+    if (type(comp) == CompType and comp == CompType.AMPLITUDE) or (type(comp) == str and CompType[comp] == CompType.AMPLITUDE):
         return get_amplitude(traces)
-    elif comp == CompType.PHASE:
+    elif (type(comp) == CompType and comp == CompType.PHASE) or (type(comp) == str and CompType[comp] == CompType.PHASE):
         return get_phase(traces)
+    elif (type(comp) == CompType and comp == CompType.PHASE_ROT) or (type(comp) == str and CompType[comp] == CompType.PHASE_ROT):
+        return get_phase_rot(traces)
+    assert False, "Bad COMP string!"
 
 def is_p2r_ready(radii, angles):
     """Check if polar complex can be converted to regular complex.
