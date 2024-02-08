@@ -315,7 +315,7 @@ class SignalQuadPlot():
         """Plot the phase of the signal in time and frequency domains in a vertical way."""
         # Filter the signal for better visualization then compute phase rotation:
         sos = signal.butter(1, 2e6, 'low', fs=self.sr, output='sos')
-        sig = signal.sosfilt(sos, self.sig)
+        sig = np.array(signal.sosfilt(sos, self.sig), dtype=np.complex64) # NOTE: sosfilt returns np.complex128.
         sig = complex.get_phase_rot(sig)
         if self.sync is True:
             self.ax_phase_time.plot(self.t, sig)
