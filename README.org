@@ -112,6 +112,28 @@ Those directories contains various signals used in experiments.
     2) 20 Msps
     3) 56 Msps
 
+* Experiments
+:PROPERTIES:
+:DIR:      experiments
+:END:
+
+** [2024-02-07 mer.] Find the best frequency before a dataset collection using BLE
+:PROPERTIES:
+:DIR:      experiments/2024-02-07_find-best-ble-freq
+:END:
+
+- Goals :: Find the best frequency where the leakage is more present before
+  launching a new collection.
+- Methods ::
+  1. Find candidates frequency using wide-band recording looking at the
+     spectrum.
+  2. Compare the SNR and visually both amplitude and phase rotation signal for
+     each frequency.
+- Results ::
+  1. Find that 2.533 GHz seems to be the best.
+  2. Plot a comparison and good match between amplitude and phase rotation
+     signal.
+
 * Organization
 
 Here is an example of a complete dataset stored after an attack:
