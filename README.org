@@ -67,6 +67,14 @@ Those directories contains full or partials datasets recorded using our
   - Profiles with 1, 2, 3 POIs.
   - Best attack and bruteforce with key rank = 2^27 and PGE median = 1 for 2k
     traces.
+- [[file:230207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw]] ::
+  - TODO: Change the =23= to =24= in the name.
+  - PROG: 16k profile traces.
+  - PROG: 4k attack traces.
+  - Anemic box, no LNA.
+  - 2.533 GHz of center frequency, 8 MHz of bandwidth.
+  - Input generated using pairing from stock firmware.
+  - No repetitions nor for profile or attack.
 
 * Recordings
 
