@@ -7,6 +7,8 @@ import matplotlib.pyplot as plt
 import csv
 from scipy.interpolate import make_interp_spline, BSpline
 
+import lib.plot as libplot
+
 # * Configuration
 
 # CSV file name.
@@ -60,6 +62,7 @@ print("y_pge={}".format(y_pge))
 
 # Use GGPlot style.
 # plt.style.use("ggplot")
+libplot.enable_latex_fonts()
 
 def myplot(x, y, param_dict, smooth=False):
     """Plot y over x.
