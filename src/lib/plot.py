@@ -16,16 +16,21 @@ import lib.load as load
 NFFT = 256
 USER_SELECT = None
 
+# Flag indicated that LaTeX fonts have been enabled.
+LATEX_FONT_ENABLED = False
+
 # * Matplotlib wrappers
 
 def enable_latex_fonts():
     """Use LaTeX for text rendering."""
+    global LATEX_FONT_ENABLED
     # Use pdflatex to generate fonts.
     plt.rcParams.update({
         "text.usetex": True,
         "font.family": "Computer Modern",
         "font.size": 15
     })
+    LATEX_FONT_ENABLED = True
 
 def show_fullscreen():
     """Show the current plot in fullscreen."""
@@ -290,6 +295,8 @@ class SignalQuadPlot():
     # Phase frequency-domain axes [Matplotlib Axes].
     ax_phase_freq = None
 
+    # x-axis labels for all plots.
+    xlabel = None
     def __init__(self, sig, sr = None, fc = None):
         assert type(sig) == np.ndarray, "sig should be a numpy array (np.ndarray)!"
         self.sig = sig
@@ -308,14 +315,16 @@ class SignalQuadPlot():
 
     def __plot_amp(self):
         """Plot the amplitude of the signal in time and frequency domains in a vertical way."""
+        # Check needed parameters have been initialized.
+        assert self.xlabel is not None
         sig = complex.get_amplitude(self.sig)
         if self.sync is True:
             self.ax_ampl_time.plot(self.t, sig)
-            self.ax_ampl_freq.set_xlabel("Time [s]")
+            self.ax_ampl_freq.set_xlabel(self.xlabel)
         else:
             self.ax_ampl_time.plot(sig)
-            self.ax_ampl_time.set_xlabel("Sample [#]")
-            self.ax_ampl_freq.set_xlabel("Sample [#]")
+            self.ax_ampl_time.set_xlabel(self.xlabel)
+            self.ax_ampl_freq.set_xlabel(self.xlabel)
         self.ax_ampl_freq.specgram(self.sig, NFFT=NFFT, Fs=self.sr, Fc=self.fc, sides="twosided", mode="magnitude")
         self.ax_ampl_time.set_ylabel("Amplitude [ADC value]")
         self.ax_ampl_freq.set_ylabel("Frequency [Hz]")
@@ -326,13 +335,15 @@ class SignalQuadPlot():
         sos = signal.butter(1, 2e6, 'low', fs=self.sr, output='sos')
         sig = np.array(signal.sosfilt(sos, self.sig), dtype=np.complex64) # NOTE: sosfilt returns np.complex128.
         sig = complex.get_phase_rot(sig)
+        # Check needed parameters have been initialized.
+        assert self.xlabel is not None
         if self.sync is True:
             self.ax_phase_time.plot(self.t, sig)
-            self.ax_phase_freq.set_xlabel("Time [s]")
+            self.ax_phase_freq.set_xlabel(self.xlabel)
         else:
             self.ax_phase_time.plot(sig)
-            self.ax_phase_time.set_xlabel("Sample [#]")
-            self.ax_phase_freq.set_xlabel("Sample [#]")
+            self.ax_phase_time.set_xlabel(self.xlabel)
+            self.ax_phase_freq.set_xlabel(self.xlabel)
         self.ax_phase_freq.specgram(sig, NFFT=NFFT, Fs=self.sr, Fc=self.fc)
         self.ax_phase_time.set_ylabel("Phase rotation [Radian]")
         self.ax_phase_freq.set_ylabel("Frequency [Hz]")
@@ -342,6 +353,12 @@ class SignalQuadPlot():
 
         :param block: If set to False, do not block the program execution while
         plotting.
+    def __plot_init_labels(self):
+        """Initialize the labels of the plot."""
+        if self.sync is True:
+            self.xlabel = "Time [s]"
+        else:
+            self.xlabel = "Sample [#]" if LATEX_FONT_ENABLED is False else "Sample [\#]"
 
         :param save: If set to a file path, use this to save the plot instead
         of interactive display.
@@ -364,6 +381,8 @@ class SignalQuadPlot():
             # NOTE: For plt.specgram():
             # - If Fs is not set, it will generates an x-axis of "len(self.sig) / 2".
             # - If Fs is set, it will generates an x-axis of "duration * sampling rate".
+        # Initialize the labels.
+        self.__plot_init_labels()
         self.__plot_amp()
         if self.ncols == 2:
             self.__plot_phase()
