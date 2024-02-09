@@ -408,11 +408,11 @@ class SignalQuadPlot():
         self.__plot_amp()
         if self.ncols == 2:
             self.__plot_phase()
-        # Enable tight_layout for larger plots.
-        plt.tight_layout()
         # Add the title if needed.
         if title is not None and title != "":
             self.fig.suptitle(title)
+        # Enable tight_layout for larger plots.
+        self.fig.set_tight_layout(True)
         if save is None or save == "":
             plt.show(block=block)
         else:
