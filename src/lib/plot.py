@@ -20,9 +20,11 @@ USER_SELECT = None
 
 def enable_latex_fonts():
     """Use LaTeX for text rendering."""
+    # Use pdflatex to generate fonts.
     plt.rcParams.update({
         "text.usetex": True,
-        "font.family": "Computer Modern"
+        "font.family": "Computer Modern",
+        "font.size": 15
     })
 
 def show_fullscreen():
