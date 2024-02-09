@@ -276,25 +276,31 @@ class SignalQuadPlot():
     # Duration of the plotted signal [s].
     duration = None
 
-    # Plotting variables.
+    # Plotting flags.
+
+    # If we sould use a shared x axis accross plot [bool].
+    sync = False
+    # Plotting objects.
+
+    # Figure [Matplotlib Figure].
+    fig = None
+    # Time vector used for shared x axis [np.ndarray].
+    t = None
+    # Amplitude time-domain axe [Matplotlib Axes].
+    ax_ampl_time = None
+    # Amplitude frequency-domain axe [Matplotlib Axes].
+    ax_ampl_freq = None
+    # Phase time-domain axe [Matplotlib Axes].
+    ax_phase_time = None
+    # Phase frequency-domain axe [Matplotlib Axes].
+    ax_phase_freq = None
+
+    # Plotting parameters.
 
     # Number of rows [integer].
     nrows = None
     # Number of columns [integer].
     ncols = None
-    # If we sould use a shared x axis accross plot [bool].
-    sync = False
-    # Time vector used for shared x axis [np.ndarray].
-    t = None
-    # Amplitude time-domain axes [Matplotlib Axes].
-    ax_ampl_time = None
-    # Amplitude frequency-domain axes [Matplotlib Axes].
-    ax_ampl_freq = None
-    # Phase time-domain axes [Matplotlib Axes].
-    ax_phase_time = None
-    # Phase frequency-domain axes [Matplotlib Axes].
-    ax_phase_freq = None
-
     # x-axis labels for all plots.
     xlabel = None
     def __init__(self, sig, sr = None, fc = None):
