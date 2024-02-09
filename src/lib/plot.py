@@ -303,6 +303,11 @@ class SignalQuadPlot():
     ncols = None
     # x-axis labels for all plots.
     xlabel = None
+    # SOS filter that will be applied to the time-domain amplitude signal before plotting.
+    sos_filter_ampl_time = None
+    # SOS filter that will be applied to the time-domain phase rotation signal before plotting.
+    sos_filter_phase = None
+
     def __init__(self, sig, sr = None, fc = None):
         assert type(sig) == np.ndarray, "sig should be a numpy array (np.ndarray)!"
         self.sig = sig
@@ -318,17 +323,25 @@ class SignalQuadPlot():
         # creation.
         if self.duration is not None:
             self.sync = True
+        # Example of creating filters that will be applied before plotting.
+        # self.sos_filter_phase_time = signal.butter(1, 2e6, 'low', fs=self.sr, output='sos')
 
     def __plot_amp(self):
         """Plot the amplitude of the signal in time and frequency domains in a vertical way."""
         # Check needed parameters have been initialized.
         assert self.xlabel is not None
+        # Compute the amplitude.
         sig = complex.get_amplitude(self.sig)
+        # Filter the signal for better visualization if requested.
+        if self.sos_filter_ampl_time is not None:
+            sig_filt = np.array(signal.sosfilt(self.sos_filter_ampl_time, sig), dtype=sig.dtype)
+        else:
+            sig_filt = sig
         if self.sync is True:
-            self.ax_ampl_time.plot(self.t, sig)
+            self.ax_ampl_time.plot(self.t, sig_filt)
             self.ax_ampl_freq.set_xlabel(self.xlabel)
         else:
-            self.ax_ampl_time.plot(sig)
+            self.ax_ampl_time.plot(sig_filt)
             self.ax_ampl_time.set_xlabel(self.xlabel)
             self.ax_ampl_freq.set_xlabel(self.xlabel)
         self.ax_ampl_freq.specgram(self.sig, NFFT=NFFT, Fs=self.sr, Fc=self.fc, sides="twosided", mode="magnitude")
@@ -337,17 +350,20 @@ class SignalQuadPlot():
 
     def __plot_phase(self):
         """Plot the phase of the signal in time and frequency domains in a vertical way."""
-        # Filter the signal for better visualization then compute phase rotation:
-        sos = signal.butter(1, 2e6, 'low', fs=self.sr, output='sos')
-        sig = np.array(signal.sosfilt(sos, self.sig), dtype=np.complex64) # NOTE: sosfilt returns np.complex128.
-        sig = complex.get_phase_rot(sig)
         # Check needed parameters have been initialized.
         assert self.xlabel is not None
+        # Compute phase rotation:
+        sig = complex.get_phase_rot(self.sig)
+        # Filter the signal for better visualization if requested.
+        if self.sos_filter_phase_time is not None:
+            sig_filt = np.array(signal.sosfilt(self.sos_filter_phase_time, sig), dtype=sig.dtype)
+        else:
+            sig_filt = sig
         if self.sync is True:
-            self.ax_phase_time.plot(self.t, sig)
+            self.ax_phase_time.plot(self.t, sig_filt)
             self.ax_phase_freq.set_xlabel(self.xlabel)
         else:
-            self.ax_phase_time.plot(sig)
+            self.ax_phase_time.plot(sig_filt)
             self.ax_phase_time.set_xlabel(self.xlabel)
             self.ax_phase_freq.set_xlabel(self.xlabel)
         self.ax_phase_freq.specgram(sig, NFFT=NFFT, Fs=self.sr, Fc=self.fc)
