@@ -1,6 +1,5 @@
 #!/bin/bash
 
-export PYTHONPATH=/home/drac/git/screaming_channels_ble/src
 dir="$(dirname $(realpath $0))"
 echo dir=$dir
 
@@ -31,6 +30,7 @@ EOF
 }
 
 plot_display 2.533e9
+# NOTE: Assume Figures are manually saved.
 mv ~/Figure_1.png $dir/plot_best_ble_freq.png
 mv ~/Figure_1.svg $dir/plot_best_ble_freq.svg
 mv ~/Figure_1.pdf $dir/plot_best_ble_freq.pdf
