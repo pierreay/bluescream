@@ -280,6 +280,9 @@ class SignalQuadPlot():
 
     # If we sould use a shared x axis accross plot [bool].
     sync = False
+    # Initialized flag for plot_init() [bool].
+    plot_init_flag = False
+
     # Plotting objects.
 
     # Figure [Matplotlib Figure].
@@ -370,11 +373,6 @@ class SignalQuadPlot():
         self.ax_phase_time.set_ylabel("Phase rotation [Radian]")
         self.ax_phase_freq.set_ylabel("Frequency [Hz]")
 
-    def plot(self, block=True, save=None, title=None):
-        """Plot the different components of a signal.
-
-        :param block: If set to False, do not block the program execution while
-        plotting.
     def __plot_init_labels(self):
         """Initialize the labels of the plot."""
         if self.sync is True:
@@ -382,12 +380,13 @@ class SignalQuadPlot():
         else:
             self.xlabel = "Sample [#]" if LATEX_FONT_ENABLED is False else "Sample [\#]"
 
-        :param save: If set to a file path, use this to save the plot instead
-        of interactive display.
+    def plot_init(self, title=None):
+        """Initialize plot without showing or saving.
 
         :param title: If set to a string, use it as plot title.
 
         """
+        assert self.plot_init_flag == False, "Plot initialized multiple times!"
         assert self.nrows == 2, "Bad nrows value"
         assert self.ncols == 1 or self.ncols == 2, "Bad ncols value"
         # Create the plot layout.
@@ -405,14 +404,34 @@ class SignalQuadPlot():
             # - If Fs is set, it will generates an x-axis of "duration * sampling rate".
         # Initialize the labels.
         self.__plot_init_labels()
+        # Proceed to plots.
         self.__plot_amp()
         if self.ncols == 2:
             self.__plot_phase()
         # Add the title if needed.
         if title is not None and title != "":
             self.fig.suptitle(title)
+        # Set the initialized flag.
+        self.plot_init_flag = True
+    
+    def plot(self, block=True, save=None, title=None):
+        """Plot the different components of a signal.
+
+        :param block: If set to False, do not block the program execution while
+        plotting.
+
+        :param save: If set to a file path, use this to save the plot instead
+        of interactive display.
+
+        :param title: If set to a string, use it as plot title.
+
+        """
+        # Initialize the plot if needed.
+        if self.plot_init_flag is False:
+            self.plot_init(title=title)
         # Enable tight_layout for larger plots.
         self.fig.set_tight_layout(True)
+        # Show it or save it.
         if save is None or save == "":
             plt.show(block=block)
         else:
