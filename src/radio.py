@@ -329,7 +329,8 @@ def plot(samp_rate, amplitude, phase, nf_id, ff_id, fast):
 @click.option("--cut/--no-cut", "cut_flag", default=False, help="Cut the recorded signal.")
 @click.option("--save", default="", help="If set to a file path, save the recorded signal as .npy file without custom dtype.")
 @click.option("--save-plot", default="", help="If set to a file path, save the plot to this path.")
-def plot_file(samp_rate, file, npy, cut_flag, save, save_plot):
+@click.option("--freq", type=float, default=None, help="Set the center frequency for the spectrogram.")
+def plot_file(samp_rate, file, npy, cut_flag, save, save_plot, freq):
     """Plot a trace from FILE.
 
     SAMP_RATE is the sampling rate used for the recording.
@@ -340,7 +341,7 @@ def plot_file(samp_rate, file, npy, cut_flag, save, save_plot):
         pltshrk = libplot.PlotShrink(sig)
         pltshrk.plot()
         sig = pltshrk.get_signal_from(sig)
-    libplot.SignalQuadPlot(sig, sr=samp_rate).plot(save=save_plot, title=file)
+    libplot.SignalQuadPlot(sig, sr=samp_rate, fc=freq).plot(save=save_plot, title=file)
     # Save the signal as requested.
     if save != "":
         l.LOGGER.info("Additional save of plotted signal to: {}".format(save))
