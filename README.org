@@ -125,6 +125,45 @@ Those directories contains various signals used in experiments.
 :DIR:      experiments
 :END:
 
+** [2024-02-06 mar.] Instrument a firmware and compare leakage among frequencies in amplitude and phase
+:PROPERTIES:
+:DIR:      experiments/2024-02-06_firmware-instrumentation-for-phase-rot-leak
+:END:
+
+- Goals ::
+  1. Compare the leakage in amplitude and phase rotation to see if we can see the signal.
+- Methods ::
+  1. Instrument the firmware with a recognizable pattern (TX Off, TX Carrier,
+     AES Soft ECB, AES Hard ECB without counter, AES Hard ECB with interrupts,
+     AES Hard CCM).
+  2. Record at multiple frequencies and sampling rates. Analyze the received
+     signal in bot amplitude and phase rotation.
+- Results ::
+  1. The DC/DC regulator enabled by the DCDCEN register seems to influence a
+     bit the leakage at the carrier, but it is not strongly different. We
+     compared the spectrums to see a difference.
+  2. With its [nRF52] clock at 64 MHz and its sub-clocks at 32, 16 and 1 MHz,
+     we can see that they are all inter-modulated with the carrier and that the
+     AES signal its itself modulated around each clock and sub-clock. Hence, we
+     find the signal in a very wide-band spectrum. However, attenuation is not
+     equal across the spectrum, hence, it is important to select the right
+     frequency. Good example is by looking at 2.496e9 for the 3rd harmonic of
+     the 32 MHz sub-clock.
+  3. The best frequency found was 2.510 and 2.512 with 8 MHz of bandwidth to
+     have the more stronger leak. It needs to be evaluated for each setup
+     before launching a Screaming Channel, but it is not as trivial as using
+     the 2nd harmonic (2.528 GHz).
+  4. The leakage in the phase is already present in the baseband signal
+     modulated around the clocks of the CPU. Hence, it may invalidate the
+     theory that the SC phase leakage is produced by voltage variations of the
+     VCO of the carrier.
+- Files ::
+  - When nothing is specified in filenames, the DCDCEN is set to 0.
+  - FF is collected using an antenna in an anechoic box.
+  - NF is collected using a NF probe out of the anechoic box.
+  - [[attachment:firmware_loop.c]] is an extract of the firmware to see the
+    pattern, see firmware repo and tag for code.
+
 ** [2024-02-07 mer.] Comparison between leakage in amplitude and phase
 :PROPERTIES:
 :DIR:      experiments/2024-02-07_leakage_comparison_amplitude_phase_rot
