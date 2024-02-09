@@ -125,6 +125,14 @@ Those directories contains various signals used in experiments.
 :DIR:      experiments
 :END:
 
+** [2024-02-07 mer.] Comparison between leakage in amplitude and phase
+:PROPERTIES:
+:DIR:      experiments/2024-02-07_leakage_comparison_amplitude_phase_rot
+:END:
+
+- Random plot without scripts of SC leakage in amplitude and in phase rotation
+  at 2.530 GHz during a BLE communication (with GFSK).
+
 ** [2024-02-07 mer.] Find the best frequency before a dataset collection using BLE
 :PROPERTIES:
 :DIR:      experiments/2024-02-07_find-best-ble-freq
