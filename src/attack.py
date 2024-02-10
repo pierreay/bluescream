@@ -1062,8 +1062,9 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
         raise Exception("This set DOES NOT use a FIXED KEY")
     if PLOT:
         plt.plot(PROFILE.POIS[:,0], np.average(TRACES, axis=0)[PROFILE.POIS[:,0]], '*')
-        plt.plot(np.average(TRACES, axis=0))
-        plt.plot(PROFILE.MEAN_TRACE, 'r')
+        plt.plot(np.average(TRACES, axis=0), label="Average of attack traces")
+        plt.plot(PROFILE.MEAN_TRACE, 'r', label="Average of profile trace")
+        plt.legend()
         plt.show()
 
     compute_variables(variable)
