@@ -965,6 +965,20 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
     DATASET.add_profile()
     PROFILE = DATASET.get_profile()
 
+    # Resampling --- START.
+    # NOTE: Used once, hence, let it there. Seems to work well. Should put it
+    # inside a lib function if needed again.
+    # from tqdm import tqdm
+    # resamp_from=DATASET.samp_rate
+    # resamp_to=8e6
+    # num = int((len(TRACES[0]) / resamp_from) * resamp_to)
+    # l.LOGGER.info("Resampling to {} points".format(num))
+    # TRACES_resampled = np.empty((TRACES.shape[0], num), dtype=TRACES.dtype)
+    # for i, t in enumerate(tqdm(TRACES, desc="Resampling from {:.2f} MHz to {:.2f} MHz".format(resamp_from / 1e6, resamp_to / 1e6))):
+    #     TRACES_resampled[i] = signal.resample(t, num)
+    # TRACES = TRACES_resampled
+    # Resampling --- END.
+
     if align:
         TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
 
