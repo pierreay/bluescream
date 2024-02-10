@@ -245,12 +245,14 @@ def extract(freq, samp_rate, id_ref, plot, overwrite, id, exit_on_error, config,
     else:
         peak_position = (peaks[0] / len(sig_raw_ref)) * 100
         snr = utils.snr(sig_raw_ref, samp_rate, peaks[0])
+        accept_snr_min = CONFIG["radio"]["extract"][config]["accept_snr_min"]
         avg = int(utils.avg_window(sig_raw_ref, samp_rate, peaks[0]))
         l.LOGGER.info("Peak: Position={:.2f}% ; SNR={:.2} ; Avg={}".format(peak_position, snr, avg))
         if peak_position < 15 or peak_position > 85:
             l.LOGGER.warning("Peak is located at recording's boundaries, bad connection event?")
-        if snr < 1.6:
-            l.LOGGER.warning("Peak SNR is inferior to 1.6, poor signal?")
+        if snr < accept_snr_min:
+            l.LOGGER.error("Current SNR of {:.2f} is inferior to validated minimum SNR of {:.2f}".format(snr, accept_snr_min))
+            peak_detect_ok = False
         if avg < 1300:
             l.LOGGER.warning("Peak value is inferior to 1300, noise?")
 

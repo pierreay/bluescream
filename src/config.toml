@@ -36,6 +36,7 @@ trg_bp_low = [1e6]         # Low cutoff frequency of the bandpass filter for the
 trg_bp_high = [2e6]        # High cutoff frequency of the bandpass filter for the trigger signal.
 trg_lp = 1e4               # Cutoff frequency of the lowpass filter for the trigger signal.
 trg_peak_prominence = 0.75 # Fractional of the peak prominence search.
+accept_snr_min = 2         # Minimum accepted SNR for extraction.
 
 [radio.extract.1_aes_ff_antenna_8msps]
 window = 0.00025
@@ -44,6 +45,7 @@ trg_bp_low = [2e6]
 trg_bp_high = [3e6]
 trg_lp = 1e4
 trg_peak_prominence = 0.40
+accept_snr_min = 15
 
 [radio.extract.1_aes]
 window = 0.005
