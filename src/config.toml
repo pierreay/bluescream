@@ -11,7 +11,7 @@ procedure_interleaving_method = "att_read_request"
 
 [device.fast]
 start_radio_conn_event = 1
-ll_enc_req_conn_event = 2
+ll_enc_req_conn_event = 3
 hop_interval = 15
 channel_map = 0x00000300
 more_data_bit = 0
