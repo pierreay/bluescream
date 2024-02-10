@@ -74,6 +74,10 @@ Those directories contains full or partials datasets recorded using our
   - 2.533 GHz of center frequency, 8 MHz of bandwidth.
   - Input generated using pairing from stock firmware.
   - No repetitions nor for profile or attack.
+  - Profiled using amplitude, correct profile with clear correlation around 0.1.
+  - Profiled using phase, unusable profile but with a start of correlation.
+  - Attack using amplitude profile converge up to 2^80 key rank using 4k
+    traces, needs more traces to see maximum convergence.
 
 * Recordings
 
