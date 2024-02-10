@@ -146,6 +146,52 @@ def debug(indir, subset, outdir):
 
 @cli.command()
 @click.argument("indir", type=click.Path())
+@click.argument("subset", type=str)
+@click.argument("nb", type=int)
+@click.argument("input", type=str)
+def increase_input_size(indir, subset, nb, input):
+    """Increase the input size of a subset.
+
+    INDIR is the dataset path [str].
+
+    SUBSET is the target subset [train | attack].
+    
+    NB is the size that will be used for the increasing [int].
+    
+    INPUT is the input type [pt | ks].
+
+    """
+    # Get dataset and subset.
+    dset = dataset.DatasetProcessing(indir, subset).dset
+    sset = dset.get_subset(subset)
+    if dset is None or sset is None:
+        l.log_n_exit("Bad INDIR or SUBSET value!", 1)
+    # Get old input array.
+    if input == "pt":
+        old_input = sset.pt
+    elif input == "ks":
+        old_input = sset.ks
+    else:
+        l.log_n_exit("Bad INPUT value!", 1)
+    if nb <= old_input.shape[0]:
+        l.log_n_exit("Bad NB value!", 1)
+    # Reshape the array using a manual copy.
+    l.LOGGER.info("Reshape {} array from {} to {}".format(input, old_input.shape[0], nb))
+    new_input = np.zeros((nb, old_input.shape[1]))
+    for i, v in enumerate(old_input):
+        new_input[i] = v
+    # Register the new array inside object.
+    if input == "pt":
+        sset.pt = new_input
+    elif input == "ks":
+        sset.ks = new_input
+    else:
+        assert False, "Bad logic!"
+    # Save on disk.
+    dset.pickle_dump(force=True)
+
+@cli.command()
+@click.argument("indir", type=click.Path())
 def debug_profile(indir):
     """Debug a profile.
 
