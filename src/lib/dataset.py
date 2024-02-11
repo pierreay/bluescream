@@ -284,7 +284,7 @@ class Subset():
         # Search for bad entries and set them to 0.
         # NOTE: Otherwise, we can load traces of different shape, even empty (0).
         # Then, the load.reshape function would reshape all traces to 0.
-        ff_bad = load.find_bad_entry(self.ff)
+        ff_bad = load.find_bad_entry(self.ff, ref_size=len(self.ff[0]))
         for v in ff_bad:
             _, self.ff[v] = analyze.fill_zeros_if_bad(self.ff[0], self.ff[v], log=True, log_idx=v)
         # NOTE: Always return 2D np.ndarray.
