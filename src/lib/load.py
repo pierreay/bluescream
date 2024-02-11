@@ -62,11 +62,14 @@ def get_nb(dir):
     return -1
 
 def find_bad_entry(arr):
-    """Return bad entry (metadata or trace) indexes from the 2D np.array ARR,
-    where a bad entry is an entry filled with zeroes."""
+    """Return bad entry (metadata or trace) indexes from the 2D np.array or
+    Python list containing 1D np.array ARR, where a bad entry is 1) of length
+    zero 2) filled with zeroes.
+
+    """
     bad = []
     for i in tqdm(range(0, len(arr)), desc="find_bad_entry()"):
-        if np.all(np.equal(arr[i], np.zeros((len(arr[0]),)))):
+        if len(arr[i]) == 0 or np.all(np.equal(arr[i], np.zeros((len(arr[0]),)))):
             bad.append(i)
     return bad
 
