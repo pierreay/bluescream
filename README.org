@@ -128,6 +128,16 @@ Those directories contains various signals used in experiments.
 :DIR:      experiments
 :END:
 
+** [2024-01-30 mar.] Instantaneous phase visualization
+:PROPERTIES:
+:DIR:      experiments/2024-01-30_instant_phase_viz
+:END:
+
+- Goals ::
+  - Compare the instantaneous phase of signals recorded during TX on (carrier only), AES software, AES hardware.
+- Results ::
+  - Significant deviations between signals.
+
 ** [2024-02-06 mar.] Instrument a firmware and compare leakage among frequencies in amplitude and phase
 :PROPERTIES:
 :DIR:      experiments/2024-02-06_firmware-instrumentation-for-phase-rot-leak
