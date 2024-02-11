@@ -394,6 +394,8 @@ def align(template, target, sr, ignore=True, log=False):
     # +++===+++++++++
     # +++++++===+++++ -> shift > 0 -> shift left target -> shrink template from right or pad target to right
     # ===++++++++++++ -> shift < 0 -> shift right target -> shrink template from left or pad target to left
+    # Safety-check to prevent weird exception inside the function.
+    assert template.shape > (1,) and target.shape > (1,), "Cannot align empty traces!"
     assert template.shape == target.shape, "Traces to align should have the same length!"
     assert template.ndim == 1 and target.ndim == 1, "Traces to align should be 1D-ndarray!"
     # Compute the cross-correlation and find shift across amplitude.
