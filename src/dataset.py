@@ -177,7 +177,7 @@ def increase_input_size(indir, subset, nb, input):
         l.log_n_exit("Bad NB value!", 1)
     # Reshape the array using a manual copy.
     l.LOGGER.info("Reshape {} array from {} to {}".format(input, old_input.shape[0], nb))
-    new_input = np.zeros((nb, old_input.shape[1]))
+    new_input = np.zeros((nb, old_input.shape[1]), dtype=old_input.dtype)
     for i, v in enumerate(old_input):
         new_input[i] = v
     # Register the new array inside object.
