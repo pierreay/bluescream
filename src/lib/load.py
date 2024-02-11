@@ -432,8 +432,15 @@ def reshape(arr):
     """
     len_min = sys.maxsize
     for i in range(len(arr)):
-        if len(arr[i]) < len_min:
-            len_min = len(arr[i])
+        len_curr = len(arr[i])
+        # NOTE: Debug
+        if len_curr < 10:
+            l.LOGGER.warn("Found entry at index #{} with length of {}!".format(i, len_curr))
+        # NOTE: Sanity-check.
+        if len_curr == 0:
+            raise Exception("Tried to reshape an array to 0 length!")
+        if len_curr < len_min:
+            len_min = len_curr
     for i in range(len(arr)):
         arr[i] = arr[i][:len_min]
     return arr
