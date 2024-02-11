@@ -281,6 +281,12 @@ class Subset():
             self.ff = None if self.ff is None else load.truncate(self.ff, start_point, end_point)
         elif isinstance(idx, range):
             self.nf, self.ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point)
+        # Search for bad entries and set them to 0.
+        # NOTE: Otherwise, we can load traces of different shape, even empty (0).
+        # Then, the load.reshape function would reshape all traces to 0.
+        ff_bad = load.find_bad_entry(self.ff)
+        for v in ff_bad:
+            _, self.ff[v] = analyze.fill_zeros_if_bad(self.ff[0], self.ff[v], log=True, log_idx=v)
         # NOTE: Always return 2D np.ndarray.
         self.nf = utils.list_array_to_2d_array(self.nf)
         self.ff = utils.list_array_to_2d_array(self.ff)
