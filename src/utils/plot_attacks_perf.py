@@ -82,7 +82,7 @@ def myplot(x, y, param_dict, smooth=False):
 
 # General:
 
-plt.title('Key rank and PGE median vs. Trace number')
+# plt.title('Key rank and PGE median vs. Trace number')
 plt.xlabel('Number of traces')
 
 # Key rank:
