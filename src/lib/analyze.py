@@ -178,8 +178,10 @@ def get_trace_format(trace):
 
 def fill_zeros_if_bad(ref, test, log=True, log_idx=-1):
     """If a bad trace TEST is given (i.e. wrong shape or None), return a bad
-    trace using REF as trace reference. Return a tuple (FLAG, TEST) where FLAG
-    is False if trace was OK and True if trace was bad.
+    trace using REF as trace reference.
+
+    /!\ Return a TUPLE (FLAG, TEST) where FLAG is False if trace was OK and
+    True if trace was bad.
 
     """
     if test is None or test.shape != ref.shape:
