@@ -686,23 +686,27 @@ class Profile():
         self.STDS       = np.load(path.join(self.get_path(), Profile.STDS_FN))
         self.MEAN_TRACE = np.load(path.join(self.get_path(), Profile.MEAN_TRACE_FN))
 
-    def plot(self, delim=False):
+    def plot(self, delim=False, save=None, plt_param_dict={}):
         # Code taken from attack.py:find_pois().
         # Plot the POIs.
         plt.subplots_adjust(hspace = 1)
         plt.subplot(2, 1, 1)
-        plt.xlabel("samples")
-        plt.ylabel("r")
+        plt.xlabel("Samples")
+        plt.ylabel("Correlation coeff. (r)")
         for i, snr in enumerate(self.RS):
-            plt.plot(snr, label="subkey %d"%i)
+            plt.plot(snr, label="subkey %d"%i, **plt_param_dict)
         for bnum in range(16):
-            plt.plot(self.POIS[bnum], self.RS[bnum][self.POIS[bnum]], '*')
+            plt.plot(self.POIS[bnum], self.RS[bnum][self.POIS[bnum]], '.')
         # Plot the mean trace.
         plt.subplot(2, 1, 2)
-        plt.plot(self.MEAN_TRACE)
-        plt.xlabel("samples")
-        plt.ylabel("mean trace")
-        plt.show()
+        plt.plot(self.MEAN_TRACE, **plt_param_dict)
+        plt.xlabel("Samples")
+        plt.ylabel("Mean trace")
+        plt.tight_layout()
+        if save is None:
+            plt.show()
+        else:
+            plt.savefig(save)
 
         # Advanced plot by printing the delimiters using the FF trace #0.
         # NOTE: This part imply that profile has been built with FF and not NF.
