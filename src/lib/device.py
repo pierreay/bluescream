@@ -183,8 +183,8 @@ class Device():
         # before, the connection events will be separated.
         l.LOGGER.info("Connection event for sending the LL_ENC_REQ request: {}".format(self.cfg.ll_enc_req_conn_event))
         trgr_send_ll_enc_req = ConnectionEventTrigger(self.cfg.ll_enc_req_conn_event)
-        l.LOGGER.info("Procedure interleaving: {}".format(self.cfg.procedure_interleaving))
-        l.LOGGER.info("More data bit: MD={}".format(self.cfg.more_data_bit))
+        # l.LOGGER.info("Procedure interleaving: {}".format(self.cfg.procedure_interleaving))
+        # l.LOGGER.info("More data bit: MD={}".format(self.cfg.more_data_bit))
         if self.cfg.procedure_interleaving is True:
             l.LOGGER.info("Procedure interleaving method: {}".format(self.cfg.procedure_interleaving_method.name))
             self.central.prepare(
