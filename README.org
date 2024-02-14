@@ -68,16 +68,18 @@ Those directories contains full or partials datasets recorded using our
   - Best attack and bruteforce with key rank = 2^27 and PGE median = 1 for 2k
     traces.
 - [[file:240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw]] ::
-  - 16k profile traces.
+  - 32k profile traces.
   - 4k attack traces.
   - Anechoic box, no LNA.
   - 2.533 GHz of center frequency, 8 MHz of bandwidth.
   - Input generated using pairing from stock firmware.
   - No repetitions nor for profile or attack.
-  - Profiled using amplitude, correct profile with clear correlation around 0.1.
-  - Profiled using phase, unusable profile but with a start of correlation.
-  - Attack using amplitude profile converge up to 2^80 key rank using 4k
-    traces, needs more traces to see maximum convergence.
+  - Profiled using amplitude, correct profile with clear correlation around 0.1
+    to 0.2.
+  - Profiled using phase, unusable profile but with a half of the subkeys
+    having a correlation peak.
+  - Attack using =AMPLITUDE_16384= profile succeed with 2^34 key rank.
+  - Attack using =AMPLITUDE_32768= profile succeed with 2^31 key rank.
 
 * Recordings
 
