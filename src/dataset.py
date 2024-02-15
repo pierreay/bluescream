@@ -34,7 +34,7 @@ def cli(log, loglevel):
 
 @cli.command()
 @click.argument("outdir", type=click.Path())
-@click.argument("samp_rate", type=int)
+@click.argument("samp_rate", type=float)
 @click.option("--force/--no-force", default=False, help="Force an overwriting of an existing initialized dataset.")
 @click.option("--input-gen-init/--no-input-gen-init", default=False,
               help="Generate plaintexts and keys at initialization instead of runtime.")
@@ -83,7 +83,7 @@ def init(outdir, samp_rate, force, input_gen_init, input_gen_run, input_src_seri
     if path.exists(outdir):
         dset_path = dataset.Dataset.get_path_static(outdir)
         if not path.exists(dset_path) or force is True:
-            dset = dataset.Dataset("tmp", outdir, samp_rate)
+            dset = dataset.Dataset("tmp", outdir, int(samp_rate))
             # Input generation configurationg.
             input_gen, input_src = input_conf()
             # Create the subset.
