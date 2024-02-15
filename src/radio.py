@@ -164,6 +164,52 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx, c
     # dset.sset.input_gen == InputGeneration.RUN_TIME.
     dset.pickle_dump(force=True)
 
+# PROG: Skeleton of new instrumentation code for custom firwmare.
+@cli.command()
+@click.argument("indir", type=click.Path())
+@click.argument("subset", type=str)
+@click.argument("ser_port")
+@click.option("--radio/--no-radio", default=True, help="Enable or disable the radio recording (instrument only).")
+@click.option("--idx", default=0, help="Current recording index to get correct dataset's inputs.")
+def instrument_custom(indir, subset, ser_port, radio, idx):
+    """Instrument a device using custom firwmare.
+
+    Trigger the target device and store the RAW recording of the communication
+    in DIR.
+
+    INDIR is the path to the dataset. It is used for collection parameters
+    (e.g. sample rate) and input values (e.g. key and plaintext).
+
+    SUBSET corresponds to the subset's name where the inputs comes from.
+
+    SER_PORT is the serial port of the target device to connect to.
+
+    """    
+    # Load the dataset.
+    dset = dataset.Dataset.pickle_load(indir, quit_on_error=True)
+    sset = dset.get_subset(subset)
+
+    # Perform optionally sanity-check about user request.
+    try:
+        dset.is_able_to_instrument(sset, idx)
+    except Exception as e:
+        l.log_n_exit("Can't instrument current index, exit!", code=1, e=e)
+
+    # Initialize the radio client.
+    rad = soapysdr.MySoapySDRsClient(enabled=radio)
+
+    # Initalize the device.
+    with device.DeviceCustom(ser_port=ser_port, baud=115200, radio=rad, dset=dset, sset=sset) as dev:
+        # Configure everything related to current trace index.
+        dev.configure(idx)
+        # Perform the instrumentation and the recording.
+        try:
+            dev.execute()
+        except Exception as e:
+            l.log_n_exit("error during custom instrumentation", 3, e, traceback=True)
+    # Save the radio capture after success.
+    rad.save()
+
 @cli.command()
 @click.argument("freq", type=float)
 @click.argument("samp_rate", type=float)

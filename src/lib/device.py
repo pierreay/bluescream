@@ -11,6 +11,7 @@ import secrets
 
 # Local modules.
 import lib.dataset as dataset
+from lib.dataset import InputSource, InputGeneration
 import lib.utils as utils
 import lib.device as device
 import lib.log as l
@@ -567,3 +568,47 @@ class DeviceInput():
         string += "\nediv=0x{:x}".format(self.ediv)
         string += "\nskdm=0x{:x}".format(self.skdm)
         return string
+
+# PROG: Skeleton of new instrumentation code for custom firwmare.
+class DeviceCustom():
+    # Parameters of custom firware.
+    
+    # Serial port [str].
+    ser_port = None
+    # Baud rate for serial connection [int].
+    baud = None
+
+    # Python objects.
+    
+    # Initialized radio object [MySoapySDR].
+    radio = None
+    # Used dataset reference [Dataset].
+    dset = None
+    # Used subset reference [Subset].
+    sset = None
+    
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *args):
+        pass
+
+    def __init__(self, ser_port, baud, radio, dset, sset):
+        l.LOGGER.info("Initilize custom device...")
+        # Set objects variables.
+        self.ser_port = ser_port
+        self.baud = baud
+        self.radio = radio
+        self.dset = dset
+        self.sset = sset
+        # Sanity check.
+        assert sset.input_src == InputSource.SERIAL
+        assert sset.input_gen == InputGeneration.INIT_TIME
+
+    def configure(self, idx):
+        l.LOGGER.info("Configure custom device for index {}...".format(idx))
+        pass
+
+    def execute(self):
+        l.LOGGER.info("Execute custom device instrumentation...")
+        pass
