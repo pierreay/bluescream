@@ -309,7 +309,7 @@ class SignalQuadPlot():
     # SOS filter that will be applied to the time-domain amplitude signal before plotting.
     sos_filter_ampl_time = None
     # SOS filter that will be applied to the time-domain phase rotation signal before plotting.
-    sos_filter_phase = None
+    sos_filter_phase_time = None
 
     def __init__(self, sig, sr = None, fc = None):
         assert type(sig) == np.ndarray, "sig should be a numpy array (np.ndarray)!"
