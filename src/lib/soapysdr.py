@@ -67,6 +67,33 @@ class MySoapySDRs():
             # Delete the FIFO.
             os.remove(FIFO_PATH)
 
+    def record_start(self):
+        """Asynchronous version of record().
+
+        Start recording for a pre-configured amount of time.
+
+        """
+        l.LOGGER.debug("MySoapySDRs.record_start().enter")
+        # Use multi-threaded implementation.
+        l.LOGGER.debug("Start recording threads...")
+        self.thr = [None] * len(self.sdrs)
+        for idx, sdr in enumerate(self.sdrs):
+            self.thr[idx] = Thread(target=sdr.record, args=(None,))
+            self.thr[idx].start()
+        l.LOGGER.debug("MySoapySDRs.record_start().exit")
+
+    def record_stop(self):
+        """Asynchronous version of record().
+
+        Wait recording after threads stopped.
+
+        """
+        l.LOGGER.debug("MySoapySDRs.record_stop().enter")
+        l.LOGGER.debug("Wait recording threads...")
+        for idx, sdr in enumerate(self.sdrs):
+            self.thr[idx].join()
+        l.LOGGER.debug("MySoapySDRs.record_stop().exit")
+
     def record(self, duration = None):
         """Perform a recording of DURATION seconds.
 
@@ -85,7 +112,7 @@ class MySoapySDRs():
                 thr[idx] = Thread(target=sdr.record, args=(duration,))
                 thr[idx].start()
             l.LOGGER.debug("Wait threads for multiple SDRs recording...")
-            for sdr in self.sdrs:
+            for idx, sdr in enumerate(self.sdrs):
                 thr[idx].join()
         # Don't use multi-threading if only one recording is needed.
         elif len(self.sdrs) == 1:
@@ -150,7 +177,7 @@ class MySoapySDRs():
                 if len(cmd) > 0:
                     l.LOGGER.debug("fifo -> {}".format(cmd))
                     # Available commands on server-side.
-                    cmds = {"record": self.record, "accept": self.accept, "save": self.save, "disable": self.disable}
+                    cmds = {"record": self.record, "accept": self.accept, "save": self.save, "disable": self.disable, "record_start": self.record_start, "record_stop": self.record_stop}
                     # Execute the received command and acknowledge its execution.
                     if cmd in cmds:
                         cmds[cmd]()
@@ -409,6 +436,7 @@ class MySoapySDR():
                 # variable.
                 readStream_len = min(samples - len(self.rx_signal_candidate), rx_buff_len)
                 assert readStream_len <= len(self.rx_buff)
+                l.LOGGER.debug("Start SoapySDR readStream()...")
                 sr = self.sdr.readStream(self.rx_stream, [self.rx_buff], readStream_len, timeoutUs=int(1e7))
                 if sr.ret == readStream_len and sr.flags == 1 << 2:
                     # Only save part of `RX buffer' containing the captured
@@ -523,6 +551,15 @@ class MySoapySDRsClient():
 
         """
         self.__cmd__("record")
+        self.__wait__()
+
+    def record_start(self):
+        self.__cmd__("record_start")
+        # NOTE: Don't need to wait because record_start is fast enough.
+        # self.__wait__()
+
+    def record_stop(self):
+        self.__cmd__("record_stop")
         self.__wait__()
 
     def accept(self):
