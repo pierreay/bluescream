@@ -1048,7 +1048,7 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
     # delimiters of start and end points.
     if PLOT:
         # Plot the attack trace and its delimiters.
-        libplot.plot_time_spec_sync_axis(DATASET.attack_set.get_trace_from_disk(idx=0, nf=False, ff=True)[dataset.TraceType.FF.value], peaks=[START_POINT, END_POINT], title="Attack trace #0 and delimiters", xtime=False)
+        libplot.plot_time_spec_sync_axis(DATASET.attack_set.get_trace_from_disk(idx=0, nf=False, ff=True)[dataset.TraceType.FF.value], peaks=[START_POINT, END_POINT], title="Attack trace #0 and delimiters", xtime=False, comp=COMPTYPE)
     #     # Plot the profile and its delimiters.
     #     PROFILE.plot(delim=True)
 
