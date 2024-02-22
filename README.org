@@ -80,6 +80,8 @@ Those directories contains full or partials datasets recorded using our
     having a correlation peak.
   - Attack using =AMPLITUDE_16384= profile succeed with 2^34 key rank.
   - Attack using =AMPLITUDE_32768= profile succeed with 2^31 key rank.
+- [[file:240222_custom_firmware_phase_eval]] ::
+  - TODO: Describe the dataset.
 
 * Recordings
 
