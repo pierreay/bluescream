@@ -168,14 +168,14 @@ class MySoapySDRs():
         # Create the FIFO.
         __create_fifo()
         # Open the FIFO.
-        l.LOGGER.info("process #{} ready for listening!".format(os.getpid()))
+        l.LOGGER.info("SDR process #{} ready for listening!".format(os.getpid()))
         with open(FIFO_PATH, "r") as fifo:
-            l.LOGGER.debug("opened FIFO at {}".format(FIFO_PATH))
+            l.LOGGER.debug("[server] Opened FIFO at {}".format(FIFO_PATH))
             # Infinitely listen for commands and execute the radio commands accordingly.
             while True:
                 cmd = fifo.read()
                 if len(cmd) > 0:
-                    l.LOGGER.debug("fifo -> {}".format(cmd))
+                    l.LOGGER.debug("[server] FIFO -> {}".format(cmd))
                     # Available commands on server-side.
                     cmds = {"record": self.record, "accept": self.accept, "save": self.save, "disable": self.disable, "record_start": self.record_start, "record_stop": self.record_stop}
                     # Execute the received command and acknowledge its execution.
@@ -183,7 +183,7 @@ class MySoapySDRs():
                         cmds[cmd]()
                         __ack__()
                     elif cmd == "quit":
-                        l.LOGGER.info("quit the listening mode")
+                        l.LOGGER.info("Quit the listening mode!")
                         break
                 # Smart polling.
                 sleep(self.POLLING_INTERVAL)
@@ -523,7 +523,7 @@ class MySoapySDRsClient():
         # is to open/close/sleep for each commands. Otherwise, the commands
         # arrived concatenated at the reader process.
         if self.enabled is True:
-            l.LOGGER.debug("fifo <- {}".format(cmd))
+            l.LOGGER.debug("[client] FIFO <- {}".format(cmd))
             with open(FIFO_PATH, "w") as fifo:
                 fifo.write(cmd)
             sleep(0.1)
@@ -537,10 +537,10 @@ class MySoapySDRsClient():
             # immediately. Use this only for long command, because if the
             # server-side opening in write mode happen before the client-side
             # opening in read mode, then it will deadlock.
-            l.LOGGER.debug("waiting...")
+            l.LOGGER.debug("[client] Waiting...")
             with open(FIFO_PATH, "r") as fifo:
                 pass
-            l.LOGGER.debug("wait completed")
+            l.LOGGER.debug("[client] Wait completed!")
         else:
             l.LOGGER.debug("Waiting stub for disabled SoapySDR client by sleeping {}s".format(self.STUB_WAIT))
             sleep(self.STUB_WAIT)
