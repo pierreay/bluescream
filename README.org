@@ -70,7 +70,7 @@ Those directories contains full or partials datasets recorded using our
 - [[file:240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw]] ::
   - 32k profile traces.
   - 4k attack traces.
-  - Anechoic box, no LNA.
+  - Anechoic box, no LNA, small Wi-Fi antenna.
   - 2.533 GHz of center frequency, 8 MHz of bandwidth.
   - Input generated using pairing from stock firmware.
   - No repetitions nor for profile or attack.
@@ -78,10 +78,19 @@ Those directories contains full or partials datasets recorded using our
     to 0.2.
   - Profiled using phase, unusable profile but with a half of the subkeys
     having a correlation peak.
-  - Attack using =AMPLITUDE_16384= profile succeed with 2^34 key rank.
-  - Attack using =AMPLITUDE_32768= profile succeed with 2^31 key rank.
+  - Attack using =AMPLITUDE_16384= profile and 16k attack traces succeed with 2^34 key rank.
+  - Attack using =AMPLITUDE_32768= profile and 16k attack traces succeed with 2^31 key rank.
+  - Attack using =AMPLITUDE_65536= profile and 16k attack traces succeed with 2^30 key rank.
+  - Attack using =PHASE_ROT_65536= profile and 16k attack traces lowered the key rank to 2^93.
 - [[file:240222_custom_firmware_phase_eval]] ::
-  - TODO: Describe the dataset.
+  - ~11k * 300 (rep) profile traces (amplitude + phase rotation, no IQ).
+  - ~16k * 300 (rep) attack traces. (amplitude + phase rotation, no IQ).
+  - Anechoic box, no LNA, small Wi-Fi antenna.
+  - 2.512 GHz of center frequency, 8 MHz of bandwidth.
+  - Custom firmware from Giovanni, only carrier (without modulation) and AES software.
+  - Correlation of about ~0.9 for amplitude profile and about ~1 for phase profile.
+  - Both attacks are very effective, lowering the key rank to 2^30 using 30 to
+    300 attack traces.
 
 * Recordings
 
