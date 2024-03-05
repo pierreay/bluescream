@@ -91,6 +91,9 @@ Those directories contains full or partials datasets recorded using our
   - Correlation of about ~0.9 for amplitude profile and about ~1 for phase profile.
   - Both attacks are very effective, lowering the key rank to 2^30 using 30 to
     300 attack traces.
+- [[file:240305_custom_firmware_phase_eval_iq]] ::
+  - Same configuration as previous dataset but keep I/Q instead of real data
+    corresponding to amplitude and phase rotation.
 
 * Recordings
 
