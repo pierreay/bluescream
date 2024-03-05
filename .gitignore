@@ -2,3 +2,5 @@
 README.html
 # Python generated files.
 __pycache__
+# Private files containing secrets.
+.envrc.private
