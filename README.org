@@ -215,6 +215,18 @@ Those directories contains various signals used in experiments.
   2. Plot a comparison and good match between amplitude and phase rotation
      signal.
 
+* Sent
+
+** [2024-03-05 Tue] BLE dataset for Karel
+:PROPERTIES:
+:DIR:      sent/240305_for_karel
+:END:
+
+- Based on [[file:240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw]].
+- Python demonstration of dataset loading and traces computation.
+- Allows to evaluate ML performance on amplitude, phase rotation, I and Q for
+  real target.
+
 * Organization
 
 Here is an example of a complete dataset stored after an attack:
