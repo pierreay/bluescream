@@ -100,8 +100,17 @@ Those directories contains full or partials datasets recorded using our
   - Attacks successful with amp, phr, i_augmented, q_augmented.
   - Attacks failed with i and q.
 - [[file:240306_custom_firmware_phase_eval_iq_norep]] ::
+  - 16k traces for training set.
+  - 4k traces for attack set.
   - Same configuration as previous dataset but:
     - Disable repetitions.
+  - Profiles used several correlations algorithms (=r=, =t=, =snr=, =corr=). Because =r=
+    is not working in this case (find correlations but doesn't find POI for
+    unknown reasons), =snr= gives best results.
+  - See that no repetitions has a high influence on the attack results even if
+    the traces looks good.
+  - =phr= is not better than =amp=.
+  - =i_augmented= is nearly as powerful than =amp= but not better.
 
 * Recordings
 
