@@ -111,6 +111,9 @@ Those directories contains full or partials datasets recorded using our
     the traces looks good.
   - =phr= is not better than =amp=.
   - =i_augmented= is nearly as powerful than =amp= but not better.
+- [[file:240308_custom_firmware_phase_eval_iq_norep_2sr]] ::
+  - Same configuration as previous dataset but with double sampling rate (from
+    8e6 to 16e6).
 
 * Recordings
 
