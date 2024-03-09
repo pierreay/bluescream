@@ -114,6 +114,9 @@ Those directories contains full or partials datasets recorded using our
 - [[file:240308_custom_firmware_phase_eval_iq_norep_2sr]] ::
   - Same configuration as previous dataset but with double sampling rate (from
     8e6 to 16e6).
+  - Results are that it leads to worse key rank for all profiles.
+- [[file:240309_custom_firmware_phase_eval_iq_norep_modgfsk/]] ::
+  - Same configuration as previous (x2) dataset but with GFSK modulation ON.
 
 * Recordings
 
