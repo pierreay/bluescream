@@ -116,7 +116,17 @@ Those directories contains full or partials datasets recorded using our
     8e6 to 16e6).
   - Results are that it leads to worse key rank for all profiles.
 - [[file:240309_custom_firmware_phase_eval_iq_norep_modgfsk/]] ::
+  - 16k profile traces.
+  - 16k attack traces.
   - Same configuration as previous (x2) dataset but with GFSK modulation ON.
+  - This collect with GFSK modulation clearly impact performances. Notes:
+    - It is unclear how it affects performance, since all profiles are affected
+      (even amplitude).
+    - More factor are present than the GFSK modulation, like the deep fades
+      between packets boundaries.
+    - The less impacted attack is the phase rotation (only 2^3 of difference of
+      keyrank) compared to the others.
+  - On this dataset, i_augmented is the better performance attack.
 
 * Recordings
 
