@@ -569,46 +569,46 @@ class DeviceInput():
         string += "\nskdm=0x{:x}".format(self.skdm)
         return string
 
-# PROG: Skeleton of new instrumentation code for custom firwmare.
-class DeviceCustom():
-    # Parameters of custom firware.
+# NOTE: Skeleton for a new instrumentation code.
+# class DeviceCustom():
+#     # Parameters of custom firware.
     
-    # Serial port [str].
-    ser_port = None
-    # Baud rate for serial connection [int].
-    baud = None
+#     # Serial port [str].
+#     ser_port = None
+#     # Baud rate for serial connection [int].
+#     baud = None
 
-    # Python objects.
+#     # Python objects.
     
-    # Initialized radio object [MySoapySDR].
-    radio = None
-    # Used dataset reference [Dataset].
-    dset = None
-    # Used subset reference [Subset].
-    sset = None
+#     # Initialized radio object [MySoapySDR].
+#     radio = None
+#     # Used dataset reference [Dataset].
+#     dset = None
+#     # Used subset reference [Subset].
+#     sset = None
     
-    def __enter__(self):
-        return self
+#     def __enter__(self):
+#         return self
 
-    def __exit__(self, *args):
-        pass
+#     def __exit__(self, *args):
+#         pass
 
-    def __init__(self, ser_port, baud, radio, dset, sset):
-        l.LOGGER.info("Initilize custom device...")
-        # Set objects variables.
-        self.ser_port = ser_port
-        self.baud = baud
-        self.radio = radio
-        self.dset = dset
-        self.sset = sset
-        # Sanity check.
-        assert sset.input_src == InputSource.SERIAL
-        assert sset.input_gen == InputGeneration.INIT_TIME
+#     def __init__(self, ser_port, baud, radio, dset, sset):
+#         l.LOGGER.info("Initilize custom device...")
+#         # Set objects variables.
+#         self.ser_port = ser_port
+#         self.baud = baud
+#         self.radio = radio
+#         self.dset = dset
+#         self.sset = sset
+#         # Sanity check.
+#         assert sset.input_src == InputSource.SERIAL
+#         assert sset.input_gen == InputGeneration.INIT_TIME
 
-    def configure(self, idx):
-        l.LOGGER.info("Configure custom device for index {}...".format(idx))
-        pass
+#     def configure(self, idx):
+#         l.LOGGER.info("Configure custom device for index {}...".format(idx))
+#         pass
 
-    def execute(self):
-        l.LOGGER.info("Execute custom device instrumentation...")
-        pass
+#     def execute(self):
+#         l.LOGGER.info("Execute custom device instrumentation...")
+#         pass
