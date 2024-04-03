@@ -134,7 +134,7 @@ Those directories contains full or partials datasets recorded using our
   - TODO profile traces.
   - TODO attack traces.
   - Office environment, TODO meters.
-  - TODO LNA + USP B210 mini + [[https://www.tp-link.com/fr/home-networking/antenna/tl-ant2424b/][TP-Link TL-ANT2424B]].
+  - [[https://www.minicircuits.com/pdfs/ZX60-272LN-S+.pdf][MiniCircuits ZX60-272LN-S+]] LNA + USRP B210 mini + [[https://www.tp-link.com/fr/home-networking/antenna/tl-ant2424b/][TP-Link TL-ANT2424B]] antenna.
   - 2.533 GHz of center frequency, 8 MHz of bandwidth.
   - Input generated using pairing from stock firmware.
   - No repetitions nor for profile or attack.
