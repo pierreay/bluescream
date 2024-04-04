@@ -136,7 +136,7 @@ def plot_time_compare_n(arr):
 
 # * Special plot for analysis
 
-def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, cond=True, comp=complex.CompType.AMPLITUDE, norm=False, xtime=True, title="", fast=False):
+def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, cond=True, comp=complex.CompType.AMPLITUDE, norm=False, xtime=True, title="", fast=False, save=None):
     """Plot signals using synchronized time and frequency domains.
 
     Plot signals contained in the S_ARR 2D np.ndarray or list containing 1D
@@ -161,7 +161,7 @@ def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, c
     # NOTE: Tried to implement a non-blocking version of this function, but
     # when using plt.plot(block=False) and re-entering this function again for
     # another plot, both plots are plotted on same figure.
-    if cond is False:
+    if cond is False and (save is None or save == ""):
         return
     # Get the corresponding component of the signal and convert s_arr into Numpy array.
     s_arr = complex.get_comp(np.array(s_arr), comp)
@@ -240,7 +240,14 @@ def plot_time_spec_sync_axis(s_arr, samp_rate=None, peaks=None, triggers=None, c
         ax_freq = plot_freq(samp_rate, s, ax_time, subplot_idx + 1, triggers)
         if peaks is not None:
             plot_peaks(peaks, ax_freq, samp_rate)
-    plt.show()
+
+    if save is not None and save != "":
+        figure = plt.gcf()
+        figure.set_size_inches(32, 18)
+        plt.savefig(save, bbox_inches='tight', dpi=300)
+    if cond is True:
+        plt.show()
+    plt.clf()
 
 def plot_metadata_balance(ks, pt):
     """Take 2D np.array of KS keys and PT plaintexts, show a boxplot of imbalance"""
@@ -414,28 +421,32 @@ class SignalQuadPlot():
         # Set the initialized flag.
         self.plot_init_flag = True
     
-    def plot(self, block=True, save=None, title=None):
+    def plot(self, block=True, save=None, title=None, show=True):
         """Plot the different components of a signal.
 
         :param block: If set to False, do not block the program execution while
         plotting.
 
-        :param save: If set to a file path, use this to save the plot instead
-        of interactive display.
+        :param save: If set to a file path, use this to save the plot.
 
         :param title: If set to a string, use it as plot title.
 
+        :param save: If set to True, show the interactive display.
+        
         """
         # Initialize the plot if needed.
         if self.plot_init_flag is False:
             self.plot_init(title=title)
         # Enable tight_layout for larger plots.
         self.fig.set_tight_layout(True)
-        # Show it or save it.
-        if save is None or save == "":
+        # Show it and/or save it.
+        if save is not None and save != "":
+            figure = plt.gcf()
+            figure.set_size_inches(32, 18)
+            plt.savefig(save, bbox_inches='tight', dpi=300)
+        if show is True:
             plt.show(block=block)
-        else:
-            plt.savefig(save, dpi=600)
+        plt.clf()
 
 def select(candidate):
     global USER_SELECT

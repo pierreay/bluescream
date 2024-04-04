@@ -221,7 +221,8 @@ def instrument(indir, subset, bd_addr_src, bd_addr_dest, ser_port, radio, idx, c
 @click.option("--config", default="1_aes", help="Select the extractor configuration based on radio.extract.NAME in the configuration file.")
 @click.option("--save", default="", type=click.Path(), help="If set to a file path, save the ID_REF extracted signal as .npy file without custom dtype. Ignored if --overwrite is set to False.")
 @click.option("--corr", default="", type=click.Path(), help="If set to a file path, cross-correlate the results against the signal.")
-def extract(freq, samp_rate, id_ref, plot, overwrite, id, exit_on_error, config, save, corr):
+@click.option("--save-plot", default="", help="If set to a file path (without extension), save the plot to this path.")
+def extract(freq, samp_rate, id_ref, plot, overwrite, id, exit_on_error, config, save, corr, save_plot):
     """Extract RAW traces from DIR.
 
     Extract a rough window around interesting signals from just-recorded RAW
@@ -307,8 +308,8 @@ def extract(freq, samp_rate, id_ref, plot, overwrite, id, exit_on_error, config,
         for idx, peak in enumerate(peaks):
             # libplot.plot_time_spec_sync_axis([analyze.extract_time_window(sig_raw_ref, samp_rate, peak, window, offset=offset)], samp_rate=samp_rate, cond=plot, title="Peak #{}".format(idx))
             sigtoplot = analyze.extract_time_window(load.load_raw_trace(DIR, rad_idx=0, rec_idx=0), samp_rate, peak, window, offset=offset)
-            libplot.SignalQuadPlot(sigtoplot, sr=samp_rate, fc=freq).plot()
-    libplot.plot_time_spec_sync_axis([sig_raw_ref], samp_rate=samp_rate, peaks=peaks, triggers=nf_triggers, cond=plot)
+            libplot.SignalQuadPlot(sigtoplot, sr=samp_rate, fc=freq).plot(save="{}_1.pdf".format(save_plot) if save_plot != "" else "", show=plot)
+    libplot.plot_time_spec_sync_axis([sig_raw_ref], samp_rate=samp_rate, peaks=peaks, triggers=nf_triggers, cond=plot, save="{}_2.pdf".format(save_plot) if save_plot != "" else "")
 
     # Exit based on results.
     if peak_detect_ok is False:
