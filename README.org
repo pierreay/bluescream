@@ -130,12 +130,12 @@ Those directories contains full or partials datasets recorded using our
     - The less impacted attack is the phase rotation (only 2^3 of difference of
       keyrank) compared to the others.
   - On this dataset, i_augmented is the better performance attack.
-- [[file:240403_1-leak-pairing-highdist-2.533e9-8e6_raw]] ::
+- [[file:240403_1-leak-pairing-highdist-2.534e9-16e6_raw]] ::
   - TODO profile traces.
   - TODO attack traces.
-  - Office environment, TODO meters.
+  - Office environment, 120 cm.
   - [[https://www.minicircuits.com/pdfs/ZX60-272LN-S+.pdf][MiniCircuits ZX60-272LN-S+]] LNA + USRP B210 mini + [[https://www.tp-link.com/fr/home-networking/antenna/tl-ant2424b/][TP-Link TL-ANT2424B]] antenna.
-  - 2.533 GHz of center frequency, 8 MHz of bandwidth.
+  - 2.534 GHz of center frequency, 16 MHz of bandwidth.
   - Input generated using pairing from stock firmware.
   - No repetitions nor for profile or attack.
 
