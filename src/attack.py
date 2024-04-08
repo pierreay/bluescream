@@ -468,7 +468,7 @@ def estimate_corr():
 # subbytes. Shape = (subbyte_idx, num_pois).
 # To find POIS, k-fold ro-test, t-test, signal to noise ratio (SNR), sum of
 # absolute differences (SOAD) can be used.
-def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='.'):
+def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='profile'):
     global SNRS, SOADS
 
     PROFILE.RZS = np.zeros((NUM_KEY_BYTES, len(TRACES[0])))
@@ -582,11 +582,14 @@ def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='.'):
             plt.legend(loc='upper right')
 
         plt.legend()
+        if SAVE_IMAGES:
+            # NOTE: Fix savefig() layout.
+            figure = plt.gcf() # Get current figure
+            figure.set_size_inches(32, 18) # Set figure's size manually to your full screen (32x18).
+            plt.savefig(os.path.join(template_dir,'pois.pdf'), bbox_inches='tight', dpi=100)
         if PLOT:
             plt.show()
-        if SAVE_IMAGES:
-            plt.savefig(os.path.join(template_dir,'pois.pdf'))
-            plt.close()
+        plt.clf()
 
 # Once the POIs are known, we can drop all the other points of the traces
 # Optionally, instead of taking the peak only, we can take the average of a
@@ -605,7 +608,7 @@ def reduce_traces(num_pois, window=0):
                 TRACES_REDUCED[bnum][i][poi] = np.average(trace[start:end])
 
 # Estimate means, std, and covariance for each possible class
-def build_profile(variable, template_dir='.'):
+def build_profile(variable, template_dir='profile'):
     num_pois = len(PROFILE.POIS[0])
     num_classes = len(CLASSES)
 
@@ -647,12 +650,14 @@ def build_profile(variable, template_dir='.'):
                              fmt='--o',
                              label="subkey %d"%bnum)
             plt.legend(loc='upper right')
+            if SAVE_IMAGES:
+                # NOTE: Fix savefig() layout.
+                figure = plt.gcf() # Get current figure
+                figure.set_size_inches(32, 18) # Set figure's size manually to your full screen (32x18).
+                plt.savefig(os.path.join(template_dir,'profile_poi_%d.pdf'%i), bbox_inches='tight', dpi=100)
             if PLOT:
                 plt.show()
-            if SAVE_IMAGES:
-                plt.savefig(os.path.join(template_dir,'profile_poi_%d.pdf'%i),
-                        bbox_inches='tight')
-                plt.close()
+            plt.clf()
 
 # Find the best (linear) combination of the bits of the leak variable that fits
 # the measured traces, compare it with the profile estimated for each possible
@@ -964,6 +969,12 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
     load_data(dataset.SubsetType.TRAIN)
     DATASET.add_profile()
     PROFILE = DATASET.get_profile()
+
+    try:
+        template_dir="profile"
+        os.makedirs(template_dir)
+    except Exception as e:
+        pass
 
     # Resampling --- START.
     # NOTE: Used once, hence, let it there. Seems to work well. Should put it
