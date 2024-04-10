@@ -48,8 +48,6 @@ CIPHERTEXTS = None
 FIXED_KEY = None
 FIXED_PLAINTEXT = None
 TRACES = None
-TRACES_AMP = None
-TRACES_PHR = None
 VARIABLES = None
 VARIABLE_FUNC = None
 CLASSES = None
@@ -79,7 +77,7 @@ def load_data(subset, forced_profile = None):
     :param forced_profile: If set to a path, use the profile under this directory.
 
     """
-    global DATASET, SUBSET, PROFILE, PLAINTEXTS, KEYS, FIXED_KEY, TRACES, TRACES_AMP, TRACES_PHR, CIPHERTEXTS, NUM_TRACES, START_POINT, END_POINT, NORM, NORM2
+    global DATASET, SUBSET, PROFILE, PLAINTEXTS, KEYS, FIXED_KEY, TRACES, CIPHERTEXTS, NUM_TRACES, START_POINT, END_POINT, NORM, NORM2
     # The original generic_load() function used in Screaming Channels implies that:
     # - FIXED_KEY should be a bool.
     # - PLAINTEXTS and KEYS should be a list of list of int read from hex
@@ -107,15 +105,9 @@ def load_data(subset, forced_profile = None):
     KEYS, PLAINTEXTS, _, TRACES = load.reduce_entry_all_dataset(KEYS, PLAINTEXTS, None, TRACES, NUM_TRACES)
     PLAINTEXTS                  = PLAINTEXTS.tolist()
     KEYS                        = KEYS.tolist()
-    TRACES_AMP                  = complex.get_comp(TRACES, "AMPLITUDE")
-    TRACES_PHR                  = complex.get_comp(TRACES, "PHASE_ROT")
+    TRACES                      = complex.get_comp(TRACES, COMPTYPE)
     if NORM or NORM2:
-        TRACES_AMP = analyze.normalize_zscore(TRACES_AMP, NORM2)
-        TRACES_PHR = analyze.normalize_zscore(TRACES_PHR, NORM2)
-    if COMPTYPE == "AMPLITUDE":
-        TRACES = TRACES_AMP
-    elif COMPTYPE == "PHASE_ROT":
-        TRACES = TRACES_PHR
+        TRACES = analyze.normalize_zscore(TRACES, NORM2)
     assert(isinstance(PLAINTEXTS, list))
     assert(isinstance(KEYS, list))
     assert(isinstance(TRACES, np.ndarray))
@@ -159,7 +151,7 @@ def load_data(subset, forced_profile = None):
               help="Choose ch1, ch2, eg, or mr")
 @click.option("--loglevel", default="DEBUG", help="Logging level.")
 @click.option("--log/--no-log", default=True, help="Enable or disable logging.")
-@click.option("--comptype", default="AMPLITUDE", help="Choose between amplitude [AMPLITUDE], phase rotation [PHASE_ROT], recombination [RECOMBIN].")
+@click.option("--comptype", default="AMPLITUDE", help="Choose between amplitude [AMPLITUDE] or phase rotation [PHASE_ROT].")
 def cli(dataset_path, num_traces, start_point, end_point, plot, save_images, wait, num_key_bytes,
         bruteforce, bit_bound_end, name, average, norm, norm2, mimo, loglevel, log, comptype):
     """
@@ -1056,54 +1048,49 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
     The template directory is where we store multiple files comprising the
     template.
     """
-    global PROFILE, TRACES, TRACES_AMP, TRACES_PHR
+    global PROFILE, TRACES
+    load_data(dataset.SubsetType.ATTACK, profile)
+    assert(PROFILE)
+    PROFILE.load()
     
-    def attack_comp(variable, pois_algo, num_pois, poi_spacing,
-                    attack_algo, k_fold, average_bytes, pooled_cov, window, align, profile):
-        load_data(dataset.SubsetType.ATTACK, profile)
-        assert(PROFILE)
-        PROFILE.load()
 
+    # NOTE: Disable those plots as they are not so useful in their current
+    # setup. The goal was to vizualise the profile and attack traces with the
+    # delimiters of start and end points.
+    if PLOT:
+        # Plot the attack trace and its delimiters.
+        libplot.plot_time_spec_sync_axis(DATASET.attack_set.get_trace_from_disk(idx=0, nf=False, ff=True)[dataset.TraceType.FF.value], peaks=[START_POINT, END_POINT], title="Attack trace #0 and delimiters", xtime=False, comp=COMPTYPE)
+    #     # Plot the profile and its delimiters.
+    #     PROFILE.plot(delim=True)
 
-        # NOTE: Disable those plots as they are not so useful in their current
-        # setup. The goal was to vizualise the profile and attack traces with the
-        # delimiters of start and end points.
-        if PLOT:
-            # Plot the attack trace and its delimiters.
-            libplot.plot_time_spec_sync_axis(DATASET.attack_set.get_trace_from_disk(idx=0, nf=False, ff=True)[dataset.TraceType.FF.value], peaks=[START_POINT, END_POINT], title="Attack trace #0 and delimiters", xtime=False, comp=COMPTYPE)
-        #     # Plot the profile and its delimiters.
-        #     PROFILE.plot(delim=True)
+    if align:
+        l.LOGGER.info("Align attack traces with themselves...")
+        TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=TRACES[0], tqdm_log=True)
+        l.LOGGER.info("Align attack traces with the profile...")
+        TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
 
-        if align:
-            l.LOGGER.info("Align attack traces with themselves...")
-            TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=TRACES[0], tqdm_log=True)
-            l.LOGGER.info("Align attack traces with the profile...")
-            TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
+    if not FIXED_KEY and variable != "hw_p" and variable != "p":
+        raise Exception("This set DOES NOT use a FIXED KEY")
+    if PLOT:
+        plt.plot(PROFILE.POIS[:,0], np.average(TRACES, axis=0)[PROFILE.POIS[:,0]], '*')
+        plt.plot(np.average(TRACES, axis=0), label="Average of attack traces")
+        plt.plot(PROFILE.MEAN_TRACE, 'r', label="Average of profile trace")
+        plt.legend()
+        plt.show()
 
-        if not FIXED_KEY and variable != "hw_p" and variable != "p":
-            raise Exception("This set DOES NOT use a FIXED KEY")
-        if PLOT:
-            plt.plot(PROFILE.POIS[:,0], np.average(TRACES, axis=0)[PROFILE.POIS[:,0]], '*')
-            plt.plot(np.average(TRACES, axis=0), label="Average of attack traces")
-            plt.plot(PROFILE.MEAN_TRACE, 'r', label="Average of profile trace")
-            plt.legend()
-            plt.show()
+    compute_variables(variable)
+    
+    if num_pois == 0:
+        num_pois = len(PROFILE.POIS[0])
 
-        compute_variables(variable)
+    if pois_algo != "":
+        classify()
+        estimate()
+        find_pois(pois_algo, num_pois, k_fold, poi_spacing)
 
-        if num_pois == 0:
-            num_pois = len(PROFILE.POIS[0])
-
-        if pois_algo != "":
-            classify()
-            estimate()
-            find_pois(pois_algo, num_pois, k_fold, poi_spacing)
-
-        reduce_traces(num_pois, window)
-        found = run_attack(attack_algo, average_bytes, num_pois, pooled_cov,
-                variable)
-
-    attack_comp(variable, pois_algo, num_pois, poi_spacing, attack_algo, k_fold, average_bytes, pooled_cov, window, align, profile)
+    reduce_traces(num_pois, window)
+    found = run_attack(attack_algo, average_bytes, num_pois, pooled_cov,
+            variable)
 
     # Always rank if HEL is available.
     rank()
