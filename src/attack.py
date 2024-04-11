@@ -1132,30 +1132,53 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
              help="If specified, use the profile from this directory.")
 def attack_recombined(variable, pois_algo, num_pois, poi_spacing,
            attack_algo, k_fold, average_bytes, pooled_cov, window, align, profile):
-    global PROFILE, TRACES
-    load_data(dataset.SubsetType.ATTACK, profile)
-    assert(PROFILE)
-    PROFILE.load()
+    global PROFILE, TRACES, COMPTYPE
 
-     if align:
-        l.LOGGER.info("Align attack traces with themselves...")
-        TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=TRACES[0], tqdm_log=True)
-        l.LOGGER.info("Align attack traces with the profile...")
-        TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
+    maxcpa = {"AMPLITUDE": None, "PHASE_ROT": None, "RECOMBIN": None}
 
-    compute_variables(variable)
-    
-    if num_pois == 0:
-        num_pois = len(PROFILE.POIS[0])
+    for comp in ["AMPLITUDE", "PHASE_ROT"]:
+        COMPTYPE = comp
+        load_data(dataset.SubsetType.ATTACK, profile.format(comp))
+        assert(PROFILE)
+        PROFILE.load()
 
-    if pois_algo != "":
-        classify()
-        estimate()
-        find_pois(pois_algo, num_pois, k_fold, poi_spacing)
+        if align:
+            l.LOGGER.info("Align attack traces with themselves...")
+            TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=TRACES[0], tqdm_log=True)
+            l.LOGGER.info("Align attack traces with the profile...")
+            TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
 
-    reduce_traces(num_pois, window)
-    found = run_attack(attack_algo, average_bytes, num_pois, pooled_cov,
-            variable)
+        compute_variables(variable)
+
+        if num_pois == 0:
+            num_pois = len(PROFILE.POIS[0])
+
+        if pois_algo != "":
+            classify()
+            estimate()
+            find_pois(pois_algo, num_pois, k_fold, poi_spacing)
+
+        reduce_traces(num_pois, window)
+        maxcpa[comp] = run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable, retmore=True)
+
+    bestguess = [0] * 16
+    pge = [256] * 16
+    cparefs = [None] * NUM_KEY_BYTES
+    maxcpa["RECOMBIN"] = np.empty_like(maxcpa["AMPLITUDE"])
+    for bnum in range(0, NUM_KEY_BYTES):
+        for kguess in range(256):
+            # NOTE: Combination of correlation coefficient from 2 channels
+            # (amplitude and phase rotation) inspired from POI recombination
+            # but using addition instead of multiplication.
+            maxcpa["RECOMBIN"][bnum][kguess] = maxcpa["AMPLITUDE"][bnum][kguess] + maxcpa["PHASE_ROT"][bnum][kguess]
+            LOG_PROBA[bnum][kguess] = np.copy(maxcpa["RECOMBIN"][bnum][kguess])
+        bestguess[bnum] = np.argmax(maxcpa["RECOMBIN"][bnum])
+        cparefs[bnum] = np.argsort(maxcpa["RECOMBIN"][bnum])[::-1]
+        pge[bnum] = list(cparefs[bnum]).index(KEYS[0][bnum])
+    known = KEYS[0]
+
+    # Print simple results without key estimation.
+    print_result(bestguess, known, pge)
 
     # Always rank if HEL is available.
     rank()
