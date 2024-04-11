@@ -1130,13 +1130,22 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
              help="Align the attack traces with the profile before to attack.")
 @click.option("--profile", default="", type=click.Path(), show_default=True,
              help="If specified, use the profile from this directory.")
+@click.option("--comptype", default="RECOMBIN",
+              help="Choose between amplitude [AMPLITUDE], phase rotation [PHASE_ROT], recombination [RECOMBIN].")
 def attack_recombined(variable, pois_algo, num_pois, poi_spacing,
-           attack_algo, k_fold, average_bytes, pooled_cov, window, align, profile):
+                      attack_algo, k_fold, average_bytes, pooled_cov, window, align, profile, comptype):
     global PROFILE, TRACES, COMPTYPE
 
     maxcpa = {"AMPLITUDE": None, "PHASE_ROT": None, "RECOMBIN": None}
 
-    for comp in ["AMPLITUDE", "PHASE_ROT"]:
+    if comptype == "AMPLITUDE" or comptype == "PHASE_ROT":
+        compdefault = comptype
+        complist = [comptype]
+    elif comptype == "RECOMBIN":
+        compdefault = "AMPLITUDE"
+        complist = ["AMPLITUDE", "PHASE_ROT"]
+
+    for comp in complist:
         COMPTYPE = comp
         load_data(dataset.SubsetType.ATTACK, profile.format(comp))
         assert(PROFILE)
@@ -1164,13 +1173,16 @@ def attack_recombined(variable, pois_algo, num_pois, poi_spacing,
     bestguess = [0] * 16
     pge = [256] * 16
     cparefs = [None] * NUM_KEY_BYTES
-    maxcpa["RECOMBIN"] = np.empty_like(maxcpa["AMPLITUDE"])
+    maxcpa["RECOMBIN"] = np.empty_like(maxcpa[compdefault])
     for bnum in range(0, NUM_KEY_BYTES):
         for kguess in range(256):
             # NOTE: Combination of correlation coefficient from 2 channels
             # (amplitude and phase rotation) inspired from POI recombination
             # but using addition instead of multiplication.
-            maxcpa["RECOMBIN"][bnum][kguess] = maxcpa["AMPLITUDE"][bnum][kguess] + maxcpa["PHASE_ROT"][bnum][kguess]
+            if comptype == "RECOMBIN":
+                maxcpa["RECOMBIN"][bnum][kguess] = maxcpa["AMPLITUDE"][bnum][kguess] + maxcpa["PHASE_ROT"][bnum][kguess]
+            else:
+                maxcpa["RECOMBIN"][bnum][kguess] = maxcpa[compdefault][bnum][kguess]
             LOG_PROBA[bnum][kguess] = np.copy(maxcpa["RECOMBIN"][bnum][kguess])
         bestguess[bnum] = np.argmax(maxcpa["RECOMBIN"][bnum])
         cparefs[bnum] = np.argsort(maxcpa["RECOMBIN"][bnum])[::-1]
