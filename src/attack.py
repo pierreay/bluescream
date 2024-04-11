@@ -748,7 +748,7 @@ def fit(lr_type, variable):
     PROFILE.COVS = None
 
 # Run a template attack or a profiled correlation attack
-def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
+def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable, retmore=False):
     global LOG_PROBA
 
     # NOTE: Use np.ndarray to fix memory address misusage.
@@ -861,8 +861,11 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
     else:
         known = KEYS[0]
 
-    print_result(bestguess, known, pge)
-    return (bestguess == known).all()
+    if retmore is False:
+        print_result(bestguess, known, pge)
+        return (bestguess == known).all()
+    else:
+        return maxcpa
 
 # Wrapper to compute AES
 def aes(pt, key):
