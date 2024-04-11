@@ -751,7 +751,9 @@ def fit(lr_type, variable):
 def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
     global LOG_PROBA
 
-    LOG_PROBA = [[0 for r in range(256)] for bnum in range(NUM_KEY_BYTES)]
+    # NOTE: Use np.ndarray to fix memory address misusage.
+    # NOTE: Use np.float64 required by HEL (otherwise, segfault).
+    LOG_PROBA = np.empty((NUM_KEY_BYTES, 256), dtype=np.float64)
 
     scores = []
     bestguess = [0]*16
@@ -817,9 +819,12 @@ def run_attack(attack_algo, average_bytes, num_pois, pooled_cov, variable):
 
         if average_bytes:
             PROFILE_MEANS_AVG = np.average(PROFILE.MEANS, axis=0)
+
+        # NOTE: Use np.ndarray to fix memory address misusage.
+        # NOTE: Use np.float64 required by HEL (otherwise, segfault).
+        maxcpa = np.empty((NUM_KEY_BYTES, 256), dtype=np.float64)
         for bnum in range(0, NUM_KEY_BYTES):
             cpaoutput = [0]*256
-            maxcpa = [0]*256
             print("Subkey %2d"%bnum)
             for kguess in range(256):
 
