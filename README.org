@@ -138,16 +138,13 @@ Those directories contains full or partials datasets recorded using our
 :END:
 
 - Summary ::
-  - TODO profile traces.
-  - TODO attack traces.
+  - 30k profile traces.
+  - 20k attack traces.
   - Office environment, 120 cm.
   - [[https://www.minicircuits.com/pdfs/ZX60-272LN-S+.pdf][MiniCircuits ZX60-272LN-S+]] LNA + USRP B210 mini + [[https://www.tp-link.com/fr/home-networking/antenna/tl-ant2424b/][TP-Link TL-ANT2424B]] antenna.
   - 2.534 GHz of center frequency, 16 MHz of bandwidth.
   - Input generated using pairing from stock firmware.
   - No repetitions nor for profile or attack.
-- [0/2] Tasks ::
-  - [ ] Profile creation
-  - [ ] Attack process
 
 * Recordings
 
