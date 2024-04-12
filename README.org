@@ -118,7 +118,14 @@ Those directories contains full or partials datasets recorded using our
   - Same configuration as previous dataset but with double sampling rate (from
     8e6 to 16e6).
   - Results are that it leads to worse key rank for all profiles.
-- [[file:240309_custom_firmware_phase_eval_iq_norep_modgfsk/]] ::
+
+** [2023-03-09 jeu.] Custom -- Phase leakage evaluation storing IQ without repetitions and using GFSK
+:PROPERTIES:
+:DIR:      240309_custom_firmware_phase_eval_iq_norep_modgfsk
+:ID:       73a81721-2fb4-42df-a572-19646c29ca81
+:END:
+
+- Summary ::
   - 16k profile traces.
   - 16k attack traces.
   - Same configuration as previous (x2) dataset but with GFSK modulation ON.
@@ -130,12 +137,19 @@ Those directories contains full or partials datasets recorded using our
     - The less impacted attack is the phase rotation (only 2^3 of difference of
       keyrank) compared to the others.
   - On this dataset, i_augmented is the better performance attack.
-- [[file:240403_1-leak-pairing-highdist-2.533e9-8e6_raw]] ::
-  - TODO profile traces.
-  - TODO attack traces.
-  - Office environment, TODO meters.
+
+** [2024-04-03 mer.] BLE -- Unique leakage using pairing at high distance using 2.534e9 SR and 16e6 FC
+:PROPERTIES:
+:DIR:      240403_1-leak-pairing-highdist-2.534e9-16e6_raw
+:ID:       951929f6-7c55-47e8-8c21-79a660d90f48
+:END:
+
+- Summary ::
+  - 30k profile traces.
+  - 20k attack traces.
+  - Office environment, 120 cm.
   - [[https://www.minicircuits.com/pdfs/ZX60-272LN-S+.pdf][MiniCircuits ZX60-272LN-S+]] LNA + USRP B210 mini + [[https://www.tp-link.com/fr/home-networking/antenna/tl-ant2424b/][TP-Link TL-ANT2424B]] antenna.
-  - 2.533 GHz of center frequency, 8 MHz of bandwidth.
+  - 2.534 GHz of center frequency, 16 MHz of bandwidth.
   - Input generated using pairing from stock firmware.
   - No repetitions nor for profile or attack.
 
