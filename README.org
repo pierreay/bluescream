@@ -153,6 +153,15 @@ Those directories contains full or partials datasets recorded using our
   - Input generated using pairing from stock firmware.
   - No repetitions nor for profile or attack.
 
+** [2024-04-12 ven.] BLE -- Add one more LNA
+:PROPERTIES:
+:DIR:      240403_1-leak-pairing-highdist-2lna-2.534e9-16e6_raw
+:END:
+
+- Summary ::
+  - Same base as [[id:951929f6-7c55-47e8-8c21-79a660d90f48][[2024-04-03 mer.] BLE -- Unique leakage using pairing at high distance using 2.534e9 SR and 16e6 FC]].
+  - Add one more LNA [[https://www.minicircuits.com/pdfs/TAMP-272LN+.pdf][Mini-Circuits TAMP-272LN+]] in the RX chain.
+
 * Recordings
 
 Those directories contains various signals used in experiments.
