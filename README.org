@@ -155,7 +155,7 @@ Those directories contains full or partials datasets recorded using our
 
 ** [2024-04-12 ven.] BLE -- Add one more LNA
 :PROPERTIES:
-:DIR:      240403_1-leak-pairing-highdist-2lna-2.534e9-16e6_raw
+:DIR:      240412_1-leak-pairing-highdist-2lna-2.534e9-16e6_raw
 :END:
 
 - Summary ::
