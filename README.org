@@ -263,6 +263,12 @@ Those directories contains various signals used in experiments.
 - Allows to evaluate ML performance on amplitude, phase rotation, I and Q for
   real target.
 
+* Scripts
+
+- [[file:scripts/check_traces_archives.sh]] :: Check that archives (commited using
+  =git-annex=) are consistent with current trace directories (ignored by
+  =git=).
+
 * Organization
 
 Here is an example of a complete dataset stored after an attack:
