@@ -958,7 +958,11 @@ def bruteforce(bit_bound_end):
               help="Reduce the trace using the POIS in this folder")
 @click.option("--align/--no-align", default=False, show_default=True,
              help="Align the traces using the first one as template before to profile.")
-def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir, align):
+@click.option("--poi-spacing", default=5, show_default=True,
+              help="Minimum number of points between two points of interest.")
+@click.option("--resamp-to", default=0, show_default=True, type=float,
+              help="If set to a number, resamples all traces to this new sampling rate. It is used for profile reusage.")
+def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir, align, resamp_to):
     """
     Build a template using a chosen technique.
 
@@ -976,19 +980,16 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
     except Exception as e:
         pass
 
-    # Resampling --- START.
-    # NOTE: Used once, hence, let it there. Seems to work well. Should put it
-    # inside a lib function if needed again.
-    # from tqdm import tqdm
-    # resamp_from=DATASET.samp_rate
-    # resamp_to=8e6
-    # num = int((len(TRACES[0]) / resamp_from) * resamp_to)
-    # l.LOGGER.info("Resampling to {} points".format(num))
-    # TRACES_resampled = np.empty((TRACES.shape[0], num), dtype=TRACES.dtype)
-    # for i, t in enumerate(tqdm(TRACES, desc="Resampling from {:.2f} MHz to {:.2f} MHz".format(resamp_from / 1e6, resamp_to / 1e6))):
-    #     TRACES_resampled[i] = signal.resample(t, num)
-    # TRACES = TRACES_resampled
-    # Resampling --- END.
+    if resamp_to > 0:
+        from tqdm import tqdm
+        resamp_from=DATASET.samp_rate
+        num_from = len(TRACES[0])
+        num_to = int((len(TRACES[0]) / resamp_from) * resamp_to)
+        l.LOGGER.info("Resampling: {} points / {:.2f} MHz -> {} points / {:.2f} MHz".format(num_from, (resamp_from / 1e6), num_to, (resamp_to / 1e6)))
+        TRACES_resampled = np.empty((TRACES.shape[0], num_to), dtype=TRACES.dtype)
+        for i, t in enumerate(tqdm(TRACES, desc="Resampling")):
+            TRACES_resampled[i] = signal.resample(t, num_to)
+        TRACES = TRACES_resampled
 
     if align:
         TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
