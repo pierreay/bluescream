@@ -8,7 +8,7 @@
 # $1 is sleeping time for radio initialization [default = 20].
 # $2 is loglevel [default = DEBUG].
 function radio_init() {
-    ./radio.py --dir $ENVRC_RADIO_DIR --loglevel ${2-DEBUG} --config $ENVRC_CONFIG_FILE listen $ENVRC_NF_FREQ $ENVRC_FF_FREQ $ENVRC_SAMP_RATE --nf-id $ENVRC_NF_ID --ff-id $ENVRC_FF_ID --duration=$ENVRC_DURATION &
+    ./radio.py --dir $ENVRC_RADIO_DIR --loglevel ${2-DEBUG} --config $ENVRC_CONFIG_FILE listen $ENVRC_NF_FREQ $ENVRC_FF_FREQ $ENVRC_SAMP_RATE --nf-id $ENVRC_NF_ID --ff-id $ENVRC_FF_ID --duration=$ENVRC_DURATION --gain=$ENVRC_GAIN &
     sleep ${1-20} # Wait for SDR's driver initialization.
 }
 
