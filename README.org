@@ -159,11 +159,27 @@ Those directories contains full or partials datasets recorded using our
 :ID:       59710f64-44d0-472a-899f-7ec999241f0b
 :END:
 
-- Summary ::
+- Initiation ::
   - Same base as [[id:951929f6-7c55-47e8-8c21-79a660d90f48][[2024-04-03 mer.] BLE -- Unique leakage using pairing at high distance using 2.534e9 SR and 16e6 FC]].
   - By wanting to add one more LNA ([[https://www.minicircuits.com/pdfs/TAMP-272LN+.pdf][Mini-Circuits TAMP-272LN+]]) in the RX chain,
     I fixed a RP-SMA male connected to a SMA female (no conduction !). SNR is
     far better now!
+- Collection ::
+  - 5k train.
+  - 1.5k attack.
+- Results ::
+  - No better than 2^60 just like [[id:951929f6-7c55-47e8-8c21-79a660d90f48][[2024-04-03 mer.] BLE -- Unique leakage using
+    pairing at high distance using 2.534e9 SR and 16e6 FC]].
+
+** BLE -- Change sampling rate
+:PROPERTIES:
+:ID:       241be11a-adeb-414a-8d1b-5fd9a050d5b8
+:DIR:      240413_1-leak-pairing-highdist-fix-2.534e9-8e6_raw
+:END:
+
+- Initiation ::
+  - Same base as [[id:59710f64-44d0-472a-899f-7ec999241f0b][[2024-04-12 ven.] BLE -- Fix RF setup]].
+  - But change sampling rate from 16e6 to 8e6.
 
 * Recordings
 
