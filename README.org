@@ -174,7 +174,7 @@ Those directories contains full or partials datasets recorded using our
   - From this dataset with this setup, impossible to compute profiles from
     phase rotation.
 
-** BLE -- Change sampling rate
+** [2024-04-13 sam.] BLE -- Change sampling rate
 :PROPERTIES:
 :ID:       241be11a-adeb-414a-8d1b-5fd9a050d5b8
 :DIR:      240413_1-leak-pairing-highdist-fix-2.534e9-8e6_raw
@@ -183,6 +183,21 @@ Those directories contains full or partials datasets recorded using our
 - Initiation ::
   - Same base as [[id:59710f64-44d0-472a-899f-7ec999241f0b][[2024-04-12 ven.] BLE -- Fix RF setup]].
   - But change sampling rate from 16e6 to 8e6.
+- Results ::
+  - No better than 2^67, worse than [[id:59710f64-44d0-472a-899f-7ec999241f0b][[2024-04-12 ven.] BLE -- Fix RF setup]].
+  - From this dataset with this setup, impossible to compute profiles from
+    phase rotation.
+
+** [2024-04-14 dim.] BLE -- Change center frequency
+:PROPERTIES:
+:ID:       f37e9745-5019-4e65-b078-49fed825b2a4
+:DIR:      240414_1-leak-pairing-highdist-fix-2.533e9-8e6_raw
+:END:
+
+- Initiation ::
+  - Same base as [[id:241be11a-adeb-414a-8d1b-5fd9a050d5b8][[2024-04-13 sam.] BLE -- Change sampling rate]]
+  - But change center frequency from 2.534e9 to 2.533e9.
+
 
 * Recordings
 
