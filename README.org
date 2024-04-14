@@ -147,6 +147,7 @@ Those directories contains full or partials datasets recorded using our
 - Summary ::
   - 30k profile traces.
   - 20k attack traces.
+  - Profiles on amplitude and phase rotation.
   - Office environment, 120 cm.
   - [[https://www.minicircuits.com/pdfs/ZX60-272LN-S+.pdf][MiniCircuits ZX60-272LN-S+]] LNA + USRP B210 mini + [[https://www.tp-link.com/fr/home-networking/antenna/tl-ant2424b/][TP-Link TL-ANT2424B]] antenna.
   - 2.534 GHz of center frequency, 16 MHz of bandwidth.
@@ -170,6 +171,8 @@ Those directories contains full or partials datasets recorded using our
 - Results ::
   - No better than 2^60 just like [[id:951929f6-7c55-47e8-8c21-79a660d90f48][[2024-04-03 mer.] BLE -- Unique leakage using
     pairing at high distance using 2.534e9 SR and 16e6 FC]].
+  - From this dataset with this setup, impossible to compute profiles from
+    phase rotation.
 
 ** BLE -- Change sampling rate
 :PROPERTIES:
