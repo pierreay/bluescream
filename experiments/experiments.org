@@ -1,0 +1,139 @@
+#+TITLE: Experiments
+#+SETUPFILE: https://raw.githubusercontent.com/pierreay/orgcss/master/orgcss.setup
+
+* About
+
+List and manage experiments.
+
+* Recordings
+
+Those directories contains various signals used in experiments.
+
+- [[file:240108_advertisement][240108_advertisement]] :: BLE advertisement recorded on channel 37 at 2.402 GHz
+  using a coaxial cable in anechoic box. Used to demodulate data from the
+  recording and compare with the reported data from the sniffer. Results:
+  demodulation successful with GR, partially successful with custom Python
+  script.
+- [[file:240109_leakage_for_demod/][240109_leakage_for_demod]] :: Recording of BLE channel + AES leak to try
+  demodulating it. Same hardware setup as =240108_advertisement=. Provides
+  =whadsniff= logs as well.
+- [[file:240111_leakage_for_demod_low_sr][240111_leakage_for_demod_low_sr]] :: Same as =240109_leakage_for_demod= but with
+  lower sample rate.
+- [[file:240111_gio_firmware_leak][240111_gio_firmware_leak]] :: Recording using Giovanni's firmware. Modified
+  version to only output fixed payload in the modulated packet (BUT with random
+  address and whitening enabled). The TX is ON sending modulated fixed packets
+  with a bunch of AES, then no CPU activity, and another bunch of AES.
+- [[file:240116_gio_firmware_leak_2][240116_gio_firmware_leak_2]] ::
+  - Modified version of Giovanni firmware output the following pattern on the
+    radio with constant time : TX OFF, TX ON, TX ON + AES.
+  - Address and payloads are constants =0x0f=.
+  - In =whiten_on=, whitening is enabled =RADIO_PCNF1_WHITEEN_Enabled=.
+  - In =whiten_off=, whitening is disabled =RADIO_PCNF1_WHITEEN_Disabled=.
+  - Multiples sample rates are tried.
+  - Multiples frequencies should be tried but not recorded yet.
+- [[file:240130_carrier_or_mod_soft_or_hard/][240130_carrier_or_mod_soft_or_hard]] ::
+  - Built upon =240116_gio_firmware_leak_2=, but with following pattern: TX OFF,
+    TX ON, Software AES, Hardware AES.
+  - =tx-mod= indicate TX ON corresponds to modulated carrier with constant packets.
+  - =tx-carrier= indicate TX ON corresponds to non-modulated constant carrier.
+  - Two sample rates: $8e6$ and $20e6$.
+- [[file:240131_with_aes_ecb_hard/][240131_with_aes_ecb_hard]] ::
+  - Build upon =240130_carrier_or_mod_soft_or_hard=, but with following pattern:
+    1) TX OFF
+    2) TX ON with carrier only
+    3) AES-ECB software implemented by TinyAES from the NordicSDK
+    4) AES-ECB hardware by the ECB periph of the nRF52
+    5) AES-CCM hardware by the CCM periph of the nRF52
+  - Use 3 sampling rates:
+    1) 8 Msps
+    2) 20 Msps
+    3) 56 Msps
+
+* Testing
+
+** [2024-01-30 mar.] Instantaneous phase visualization
+:PROPERTIES:
+:DIR:      2024-01-30_instant_phase_viz
+:END:
+
+- Goals ::
+  - Compare the instantaneous phase of signals recorded during TX on (carrier only), AES software, AES hardware.
+- Results ::
+  - Significant deviations between signals.
+
+** [2024-02-06 mar.] Instrument a firmware and compare leakage among frequencies in amplitude and phase
+:PROPERTIES:
+:DIR:      2024-02-06_firmware-instrumentation-for-phase-rot-leak
+:END:
+
+- Goals ::
+  1. Compare the leakage in amplitude and phase rotation to see if we can see the signal.
+- Methods ::
+  1. Instrument the firmware with a recognizable pattern (TX Off, TX Carrier,
+     AES Soft ECB, AES Hard ECB without counter, AES Hard ECB with interrupts,
+     AES Hard CCM).
+  2. Record at multiple frequencies and sampling rates. Analyze the received
+     signal in bot amplitude and phase rotation.
+- Results ::
+  1. The DC/DC regulator enabled by the DCDCEN register seems to influence a
+     bit the leakage at the carrier, but it is not strongly different. We
+     compared the spectrums to see a difference.
+  2. With its [nRF52] clock at 64 MHz and its sub-clocks at 32, 16 and 1 MHz,
+     we can see that they are all inter-modulated with the carrier and that the
+     AES signal its itself modulated around each clock and sub-clock. Hence, we
+     find the signal in a very wide-band spectrum. However, attenuation is not
+     equal across the spectrum, hence, it is important to select the right
+     frequency. Good example is by looking at 2.496e9 for the 3rd harmonic of
+     the 32 MHz sub-clock.
+  3. The best frequency found was 2.510 and 2.512 with 8 MHz of bandwidth to
+     have the more stronger leak. It needs to be evaluated for each setup
+     before launching a Screaming Channel, but it is not as trivial as using
+     the 2nd harmonic (2.528 GHz).
+  4. The leakage in the phase is already present in the baseband signal
+     modulated around the clocks of the CPU. Hence, it may invalidate the
+     theory that the SC phase leakage is produced by voltage variations of the
+     VCO of the carrier.
+- Files ::
+  - When nothing is specified in filenames, the DCDCEN is set to 0.
+  - FF is collected using an antenna in an anechoic box.
+  - NF is collected using a NF probe out of the anechoic box.
+  - [[attachment:firmware_loop.c]] is an extract of the firmware to see the
+    pattern, see firmware repo and tag for code.
+
+** [2024-02-07 mer.] Comparison between leakage in amplitude and phase
+:PROPERTIES:
+:DIR:      2024-02-07_leakage_comparison_amplitude_phase_rot
+:END:
+
+- Random plot without scripts of SC leakage in amplitude and in phase rotation
+  at 2.530 GHz during a BLE communication (with GFSK).
+
+** [2024-02-07 mer.] Find the best frequency before a dataset collection using BLE
+:PROPERTIES:
+:DIR:      2024-02-07_find-best-ble-freq
+:END:
+
+- Goals :: Find the best frequency where the leakage is more present before
+  launching a new collection.
+- Methods ::
+  1. Find candidates frequency using wide-band recording looking at the
+     spectrum.
+  2. Compare the SNR and visually both amplitude and phase rotation signal for
+     each frequency.
+- Results ::
+  1. Find that 2.533 GHz seems to be the best.
+  2. Plot a comparison and good match between amplitude and phase rotation
+     signal.
+
+** [2024-03-18 lun.] Dataset loading Python demonstration
+:PROPERTIES:
+:DIR:      2024-03-18_demo-loading
+:END:
+
+Python demonstration of dataset loading and traces computation (sent to Karel).
+
+* Bibliography
+
+#+print_bibliography:
+
+* Footnotes
