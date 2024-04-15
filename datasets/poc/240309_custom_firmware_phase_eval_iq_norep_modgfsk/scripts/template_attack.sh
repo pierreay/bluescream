@@ -3,11 +3,11 @@
 # * Parameters
 
 # Path of dataset used to create the profile.
-TRAIN_SET=$REPO_DATASET_PATH/240309_custom_firmware_phase_eval_iq_norep_modgfsk/train
+TRAIN_SET=$REPO_DATASET_PATH/poc/240309_custom_firmware_phase_eval_iq_norep_modgfsk/train
 # Base path used to store the created profile.
 PROFILE_PATH_BASE=$TRAIN_SET/../profile
 # Path of dataset used to perform the attack.
-ATTACK_SET=$REPO_DATASET_PATH/240309_custom_firmware_phase_eval_iq_norep_modgfsk/attack
+ATTACK_SET=$REPO_DATASET_PATH/poc/240309_custom_firmware_phase_eval_iq_norep_modgfsk/attack
 
 # Number of traces to use for profile creation.
 NUM_TRACES_PROFILE=16000

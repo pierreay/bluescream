@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dataset=$REPO_DATASET_PATH/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw
+dataset=$REPO_DATASET_PATH/ble/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw
 sp=1000
 ep=1500
 

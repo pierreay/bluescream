@@ -7,7 +7,7 @@
 # * Global configuration
 
 # Dataset path.
-DATASET=$REPO_DATASET_PATH/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw
+DATASET=$REPO_DATASET_PATH/ble/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw
 
 # Length of the profile in samples.
 PROFILE_LENGTH=500

@@ -2,7 +2,7 @@
 
 # * Variables
 
-dataset=$REPO_DATASET_PATH/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw
+dataset=$REPO_DATASET_PATH/ble/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw
 
 profile_length=500
 start_point=1000
@@ -14,7 +14,7 @@ plot=--plot
 function attack() {
     trace_nb=$1
     bruteforce=$2
-    profile_path=$REPO_DATASET_PATH/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw/profile_$3
+    profile_path=$REPO_DATASET_PATH/ble/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw/profile_$3
     comptype=$4
     echo trace_nb=$trace_nb
     echo bruteforce=$bruteforce
@@ -44,7 +44,7 @@ function attack() {
 function attack() {
     trace_nb=$1
     bruteforce=$2
-    profile_path=$REPO_DATASET_PATH/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw/profile_$3
+    profile_path=$REPO_DATASET_PATH/ble/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw/profile_$3
     comptype=$4
     echo trace_nb=$trace_nb
     echo bruteforce=$bruteforce

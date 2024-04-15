@@ -3,7 +3,7 @@
 # * Variables
 
 # Paths.
-DATASET=$REPO_DATASET_PATH/240414_1-leak-pairing-highdist-fix-2.533e9-8e6_raw
+DATASET=$REPO_DATASET_PATH/ble/240414_1-leak-pairing-highdist-fix-2.533e9-8e6_raw
 LOGFILE_PATH=${DATASET}/logs/attack.log
 
 # Parameters.

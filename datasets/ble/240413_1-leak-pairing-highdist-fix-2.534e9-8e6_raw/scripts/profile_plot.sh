@@ -3,7 +3,7 @@
 # * Configuration
 
 # Dataset path.
-DATASET=$REPO_DATASET_PATH/240413_1-leak-pairing-highdist-fix-2.534e9-8e6_raw
+DATASET=$REPO_DATASET_PATH/ble/240413_1-leak-pairing-highdist-fix-2.534e9-8e6_raw
 
 SCRIPT_WD="$(dirname $(realpath $0))"
 

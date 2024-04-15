@@ -7,7 +7,7 @@
 # * Global configuration
 
 # Dataset path.
-DATASET=$REPO_DATASET_PATH/240305_custom_firmware_phase_eval_iq
+DATASET=$REPO_DATASET_PATH/poc/240305_custom_firmware_phase_eval_iq
 # Attack set path.
 ATTACK_SET=$DATASET/attack
 

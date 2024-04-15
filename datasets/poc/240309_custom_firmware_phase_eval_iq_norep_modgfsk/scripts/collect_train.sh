@@ -7,7 +7,7 @@ LOG_LEVEL=INFO
 # Number of traces.
 NUM_TRACES=16000
 # Temporary collection path.
-TARGET_PATH=$REPO_DATASET_PATH/240309_custom_firmware_phase_eval_iq_norep_modgfsk/train
+TARGET_PATH=$REPO_DATASET_PATH/poc/240309_custom_firmware_phase_eval_iq_norep_modgfsk/train
 
 # * Functions
 

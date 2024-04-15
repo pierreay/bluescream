@@ -1,6 +1,6 @@
 #!/bin/bash
 
-dataset=$REPO_DATASET_PATH/240126_300-leak-insub-10cm-lna_avg
+dataset=$REPO_DATASET_PATH/ble/240126_300-leak-insub-10cm-lna_avg
 
 # Profile with only 1 POI:
 $SC_SRC/attack.py --plot --norm --dataset-path $dataset --num-traces 0 --start-point 800 --end-point 1200 profile --pois-algo r --num-pois 1 --poi-spacing 2 --variable p_xor_k --align

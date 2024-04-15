@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DATASET=$REPO_DATASET_PATH/240412_1-leak-pairing-highdist-fix-2.534e9-16e6_raw
+DATASET=$REPO_DATASET_PATH/ble/240412_1-leak-pairing-highdist-fix-2.534e9-16e6_raw
 SP=2000
 EP=3000
 

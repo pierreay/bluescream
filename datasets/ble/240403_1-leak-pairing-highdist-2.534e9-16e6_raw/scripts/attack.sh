@@ -3,7 +3,7 @@
 # * Variables
 
 # Paths.
-DATASET=$REPO_DATASET_PATH/240403_1-leak-pairing-highdist-2.534e9-16e6_raw
+DATASET=$REPO_DATASET_PATH/ble/240403_1-leak-pairing-highdist-2.534e9-16e6_raw
 LOGFILE_PATH=${DATASET}/logs/attack.log
 
 # Parameters.
@@ -105,7 +105,7 @@ if [[ $COMPARE_EXTPROF == 1 ]]; then
     echo "External profile:"
     START_POINT=2133
     END_POINT=$((START_POINT + PROFILE_LENGTH))
-    dataset_ext="$REPO_DATASET_PATH/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw"
+    dataset_ext="$REPO_DATASET_PATH/ble/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw"
     profile_ext="$dataset_ext/profile_AMPLITUDE_65536_resamp_16e6"
     $SC_SRC/attack.py --log --plot --norm --dataset-path $DATASET --start-point $START_POINT --end-point $END_POINT --num-traces 3000  --comptype AMPLITUDE \
                       attack --attack-algo pcc --profile ${profile_ext} --num-pois 1 --poi-spacing 1 --variable p_xor_k --align
