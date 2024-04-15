@@ -2,7 +2,7 @@
 
 VERBOSE=0
 
-for dataset in $(realpath $(find "$REPO_ROOT" -maxdepth 1 -type d -regex ".*23.*\|.*24.*")); do
+for dataset in $(realpath $(find "$REPO_DATASET_PATH" -maxdepth 1 -type d -regex ".*23.*\|.*24.*")); do
     if [[ $VERBOSE == 1 ]]; then
         echo "INFO: Check: ${dataset}"
     fi
