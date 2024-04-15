@@ -69,6 +69,7 @@ List and manage datasets.
 ** [2024-04-15 lun.] Custom firmware at high distance
 :PROPERTIES:
 :DIR:      poc/240415_custom_firmware_highdist
+:ID:       e9b9f217-5250-44b6-80f8-4dec77ff381c
 :END:
 
 - Software setup :: Based on [[id:73a81721-2fb4-42df-a572-19646c29ca81][[2023-03-09 jeu.] Phase leakage evaluation storing
