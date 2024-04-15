@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# * Configuration
+# * Variables
+
+# ** Configuration
 
 # Logging level for Python.
 LOG_LEVEL=INFO
@@ -15,7 +17,30 @@ MODE="train"
 # Temporary collection path.
 TARGET_PATH="${REPO_DATASET_PATH}/poc/240415_custom_firmware_highdist/${MODE}"
 
+# ** Actions
+
+# Reflash the custom firmware.
+REFLASH_FIRMWARE=1
+
+# ** Internals
+
+CALIBRATION_FLAG_PATH="${TARGET_PATH}/.calibration_done"
+COLLECTION_FLAG_PATH="${TARGET_PATH}/.collection_started"
+
+TMP_TRACE_PATH=$HOME/storage/tmp/raw_0_0.npy
+
 # * Functions
+
+# ** Firmware
+
+function flash_firmware() {
+    echo "INFO: Checkout feat-recombination-corr -> $SC_POC"
+    cd $SC_POC/firmware
+    echo "INFO: Flash custom firmware..."
+    git checkout feat-recombination-corr
+    make -C pca10040/blank/armgcc flash
+    echo "DONE!"
+}
 
 # ** Configuration
 
@@ -39,42 +64,45 @@ function configure_param_json() {
     fi
 }
 
-function configure_json_plot() {
+function configure_json_common() {
     export CONFIG_JSON_PATH_SRC=$SC_POC/experiments/config/example_collection_collect_plot.json
-    export CONFIG_JSON_PATH_DST=$TARGET_PATH/example_collection_collect_plot.json
     cp $CONFIG_JSON_PATH_SRC $CONFIG_JSON_PATH_DST
-    configure_param_json $CONFIG_JSON_PATH_DST "trigger_threshold" "90e3"
+    configure_param_json $CONFIG_JSON_PATH_DST "bandpass_lower" "0.5e6"
+    configure_param_json $CONFIG_JSON_PATH_DST "bandpass_upper" "0.7e6"
+    configure_param_json $CONFIG_JSON_PATH_DST "trigger_threshold" "140e3"
+    configure_param_json $CONFIG_JSON_PATH_DST "trigger_offset" "200e-6"
+    configure_param_json $CONFIG_JSON_PATH_DST "trigger_rising" "true"
+    configure_param_json $CONFIG_JSON_PATH_DST "drop_start" "2e-1"
     configure_param_json $CONFIG_JSON_PATH_DST "num_traces_per_point" 300
     configure_param_json $CONFIG_JSON_PATH_DST "num_traces_per_point_keep" 1
     configure_param_json $CONFIG_JSON_PATH_DST "modulate" "true"
     configure_param_json $CONFIG_JSON_PATH_DST "min_correlation" "1.9e19"
 }
 
+function configure_json_plot() {
+    export CONFIG_JSON_PATH_DST=$TARGET_PATH/example_collection_collect_plot.json
+    configure_json_common
+    configure_param_json $CONFIG_JSON_PATH_DST "num_points" 1
+}
+
 function configure_json_collect() {
-    export CONFIG_JSON_PATH_SRC=$SC_POC/experiments/config/example_collection_collect_plot.json
     export CONFIG_JSON_PATH_DST=$TARGET_PATH/example_collection_collect.json
-    cp $CONFIG_JSON_PATH_SRC $CONFIG_JSON_PATH_DST
-    configure_param_json $CONFIG_JSON_PATH_DST "trigger_threshold" "90e3"
+    configure_json_common
     configure_param_json $CONFIG_JSON_PATH_DST "num_points" "$NUM_TRACES"
-    configure_param_json $CONFIG_JSON_PATH_DST "num_traces_per_point" 300
-    configure_param_json $CONFIG_JSON_PATH_DST "num_traces_per_point_keep" 1
-    configure_param_json $CONFIG_JSON_PATH_DST "modulate" "true"
-    configure_param_json $CONFIG_JSON_PATH_DST "min_correlation" "1.9e19"
+    configure_param_json $CONFIG_JSON_PATH_DST "template_name" "$(configure_param_json_escape_path $TARGET_PATH/template.npy)"
     if [[ $MODE == "train" ]]; then
         configure_param_json $CONFIG_JSON_PATH_DST "fixed_key" "false"
     elif [[ $MODE == "attack" ]]; then
         configure_param_json $CONFIG_JSON_PATH_DST "fixed_key" "true"
     fi
-    configure_param_json $CONFIG_JSON_PATH_DST "template_name" "$(configure_param_json_escape_path $TARGET_PATH/template.npy)"
 }
 
 # ** Instrumentation
 
 function record() {
+    # Get args.
     plot=$1
-    echo "plot=$plot"
     saveplot=$2
-    echo "saveplot=$saveplot"
     
     # Kill previously started radio server.
     pkill radio.py
@@ -86,54 +114,61 @@ function record() {
 
     # Start SDR server.
     # NOTE: Make sure the JSON config file is configured accordingly to the SDR server here.
-    $SC_SRC/radio.py --config $SC_SRC/config.toml --dir $HOME/storage/tmp --loglevel $LOG_LEVEL listen 128e6 2.512e9 8e6 --nf-id -1 --ff-id 0 --duration=0.6 --gain 76 &
+    $SC_SRC/radio.py --config $SC_SRC/config.toml --dir $HOME/storage/tmp --loglevel $LOG_LEVEL listen 128e6 2.512e9 8e6 --nf-id -1 --ff-id 0 --duration=0.8 --gain 76 &
     sleep 10
 
     # Start collection and plot result.
-    sc-experiment --loglevel=$LOG_LEVEL --radio=USRP --device=$(nrfjprog --com | cut - -d " " -f 5) -o $HOME/storage/tmp/raw_0_0.npy collect $CONFIG_JSON_PATH_DST $TARGET_PATH $plot $saveplot --average-out=$TARGET_PATH/template.npy
+    sc-experiment --loglevel=$LOG_LEVEL --radio=USRP --device=$(nrfjprog --com | cut - -d " " -f 5) -o $TMP_TRACE_PATH collect $CONFIG_JSON_PATH_DST $TARGET_PATH $plot $saveplot --average-out=$TARGET_PATH/template.npy
 }
 
 function analyze_only() {
-    sc-experiment --loglevel=$LOG_LEVEL --radio=USRP --device=$(nrfjprog --com | cut - -d " " -f 5) -o $HOME/storage/tmp/raw_0_0.npy extract $CONFIG_JSON_PATH_DST $TARGET_PATH --plot --average-out=$TARGET_PATH/template.npy
+    sc-experiment --loglevel=$LOG_LEVEL --radio=USRP --device=$(nrfjprog --com | cut - -d " " -f 5) -o $TMP_TRACE_PATH extract $CONFIG_JSON_PATH_DST $TARGET_PATH --plot --average-out=$TARGET_PATH/template.npy
 }
 
 # * Script
 
-if [[ -f "$TARGET_PATH" ]]; then
-    echo "SKIP: File exists: $TARGET_PATH"
-    exit 1
-fi
-
-# Create collection directory.
+# Ensure collection directory is created.
 mkdir -p $TARGET_PATH
 
-# ** Step 1: Calibrate
+# ** Step 1: Calibrate and generate a template
 
-# Set the JSON configuration file for one recording analysis.
-configure_json_plot
+# If calibration has not been done.
+if [[ ! -f "$CALIBRATION_FLAG_PATH" ]]; then
+    # Flash custom firmware.
+    if [[ $REFLASH_FIRMWARE == 1 ]]; then
+        flash_firmware
+    fi
 
-# DONE: Use this once to record a trace. 
-record --no-plot --saveplot
-# Once the recording is good, use this to configure the analysis if needed.
-analyze_only
+    # Set the JSON configuration file for one recording analysis.
+    configure_json_plot
 
-# XXX
-exit 1
+    # Record a new trace if not already done.
+    if [[ ! -f "${TMP_TRACE_PATH}" ]]; then
+        record --plot --saveplot
+    # Analyze only.
+    else
+        echo "SKIP: New recording: File exists: ${TMP_TRACE_PATH}"
+        analyze_only
+    fi
 
-# ** Step 2: Template generation
+    read -p "Press [ENTER] to confirm calibration, otherwise press [CTRL-C]..."
+    touch $CALIBRATION_FLAG_PATH
+else
+    echo "SKIP: Calibration: File exists: $CALIBRATION_FLAG_PATH"
+fi
 
-# Set the JSON configuration file for one recording analysis.
-configure_json_plot
+# ** Step 2: Collect
 
 if [[ ! -f $TARGET_PATH/template.npy ]]; then
     echo "Template has not been created! (no file at $TARGET_PATH/template.npy)"
     exit 1
 fi
 
-# ** Step 3: Collect
-
-# Set the JSON configuration file for collection.
-configure_json_collect
-
-# DONE: Collect a set of traces.
-# record --no-plot --no-saveplot
+# If collection has not been started.
+if [[ ! -f "$COLLECTION_FLAG_PATH" ]]; then
+    touch $COLLECTION_FLAG_PATH
+    configure_json_collect
+    record --no-plot --no-saveplot
+else
+    echo "SKIP: Collection: File exists: $COLLECTION_FLAG_PATH"
+fi
