@@ -66,6 +66,20 @@ List and manage datasets.
       keyrank) compared to the others.
   - On this dataset, i_augmented is the better performance attack.
 
+** [2024-04-15 lun.] Custom firmware at high distance
+:PROPERTIES:
+:DIR:      poc/240415_custom_firmware_highdist
+:END:
+
+- Software setup :: Based on [[id:73a81721-2fb4-42df-a572-19646c29ca81][[2023-03-09 jeu.] Phase leakage evaluation storing
+  IQ without repetitions and using GFSK]].
+- Hardware setup :: Based on [[id:59710f64-44d0-472a-899f-7ec999241f0b][[2024-04-12 ven.] ... fix RF setup]].
+- Expectation ::
+  - 1. Reproduce the phenomenon observed in [[id:59710f64-44d0-472a-899f-7ec999241f0b][[2024-04-12 ven.] ... fix
+   RF setup]] where we cannot compute profile on phase rotation.
+  - 2. Evaluate the hardware setup performance before to record a new dataset
+    using Nimble.
+
 * BLE
 :PROPERTIES:
 :DIR:      ble
