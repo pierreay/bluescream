@@ -1,0 +1,102 @@
+Saren in dataset/240109_leakage_for_demod on  master [!?]
+at 17:54:12 ❯ whadsniff --format=hexdump -i uart1 ble -f -e
+/usr/lib/python3.11/site-packages/scapy/base_classes.py:324: SyntaxWarning: Packet 'ForceRejoinReq' has a duplicated 'RFU' field ! If you are using several ConditionalFields, have a look at MultipleTypeField instead ! This will become a Syn
+taxError in a future version of Scapy !
+  warnings.warn(war_msg, SyntaxWarning)
+[ timestamp=31329309, channel=0, rssi=-16, direction=0, connection_handle=0, is_crc_valid=True, relative_timestamp=0, decrypted=False ]
+00000000: D6 BE 89 8E 05 22 FE CA  FE CA FE CA 4C 5C 84 54  ....."......L\.T
+00000010: 3E C2 87 D4 A3 23 95 90  04 03 09 00 38 00 00 00  >....#......8...
+00000020: 2A 00 00 03 00 00 00 28  40 DF 0E                 *......(@..
+
+[ timestamp=31342333, channel=30, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4284004269, decrypted=False ]
+00000000: 87 D4 A3 23 01 00 45 75  BB                       ...#..Eu.
+
+[ timestamp=31342564, channel=2574731683, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=231, decrypted=False ]
+00000000: 87 D4 A3 23 07 09 0E FF  00 00 00 00 00 00 00 FD  ...#............
+00000010: 2D EB                                             -.
+
+[ timestamp=31412305, channel=30, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967268, decrypted=False ]
+00000000: 87 D4 A3 23 01 00 45 75  BB                       ...#..Eu.
+
+[ timestamp=31412535, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 07 09 0E FF  00 00 00 00 00 00 00 FD  ...#............
+00000010: 2D EB                                             -.
+
+[ timestamp=31482298, channel=30, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 0F 02 07 0E  E2 EF 94                 ...#.......
+
+[ timestamp=31482544, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=246, decrypted=False ]
+00000000: 87 D4 A3 23 09 00 E3 78  BB                       ...#...x.
+
+[ timestamp=31552291, channel=30, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 01 00 45 75  BB                       ...#..Eu.
+
+[ timestamp=31552521, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 05 00 96 73  BB                       ...#...s.
+
+[ timestamp=31622284, channel=30, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 0D 00 30 7E  BB                       ...#..0~.
+
+[ timestamp=31622514, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 09 00 E3 78  BB                       ...#...x.
+
+[ timestamp=31692276, channel=30, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967288, decrypted=False ]
+00000000: 87 D4 A3 23 01 00 45 75  BB                       ...#..Eu.
+
+[ timestamp=31692506, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 05 00 96 73  BB                       ...#...s.
+
+[ timestamp=31762269, channel=597939335, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 0F 17 03 EF  BE AD DE EF BE AD DE AD  ...#............
+00000010: DE 00 00 00 00 00 00 00  00 00 00 00 00 80 98 6C  ...............l
+
+[ timestamp=31762683, channel=597939335, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=414, decrypted=False ]
+00000000: 87 D4 A3 23 09 00 E3 78  BB                       ...#...x.
+
+[ timestamp=31832262, channel=0, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 01 00 45 75  BB                       ...#..Eu.
+
+[ timestamp=31832492, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 07 0D 04 64  45 AA 42 26 03 86 5D B4  ...#...dE.B&..].
+00000010: CF 43 B4 35 EC CE                                 .C.5..
+
+[ timestamp=31902254, channel=0, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967288, decrypted=False ]
+00000000: 87 D4 A3 23 0F 02 0D 1A  2D 1E 53                 ...#....-.S
+
+[ timestamp=31902501, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=247, decrypted=False ]
+00000000: 87 D4 A3 23 09 00 E3 78  BB                       ...#...x.
+
+[ timestamp=31972247, channel=0, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 01 00 45 75  BB                       ...#..Eu.
+
+[ timestamp=31972477, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 07 01 05 24  7B 23                    ...#...${#
+
+[ timestamp=32042240, channel=0, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 0D 00 30 7E  BB                       ...#..0~.
+
+[ timestamp=32042470, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 09 00 E3 78  BB                       ...#...x.
+
+[ timestamp=32112233, channel=0, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 01 00 45 75  BB                       ...#..Eu.
+
+[ timestamp=32112463, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 05 00 96 73  BB                       ...#...s.
+
+[i] event: Connection desynchronized
+^C
+/!\ sniffer stopped (CTRL-C)
+
+Saren in dataset/240109_leakage_for_demod on  master [!?] took 18s
+at 18:01:13 ❯ tmux-capture-pane
+
+
+
+
+
+
+
+
+
+

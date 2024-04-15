@@ -1,0 +1,248 @@
+Saren in screaming_channels_ble/src on  main [$!⇡] via 🐍 v3.11.6
+at 17:54:14 ❯ ./radio.py --dir $ENVRC_RADIO_DIR --loglevel ${2-DEBUG} listen $ENVRC_NF_FREQ $ENVRC_FF_FREQ $ENVRC_SAMP_RATE --nf-id $ENVRC_NF_ID --ff-id $ENVRC_FF_ID --duration=$ENVRC_DURATION --gain=46
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:471: CryptographyDeprecationWarning: Blowfish has been deprecated
+  cipher=algorithms.Blowfish,
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:485: CryptographyDeprecationWarning: CAST5 has been deprecated
+  cipher=algorithms.CAST5,
+[2024-01-09 17:54:15,752] [501862] [MainThread] [soapysdr] DEBUG - MySoapySDRs.__init__()
+[2024-01-09 17:54:15,752] [501862] [MainThread] [soapysdr] DEBUG - MySoapySDR.__init__(fs=30000000,freq=2420000000,idx=0,enabled=True,duration=0.1,dir=/home/drac/storage/tmp,gain=46)
+[INFO] [UHD] linux; GNU C++ version 13.2.1 20230801; Boost_108300; UHD_4.6.0.0-0-unknown
+[INFO] [b200_impl.cpp:421] [B200] Detected Device: B200mini
+[INFO] [B200] Detected Device: B200mini
+[INFO] [b200_impl.cpp:468] [B200] Operating over USB 3.
+[INFO] [B200] Operating over USB 3.
+[INFO] [b200_impl.cpp:619] [B200] Initialize CODEC control...
+[INFO] [B200] Initialize CODEC control...
+[INFO] [b200_impl.cpp:688] [B200] Initialize Radio control...
+[INFO] [B200] Initialize Radio control...
+[INFO] [b200_impl.cpp:1099] [B200] Performing register loopback test...
+[INFO] [B200] Performing register loopback test...
+[INFO] [b200_impl.cpp:1108] [B200] Register loopback test passed
+[INFO] [B200] Register loopback test passed
+[INFO] [b200_impl.cpp:814] [B200] Setting master clock rate selection to 'automatic'.
+[INFO] [B200] Setting master clock rate selection to 'automatic'.
+[INFO] [b200_impl.cpp:1149] [B200] Asking for clock rate 16.000000 MHz...
+[INFO] [B200] Asking for clock rate 16.000000 MHz...
+[INFO] [b200_impl.cpp:1162] [B200] Actually got clock rate 16.000000 MHz.
+[INFO] [B200] Actually got clock rate 16.000000 MHz.
+[INFO] [b200_impl.cpp:1149] [B200] Asking for clock rate 30.000000 MHz...
+[INFO] [B200] Asking for clock rate 30.000000 MHz...
+[INFO] [b200_impl.cpp:1162] [B200] Actually got clock rate 30.000000 MHz.
+[INFO] [B200] Actually got clock rate 30.000000 MHz.
+[2024-01-09 17:54:17,775] [501862] [MainThread] [soapysdr] DEBUG - MySoapySDRs.register(idx=0)
+[2024-01-09 17:54:17,775] [501862] [MainThread] [soapysdr] DEBUG - MySoapySDRs.open()
+[2024-01-09 17:54:17,776] [501862] [MainThread] [soapysdr] INFO  - initialize streams for radio #0
+[2024-01-09 17:54:17,778] [501862] [MainThread] [soapysdr] DEBUG - re-initialization
+[2024-01-09 17:54:17,778] [501862] [MainThread] [soapysdr] INFO  - process #501862 ready for listening!
+^Z
+[1]  + 501862 suspended  ./radio.py --dir $ENVRC_RADIO_DIR --loglevel ${2-DEBUG} listen $ENVRC_NF_FREQ
+
+Saren in screaming_channels_ble/src on  main [$!⇡] via 🐍 v3.11.6 took 3s
+✦ at 17:54:18 ❌148 ❯ bg
+[1]  + 501862 continued  ./radio.py --dir $ENVRC_RADIO_DIR --loglevel ${2-DEBUG} listen $ENVRC_NF_FREQ
+
+Saren in screaming_channels_ble/src on  main [$!⇡] via 🐍 v3.11.6
+✦ at 17:54:19 ❯ radio_instrument
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:471: CryptographyDeprecationWarning: Blowfish has been deprecated
+  cipher=algorithms.Blowfish,
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:485: CryptographyDeprecationWarning: CAST5 has been deprecated
+  cipher=algorithms.CAST5,
+[2024-01-09 17:54:20,723] [502035] [MainThread] [dataset] INFO  - Dataset loaded from '/home/drac/storage/dataset/tmp_raw/dataset.pyc'
+[2024-01-09 17:54:20,723] [502035] [MainThread] [soapysdr] INFO  - Initialize a SoapySDR client... (enabled=True)
+[2024-01-09 17:54:20,723] [502035] [MainThread] [device] INFO  - Instantiate Central using dongle on UART0
+[2024-01-09 17:54:20,760] [502035] [MainThread] [device] INFO  - Instantiate Central using dongle on HCI0
+[2024-01-09 17:54:20,760] [502035] [MainThread] [device] INFO  - Spoof bluetooth address: CA:FE:CA:FE:CA:FE
+[2024-01-09 17:54:20,765] [502035] [MainThread] [device] INFO  - Configure device for recording index #0
+[2024-01-09 17:54:20,765] [502035] [MainThread] [device] INFO  - Send p and k on serial port...
+[2024-01-09 17:54:20,766] [502035] [MainThread] [device] INFO  - Send k=693d228aeea101e2081423530b632e92
+[2024-01-09 17:54:20,766] [502035] [MainThread] [device] DEBUG - ser <- k:693d228aeea101e2081423530b632e92
+[2024-01-09 17:54:20,866] [502035] [MainThread] [device] INFO  - Send p=182deca78152c897820ed3b91af5e543
+[2024-01-09 17:54:20,867] [502035] [MainThread] [device] DEBUG - ser <- p:182deca78152c897820ed3b91af5e543
+[2024-01-09 17:54:20,968] [502035] [MainThread] [device] DEBUG - ser <- input_sub
+[2024-01-09 17:54:21,069] [502035] [MainThread] [device] DEBUG - ser <- input_dump
+[2024-01-09 17:54:21,170] [502035] [MainThread] [device] DEBUG - Start preparing WHAD's sequences...
+[2024-01-09 17:54:21,171] [502035] [MainThread] [device] INFO  - Connection event for starting the recording: 6
+[2024-01-09 17:54:21,182] [502035] [MainThread] [device] INFO  - Connection event for sending the LL_ENC_REQ request: 6
+[2024-01-09 17:54:21,182] [502035] [MainThread] [device] INFO  - Procedure interleaving enabled: False
+[2024-01-09 17:54:21,183] [502035] [MainThread] [device] DEBUG - More Data Bit=0
+[2024-01-09 17:54:21,193] [502035] [MainThread] [device] DEBUG - central.prepare(LL_ENC_REQ[rand=0xdeadbeefdeadbeef, ediv=0xdead, skdm=0x0, ivm=0x0])
+[2024-01-09 17:54:21,214] [502035] [MainThread] [device] INFO  - Connect to target device...
+[2024-01-09 17:54:21,215] [502035] [MainThread] [device] DEBUG - Connection parameters: address=C2:3E:54:84:5C:4C, random=False, hop_interval=56, channel_map=0x300, timeout=30
+[2024-01-09 17:54:21,327] [502035] [MainThread] [device] DEBUG - WHAD's central is connected to target device!
+[2024-01-09 17:54:21,694] [502035] [MainThread] [soapysdr] DEBUG - fifo <- record
+[2024-01-09 17:54:21,694] [501862] [MainThread] [soapysdr] DEBUG - opened FIFO at /tmp/soapysdr.fifo
+[2024-01-09 17:54:21,694] [501862] [MainThread] [soapysdr] DEBUG - fifo -> record
+[2024-01-09 17:54:21,694] [501862] [MainThread] [soapysdr] DEBUG - MySoapySDRs.record(duration=None).enter
+[2024-01-09 17:54:21,695] [501862] [Thread-1 (record)] [soapysdr] INFO  - start record for radio #0 during 0.1s
+[2024-01-09 17:54:21,744] [502035] [Thread-2] [device] DEBUG - Save the received LL_ENC_RSP packet!
+[2024-01-09 17:54:21,794] [502035] [MainThread] [soapysdr] DEBUG - waiting...
+OOO[2024-01-09 17:54:21,952] [501862] [Thread-1 (record)] [soapysdr] DEBUG - MySoapySDR(idx=0).record().leave
+[2024-01-09 17:54:21,952] [501862] [MainThread] [soapysdr] DEBUG - MySoapySDRs.record(duration=None).exit
+[2024-01-09 17:54:21,952] [502035] [MainThread] [soapysdr] DEBUG - wait completed
+[2024-01-09 17:54:21,953] [502035] [MainThread] [soapysdr] DEBUG - fifo <- accept
+[2024-01-09 17:54:21,953] [501862] [MainThread] [soapysdr] DEBUG - fifo -> accept
+[2024-01-09 17:54:21,953] [501862] [MainThread] [soapysdr] DEBUG - MySoapySDRs.accept()
+[2024-01-09 17:54:21,953] [501862] [MainThread] [soapysdr] DEBUG - MySoapySDR(idx=0).accept()
+[2024-01-09 17:54:22,053] [502035] [MainThread] [device] INFO  - Disconnect from the target device
+[2024-01-09 17:54:22,059] [502035] [MainThread] [device] DEBUG - Stop and close UART0 dongle...
+[2024-01-09 17:54:23,083] [502035] [MainThread] [device] DEBUG - Stop and close HCI dongle...
+[2024-01-09 17:54:23,084] [502035] [MainThread] [soapysdr] DEBUG - fifo <- save
+[2024-01-09 17:54:23,084] [501862] [MainThread] [soapysdr] DEBUG - fifo -> save
+[2024-01-09 17:54:23,085] [501862] [MainThread] [soapysdr] DEBUG - MySoapySDRs.save(dir=None)
+[2024-01-09 17:54:23,085] [501862] [MainThread] [soapysdr] INFO  - save recording of radio #0 into directory /home/drac/storage/tmp
+[2024-01-09 17:54:23,116] [501862] [MainThread] [soapysdr] DEBUG - re-initialization
+[2024-01-09 17:54:23,193] [502035] [MainThread] [dataset] INFO  - Dataset saved to '/home/drac/storage/dataset/tmp_raw/dataset.pyc'
+
+Saren in screaming_channels_ble/src on  main [$!⇡] via 🐍 v3.11.6 took 3s
+✦ at 17:54:25 ❯ radio_quit
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:471: CryptographyDeprecationWarning: Blowfish has been deprecated
+  cipher=algorithms.Blowfish,
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:485: CryptographyDeprecationWarning: CAST5 has been deprecated
+  cipher=algorithms.CAST5,
+[2024-01-09 17:54:27,043] [502179] [MainThread] [soapysdr] INFO  - Initialize a SoapySDR client... (enabled=True)
+[2024-01-09 17:54:27,043] [502179] [MainThread] [soapysdr] DEBUG - fifo <- quit
+[2024-01-09 17:54:27,043] [501862] [MainThread] [soapysdr] DEBUG - fifo -> quit
+[2024-01-09 17:54:27,043] [501862] [MainThread] [soapysdr] INFO  - quit the listening mode
+[2024-01-09 17:54:27,043] [501862] [MainThread] [soapysdr] DEBUG - MySoapySDRs.close()
+[2024-01-09 17:54:27,043] [501862] [MainThread] [soapysdr] DEBUG - MySoapySDR(idx=0).close().enter
+[2024-01-09 17:54:27,043] [501862] [MainThread] [soapysdr] DEBUG - MySoapySDR(idx=0).close().leave
+[1]  + 501862 done       ./radio.py --dir $ENVRC_RADIO_DIR --loglevel ${2-DEBUG} listen $ENVRC_NF_FREQ
+
+Saren in screaming_channels_ble/src on  main [$!⇡] via 🐍 v3.11.6
+at 17:54:28 ❯ radio_plot
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:471: CryptographyDeprecationWarning: Blowfish has been deprecated
+  cipher=algorithms.Blowfish,
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:485: CryptographyDeprecationWarning: CAST5 has been deprecated
+  cipher=algorithms.CAST5,
+[2024-01-09 17:54:29,639] [502262] [MainThread] [load] INFO  - Load RAW trace from /home/drac/storage/tmp/raw_0_0.npy
+
+Saren in screaming_channels_ble/src on  main [$!⇡] via 🐍 v3.11.6 took 10s
+at 17:55:23 ❯ ./radio.py --dir $ENVRC_RADIO_DIR to-numpy ~/downloads/channel.npy
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:471: CryptographyDeprecationWarning: Blowfish has been deprecated
+  cipher=algorithms.Blowfish,
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:485: CryptographyDeprecationWarning: CAST5 has been deprecated
+  cipher=algorithms.CAST5,
+[2024-01-09 17:55:30,517] [502671] [MainThread] [load] INFO  - Load RAW trace from /home/drac/storage/tmp/raw_0_0.npy
+[2024-01-09 17:55:30,547] [502671] [MainThread] [radio] INFO  - Signal saved in /home/drac/downloads/channel.npy
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Saren in dataset/240109_leakage_for_demod on  master [!?]
+
+Saren in dataset/240109_leakage_for_demod on  master [!?]
+at 17:54:12 ❯ whadsniff --format=hexdump -i uart1 ble -f -e
+/usr/lib/python3.11/site-packages/scapy/base_classes.py:324: SyntaxWarning: Packet 'ForceRejoinReq' has a duplicated 'RFU' field ! If you are using several ConditionalFields, have a look at MultipleTypeField instead ! This will become a Syn
+taxError in a future version of Scapy !
+  warnings.warn(war_msg, SyntaxWarning)
+[ timestamp=31329309, channel=0, rssi=-16, direction=0, connection_handle=0, is_crc_valid=True, relative_timestamp=0, decrypted=False ]
+00000000: D6 BE 89 8E 05 22 FE CA  FE CA FE CA 4C 5C 84 54  ....."......L\.T
+00000010: 3E C2 87 D4 A3 23 95 90  04 03 09 00 38 00 00 00  >....#......8...
+00000020: 2A 00 00 03 00 00 00 28  40 DF 0E                 *......(@..
+
+[ timestamp=31342333, channel=30, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4284004269, decrypted=False ]
+00000000: 87 D4 A3 23 01 00 45 75  BB                       ...#..Eu.
+
+[ timestamp=31342564, channel=2574731683, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=231, decrypted=False ]
+00000000: 87 D4 A3 23 07 09 0E FF  00 00 00 00 00 00 00 FD  ...#............
+00000010: 2D EB                                             -.
+
+[ timestamp=31412305, channel=30, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967268, decrypted=False ]
+00000000: 87 D4 A3 23 01 00 45 75  BB                       ...#..Eu.
+
+[ timestamp=31412535, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 07 09 0E FF  00 00 00 00 00 00 00 FD  ...#............
+00000010: 2D EB                                             -.
+
+[ timestamp=31482298, channel=30, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 0F 02 07 0E  E2 EF 94                 ...#.......
+
+[ timestamp=31482544, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=246, decrypted=False ]
+00000000: 87 D4 A3 23 09 00 E3 78  BB                       ...#...x.
+
+[ timestamp=31552291, channel=30, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 01 00 45 75  BB                       ...#..Eu.
+
+[ timestamp=31552521, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 05 00 96 73  BB                       ...#...s.
+
+[ timestamp=31622284, channel=30, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 0D 00 30 7E  BB                       ...#..0~.
+
+[ timestamp=31622514, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 09 00 E3 78  BB                       ...#...x.
+
+[ timestamp=31692276, channel=30, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967288, decrypted=False ]
+00000000: 87 D4 A3 23 01 00 45 75  BB                       ...#..Eu.
+
+[ timestamp=31692506, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 05 00 96 73  BB                       ...#...s.
+
+[ timestamp=31762269, channel=597939335, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 0F 17 03 EF  BE AD DE EF BE AD DE AD  ...#............
+00000010: DE 00 00 00 00 00 00 00  00 00 00 00 00 80 98 6C  ...............l
+
+[ timestamp=31762683, channel=597939335, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=414, decrypted=False ]
+00000000: 87 D4 A3 23 09 00 E3 78  BB                       ...#...x.
+
+[ timestamp=31832262, channel=0, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 01 00 45 75  BB                       ...#..Eu.
+
+[ timestamp=31832492, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 07 0D 04 64  45 AA 42 26 03 86 5D B4  ...#...dE.B&..].
+00000010: CF 43 B4 35 EC CE                                 .C.5..
+
+[ timestamp=31902254, channel=0, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967288, decrypted=False ]
+00000000: 87 D4 A3 23 0F 02 0D 1A  2D 1E 53                 ...#....-.S
+
+[ timestamp=31902501, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=247, decrypted=False ]
+00000000: 87 D4 A3 23 09 00 E3 78  BB                       ...#...x.
+
+[ timestamp=31972247, channel=0, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 01 00 45 75  BB                       ...#..Eu.
+
+[ timestamp=31972477, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 07 01 05 24  7B 23                    ...#...${#
+
+[ timestamp=32042240, channel=0, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 0D 00 30 7E  BB                       ...#..0~.
+
+[ timestamp=32042470, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 09 00 E3 78  BB                       ...#...x.
+
+[ timestamp=32112233, channel=0, rssi=0, direction=1, connection_handle=0, is_crc_valid=True, relative_timestamp=4294967289, decrypted=False ]
+00000000: 87 D4 A3 23 01 00 45 75  BB                       ...#..Eu.
+
+[ timestamp=32112463, channel=0, rssi=0, direction=2, connection_handle=0, is_crc_valid=True, relative_timestamp=230, decrypted=False ]
+00000000: 87 D4 A3 23 05 00 96 73  BB                       ...#...s.
+
+[i] event: Connection desynchronized
+^C
+/!\ sniffer stopped (CTRL-C)
+
+Saren in dataset/240109_leakage_for_demod on  master [!?] took 18s
+at 18:01:13 ❯ tmux-capture-pane
+
+
+
+
+
+
+
+
+
+

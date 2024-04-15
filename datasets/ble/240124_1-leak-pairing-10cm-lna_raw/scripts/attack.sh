@@ -1,0 +1,1 @@
+export SP=73911 ; ./attack.py --log --plot --norm --dataset-path ~/storage/dataset/240124_1-leak-pairing-10cm-lna_raw --start-point $SP --end-point $((SP + 400)) --num-traces 12502 attack --attack-algo pcc --profile ~/storage/dataset/240112_multi-leak-insub-1m-lna_avg/profile_pois_1 --num-pois 1 --poi-spacing 2 --variable p_xor_k --align

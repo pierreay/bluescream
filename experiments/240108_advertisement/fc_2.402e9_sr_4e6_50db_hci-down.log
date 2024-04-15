@@ -1,0 +1,49 @@
+Saren in screaming_channels_ble/src on  main [!⇡] via 🐍 v3.11.6 took 17s
+at 17:00:04 ❯ ./radio.py record 2.402e9 4e6 --duration=3 --save ~/fc_2.402e9_sr_4e6_50db_hci-down.npy --plot --gain=50
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:471: CryptographyDeprecationWarning: Blowfish has been deprecated
+  cipher=algorithms.Blowfish,
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:485: CryptographyDeprecationWarning: CAST5 has been deprecated
+  cipher=algorithms.CAST5,
+[2024-01-08 17:01:25,519] [97971] [MainThread] [soapysdr] DEBUG - MySoapySDRs.__init__()
+[2024-01-08 17:01:25,519] [97971] [MainThread] [soapysdr] DEBUG - MySoapySDR.__init__(fs=4000000.0,freq=2402000000.0,idx=0,enabled=True,duration=3.0,dir=/tmp,gain=50)
+[INFO] [UHD] linux; GNU C++ version 13.2.1 20230801; Boost_108300; UHD_4.6.0.0-0-unknown
+[INFO] [b200_impl.cpp:421] [B200] Detected Device: B200mini
+[INFO] [B200] Detected Device: B200mini
+[INFO] [b200_impl.cpp:468] [B200] Operating over USB 3.
+[INFO] [B200] Operating over USB 3.
+[INFO] [b200_impl.cpp:619] [B200] Initialize CODEC control...
+[INFO] [B200] Initialize CODEC control...
+[INFO] [b200_impl.cpp:688] [B200] Initialize Radio control...
+[INFO] [B200] Initialize Radio control...
+[INFO] [b200_impl.cpp:1099] [B200] Performing register loopback test...
+[INFO] [B200] Performing register loopback test...
+[INFO] [b200_impl.cpp:1108] [B200] Register loopback test passed
+[INFO] [B200] Register loopback test passed
+[INFO] [b200_impl.cpp:814] [B200] Setting master clock rate selection to 'automatic'.
+[INFO] [B200] Setting master clock rate selection to 'automatic'.
+[INFO] [b200_impl.cpp:1149] [B200] Asking for clock rate 16.000000 MHz...
+[INFO] [B200] Asking for clock rate 16.000000 MHz...
+[INFO] [b200_impl.cpp:1162] [B200] Actually got clock rate 16.000000 MHz.
+[INFO] [B200] Actually got clock rate 16.000000 MHz.
+[INFO] [b200_impl.cpp:1149] [B200] Asking for clock rate 32.000000 MHz...
+[INFO] [B200] Asking for clock rate 32.000000 MHz...
+[INFO] [b200_impl.cpp:1162] [B200] Actually got clock rate 32.000000 MHz.
+[INFO] [B200] Actually got clock rate 32.000000 MHz.
+[2024-01-08 17:01:27,576] [97971] [MainThread] [soapysdr] DEBUG - MySoapySDRs.register(idx=0)
+[2024-01-08 17:01:27,577] [97971] [MainThread] [soapysdr] DEBUG - MySoapySDRs.open()
+[2024-01-08 17:01:27,577] [97971] [MainThread] [soapysdr] INFO  - initialize streams for radio #0
+[2024-01-08 17:01:27,579] [97971] [MainThread] [soapysdr] DEBUG - re-initialization
+[2024-01-08 17:01:27,580] [97971] [MainThread] [soapysdr] DEBUG - MySoapySDRs.record(duration=3.0).enter
+[2024-01-08 17:01:27,580] [97971] [Thread-1 (record)] [soapysdr] INFO  - start record for radio #0 during 3.0s
+O[2024-01-08 17:01:33,486] [97971] [Thread-1 (record)] [soapysdr] DEBUG - MySoapySDR(idx=0).record().leave
+[2024-01-08 17:01:33,487] [97971] [MainThread] [soapysdr] DEBUG - MySoapySDRs.record(duration=3.0).exit
+[2024-01-08 17:01:33,487] [97971] [MainThread] [soapysdr] DEBUG - MySoapySDRs.accept()
+[2024-01-08 17:01:33,487] [97971] [MainThread] [soapysdr] DEBUG - MySoapySDR(idx=0).accept()
+[2024-01-08 17:01:33,599] [97971] [MainThread] [soapysdr] DEBUG - MySoapySDRs.save(dir=None)
+[2024-01-08 17:01:33,599] [97971] [MainThread] [soapysdr] INFO  - save recording of radio #0 into directory /tmp
+[2024-01-08 17:01:33,649] [97971] [MainThread] [soapysdr] DEBUG - MySoapySDRs.close()
+[2024-01-08 17:01:33,649] [97971] [MainThread] [soapysdr] DEBUG - MySoapySDR(idx=0).close().enter
+[2024-01-08 17:01:33,649] [97971] [MainThread] [soapysdr] DEBUG - MySoapySDR(idx=0).close().leave
+[2024-01-08 17:02:10,682] [97971] [MainThread] [analyze] INFO  - Keep I/Q of the processed signal
+[2024-01-08 17:02:10,684] [97971] [MainThread] [radio] INFO  - Additional save of recorded signal to: /home/drac/fc_2.402e9_sr_4e6_50db_hci-down.npy
+
