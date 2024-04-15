@@ -99,25 +99,38 @@ function analyze_only() {
 
 # * Script
 
+if [[ -f "$TARGET_PATH" ]]; then
+    echo "SKIP: File exists: $TARGET_PATH"
+    exit 1
+fi
+
 # Create collection directory.
 mkdir -p $TARGET_PATH
 
-# ** Configure the extraction / Template generation
+# ** Step 1: Calibrate
 
 # Set the JSON configuration file for one recording analysis.
 configure_json_plot
 
 # DONE: Use this once to record a trace. 
-# record --no-plot --saveplot
+record --no-plot --saveplot
 # Once the recording is good, use this to configure the analysis if needed.
-# analyze_only
+analyze_only
+
+# XXX
+exit 1
+
+# ** Step 2: Template generation
+
+# Set the JSON configuration file for one recording analysis.
+configure_json_plot
 
 if [[ ! -f $TARGET_PATH/template.npy ]]; then
     echo "Template has not been created! (no file at $TARGET_PATH/template.npy)"
     exit 1
 fi
 
-# ** Collect
+# ** Step 3: Collect
 
 # Set the JSON configuration file for collection.
 configure_json_collect
