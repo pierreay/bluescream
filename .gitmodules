@@ -1,24 +1,24 @@
 [submodule "231213_single-cable_raw/submodules/screaming_channels_ble"]
-	path = 231213_single-cable_raw/submodules/screaming_channels_ble
+	path = datasets/231213_single-cable_raw/submodules/screaming_channels_ble
 	url = git@github.com:pierreay/screaming_channels_ble.git
 [submodule "231213_single-cable_raw/submodules/screaming_channels_nimble"]
-	path = 231213_single-cable_raw/submodules/screaming_channels_nimble
+	path = datasets/231213_single-cable_raw/submodules/screaming_channels_nimble
 	url = git@github.com:pierreay/screaming_channels_nimble.git
 [submodule "231213_single-cable_raw/submodules/butterfly"]
-	path = 231213_single-cable_raw/submodules/butterfly
+	path = datasets/231213_single-cable_raw/submodules/butterfly
 	url = git@github.com:pierreay/butterfly.git
 [submodule "231213_single-cable_raw/submodules/whad"]
-	path = 231213_single-cable_raw/submodules/whad
+	path = datasets/231213_single-cable_raw/submodules/whad
 	url = git@github.com:pierreay/whad.git
 [submodule "231222_single-cable-balanced_raw/submodules/screaming_channels_nimble"]
-	path = 231222_single-cable-balanced_raw/submodules/screaming_channels_nimble
+	path = datasets/231222_single-cable-balanced_raw/submodules/screaming_channels_nimble
 	url = git@github.com:pierreay/screaming_channels_nimble.git
 [submodule "231223_single-1m-pair_raw/submodules/screaming_channels_nimble"]
-	path = 231223_single-1m-pair_raw/submodules/screaming_channels_nimble
+	path = datasets/231223_single-1m-pair_raw/submodules/screaming_channels_nimble
 	url = git@github.com:pierreay/screaming_channels_nimble.git
 [submodule "240110_single-leak-pairing-1m-lna_raw/submodules/screaming_channels_nimble"]
-	path = 240110_single-leak-pairing-1m-lna_raw/submodules/screaming_channels_nimble
+	path = datasets/240110_single-leak-pairing-1m-lna_raw/submodules/screaming_channels_nimble
 	url = git@github.com:pierreay/screaming_channels_nimble.git
 [submodule "240112_multi-leak-insub-1m-lna_raw/submodules/screaming_channels_nimble"]
-	path = 240112_multi-leak-insub-1m-lna_raw/submodules/screaming_channels_nimble
+	path = datasets/240112_multi-leak-insub-1m-lna_raw/submodules/screaming_channels_nimble
 	url = git@github.com:pierreay/screaming_channels_nimble.git
