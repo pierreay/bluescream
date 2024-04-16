@@ -14,8 +14,11 @@ NUM_TRACES=16000
 MODE="train"
 # MODE="attack"
 
+# Dataset path.
+DATASET_PATH="${REPO_DATASET_PATH}/poc/240415_custom_firmware_highdist"
+
 # Temporary collection path.
-TARGET_PATH="${REPO_DATASET_PATH}/poc/240415_custom_firmware_highdist/${MODE}"
+TARGET_PATH="${DATASET_PATH}/${MODE}"
 
 # ** Actions
 
@@ -36,9 +39,15 @@ TMP_TRACE_PATH=$HOME/storage/tmp/raw_0_0.npy
 function flash_firmware() {
     echo "INFO: Checkout feat-recombination-corr -> $SC_POC"
     cd $SC_POC/firmware
+
     echo "INFO: Flash custom firmware..."
     git checkout feat-recombination-corr
     make -C pca10040/blank/armgcc flash
+
+    firmware_src="${SC_POC}/firmware/pca10040/blank/armgcc/_build/nrf52832_xxaa.hex"
+    firmware_dst="${DATASET_PATH}/bin"
+    echo "INFO: Save firmware: ${firmware_src} -> ${firmware_dst}"
+    mkdir -p "$firmware_dst" && cp "${firmware_src}" "${firmware_dst}"
     echo "DONE!"
 }
 
