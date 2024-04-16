@@ -79,15 +79,16 @@ function configure_json_common() {
     configure_param_json $CONFIG_JSON_PATH_DST "channel" "20"
     configure_param_json $CONFIG_JSON_PATH_DST "bandpass_lower" "2.10e6"
     configure_param_json $CONFIG_JSON_PATH_DST "bandpass_upper" "2.30e6"
-    configure_param_json $CONFIG_JSON_PATH_DST "trigger_threshold" "190e3"
-    # Shift right -> positive offset / Shift left -> negative offset.
-    configure_param_json $CONFIG_JSON_PATH_DST "trigger_offset" "50e-6"
-    configure_param_json $CONFIG_JSON_PATH_DST "trigger_rising" "true"
     configure_param_json $CONFIG_JSON_PATH_DST "drop_start" "2e-1"
+    configure_param_json $CONFIG_JSON_PATH_DST "trigger_threshold" "190e3"
+    # Shift right -> increase offset / Shift left -> decrease offset.
+    configure_param_json $CONFIG_JSON_PATH_DST "trigger_offset" "0e-6"
+    configure_param_json $CONFIG_JSON_PATH_DST "trigger_rising" "true"
+    configure_param_json $CONFIG_JSON_PATH_DST "signal_length" "200e-6"
     configure_param_json $CONFIG_JSON_PATH_DST "num_traces_per_point" 300
     configure_param_json $CONFIG_JSON_PATH_DST "num_traces_per_point_keep" 1
     configure_param_json $CONFIG_JSON_PATH_DST "modulate" "true"
-    configure_param_json $CONFIG_JSON_PATH_DST "min_correlation" "1.9e19"
+    configure_param_json $CONFIG_JSON_PATH_DST "min_correlation" "1.4e20"
 }
 
 function configure_json_plot() {
