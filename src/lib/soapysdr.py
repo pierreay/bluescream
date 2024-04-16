@@ -17,14 +17,18 @@ import lib.plot as libplot
 import lib.complex as complex
 
 # Path of the FIFO file used between MySoapySDRs and MySoapySDRsClient.
+# client -> FIFO -> server
 FIFO_PATH = "/tmp/soapysdr.fifo"
+# server -> FIFO -> client
+FIFO_PATH_CLIENT = "/tmp/soapysdr_client.fifo"
+
+# Polling interval for a while True loop , i.e. sleeping time, i.e. interval to
+# check whether a command is queued in the FIFO or not. High enough to not
+# consume too much CPU (here, 5%) but small enough to not introduce noticeable
+# delay to the recording.
+POLLING_INTERVAL = 1e-6
 
 class MySoapySDRs():
-    # Polling interval of the listening radio thread, i.e. sleeping time,
-    # i.e. interval to check whether a command is queued in the FIFO or
-    # not. High enough to not consume too much CPU (here, 5%) but small enough
-    # to not introduce noticeable delay to the recording.
-    POLLING_INTERVAL = 1e-6
 
     def __enter__(self):
         return self
@@ -66,6 +70,9 @@ class MySoapySDRs():
         if path.exists(FIFO_PATH):
             # Delete the FIFO.
             os.remove(FIFO_PATH)
+        if path.exists(FIFO_PATH_CLIENT):
+            # Delete the FIFO.
+            os.remove(FIFO_PATH_CLIENT)
 
     def record_start(self):
         """Asynchronous version of record().
@@ -141,25 +148,30 @@ class MySoapySDRs():
         communicate with this server mode.
 
         """
-        def __ack__():
+        def __ack__(cmd):
             """Acknoledge the end of the command execution by opening-closing
             the FIFO in W mode.
 
             """
-            with open(FIFO_PATH, "w") as fifo_w:
-                pass
+            with open(FIFO_PATH_CLIENT, "w") as fifo_w:
+                ack = "ack:{}".format(cmd)
+                l.LOGGER.debug("[server] Opened FIFO_CLIENT at {}".format(FIFO_PATH_CLIENT))
+                fifo_w.write(ack)
+                l.LOGGER.debug("[server] FIFO_CLIENT <- {}".format(ack))
 
         def __create_fifo():
             """Create the named pipe (FIFO)."""
             # Remove previously created FIFO.
             try:
                 os.remove(FIFO_PATH)
+                os.remove(FIFO_PATH_CLIENT)
             except Exception as e:
                 if not isinstance(e, FileNotFoundError):
                     raise e
             # Create the named pipe (FIFO).
             try:
                 os.mkfifo(FIFO_PATH)
+                os.mkfifo(FIFO_PATH_CLIENT)
             except OSError as oe:
                 raise
                 # if oe.errno != errno.EEXIST:
@@ -181,12 +193,12 @@ class MySoapySDRs():
                     # Execute the received command and acknowledge its execution.
                     if cmd in cmds:
                         cmds[cmd]()
-                        __ack__()
+                        __ack__(cmd)
                     elif cmd == "quit":
                         l.LOGGER.info("Quit the listening mode!")
                         break
                 # Smart polling.
-                sleep(self.POLLING_INTERVAL)
+                sleep(POLLING_INTERVAL)
 
     def get_nb(self):
         """Get the number of currently registed SDRs."""
@@ -528,7 +540,7 @@ class MySoapySDRsClient():
                 fifo.write(cmd)
             sleep(0.1)
 
-    def __wait__(self):
+    def __wait__(self, cmd):
         """Wait for the previous command to complete."""
         if self.enabled is True:
             # NOTE: Hacky trick here, Linux is making the opening of a FIFO in
@@ -538,9 +550,16 @@ class MySoapySDRsClient():
             # server-side opening in write mode happen before the client-side
             # opening in read mode, then it will deadlock.
             l.LOGGER.debug("[client] Waiting...")
-            with open(FIFO_PATH, "r") as fifo:
-                pass
-            l.LOGGER.debug("[client] Wait completed!")
+            with open(FIFO_PATH_CLIENT, "r") as fifo:
+                l.LOGGER.debug("[client] Opened FIFO_CLIENT at {}".format(FIFO_PATH_CLIENT))
+                while True:
+                    ack = fifo.read()
+                    if len(ack) > 0:
+                        l.LOGGER.debug("[client] FIFO_CLIENT -> {}".format(ack))
+                        if ack == "ack:{}".format(cmd):
+                            l.LOGGER.debug("[client] Wait completed!")
+                            break
+                    sleep(POLLING_INTERVAL)
         else:
             l.LOGGER.debug("Waiting stub for disabled SoapySDR client by sleeping {}s".format(self.STUB_WAIT))
             sleep(self.STUB_WAIT)
@@ -551,16 +570,15 @@ class MySoapySDRsClient():
 
         """
         self.__cmd__("record")
-        self.__wait__()
+        self.__wait__("record")
 
     def record_start(self):
         self.__cmd__("record_start")
         # NOTE: Don't need to wait because record_start is fast enough.
-        # self.__wait__()
 
     def record_stop(self):
         self.__cmd__("record_stop")
-        self.__wait__()
+        self.__wait__("record_stop")
 
     def accept(self):
         """Call the MySoapySDRs.accept() method through the FIFO. Returns
@@ -571,6 +589,7 @@ class MySoapySDRsClient():
         """Call the MySoapySDRs.save() method through the FIFO. Returns
         immediately."""
         self.__cmd__("save")
+        self.__wait__("save")
 
     def disable(self):
         """Call the MySoapySDRs.disable() method through the FIFO. Returns
