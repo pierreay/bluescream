@@ -41,6 +41,7 @@ function flash_firmware_once() {
     firmware_dst="${DATASET_PATH}/bin/nrf52832_xxaa.hex"
     if [[ -f "${firmware_dst}" ]]; then
         echo "SKIP: Flash firmware: File exists: ${firmware_dst}"
+        return 0
     fi
     
     echo "INFO: Checkout feat-recombination-corr -> $SC_POC"
