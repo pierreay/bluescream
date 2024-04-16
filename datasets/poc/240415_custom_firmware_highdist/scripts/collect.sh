@@ -36,18 +36,21 @@ TMP_TRACE_PATH=$HOME/storage/tmp/raw_0_0.npy
 
 # ** Firmware
 
-function flash_firmware() {
+function flash_firmware_once() {
+    firmware_src="${SC_POC}/firmware/pca10040/blank/armgcc/_build/nrf52832_xxaa.hex"
+    firmware_dst="${DATASET_PATH}/bin/nrf52832_xxaa.hex"
+    if [[ -f "${firmware_dst}" ]]; then
+        echo "SKIP: Flash firmware: File exists: ${firmware_dst}"
+    fi
+    
     echo "INFO: Checkout feat-recombination-corr -> $SC_POC"
     cd $SC_POC/firmware
 
     echo "INFO: Flash custom firmware..."
     git checkout feat-recombination-corr
     make -C pca10040/blank/armgcc flash
-
-    firmware_src="${SC_POC}/firmware/pca10040/blank/armgcc/_build/nrf52832_xxaa.hex"
-    firmware_dst="${DATASET_PATH}/bin"
     echo "INFO: Save firmware: ${firmware_src} -> ${firmware_dst}"
-    mkdir -p "$firmware_dst" && cp "${firmware_src}" "${firmware_dst}"
+    mkdir -p "$(dirname "$firmware_dst")" && cp "${firmware_src}" "${firmware_dst}"
     echo "DONE!"
 }
 
@@ -147,9 +150,7 @@ mkdir -p $TARGET_PATH
 # If calibration has not been done.
 if [[ ! -f "$CALIBRATION_FLAG_PATH" ]]; then
     # Flash custom firmware.
-    if [[ $REFLASH_FIRMWARE == 1 ]]; then
-        flash_firmware
-    fi
+    flash_firmware_once
 
     # Set the JSON configuration file for one recording analysis.
     configure_json_plot
