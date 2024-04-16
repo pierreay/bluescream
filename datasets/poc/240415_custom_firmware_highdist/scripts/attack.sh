@@ -1,96 +1,80 @@
 #!/bin/bash
 
-# * Parameters
+# * Variables
 
-# Path of dataset used to create the profile.
-TRAIN_SET=$REPO_DATASET_PATH/poc/240415_custom_firmware_highdist/train
-# Base path used to store the created profile.
-PROFILE_PATH_BASE=$TRAIN_SET/../profile
-# Path of dataset used to perform the attack.
-ATTACK_SET=$REPO_DATASET_PATH/poc/240415_custom_firmware_highdist/attack
+# ** Configuration for the used profiles
 
-# Number of traces to use for profile creation.
-NUM_TRACES_PROFILE=16000
-# Number of traces to use for attack.
-NUM_TRACES_ATTACK=4100
-# Delimiters. Small window greatly increase profile computation speed.
+# Dataset path.
+DATASET_PATH="${REPO_DATASET_PATH}/poc/240415_custom_firmware_highdist"
+
+# List of parameters for the used profiles.
+COMP_LIST=(amp phr)
+NUM_TRACES_LIST=(2100)
+POIS_ALGO_LIST=(r snr)
+POIS_NB_LIST=(1 2)
+
+# Delimiters.
 START_POINT=0
 END_POINT=0
 
 # NOTE: Sampling rate is hardcoded in collect_*.sh scripts.
 FS=8e6
 
+# ** Configuration specific to the attack
+
+NUM_TRACES_ATTACK_LIST=(250 500 1000)
+
+# ** Internals
+
+# Path of dataset used for the attack.
+ATTACK_SET="${DATASET_PATH}/attack"
+
+# Base path used to fetch the created profile.
+PROFILE_PATH_BASE="${DATASET_PATH}/profile"
+
+# Base path used to store the attack log.
+LOG_PATH_BASE="${DATASET_PATH}/logs"
+
 # * Functions
 
-function profile_comp() {
-    # Get parameters.
-    comp=$1
-
-    # Iterate over good POI algorithms.
-    for pois_algo in snr t r corr 
-    do
-        echo "pois_algo=$pois_algo"
-        # Set global parameters.
-        export PROFILE_PATH=${PROFILE_PATH_BASE}_${comp}_${NUM_TRACES_PROFILE}_${pois_algo}
-        # Initialize directories.
-        mkdir -p $PROFILE_PATH
-        # Create the profile.
-        profile $pois_algo
-    done
-    
-    # Check result.
-    if [[ ! -f $PROFILE_PATH/PROFILE_MEAN_TRACE.npy ]]; then
-        echo "Profile has not been created! (no file at $PROFILE_PATH/*.npy)"
-        exit 1
-    fi
-}
-
-function profile() {
-    # Get parameters.
-    pois_algo=$1
-    # Print options.
-    plot=--no-plot
-    echo "plot=$plot"
-    save_images=--save-images
-    echo "save_images=$save_images"
-    # Profile.
-    sc-attack $plot $save_images --norm --data-path $TRAIN_SET --start-point $START_POINT --end-point $END_POINT --num-traces $NUM_TRACES_PROFILE --comp $comp profile $PROFILE_PATH --pois-algo $pois_algo --num-pois 1 --poi-spacing 2 --variable p_xor_k --align --fs $FS
-}
-
-function attack_comp() {
-    # Get parameters.
-    comp=$1
-
-    # Attack only successful profiles (good correlations + good POIs values).
-    for pois_algo in snr corr
-    do
-        echo "pois_algo=$pois_algo"
-        # Set global parameters.
-        export PROFILE_PATH=${PROFILE_PATH_BASE}_${comp}_${NUM_TRACES_PROFILE}_${pois_algo}
-        # Perform the attack.
-        echo "Attack '$comp' with profile: $PROFILE_PATH"
-        attack
-    done
-}
-
 function attack() {
-    # bruteforce="--bruteforce"
-    # plot="--plot"
-    sc-attack $plot --norm --data-path $ATTACK_SET --start-point $START_POINT --end-point $END_POINT --num-traces $NUM_TRACES_ATTACK $bruteforce --comp $comp \
-              attack $PROFILE_PATH --attack-algo pcc --variable p_xor_k --align --fs $FS
+    # Get parameters.
+    comp=$1
+    num_traces=$2
+    pois_algo=$3
+    pois_nb=$4
+    num_traces_attack=$5
+    # Set parameters.
+    profile_path=${PROFILE_PATH_BASE}/${comp}_${num_traces}_${pois_algo}_${pois_nb}
+    log_path=${LOG_PATH_BASE}/attack_${comp}_${num_traces}_${pois_algo}_${pois_nb}.log
+    bruteforce="--no-bruteforce"
+    plot="--no-plot"
+
+    # Safety-guard.
+    if [[ -d "${log_path}" ]]; then
+        echo "[!] SKIP: Attack: File exists: ${log_path}"
+        return 0
+    fi
+    
+    # Initialize directories.
+    mkdir -p $LOG_PATH_BASE
+    # Perform the attack.
+    sc-attack $plot --norm --data-path $ATTACK_SET --start-point $START_POINT \
+              --end-point $END_POINT --num-traces $num_traces_attack $bruteforce --comp $comp \
+              attack $profile_path --attack-algo pcc --variable p_xor_k --align --fs $FS \
+              | tee $log_path
 }
 
 # * Script
 
-# ** Profiles
-
-profile_comp amp
-profile_comp phr
-
-# ** Attacks
-
-# DONE: Attack using previously created templates.
-# attack_comp amp
-# attack_comp phr
-# attack_comp i_augmented
-# attack_comp q_augmented
+for comp in "${COMP_LIST[@]}"; do
+    for num_traces in "${NUM_TRACES_LIST[@]}"; do
+        for pois_algo in "${POIS_ALGO_LIST[@]}"; do
+            for pois_nb in "${POIS_NB_LIST[@]}"; do
+                for num_traces_attack in "${NUM_TRACES_ATTACK_LIST[@]}"; do
+                    attack $comp $num_traces $pois_algo $pois_nb $num_traces_attack
+                done
+            done
+        done
+    done
+done
