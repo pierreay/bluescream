@@ -76,10 +76,12 @@ function configure_param_json() {
 function configure_json_common() {
     export CONFIG_JSON_PATH_SRC=$SC_POC/experiments/config/example_collection_collect_plot.json
     cp $CONFIG_JSON_PATH_SRC $CONFIG_JSON_PATH_DST
-    configure_param_json $CONFIG_JSON_PATH_DST "bandpass_lower" "0.5e6"
-    configure_param_json $CONFIG_JSON_PATH_DST "bandpass_upper" "0.7e6"
-    configure_param_json $CONFIG_JSON_PATH_DST "trigger_threshold" "140e3"
-    configure_param_json $CONFIG_JSON_PATH_DST "trigger_offset" "200e-6"
+    configure_param_json $CONFIG_JSON_PATH_DST "channel" "20"
+    configure_param_json $CONFIG_JSON_PATH_DST "bandpass_lower" "2.10e6"
+    configure_param_json $CONFIG_JSON_PATH_DST "bandpass_upper" "2.30e6"
+    configure_param_json $CONFIG_JSON_PATH_DST "trigger_threshold" "190e3"
+    # Shift right -> positive offset / Shift left -> negative offset.
+    configure_param_json $CONFIG_JSON_PATH_DST "trigger_offset" "50e-6"
     configure_param_json $CONFIG_JSON_PATH_DST "trigger_rising" "true"
     configure_param_json $CONFIG_JSON_PATH_DST "drop_start" "2e-1"
     configure_param_json $CONFIG_JSON_PATH_DST "num_traces_per_point" 300
@@ -123,7 +125,7 @@ function record() {
 
     # Start SDR server.
     # NOTE: Make sure the JSON config file is configured accordingly to the SDR server here.
-    $SC_SRC/radio.py --config $SC_SRC/config.toml --dir $HOME/storage/tmp --loglevel $LOG_LEVEL listen 128e6 2.512e9 8e6 --nf-id -1 --ff-id 0 --duration=0.8 --gain 76 &
+    $SC_SRC/radio.py --config $SC_SRC/config.toml --dir $HOME/storage/tmp --loglevel $LOG_LEVEL listen 128e6 2.533e9 8e6 --nf-id -1 --ff-id 0 --duration=0.3 --gain 76 &
     sleep 10
 
     # Start collection and plot result.
