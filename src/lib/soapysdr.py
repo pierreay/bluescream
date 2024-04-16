@@ -2,7 +2,7 @@
 SDRs in parallel using threads."""
 
 import time
-from time import sleep
+from time import sleep, time
 import os
 import errno
 from os import path
@@ -157,8 +157,9 @@ class MySoapySDRs():
                 ack = "ack:{}".format(cmd)
                 l.LOGGER.debug("[server] Opened FIFO_CLIENT at {}".format(FIFO_PATH_CLIENT))
                 fifo_w.write(ack)
-                # NOTE: Prevent a bug where two successive ack message are read
-                # concatenated in one single read from the client:
+                # NOTE: Help but not enough to prevent a bug where two
+                # successive ack message are read concatenated in one single
+                # read from the client:
                 fifo_w.write("")
                 l.LOGGER.debug("[server] FIFO_CLIENT <- {}".format(ack))
 
@@ -546,12 +547,7 @@ class MySoapySDRsClient():
     def __wait__(self, cmd):
         """Wait for the previous command to complete."""
         if self.enabled is True:
-            # NOTE: Hacky trick here, Linux is making the opening of a FIFO in
-            # read mode blocking until a writer opened it. Here, we simply wait
-            # for the radio server to open it in write mode, and exit
-            # immediately. Use this only for long command, because if the
-            # server-side opening in write mode happen before the client-side
-            # opening in read mode, then it will deadlock.
+            time_start = time()
             l.LOGGER.debug("[client] Waiting for: {}".format(cmd))
             with open(FIFO_PATH_CLIENT, "r") as fifo:
                 l.LOGGER.debug("[client] Opened FIFO_CLIENT at {}".format(FIFO_PATH_CLIENT))
@@ -563,6 +559,9 @@ class MySoapySDRsClient():
                             l.LOGGER.debug("[client] Wait completed!")
                             break
                     sleep(POLLING_INTERVAL)
+                    # Timeout for waiting a command.
+                    if (time() - time_start) > 3: # [s]
+                        raise Exception("Timeout exceeded!")
         else:
             l.LOGGER.debug("Waiting stub for disabled SoapySDR client by sleeping {}s".format(self.STUB_WAIT))
             sleep(self.STUB_WAIT)
