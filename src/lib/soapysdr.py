@@ -157,6 +157,9 @@ class MySoapySDRs():
                 ack = "ack:{}".format(cmd)
                 l.LOGGER.debug("[server] Opened FIFO_CLIENT at {}".format(FIFO_PATH_CLIENT))
                 fifo_w.write(ack)
+                # NOTE: Prevent a bug where two successive ack message are read
+                # concatenated in one single read from the client:
+                fifo_w.write("")
                 l.LOGGER.debug("[server] FIFO_CLIENT <- {}".format(ack))
 
         def __create_fifo():
@@ -549,7 +552,7 @@ class MySoapySDRsClient():
             # immediately. Use this only for long command, because if the
             # server-side opening in write mode happen before the client-side
             # opening in read mode, then it will deadlock.
-            l.LOGGER.debug("[client] Waiting...")
+            l.LOGGER.debug("[client] Waiting for: {}".format(cmd))
             with open(FIFO_PATH_CLIENT, "r") as fifo:
                 l.LOGGER.debug("[client] Opened FIFO_CLIENT at {}".format(FIFO_PATH_CLIENT))
                 while True:
