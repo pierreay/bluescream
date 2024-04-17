@@ -24,6 +24,9 @@ TARGET_PATH="${DATASET_PATH}/${MODE}"
 
 # Reflash the custom firmware.
 REFLASH_FIRMWARE=1
+# Calibration mode ["analyze" | "snr"].
+CALIBRATION_MODE="analyze"
+#CALIBRATION_MODE="snr"
 
 # ** Internals
 
@@ -115,10 +118,11 @@ function configure_json_collect() {
 
 # ** Instrumentation
 
-function record() {
+function experiment() {
     # Get args.
     plot=$1
     saveplot=$2
+    cmd=$3 # ["collect" or "snr"]
     
     # Kill previously started radio server.
     pkill radio.py
@@ -134,7 +138,7 @@ function record() {
     sleep 10
 
     # Start collection and plot result.
-    sc-experiment --loglevel=$LOG_LEVEL --radio=USRP --device=$(nrfjprog --com | cut - -d " " -f 5) -o $TMP_TRACE_PATH collect $CONFIG_JSON_PATH_DST $TARGET_PATH $plot $saveplot --average-out=$TARGET_PATH/template.npy
+    sc-experiment --loglevel=$LOG_LEVEL --radio=USRP --device=$(nrfjprog --com | cut - -d " " -f 5) -o $TMP_TRACE_PATH $cmd $CONFIG_JSON_PATH_DST $TARGET_PATH $plot $saveplot --average-out=$TARGET_PATH/template.npy
 }
 
 function analyze_only() {
@@ -146,7 +150,7 @@ function analyze_only() {
 # Ensure collection directory is created.
 mkdir -p $TARGET_PATH
 
-# ** Step 1: Calibrate and generate a template
+# ** Step 1: Calibratation
 
 # If calibration has not been done.
 if [[ ! -f "$CALIBRATION_FLAG_PATH" ]]; then
@@ -156,13 +160,18 @@ if [[ ! -f "$CALIBRATION_FLAG_PATH" ]]; then
     # Set the JSON configuration file for one recording analysis.
     configure_json_plot
 
-    # Record a new trace if not already done.
-    if [[ ! -f "${TMP_TRACE_PATH}" ]]; then
-        record --plot --saveplot
-    # Analyze only.
-    else
-        echo "SKIP: New recording: File exists: ${TMP_TRACE_PATH}"
-        analyze_only
+    if [[ "$CALIBRATION_MODE" == "snr" ]]; then
+        tmux split-window "watch -n 0.1 'grep SNR /tmp/sc-experiment_snr.log | tail -n 10'"
+        experiment --no-plot --no-saveplot snr | tee "/tmp/sc-experiment_snr.log"
+    elif [[ "$CALIBRATION_MODE" == "analyze" ]]; then
+        # Record a new trace if not already done.
+        if [[ ! -f "${TMP_TRACE_PATH}" ]]; then
+            experiment --plot --saveplot collect
+        # Analyze only.
+        else
+            echo "SKIP: New recording: File exists: ${TMP_TRACE_PATH}"
+            analyze_only
+        fi
     fi
 
     read -p "Press [ENTER] to confirm calibration, otherwise press [CTRL-C]..."
@@ -171,7 +180,7 @@ else
     echo "SKIP: Calibration: File exists: $CALIBRATION_FLAG_PATH"
 fi
 
-# ** Step 2: Collect
+# ** Step 2: Collection
 
 if [[ ! -f $TARGET_PATH/template.npy ]]; then
     echo "Template has not been created! (no file at $TARGET_PATH/template.npy)"
@@ -182,7 +191,7 @@ fi
 if [[ ! -f "$COLLECTION_FLAG_PATH" ]]; then
     touch $COLLECTION_FLAG_PATH
     configure_json_collect
-    record --no-plot --no-saveplot
+    experiment --no-plot --no-saveplot collect
 else
     echo "SKIP: Collection: File exists: $COLLECTION_FLAG_PATH"
 fi
