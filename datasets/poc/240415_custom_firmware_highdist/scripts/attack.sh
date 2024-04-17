@@ -8,10 +8,10 @@
 DATASET_PATH="${REPO_DATASET_PATH}/poc/240415_custom_firmware_highdist"
 
 # List of parameters for the used profiles.
-COMP_LIST=(amp phr)
-NUM_TRACES_LIST=(2100)
-POIS_ALGO_LIST=(r snr)
-POIS_NB_LIST=(1 2)
+COMP_LIST=(amp)
+NUM_TRACES_LIST=(8000 16000)
+POIS_ALGO_LIST=(snr)
+POIS_NB_LIST=(1)
 
 # Delimiters.
 START_POINT=0
@@ -22,7 +22,7 @@ FS=8e6
 
 # ** Configuration specific to the attack
 
-NUM_TRACES_ATTACK_LIST=(250 500 1000)
+NUM_TRACES_ATTACK_LIST=(250 500 1000 2000 4000 6000 12000 16000)
 
 # ** Internals
 
@@ -46,7 +46,7 @@ function attack() {
     num_traces_attack=$5
     # Set parameters.
     profile_path=${PROFILE_PATH_BASE}/${comp}_${num_traces}_${pois_algo}_${pois_nb}
-    log_path=${LOG_PATH_BASE}/attack_${comp}_${num_traces}_${pois_algo}_${pois_nb}.log
+    log_path=${LOG_PATH_BASE}/attack_${comp}_${num_traces}_${pois_algo}_${pois_nb}_${num_traces_attack}.log
     bruteforce="--no-bruteforce"
     plot="--no-plot"
 
