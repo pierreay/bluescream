@@ -91,7 +91,7 @@ List and manage datasets.
   - Radio configuration ::
     - Center frequency = 2.533 GHz
     - Sampling rate = 8e6 Msps
-    - Gain = ~50 dB to maximize the measured SNR
+    - Gain = ~50 dB to maximize the measured SNR between signal and noise.
   - Sets ::
     - Training set = 16k traces using ~200 repetitions
     - Attack set = XXX traces using ~XXX repetitions
@@ -110,7 +110,7 @@ List and manage datasets.
   - Radio configuration ::
     - Center frequency = 2.533 GHz
     - Sampling rate = 8e6 Msps
-    - Gain = 76 dB to maximize absolute value
+    - Gain = 70 dB to maximize range between signal minimum and signal maximum.
   - Sets ::
     - Training set = XXX traces using ~200 repetitions
     - Attack set = XXX traces using ~XXX repetitions
