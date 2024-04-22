@@ -81,6 +81,21 @@ List and manage datasets.
   - 2. Evaluate the hardware setup performance before to record a new dataset
     using Nimble.
 
+** [2024-04-17 mer.] Custom firmware at high distance using 2 LNAs and repetitions
+:PROPERTIES:
+:DIR:      poc/240417
+:ID:       db7ed3e7-db7f-42c0-bf7d-ee1151448f74
+:END:
+
+- Software setup ::
+  - Radio configuration using a center frequency at 2.533 GHz and sampling rate
+    at 8e6 Msps.
+  - Training set using ~200 repetitions.
+- Hardware setup ::
+  - Based on [[id:e9b9f217-5250-44b6-80f8-4dec77ff381c][[2024-04-15 lun.] Custom firmware at high distance]].
+  - Add another LNA, ending up with: antenna -> [[https://www.minicircuits.com/pdfs/TAMP-272LN+.pdf][Mini-Circuits TAMP-272LN+]] ->
+    [[https://www.minicircuits.com/pdfs/ZX60-272LN-S+.pdf][MiniCircuits ZX60-272LN-S+]].
+
 * BLE
 :PROPERTIES:
 :DIR:      ble
