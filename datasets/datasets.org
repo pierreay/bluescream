@@ -88,13 +88,16 @@ List and manage datasets.
 :END:
 
 - Software setup ::
-  - Radio configuration using a center frequency at 2.533 GHz and sampling rate
-    at 8e6 Msps.
-  - Training set using ~200 repetitions.
+  - Radio configuration ::
+    - Center frequency = 2.533 GHz
+    - Sampling rate = 8e6 Msps
+  - Sets ::
+    - Training set = XXX traces using ~200 repetitions
+    - Attack set = XXX traces using ~XXX repetitions
 - Hardware setup ::
-  - Based on [[id:e9b9f217-5250-44b6-80f8-4dec77ff381c][[2024-04-15 lun.] Custom firmware at high distance]].
+  - Based on: [[id:e9b9f217-5250-44b6-80f8-4dec77ff381c][[2024-04-15 lun.] Custom firmware at high distance]]
   - Add another LNA, ending up with: antenna -> [[https://www.minicircuits.com/pdfs/TAMP-272LN+.pdf][Mini-Circuits TAMP-272LN+]] ->
-    [[https://www.minicircuits.com/pdfs/ZX60-272LN-S+.pdf][MiniCircuits ZX60-272LN-S+]].
+    [[https://www.minicircuits.com/pdfs/ZX60-272LN-S+.pdf][MiniCircuits ZX60-272LN-S+]]
 
 * BLE
 :PROPERTIES:
