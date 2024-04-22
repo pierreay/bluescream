@@ -83,7 +83,7 @@ List and manage datasets.
 
 ** [2024-04-17 mer.] Custom firmware at high distance using 2 LNAs and repetitions
 :PROPERTIES:
-:DIR:      poc/240417
+:DIR:      poc/240417_custom_firmware_highdist_2lna_lowgain
 :ID:       db7ed3e7-db7f-42c0-bf7d-ee1151448f74
 :END:
 
@@ -91,6 +91,26 @@ List and manage datasets.
   - Radio configuration ::
     - Center frequency = 2.533 GHz
     - Sampling rate = 8e6 Msps
+    - Gain = ~50 dB to maximize the measured SNR
+  - Sets ::
+    - Training set = 16k traces using ~200 repetitions
+    - Attack set = XXX traces using ~XXX repetitions
+- Hardware setup ::
+  - Based on: [[id:e9b9f217-5250-44b6-80f8-4dec77ff381c][[2024-04-15 lun.] Custom firmware at high distance]]
+  - Add another LNA, ending up with: antenna -> [[https://www.minicircuits.com/pdfs/TAMP-272LN+.pdf][Mini-Circuits TAMP-272LN+]] ->
+    [[https://www.minicircuits.com/pdfs/ZX60-272LN-S+.pdf][MiniCircuits ZX60-272LN-S+]]
+
+** [2024-04-22 lun.] Custom firmware at high distance using 2 LNAs and repetitions with increased gain
+:PROPERTIES:
+:DIR:      poc/240422_custom_firmware_highdist_2lna_highgain
+:ID:       db7ed3e7-db7f-42c0-bf7d-ee1151448f74
+:END:
+
+- Software setup ::
+  - Radio configuration ::
+    - Center frequency = 2.533 GHz
+    - Sampling rate = 8e6 Msps
+    - Gain = 76 dB to maximize absolute value
   - Sets ::
     - Training set = XXX traces using ~200 repetitions
     - Attack set = XXX traces using ~XXX repetitions
