@@ -103,8 +103,8 @@ function configure_json_common() {
     configure_param_json $CONFIG_JSON_PATH_DST "trigger_offset" "0e-6"
     configure_param_json $CONFIG_JSON_PATH_DST "trigger_rising" "true"
     configure_param_json $CONFIG_JSON_PATH_DST "signal_length" "200e-6"
-    configure_param_json $CONFIG_JSON_PATH_DST "num_traces_per_point" 500
-    configure_param_json $CONFIG_JSON_PATH_DST "num_traces_per_point_keep" 300
+    configure_param_json $CONFIG_JSON_PATH_DST "num_traces_per_point" 300
+    configure_param_json $CONFIG_JSON_PATH_DST "num_traces_per_point_keep" 1
     configure_param_json $CONFIG_JSON_PATH_DST "modulate" "true"
     # May be set to 0 for no reject.
     configure_param_json $CONFIG_JSON_PATH_DST "min_correlation" "1.9e20"
@@ -146,7 +146,7 @@ function experiment() {
 
     # Start SDR server.
     # NOTE: Make sure the JSON config file is configured accordingly to the SDR server here.
-    $SC_SRC/radio.py --config $SC_SRC/config.toml --dir $HOME/storage/tmp --loglevel $LOG_LEVEL listen 128e6 2.533e9 $FS --nf-id -1 --ff-id 0 --duration=0.5 --gain 70 &
+    $SC_SRC/radio.py --config $SC_SRC/config.toml --dir $HOME/storage/tmp --loglevel $LOG_LEVEL listen 128e6 2.533e9 $FS --nf-id -1 --ff-id 0 --duration=0.3 --gain 70 &
     sleep 10
 
     # Start collection and plot result.
