@@ -54,6 +54,7 @@ trg_bp_low = [7.5e6]
 trg_bp_high = [11.5e6]
 trg_lp = 1e4
 trg_peak_prominence = 0.75
+accept_snr_min = 2
 
 [radio.extract.1_aes_weak]
 window = 0.005
@@ -62,6 +63,7 @@ trg_bp_low = [7.5e6]
 trg_bp_high = [11.5e6]
 trg_lp = 1e4
 trg_peak_prominence = 0.40
+accept_snr_min = 2
 
 [radio.extract.100_aes]
 window = 0.07
@@ -70,6 +72,7 @@ trg_bp_low = [4e6]
 trg_bp_high = [4.9e6]
 trg_lp = 1e3
 trg_peak_prominence = 0.75
+accept_snr_min = 2
 
 [radio.extract.300_aes]
 window = 0.2
@@ -78,3 +81,4 @@ trg_bp_low = [4e6]
 trg_bp_high = [4.9e6]
 trg_lp = 1e3
 trg_peak_prominence = 0.75
+accept_snr_min = 2
