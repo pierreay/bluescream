@@ -57,7 +57,7 @@ function attack() {
     plot="--no-plot"
 
     # Safety-guard.
-    if [[ -d "${log_path}" ]]; then
+    if [[ -f "${log_path}" ]]; then
         echo "[!] SKIP: Attack: File exists: ${log_path}"
         return 0
     elif [[ $(ls -alh ${ATTACK_SET} | grep -E "amp.*.npy" | wc -l) -lt ${num_traces_attack} ]]; then
