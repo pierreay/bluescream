@@ -277,6 +277,21 @@ List and manage datasets.
   - Same base as [[id:241be11a-adeb-414a-8d1b-5fd9a050d5b8][[2024-04-13 sam.] BLE -- Change sampling rate]]
   - But change center frequency from 2.534e9 to 2.533e9.
 
+** [2024-04-23 mar.] Nimble at high distance using 2 LNAs and repetitions with increased gain
+:PROPERTIES:
+:ID:       0936568c-d3f9-4c18-841f-5dadecf0118a
+:DIR:      ble/240423_highdist_2lna_highgain_raw
+:END:
+
+- Hardware setup ::
+  - Identical to [[id:c2b4dc98-bf62-4225-8dfe-da6e02967282][[2024-04-23 mar.] Custom firmware at high distance using 2 LNAs without repetitions with increased gain]].
+- Software setup ::
+  - Radio configuration :: XXX
+  - Sets ::
+    - Training set = XXX traces using ~XXX repetitions
+    - Attack set = XXX traces using ~XXX repetitions
+- Results :: 
+
 * Bibliography
 
 #+print_bibliography:
