@@ -128,8 +128,13 @@ List and manage datasets.
 :DIR:      poc/240423_custom_firmware_highdist_2lna_highgain_norep
 :END:
 
-- Based on [[id:db7ed3e7-db7f-42c0-bf7d-ee1151448f74][[2024-04-22 lun.] Custom firmware at high distance using 2 LNAs and repetitions with increased gain]].
-- Excepted that we are collecting only attack traces without repetitions.
+- Setup ::
+  - Based on [[id:db7ed3e7-db7f-42c0-bf7d-ee1151448f74][[2024-04-22 lun.] Custom firmware at high distance using 2 LNAs and repetitions with increased gain]]
+  - Attack set = 10k traces using 0 repetitions
+- Results ::
+  - Use the profiles of [[id:db7ed3e7-db7f-42c0-bf7d-ee1151448f74][[2024-04-22 lun.] Custom firmware at high distance using 2 LNAs and repetitions with increased gain]].
+  - Key rank of ~2^30 (key found) for amplitude.
+  - Key rank of ~2^90 for phase rotation.
 
 * BLE
 :PROPERTIES:
