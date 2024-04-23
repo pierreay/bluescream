@@ -112,12 +112,24 @@ List and manage datasets.
     - Sampling rate = 8e6 Msps
     - Gain = 70 dB to maximize range between signal minimum and signal maximum.
   - Sets ::
-    - Training set = XXX traces using ~200 repetitions
-    - Attack set = XXX traces using ~XXX repetitions
+    - Training set = 16k traces using ~200 repetitions
+    - Attack set = 4k traces using ~200 repetitions
 - Hardware setup ::
   - Based on: [[id:e9b9f217-5250-44b6-80f8-4dec77ff381c][[2024-04-15 lun.] Custom firmware at high distance]]
   - Add another LNA, ending up with: antenna -> [[https://www.minicircuits.com/pdfs/TAMP-272LN+.pdf][Mini-Circuits TAMP-272LN+]] ->
     [[https://www.minicircuits.com/pdfs/ZX60-272LN-S+.pdf][MiniCircuits ZX60-272LN-S+]]
+- Results ::
+  - Good profiles for amplitude and phase rotation.
+  - Key rank of ~2^30 (key found) for both amplitude and phase rotation.
+
+** [2024-04-23 mar.] Custom firmware at high distance using 2 LNAs without repetitions with increased gain
+:PROPERTIES:
+:ID:       c2b4dc98-bf62-4225-8dfe-da6e02967282
+:DIR:      poc/240423_custom_firmware_highdist_2lna_highgain_norep
+:END:
+
+- Based on [[id:db7ed3e7-db7f-42c0-bf7d-ee1151448f74][[2024-04-22 lun.] Custom firmware at high distance using 2 LNAs and repetitions with increased gain]].
+- Excepted that we are collecting only attack traces without repetitions.
 
 * BLE
 :PROPERTIES:
