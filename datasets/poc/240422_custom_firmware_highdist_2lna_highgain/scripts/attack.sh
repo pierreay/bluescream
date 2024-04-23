@@ -17,9 +17,9 @@ if [[ -z $DATASET_PATH ]]; then
 fi
 
 # List of parameters for the used profiles.
-COMP_LIST=(amp)
-NUM_TRACES_LIST=(8000 16000)
-POIS_ALGO_LIST=(snr)
+COMP_LIST=(amp phr)
+NUM_TRACES_LIST=(4000 8000 16000)
+POIS_ALGO_LIST=(r)
 POIS_NB_LIST=(1)
 
 # Delimiters.
@@ -28,7 +28,7 @@ END_POINT=0
 
 # ** Configuration specific to the attack
 
-NUM_TRACES_ATTACK_LIST=(250 500 1000 2000 4000 6000 12000 16000)
+NUM_TRACES_ATTACK_LIST=(200 700 2500 4000 10000 16000)
 
 # ** Internals
 
@@ -59,6 +59,9 @@ function attack() {
     # Safety-guard.
     if [[ -d "${log_path}" ]]; then
         echo "[!] SKIP: Attack: File exists: ${log_path}"
+        return 0
+    elif [[ $(ls -alh ${ATTACK_SET} | grep -E "amp.*.npy" | wc -l) -lt ${num_traces_attack} ]]; then
+        echo "[!] SKIP: Attack: Not enough traces: < ${num_traces}"
         return 0
     fi
     

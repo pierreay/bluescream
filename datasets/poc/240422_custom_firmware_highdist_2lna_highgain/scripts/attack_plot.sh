@@ -17,9 +17,9 @@ if [[ -z $DATASET_PATH ]]; then
 fi
 
 # List of parameters for the used profiles.
-COMP_LIST=(amp)
-NUM_TRACES_LIST=(8000 16000)
-POIS_ALGO_LIST=(snr)
+COMP_LIST=(amp phr)
+NUM_TRACES_LIST=(4000 8000 16000)
+POIS_ALGO_LIST=(r)
 POIS_NB_LIST=(1)
 
 # Delimiters.
@@ -103,9 +103,9 @@ for comp in "${COMP_LIST[@]}"; do
     for num_traces in "${NUM_TRACES_LIST[@]}"; do
         for pois_algo in "${POIS_ALGO_LIST[@]}"; do
             for pois_nb in "${POIS_NB_LIST[@]}"; do
-                attack $comp $num_traces $pois_algo $pois_nb 10 25 1000 1
-                attack $comp $num_traces $pois_algo $pois_nb 1000 100 3000 0
-                attack $comp $num_traces $pois_algo $pois_nb 3000 300 16000 0
+                # [START ; STEP ; END ; INIT_MODE]
+                attack $comp $num_traces $pois_algo $pois_nb 10 20 1000 1
+                attack $comp $num_traces $pois_algo $pois_nb 1000 50 2000 0
             done
         done
     done
