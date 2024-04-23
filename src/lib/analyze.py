@@ -184,7 +184,14 @@ def fill_zeros_if_bad(ref, test, log=True, log_idx=-1):
     True if trace was bad.
 
     """
-    if test is None or test.shape != ref.shape:
+    bad = False
+    if test is None:
+        bad = True
+    if test.shape != ref.shape:
+        bad = True
+        if log is True:
+            l.LOGGER.warning("Trace #{} is of shape {} while reference trace is {}!".format(log_idx, test.shape, ref.shape))
+    if bad is True:
         if log is True:
             l.LOGGER.warning("Trace #{} filled with zeroes!".format(log_idx))
         return True, get_bad_trace(ref)
