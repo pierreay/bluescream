@@ -112,8 +112,10 @@ for comp in "${COMP_LIST[@]}"; do
         for pois_algo in "${POIS_ALGO_LIST[@]}"; do
             for pois_nb in "${POIS_NB_LIST[@]}"; do
                 # [START ; STEP ; END ; INIT_MODE]
-                attack $comp $num_traces $pois_algo $pois_nb 10 20 1000 1
-                attack $comp $num_traces $pois_algo $pois_nb 1000 50 2000 0
+                attack $comp $num_traces $pois_algo $pois_nb 10 10 500 1
+                attack $comp $num_traces $pois_algo $pois_nb 500 30 1000 0
+                attack $comp $num_traces $pois_algo $pois_nb 1000 60 2000 0
+                attack $comp $num_traces $pois_algo $pois_nb 2000 200 10000 0
             done
         done
     done
