@@ -26,6 +26,10 @@ POIS_NB_LIST=(1)
 START_POINT=0
 END_POINT=0
 
+# Should we use an external profile?
+PROFILE_EXTERNAL=1
+PROFILE_EXTERNAL_PATH_BASE="${REPO_DATASET_PATH}/poc/240422_custom_firmware_highdist_2lna_highgain/profile"
+
 # ** Internals
 
 # Path of dataset used for the attack.
@@ -56,7 +60,11 @@ function attack() {
     i_end=$(( $7 - 1 ))
     init_mode=$8 # [1 = Initialize CSV ; 0 = Append to CSV]
     # Set parameters.
-    profile_path=${PROFILE_PATH_BASE}/${comp}_${num_traces}_${pois_algo}_${pois_nb}
+    if [[ ${PROFILE_EXTERNAL} -eq 0 ]]; then
+        profile_path=${PROFILE_PATH_BASE}/${comp}_${num_traces}_${pois_algo}_${pois_nb}
+    else
+        profile_path=${PROFILE_EXTERNAL_PATH_BASE}/${comp}_${num_traces}_${pois_algo}_${pois_nb}
+    fi
     csv_path=${CSV_PATH_BASE}/attack_${comp}_${num_traces}_${pois_algo}_${pois_nb}.csv
 
     if [[ "$init_mode" == 1 ]]; then

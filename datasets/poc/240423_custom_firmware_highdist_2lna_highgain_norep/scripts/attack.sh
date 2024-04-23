@@ -26,6 +26,10 @@ POIS_NB_LIST=(1)
 START_POINT=0
 END_POINT=0
 
+# Should we use an external profile?
+PROFILE_EXTERNAL=1
+PROFILE_EXTERNAL_PATH_BASE="${REPO_DATASET_PATH}/poc/240422_custom_firmware_highdist_2lna_highgain/profile"
+
 # ** Configuration specific to the attack
 
 NUM_TRACES_ATTACK_LIST=(200 700 2500 4000 10000 16000)
@@ -51,7 +55,11 @@ function attack() {
     pois_nb=$4
     num_traces_attack=$5
     # Set parameters.
-    profile_path=${PROFILE_PATH_BASE}/${comp}_${num_traces}_${pois_algo}_${pois_nb}
+    if [[ ${PROFILE_EXTERNAL} -eq 0 ]]; then
+        profile_path=${PROFILE_PATH_BASE}/${comp}_${num_traces}_${pois_algo}_${pois_nb}
+    else
+        profile_path=${PROFILE_EXTERNAL_PATH_BASE}/${comp}_${num_traces}_${pois_algo}_${pois_nb}
+    fi
     log_path=${LOG_PATH_BASE}/attack_${comp}_${num_traces}_${pois_algo}_${pois_nb}_${num_traces_attack}.log
     bruteforce="--no-bruteforce"
     plot="--no-plot"
