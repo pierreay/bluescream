@@ -346,7 +346,7 @@ class Subset():
         del self.ff
         self.ff = None
 
-    def save_trace(self, nf=True, ff=True):
+    def save_trace(self, nf=True, ff=True, custom_dtype=True):
         if isinstance(self.load_trace_idx, int) and self.load_trace_idx == -1:
             load.save_all_traces(self.get_path(save=True),
                                  self.nf if nf is True else None,
@@ -355,7 +355,8 @@ class Subset():
         elif isinstance(self.load_trace_idx, int) and self.load_trace_idx > -1:
             load.save_pair_trace(self.get_path(save=True), self.load_trace_idx,
                                  self.nf[0] if nf is True else None,
-                                 self.ff[0] if ff is True else None)
+                                 self.ff[0] if ff is True else None,
+                                 custom_dtype=False)
         elif isinstance(self.load_trace_idx, range):
             load.save_all_traces(self.get_path(save=True),
                                  self.nf if nf is True else None,
@@ -1049,7 +1050,7 @@ class DatasetProcessing():
         if sset.ff[0] is not None:
             libplot.plot_time_spec_sync_axis(sset.ff[0:1], samp_rate=dset.samp_rate, cond=plot, comp=complex.CompType.AMPLITUDE)
         # * Save the processed trace and transmit result to caller process.
-        sset.save_trace(nf=False)
+        sset.save_trace(nf=False, custom_dtype=False)
         q.put((check, i))
         l.LOGGER.debug("End __process_fn() for trace #{}".format(i))
 

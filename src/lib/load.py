@@ -293,13 +293,19 @@ def load_raw_trace(dir, rad_idx, rec_idx, log=False):
         l.LOGGER.warning("No loaded raw trace for radio index #{}!".format(rad_idx))
     return trace
 
-def save_pair_trace(dir, idx, nf, ff):
+def save_pair_trace(dir, idx, nf, ff, custom_dtype=True):
     """Save one pair of traces (NF & FF) located in directory DIR at index
     IDX. If NF or FF are None, they are ignored. """
     if nf is not None:
-        MySoapySDR.numpy_save(get_dataset_path_unpack_nf(dir, idx), nf)
+        if custom_dtype is True:
+            MySoapySDR.numpy_save(get_dataset_path_unpack_nf(dir, idx), nf)
+        else:
+            np.save(get_dataset_path_unpack_nf(dir, idx), nf)
     if ff is not None:
-        MySoapySDR.numpy_save(get_dataset_path_unpack_ff(dir, idx), ff)
+        if custom_dtype is True:
+            MySoapySDR.numpy_save(get_dataset_path_unpack_ff(dir, idx), ff)
+        else:
+            np.save(get_dataset_path_unpack_ff(dir, idx), ff)
  
 def load_pair_trace(dir, idx, nf=True, ff=True):
     """Load one pair of traces (NF & FF) located in directory DIR at index IDX.
