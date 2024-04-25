@@ -216,7 +216,7 @@ def find_aes_configured(s, sr, nb_aes=1, starts_offset=0, plot=False):
     # Second version of find_aes used for attack set:
     # starts, trigger = analyze.find_aes(arr, sr, 8.1e6, 8.5e6, nb_aes, 1e4, -0.5e-4, flip=False)
     # * 8 MHz bandwidth:
-    starts = analyze.find_aes(s, sr, 2.65e6, 2.85e6, nb_aes=nb_aes, lp=1e4, offset=(-0.5e-4 * sr) + starts_offset, flip=True, plot=plot)
+    starts = analyze.find_aes(s, sr, 2.65e6, 2.85e6, nb_aes=nb_aes, lp=1e4, offset=(1.0e-4 * sr) + starts_offset, flip=True, plot=plot)
     # * 10 MHz bandwidth:
     # starts = analyze.find_aes(s, sr, 2.9e6, 3.3e6, nb_aes=nb_aes, lp=1e4, offset=(-0.5e-4 * sr) + starts_offset, flip=True, plot=plot)
     # * 30 MHz bandwidth:
