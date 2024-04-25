@@ -61,7 +61,7 @@ def get_nb(dir):
         assert(i < 1e5), "Infinite loop?"
     return -1
 
-def find_bad_entry(arr, ref_size=None):
+def find_bad_entry(arr, ref_size=None, log=True):
     """Return bad entry (metadata or trace) indexes from the 2D np.array or
     Python list containing 1D np.array ARR.
 
@@ -72,7 +72,11 @@ def find_bad_entry(arr, ref_size=None):
 
     """
     bad = []
-    for i in tqdm(range(0, len(arr)), desc="find_bad_entry()"):
+    if log is True:
+        iter_range = tqdm(range(0, len(arr)), desc="find_bad_entry()")
+    else:
+        iter_range = range(0, len(arr))
+    for i in iter_range:
         if len(arr[i]) != 0:
             if ref_size is None or len(arr[i]) == ref_size:
                 if not np.all(np.equal(arr[i], np.zeros((len(arr[0]),)))):
