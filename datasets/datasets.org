@@ -280,7 +280,7 @@ List and manage datasets.
 ** [2024-04-23 mar.] Nimble at high distance using 2 LNAs and repetitions with increased gain
 :PROPERTIES:
 :ID:       0936568c-d3f9-4c18-841f-5dadecf0118a
-:DIR:      ble/240423_highdist_2lna_highgain_raw
+:DIR:      ble/240423_highdist_2lna_highgain
 :END:
 
 - Hardware setup ::
