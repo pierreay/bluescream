@@ -451,11 +451,13 @@ class SignalQuadPlot():
 def select(candidate):
     global USER_SELECT
     USER_SELECT = False
-    fig, _ = plt.subplots()
-    fig.canvas.mpl_connect('key_press_event', select_input)
-    # Ask user confirmation and return choice.
-    l.LOGGER.info("Please, press 'y' to select the current trace or 'q' to skip to the next candidate")
+    # Initiate the plot of the candidate.
     sigplot = SignalQuadPlot(candidate)
+    sigplot.plot_init()
+    # Ask user confirmation and return choice.
+    sigplot.fig.canvas.mpl_connect('key_press_event', select_input)
+    l.LOGGER.info("Please, press 'y' to select the current trace or 'q' to skip to the next candidate")
+    # Plot and wait for the result.
     sigplot.plot(block=True)
     return USER_SELECT
 
