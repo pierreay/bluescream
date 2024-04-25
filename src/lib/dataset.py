@@ -277,8 +277,8 @@ class Subset():
             self.nf, self.ff = load.load_all_traces(self.get_path(), nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point)
         elif isinstance(idx, int):
             self.nf, self.ff = load.load_pair_trace(self.get_path(), idx, nf=nf, ff=ff)
-            self.nf = None if self.nf is None else load.truncate(self.nf, start_point, end_point)
-            self.ff = None if self.ff is None else load.truncate(self.ff, start_point, end_point)
+            self.nf[0] = None if self.nf[0] is None else load.truncate(self.nf[0], start_point, end_point)
+            self.ff[0] = None if self.ff[0] is None else load.truncate(self.ff[0], start_point, end_point)
         elif isinstance(idx, range):
             self.nf, self.ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point)
         # Search for bad entries and set them to 0.

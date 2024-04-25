@@ -302,10 +302,10 @@ def save_pair_trace(dir, idx, nf, ff):
         MySoapySDR.numpy_save(get_dataset_path_unpack_ff(dir, idx), ff)
  
 def load_pair_trace(dir, idx, nf=True, ff=True):
-    """Load one pair of traces (NF & FF) located in directory DIR at index
-    IDX. Return a tuple composed of NF then FF trace, or None on loading
-    error. NF and FF can be set to False to not load them in an unpacked
-    dataset.
+    """Load one pair of traces (NF & FF) located in directory DIR at index IDX.
+    Return a tuple composed of two lists containing each a single NF or FF
+    trace, or None on loading error. NF and FF can be set to False to not load
+    them in an unpacked dataset.
 
     """
     trace_nf = None
@@ -318,7 +318,7 @@ def load_pair_trace(dir, idx, nf=True, ff=True):
         trace_ff = None if ff is False else MySoapySDR.numpy_load(get_dataset_path_unpack_ff(dir, idx))
     except Exception as e:
         l.LOGGER.warn(e)
-    return trace_nf, trace_ff
+    return [trace_nf], [trace_ff]
 
 def save_all_traces(dir, nf, ff, packed=False, start=0, stop=0):
     """Save traces in DIR. NF and FF can be a 2D np.array of shape (nb_traces,
@@ -423,7 +423,12 @@ def reshape_needed(arr):
     """Return True if all arrays inside ARR are not of equal length (i.e. a
     reshape() call is needed before to create a 2D np.array).
 
+    If first element of the array is None, then return False because the array
+    is assumed empty.
+
     """
+    if arr[0] is None:
+        return False
     len_ref = len(arr[0])
     for i in range(len(arr)):
         if len(arr[i]) != len_ref:
