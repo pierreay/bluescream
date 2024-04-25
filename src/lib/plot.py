@@ -455,7 +455,7 @@ def select(candidate):
     fig.canvas.mpl_connect('key_press_event', select_input)
     # Ask user confirmation and return choice.
     l.LOGGER.info("Please, press 'y' to select the current trace or 'q' to skip to the next candidate")
-    sigplot = SignalPlot(candidate)
+    sigplot = SignalQuadPlot(candidate)
     sigplot.plot(block=True)
     return USER_SELECT
 
