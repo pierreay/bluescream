@@ -397,7 +397,7 @@ class SignalQuadPlot():
         assert self.nrows == 2, "Bad nrows value"
         assert self.ncols == 1 or self.ncols == 2, "Bad ncols value"
         # Create the plot layout.
-        sharex = "col" if self.sync is True else None
+        sharex = "col" if self.sync is True else "none"
         if self.ncols == 1:
             self.fig, (self.ax_ampl_time, self.ax_ampl_freq) = plt.subplots(nrows=self.nrows, ncols=self.ncols, sharex=sharex)
         elif self.ncols == 2:
