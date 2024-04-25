@@ -215,10 +215,12 @@ def find_aes_configured(s, sr, nb_aes=1, starts_offset=0, plot=False):
     # XXX: Find a better way to configure this function than modifying this place of the source code.
     # Second version of find_aes used for attack set:
     # starts, trigger = analyze.find_aes(arr, sr, 8.1e6, 8.5e6, nb_aes, 1e4, -0.5e-4, flip=False)
+    # * 8 MHz bandwidth:
+    starts = analyze.find_aes(s, sr, 2.65e6, 2.85e6, nb_aes=nb_aes, lp=1e4, offset=(-0.5e-4 * sr) + starts_offset, flip=True, plot=plot)
     # * 10 MHz bandwidth:
     # starts = analyze.find_aes(s, sr, 2.9e6, 3.3e6, nb_aes=nb_aes, lp=1e4, offset=(-0.5e-4 * sr) + starts_offset, flip=True, plot=plot)
     # * 30 MHz bandwidth:
-    starts = analyze.find_aes(s, sr, 8.8e6, 9.5e6, nb_aes=nb_aes, lp=1e4, offset=(-0.5e-4 * sr) + starts_offset, flip=True, plot=plot)
+    # starts = analyze.find_aes(s, sr, 8.8e6, 9.5e6, nb_aes=nb_aes, lp=1e4, offset=(-0.5e-4 * sr) + starts_offset, flip=True, plot=plot)
     aes_nb_window = 0.50
     check_nb = len(starts) < ((1 + aes_nb_window) * nb_aes) and len(starts) > ((1 - aes_nb_window) * nb_aes)
     if check_nb is True:
