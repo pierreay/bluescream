@@ -522,6 +522,9 @@ def average_aes(arr, sr, nb_aes, template, plot_enable=True):
         l.LOGGER.error("Expected error during finding AES: {}".format(e), stack_info=False)
         return None, template # NOTE: Will generate a bad trace in dataset.py/__process_fn().
     except Exception as e:
+        # Raise Assertion which are exceptions to not silent them to the programmer.
+        if isinstance(e, AssertionError):
+            raise e
         l.LOGGER.error("Unexpected error during finding AES: {}".format(e), stack_info=True)
         return None, template # NOTE: Will generate a bad trace in dataset.py/__process_fn().
 
