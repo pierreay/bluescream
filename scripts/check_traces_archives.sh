@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# TODO: Handle datasets/ble/*/{raw,avg} layout.
+
 VERBOSE=0
 
 function check_datasets_under() {
