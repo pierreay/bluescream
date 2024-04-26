@@ -585,6 +585,7 @@ def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='profile'):
             plt.legend(loc='upper right')
 
         plt.legend()
+        plt.suptitle("{} {} {} {} - Mean trace".format(COMPTYPE, NUM_TRACES, pois_algo, num_pois))
         if SAVE_IMAGES:
             # NOTE: Fix savefig() layout.
             figure = plt.gcf() # Get current figure
@@ -611,7 +612,7 @@ def reduce_traces(num_pois, window=0):
                 TRACES_REDUCED[bnum][i][poi] = np.average(trace[start:end])
 
 # Estimate means, std, and covariance for each possible class
-def build_profile(variable, template_dir='profile'):
+def build_profile(variable, template_dir='profile', pois_algo="none"):
     num_pois = len(PROFILE.POIS[0])
     num_classes = len(CLASSES)
 
@@ -635,7 +636,7 @@ def build_profile(variable, template_dir='profile'):
             for spine in list(plt.gca().spines.values()):
                     spine.set_visible(False)
 
-            plt.title("Profile")
+            plt.suptitle("{} {} {} {} - POI {}".format(COMPTYPE, NUM_TRACES, pois_algo, num_pois, i))
             plt.xlabel(variable)
             plt.ylabel("normalized amplitude")
 
@@ -1018,7 +1019,7 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
         estimate()
         # Set POIS.
         find_pois(pois_algo, k_fold, num_pois, poi_spacing)
-        build_profile(variable)
+        build_profile(variable, pois_algo=pois_algo)
         fit(lr_type, variable)
         PROFILE.save()
 
