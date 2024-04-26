@@ -153,7 +153,7 @@ def load_data(subset, forced_profile = None):
 @click.option("--loglevel", default="DEBUG", help="Logging level.")
 @click.option("--log/--no-log", default=True, help="Enable or disable logging.")
 @click.option("--comptype", default="AMPLITUDE", help="Choose between amplitude [AMPLITUDE] or phase rotation [PHASE_ROT].")
-@click.option("--custom-type/--no-custom-dtype", default=False, help="Load traces using custom Numpy dtype or default Numpy format.")
+@click.option("--custom-dtype/--no-custom-dtype", default=False, help="Load traces using custom Numpy dtype or default Numpy format.")
 def cli(dataset_path, num_traces, start_point, end_point, plot, save_images, wait, num_key_bytes,
         bruteforce, bit_bound_end, name, average, norm, norm2, mimo, loglevel, log, comptype, custom_dtype):
     """
