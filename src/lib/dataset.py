@@ -249,7 +249,7 @@ class Subset():
             self.ks_type = InputType.FIXED
 
     # NOTE: The get_trace_from_disk() is a modified copy of this function.
-    def load_trace(self, idx=-1, nf=True, ff=True, check=False, start_point=0, end_point=0, log=False):
+    def load_trace(self, idx=-1, nf=True, ff=True, check=False, start_point=0, end_point=0, log=False, custom_dtype=True):
         """Load the on-disk traces into memory.
 
         The loading will put the traces in the self.nf and self.ff
@@ -274,13 +274,13 @@ class Subset():
             l.LOGGER.info("Load traces (nf={}, ff={}) from {} subset...".format(nf, ff, self.name))
         assert(path.exists(self.get_path()))
         if isinstance(idx, int) and idx == -1:
-            self.nf, self.ff = load.load_all_traces(self.get_path(), nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point)
+            self.nf, self.ff = load.load_all_traces(self.get_path(), nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point, custom_dtype=custom_dtype)
         elif isinstance(idx, int):
-            self.nf, self.ff = load.load_pair_trace(self.get_path(), idx, nf=nf, ff=ff)
+            self.nf, self.ff = load.load_pair_trace(self.get_path(), idx, nf=nf, ff=ff, custom_dtype=custom_dtype)
             self.nf[0] = None if self.nf[0] is None else load.truncate(self.nf[0], start_point, end_point)
             self.ff[0] = None if self.ff[0] is None else load.truncate(self.ff[0], start_point, end_point)
         elif isinstance(idx, range):
-            self.nf, self.ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point)
+            self.nf, self.ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point, custom_dtype=custom_dtype)
         # Search for bad entries and set them to 0.
         # NOTE: Otherwise, we can load traces of different shape, even empty (0).
         # Then, the load.reshape function would reshape all traces to 0.
@@ -351,17 +351,19 @@ class Subset():
             load.save_all_traces(self.get_path(save=True),
                                  self.nf if nf is True else None,
                                  self.ff if ff is True else None,
-                                 packed=False)
+                                 packed=False,
+                                 custom_dtype=custom_dtype)
         elif isinstance(self.load_trace_idx, int) and self.load_trace_idx > -1:
             load.save_pair_trace(self.get_path(save=True), self.load_trace_idx,
                                  self.nf[0] if nf is True else None,
                                  self.ff[0] if ff is True else None,
-                                 custom_dtype=False)
+                                 custom_dtype=custom_dtype)
         elif isinstance(self.load_trace_idx, range):
             load.save_all_traces(self.get_path(save=True),
                                  self.nf if nf is True else None,
                                  self.ff if ff is True else None,
-                                 packed=False, start=self.load_trace_idx.start, stop=self.load_trace_idx.stop)
+                                 packed=False, start=self.load_trace_idx.start, stop=self.load_trace_idx.stop,
+                                 custom_dtype=custom_dtype)
         self.unload_trace()
 
     def get_save_trace_exist(self, idx=-1):

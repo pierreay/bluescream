@@ -69,6 +69,7 @@ TRACES_TEST = None
 TRACES_PROFILE = None
 LOG_PROBA = None
 COMPTYPE = None
+CUSTOM_DTYPE = None
 
 def load_data(subset, forced_profile = None):
     """Load the data (keys, plaintexts, traces) into global variables. Must be
@@ -88,7 +89,7 @@ def load_data(subset, forced_profile = None):
     DATASET = dataset.Dataset.pickle_load(DATASET_PATH)
     assert(DATASET)
     SUBSET = DATASET.get_subset(subset)
-    SUBSET.load_trace(range(0, NUM_TRACES), nf=False, ff=True, start_point=START_POINT, end_point=END_POINT)
+    SUBSET.load_trace(range(0, NUM_TRACES), nf=False, ff=True, start_point=START_POINT, end_point=END_POINT, custom_dtype=CUSTOM_DTYPE)
     # Load the profile from the dataset or a standalone one.
     if forced_profile is None or forced_profile == "":
         PROFILE = DATASET.get_profile()
@@ -152,8 +153,9 @@ def load_data(subset, forced_profile = None):
 @click.option("--loglevel", default="DEBUG", help="Logging level.")
 @click.option("--log/--no-log", default=True, help="Enable or disable logging.")
 @click.option("--comptype", default="AMPLITUDE", help="Choose between amplitude [AMPLITUDE] or phase rotation [PHASE_ROT].")
+@click.option("--custom-type/--no-custom-dtype", default=False, help="Load traces using custom Numpy dtype or default Numpy format.")
 def cli(dataset_path, num_traces, start_point, end_point, plot, save_images, wait, num_key_bytes,
-        bruteforce, bit_bound_end, name, average, norm, norm2, mimo, loglevel, log, comptype):
+        bruteforce, bit_bound_end, name, average, norm, norm2, mimo, loglevel, log, comptype, custom_dtype):
     """
     Run an attack against previously collected traces.
 
@@ -178,6 +180,7 @@ def cli(dataset_path, num_traces, start_point, end_point, plot, save_images, wai
     NORM2 = norm2
     DATASET_PATH = dataset_path
     COMPTYPE = comptype
+    CUSTOM_DTYPE = custom_dtype
 
 # * CCS18 UTILS (from ChipWhisper)
 

@@ -311,7 +311,7 @@ def save_pair_trace(dir, idx, nf, ff, custom_dtype=True):
         else:
             np.save(get_dataset_path_unpack_ff(dir, idx), ff)
  
-def load_pair_trace(dir, idx, nf=True, ff=True):
+def load_pair_trace(dir, idx, nf=True, ff=True, custom_dtype=True):
     """Load one pair of traces (NF & FF) located in directory DIR at index IDX.
     Return a tuple composed of two lists containing each a single NF or FF
     trace, or None on loading error. NF and FF can be set to False to not load
@@ -321,16 +321,22 @@ def load_pair_trace(dir, idx, nf=True, ff=True):
     trace_nf = None
     trace_ff = None
     try:
-        trace_nf = None if nf is False else MySoapySDR.numpy_load(get_dataset_path_unpack_nf(dir, idx))
+        if custom_dtype is True:
+            trace_nf = None if nf is False else MySoapySDR.numpy_load(get_dataset_path_unpack_nf(dir, idx))
+        else:
+            trace_nf = None if nf is False else np.load(get_dataset_path_unpack_nf(dir, idx)) 
     except Exception as e:
         l.LOGGER.warn(e)
     try:
-        trace_ff = None if ff is False else MySoapySDR.numpy_load(get_dataset_path_unpack_ff(dir, idx))
+        if custom_dtype is True:
+            trace_ff = None if ff is False else MySoapySDR.numpy_load(get_dataset_path_unpack_ff(dir, idx))
+        else:
+            trace_ff = None if ff is False else np.load(get_dataset_path_unpack_ff(dir, idx))
     except Exception as e:
         l.LOGGER.warn(e)
     return [trace_nf], [trace_ff]
 
-def save_all_traces(dir, nf, ff, packed=False, start=0, stop=0):
+def save_all_traces(dir, nf, ff, packed=False, start=0, stop=0, custom_dtype=True):
     """Save traces in DIR. NF and FF can be a 2D np.array of shape (nb_traces,
     nb_samples) or None. If PACKED is set to True or if STOP is set to < 1,
     then all the traces are saved. Othserwise, START and STOP can be specified
@@ -351,12 +357,18 @@ def save_all_traces(dir, nf, ff, packed=False, start=0, stop=0):
             stop = len(nf) if nf is not None else len(ff) 
         for i in tqdm(range(start, stop), desc="save all traces"):
             if nf is not None:
-                MySoapySDR.numpy_save(get_dataset_path_unpack_nf(dir, i), nf[i - start])
+                if custom_dtype is True:
+                    MySoapySDR.numpy_save(get_dataset_path_unpack_nf(dir, i), nf[i - start])
+                else:
+                    np.save(get_dataset_path_unpack_nf(dir, i), nf[i - start])
             if ff is not None:
-                MySoapySDR.numpy_save(get_dataset_path_unpack_ff(dir, i), ff[i - start])
+                if custom_dtype is True:
+                    MySoapySDR.numpy_save(get_dataset_path_unpack_ff(dir, i), ff[i - start])
+                else:
+                    np.save(get_dataset_path_unpack_ff(dir, i), ff[i - start])
     l.LOGGER.info("done!")
 
-def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=True, start_point=0, end_point=0):
+def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=True, start_point=0, end_point=0, custom_dtype=True):
     """Load traces contained in DIR. Can be packed or unpacked. Return a 2D
     np.array of shape (nb_traces, nb_samples). START and STOP can be specified
     to load a specific range of file from the disk for an unpacked
@@ -394,7 +406,12 @@ def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=Tr
                 nf_p = get_dataset_path_unpack_nf(dir, i)
                 # NOTE: Make sure "copy" is enabled to not overflow the memory
                 # after truncating loaded trace.
-                nf[i - start] = truncate(MySoapySDR.numpy_load(nf_p), start=start_point, end=end_point, copy=True)
+                loaded_trace = None
+                if custom_dtype is True:
+                    loaded_trace = MySoapySDR.numpy_load(nf_p)
+                else:
+                    loaded_trace = np.load(nf_p)
+                nf[i - start] = truncate(loaded_trace, start=start_point, end=end_point, copy=True)
         else:
              l.LOGGER.warning("No loaded NF traces!")
         if ff_wanted is True and ff_exist is True:
@@ -404,7 +421,12 @@ def load_all_traces(dir, start=0, stop=0, nf_wanted=True, ff_wanted=True, bar=Tr
                 ff_p = get_dataset_path_unpack_ff(dir, i)
                 # NOTE: Make sure "copy" is enabled to not overflow the memory
                 # after truncating loaded trace.
-                ff[i - start] = truncate(MySoapySDR.numpy_load(ff_p), start=start_point, end=end_point, copy=True)
+                loaded_trace = None
+                if custom_dtype is True:
+                    loaded_trace = MySoapySDR.numpy_load(ff_p)
+                else:
+                    loaded_trace = np.load(ff_p)
+                ff[i - start] = truncate(loaded_trace, start=start_point, end=end_point, copy=True)
         else:
             l.LOGGER.warning("No loaded FF traces!")
         if nf_exist or ff_exist:
