@@ -590,7 +590,7 @@ def find_pois(pois_algo, k_fold, num_pois, poi_spacing, template_dir='profile'):
             # NOTE: Fix savefig() layout.
             figure = plt.gcf() # Get current figure
             figure.set_size_inches(32, 18) # Set figure's size manually to your full screen (32x18).
-            plt.savefig(os.path.join(template_dir,'pois.pdf'), bbox_inches='tight', dpi=100)
+            plt.savefig(os.path.join(DATASET_PATH,template_dir,'pois.pdf'), bbox_inches='tight', dpi=100)
         if PLOT:
             plt.show()
         plt.clf()
@@ -658,7 +658,7 @@ def build_profile(variable, template_dir='profile', pois_algo="none"):
                 # NOTE: Fix savefig() layout.
                 figure = plt.gcf() # Get current figure
                 figure.set_size_inches(32, 18) # Set figure's size manually to your full screen (32x18).
-                plt.savefig(os.path.join(template_dir,'profile_poi_%d.pdf'%i), bbox_inches='tight', dpi=100)
+                plt.savefig(os.path.join(DATASET_PATH,template_dir,'profile_poi_%d.pdf'%i), bbox_inches='tight', dpi=100)
             if PLOT:
                 plt.show()
             plt.clf()
@@ -988,7 +988,7 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
 
     try:
         template_dir="profile"
-        os.makedirs(template_dir)
+        os.makedirs(os.path.join(DATASET_PATH, template_dir))
     except Exception as e:
         pass
 
