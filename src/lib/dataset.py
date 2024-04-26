@@ -650,34 +650,40 @@ class Profile():
         elif fp is not None:
             self.attach_path(fp)
 
-    def get_path(self, save=False):
+    def get_path(self, save=False, fp=False):
         """Return the absolute path of the Profile.
 
-        Assert that the dirname of the returned path exists.
+        Assert that the dirname of the returned path exists. If FP is set to
+        True, force returning path based on self.fp.
 
         """
         # If a dataset is attached to the profile, return a path based on the
         # dataset path.
-        if self.dataset is not None:
+        if self.dataset is not None and fp is False:
             assert self.dataset.dir is not None and path.exists(self.dataset.dir)
             return path.abspath(path.join(self.dataset.dir, self.dir))
         # If a full path is registered, return it.
-        elif self.fp is not None:
+        elif self.fp is not None or fp is True:
             assert path.exists(path.dirname(self.fp))
             return path.abspath(self.fp)
         else:
             assert False, "Profile has not been configured correctly!"
 
-    def save(self):
+    def save(self, full_path=None):
         """Store traces and points from the Profile."""
-        os.makedirs(self.get_path(), exist_ok=True)
-        np.save(path.join(self.get_path(), Profile.POIS_FN), self.POIS)
-        np.save(path.join(self.get_path(), Profile.RS_FN), self.RS)
-        np.save(path.join(self.get_path(), Profile.RZS_FN), self.RZS)
-        np.save(path.join(self.get_path(), Profile.MEANS_FN), self.MEANS)
-        np.save(path.join(self.get_path(), Profile.STDS_FN), self.STDS)
-        np.save(path.join(self.get_path(), Profile.COVS_FN), self.COVS)
-        np.save(path.join(self.get_path(), Profile.MEAN_TRACE_FN), self.MEAN_TRACE)
+        # NOTE: Feature to test.
+        fp = False
+        # if full_path is not None:
+        #     self.fp = path.abspath(full_path)
+        #     fp = True
+        os.makedirs(self.get_path(fp=fp), exist_ok=True)
+        np.save(path.join(self.get_path(fp=fp), Profile.POIS_FN), self.POIS)
+        np.save(path.join(self.get_path(fp=fp), Profile.RS_FN), self.RS)
+        np.save(path.join(self.get_path(fp=fp), Profile.RZS_FN), self.RZS)
+        np.save(path.join(self.get_path(fp=fp), Profile.MEANS_FN), self.MEANS)
+        np.save(path.join(self.get_path(fp=fp), Profile.STDS_FN), self.STDS)
+        np.save(path.join(self.get_path(fp=fp), Profile.COVS_FN), self.COVS)
+        np.save(path.join(self.get_path(fp=fp), Profile.MEAN_TRACE_FN), self.MEAN_TRACE)
 
     # Load the profile, for comparison or for attacks.
     def load(self):
