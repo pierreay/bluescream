@@ -24,7 +24,7 @@ NIMBLE_ADDR="C2:3E:54:84:5C:4C"
 # *** Parameters
 
 # Should we enable AES repetitions?
-AES_REPETITIONS=1
+AES_REPETITIONS=0
 
 # *** Actions
 
@@ -183,11 +183,11 @@ function capture() {
 
     init_config
 
-    config "$CONFIG_PATH" "accept_snr_min" "5.0"
+    config "$CONFIG_PATH" "accept_snr_min" "4.0"
     config "$CONFIG_PATH" "more_data_bit" "1"
     config "$CONFIG_PATH" "hop_interval" "15"
     config "$CONFIG_PATH" "procedure_interleaving" "false"
-    config "$CONFIG_PATH" "ll_enc_req_conn_event" "4"
+    config "$CONFIG_PATH" "ll_enc_req_conn_event" "5"
     config "$CONFIG_PATH" "trg_bp_low" "[1.0e6]"
     config "$CONFIG_PATH" "trg_bp_high" "[1.9e6]"
 

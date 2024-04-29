@@ -15,7 +15,7 @@ fi
 # * Variables
 
 # Should we enable AES repetitions?
-AES_REPETITIONS=1
+AES_REPETITIONS=0
 
 # ** Screaming Channels .envrc
 
@@ -23,8 +23,8 @@ export ENVRC_VICTIM_PORT="$(nrfjprog --com | cut - -d " " -f 5)"
 export ENVRC_SAMP_RATE=${FS}
 export ENVRC_DURATION=0.2
 export ENVRC_GAIN=${GAIN}
-export ENVRC_WANTED_TRACE_TRAIN=16000
-export ENVRC_WANTED_TRACE_ATTACK=16000
+export ENVRC_WANTED_TRACE_TRAIN=0
+export ENVRC_WANTED_TRACE_ATTACK=65000
 export ENVRC_NF_FREQ=128000000 # 128e6
 export ENVRC_FF_FREQ=${FC}
 export ENVRC_RADIO_DIR="$HOME/storage/tmp"
@@ -73,11 +73,11 @@ echo "INFO: Checkout main -> $SC_SRC"
 
 init_config
 
-config "$ENVRC_CONFIG_FILE" "accept_snr_min" "2.0"
+config "$ENVRC_CONFIG_FILE" "accept_snr_min" "4.0"
 config "$ENVRC_CONFIG_FILE" "more_data_bit" "1"
 config "$ENVRC_CONFIG_FILE" "hop_interval" "15"
 config "$ENVRC_CONFIG_FILE" "procedure_interleaving" "false"
-config "$ENVRC_CONFIG_FILE" "ll_enc_req_conn_event" "4"
+config "$ENVRC_CONFIG_FILE" "ll_enc_req_conn_event" "5"
 config "$ENVRC_CONFIG_FILE" "trg_bp_low" "[1.0e6]"
 config "$ENVRC_CONFIG_FILE" "trg_bp_high" "[1.9e6]"
 
