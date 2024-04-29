@@ -3,6 +3,7 @@
 # TODO: Handle datasets/ble/*/{raw,avg} layout.
 
 VERBOSE=0
+PRUNE=0
 
 function path_directory_to_archive() {
     path="${1}"
@@ -28,7 +29,14 @@ function check_datasets_under() {
                     echo size_stage="$size_stage"
                 fi
                 if [[ "$size_run" -gt "$size_stage" ]]; then
-                    echo "WARN: Please, compress ${directory} into ${archive}: ${dataset}"
+                    if [[ "${PRUNE}" -eq 1 ]]; then
+                        echo "WARN: Please, compress ${directory} into ${archive}: ${dataset}"
+                    else
+                        (
+                            cd "${dataset}"
+                            tar cvf "${archive}" "${directory}"
+                        )
+                    fi
                 fi
             fi
         done
