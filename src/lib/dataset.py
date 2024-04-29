@@ -571,7 +571,7 @@ class Subset():
             self.pt[idx] = val
             self.run_new_input = True
 
-    def overview(self, base = 0, nb = 5, plot = 0):
+    def overview(self, base = 0, nb = 5, plot = 0, custom_dtype=True):
         """Overview a small numbers of Far-Field (FF) traces from the subset.
 
         :param base: Index of first trace to plot.
@@ -582,7 +582,7 @@ class Subset():
 
         """
         # Load the requested trace.
-        self.load_trace(range(base, base + nb), nf=False, ff=True)
+        self.load_trace(range(base, base + nb), nf=False, ff=True, custom_dtype=custom_dtype)
         assert self.ff is not None and type (self.ff) == np.ndarray and self.ff.ndim == 2
         # Select the plotting function and plot the loaded traces.
         if plot == 0:
