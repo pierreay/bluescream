@@ -300,6 +300,21 @@ List and manage datasets.
     the key rank down to 2^30 (key found).
   - No correlations found on phase rotation.
 
+** [2024-04-29 lun.] Nimble at high distance using 2 LNAs without repetitions with increased gain
+:PROPERTIES:
+:DIR:      ble/240429_highdist_2lna_highgain_norep
+:ID:       8892d212-8c59-45a4-86e3-f87822f13264
+:END:
+
+- Hardware setup ::
+  - Identical to [[id:c2b4dc98-bf62-4225-8dfe-da6e02967282][[2024-04-23 mar.] Custom firmware at high distance using 2 LNAs without repetitions with increased gain]]
+- Software setup ::
+  - Identical to [[id:0936568c-d3f9-4c18-841f-5dadecf0118a][[2024-04-23 mar.] Nimble at high distance using 2 LNAs and repetitions with increased gain]]
+  - Firmware : original without repetitions
+  - Attack set = 60k traces
+- Results ::
+  - XXX
+
 * Bibliography
 
 #+print_bibliography:
