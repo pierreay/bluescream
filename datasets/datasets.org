@@ -286,11 +286,19 @@ List and manage datasets.
 - Hardware setup ::
   - Identical to [[id:c2b4dc98-bf62-4225-8dfe-da6e02967282][[2024-04-23 mar.] Custom firmware at high distance using 2 LNAs without repetitions with increased gain]].
 - Software setup ::
-  - Radio configuration :: XXX
+  - Radio configuration ::
+    - Center frequency = 2.533 GHz
+    - Sampling rate = 8e6 Msps
+    - Gain = 70 dB
   - Sets ::
-    - Training set = XXX traces using ~XXX repetitions
-    - Attack set = XXX traces using ~XXX repetitions
-- Results :: 
+    - Training set = 16k traces using ~300 repetitions
+    - Attack set = 16k traces using ~300 repetitions =avg= and no repetition for
+      =ext=
+- Results ::
+  - Summary in [[attachment:plots/attack_all.pdf]].
+  - Using the [[attachment:avg/profiles/AMPLITUDE_16000_r_2/]] profile, we lower
+    the key rank down to 2^30 (key found).
+  - No correlations found on phase rotation.
 
 * Bibliography
 
