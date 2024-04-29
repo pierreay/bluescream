@@ -13,6 +13,7 @@ import lib.filters as filters
 import lib.triggers as triggers
 import lib.analyze as analyze
 import lib.complex as complex
+import lib.debug as debug
 from lib.exception import BadAESDetection
 
 # Note about implementation:

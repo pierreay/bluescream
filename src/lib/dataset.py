@@ -19,6 +19,7 @@ import lib.plot as libplot
 import lib.complex as complex
 import lib.analyze as analyze
 import lib.utils as utils
+import lib.debug as debug
 
 # NOTE: start=0 because used to index tuples returning (traces_nf, traces_ff).
 TraceType = Enum('TraceType', ['NF', 'FF'], start=0)

@@ -17,4 +17,7 @@ def info(type, value, tb):
         # Then start the debugger in post-mortem mode.
         ipdb.pm()
 
+def plot_oneline(arr):
+    import numpy as np; import matplotlib.pyplot as plt; plt.plot(np.abs(arr)); plt.show()
+
 sys.excepthook = info
