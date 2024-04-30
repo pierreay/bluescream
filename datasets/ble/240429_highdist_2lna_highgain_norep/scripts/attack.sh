@@ -38,7 +38,10 @@ readonly METASET_LIST=(avg ext)
 # ** Internals
 
 readonly LOG_PATH_BASE="${DATASET_PATH}/logs"
-readonly PROFILE_PATH_BASE="${DATASET_PATH}/avg/profiles"
+# For an internal profile:
+# readonly PROFILE_PATH_BASE="${DATASET_PATH}/avg/profiles"
+# For an external profile:
+readonly PROFILE_PATH_BASE="${REPO_DATASET_PATH}/ble/240423_highdist_2lna_highgain/avg/profiles"
 
 TMUX_PANE_CAPTURE=""
 
