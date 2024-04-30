@@ -60,6 +60,10 @@ function attack() {
     fi
     local log_path="${LOG_PATH_BASE}/attack_${metaset}_${comp}_${num_traces}_${pois_algo}_${pois_nb}_${num_traces_attack}.log"
     local bruteforce="--no-bruteforce"
+    local custom_dtype="--no-custom-dtype"
+    if [[ "${metaset}" == "raw" ]]; then
+        custom_dtype="--custom-dtype"
+    fi
 
     # Safety-guard.
     if [[ -f "${log_path}" ]]; then
@@ -73,7 +77,7 @@ function attack() {
     # Initialize log.
     mkdir -p "$LOG_PATH_BASE"
     # Perform the attack.
-    "${SC_SRC}"/attack.py --log "${PLOT}" --norm --dataset-path "${metaset_path}" --start-point "${START_POINT}" --end-point "${END_POINT}" --num-traces "${num_traces_attack}" "${bruteforce}" \
+    "${SC_SRC}"/attack.py "${custom_dtype}" --log "${PLOT}" --norm --dataset-path "${metaset_path}" --start-point "${START_POINT}" --end-point "${END_POINT}" --num-traces "${num_traces_attack}" "${bruteforce}" \
                attack-recombined --comptype "${comp}" --attack-algo pcc --profile "${profile_path}" --num-pois "${pois_nb}" --poi-spacing 1 --variable p_xor_k --align
     # Finalize log.
     tmux capture-pane -t "${TMUX_PANE_CAPTURE}" -pS - > "${log_path}"
