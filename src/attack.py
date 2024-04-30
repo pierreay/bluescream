@@ -1055,10 +1055,12 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
              help="Align the attack traces between themselves before to attack.")
 @click.option("--align-profile/--no-align-profile", default=False, show_default=True,
              help="Align the attack traces with the profile before to attack.")
+@click.option("--align-profile-avg/--no-align-profile-avg", default=False, show_default=True,
+             help="Align the average of the attack traces with the profile before to attack.")
 @click.option("--profile", default="", type=click.Path(), show_default=True,
              help="If specified, use the profile from this directory.")
 def attack(variable, pois_algo, num_pois, poi_spacing,
-           attack_algo, k_fold, average_bytes, pooled_cov, window, align, align_attack, align_profile, profile):
+           attack_algo, k_fold, average_bytes, pooled_cov, window, align, align_attack, align_profile, align_profile_avg, profile):
     """
     Template attack or profiled correlation attack.
 
@@ -1086,6 +1088,11 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
     if align is True or align_profile is True:
         l.LOGGER.info("Align attack traces with the profile...")
         TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
+    if align_profile_avg is True:
+        l.LOGGER.info("Align average of attack traces with the profile using single shift...")
+        shift = analyze.align(template=PROFILE.MEAN_TRACE, target=np.average(TRACES, axis=0), sr=DATASET.samp_rate, get_shift_only=True, normalize=True)
+        for trace_idx in range(len(TRACES)):
+            TRACES[trace_idx] = analyze.shift(TRACES[trace_idx], shift)
 
     if not FIXED_KEY and variable != "hw_p" and variable != "p":
         raise Exception("This set DOES NOT use a FIXED KEY")
@@ -1142,12 +1149,14 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
              help="Align the attack traces between themselves before to attack.")
 @click.option("--align-profile/--no-align-profile", default=False, show_default=True,
              help="Align the attack traces with the profile before to attack.")
+@click.option("--align-profile-avg/--no-align-profile-avg", default=False, show_default=True,
+             help="Align the average of the attack traces with the profile before to attack.")
 @click.option("--profile", default="", type=click.Path(), show_default=True,
              help="If specified, use the profile from this directory.")
 @click.option("--comptype", default="RECOMBIN",
               help="Choose between amplitude [AMPLITUDE], phase rotation [PHASE_ROT], recombination [RECOMBIN].")
 def attack_recombined(variable, pois_algo, num_pois, poi_spacing,
-                      attack_algo, k_fold, average_bytes, pooled_cov, window, align, align_attack, align_profile, profile, comptype):
+                      attack_algo, k_fold, average_bytes, pooled_cov, window, align, align_attack, align_profile, align_profile_avg, profile, comptype):
     global PROFILE, TRACES, COMPTYPE
 
     maxcpa = {"AMPLITUDE": None, "PHASE_ROT": None, "RECOMBIN": None}
@@ -1177,6 +1186,11 @@ def attack_recombined(variable, pois_algo, num_pois, poi_spacing,
         if align is True or align_profile is True:
             l.LOGGER.info("Align attack traces with the profile...")
             TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
+        if align_profile_avg is True:
+            l.LOGGER.info("Align average of attack traces with the profile using single shift...")
+            shift = analyze.align(template=PROFILE.MEAN_TRACE, target=np.average(TRACES, axis=0), sr=DATASET.samp_rate, get_shift_only=True, normalize=True)
+            for trace_idx in range(len(TRACES)):
+                TRACES[trace_idx] = analyze.shift(TRACES[trace_idx], shift)
 
         if PLOT:
             plt.plot(PROFILE.POIS[:,0], np.average(TRACES, axis=0)[PROFILE.POIS[:,0]], '*')
