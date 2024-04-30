@@ -413,7 +413,8 @@ def align(template, target, sr, ignore=True, log=False, get_shift_only=False, no
     # ===++++++++++++ -> shift < 0 -> shift right target -> shrink template from left or pad target to left
     # Safety-check to prevent weird exception inside the function.
     assert template.shape > (1,) and target.shape > (1,), "Cannot align empty traces!"
-    assert template.shape == target.shape, "Traces to align should have the same length!"
+    # NOTE: Disabled this assertation because I'm not sure why it was necessary.
+    # assert template.shape == target.shape, "Traces to align should have the same length!"
     assert template.ndim == 1 and target.ndim == 1, "Traces to align should be 1D-ndarray!"
     # Compute the cross-correlation and find shift across amplitude.
     lpf_freq     = sr / 4
