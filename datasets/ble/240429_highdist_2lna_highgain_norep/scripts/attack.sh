@@ -18,22 +18,27 @@ fi
 
 # List of parameters for the used profiles.
 readonly COMP_LIST=(AMPLITUDE) # AMPLITUDE PHASE_ROT RECOMBIN
-readonly NUM_TRACES_LIST=(4000 16000)
+readonly NUM_TRACES_LIST=(16000)
 readonly POIS_ALGO_LIST=(r)
-readonly POIS_NB_LIST=(1 2)
+readonly POIS_NB_LIST=(1)
 
-# Delimiters.
 readonly PROFILE_LENGTH=400
-readonly START_POINT=300
-readonly END_POINT=$((START_POINT + PROFILE_LENGTH))
 
 # ** Attack configuration
 
+# Options.
 readonly PLOT=--plot
+
 # Number of traces for the attack.
-readonly NUM_TRACES_ATTACK_LIST=(200 700 2500 4000 10000 16000)
+# readonly NUM_TRACES_ATTACK_LIST=(200 700 2500 4000 10000 16000)
+readonly NUM_TRACES_ATTACK_LIST=(9000)
+
 # Paths.
-readonly METASET_LIST=(avg ext)
+readonly METASET_LIST=(raw) # raw avg ext
+
+# Delimiters.
+readonly START_POINT=1050
+readonly END_POINT=$((START_POINT + PROFILE_LENGTH))
 
 # ** Internals
 
