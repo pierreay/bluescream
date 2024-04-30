@@ -163,7 +163,7 @@ def cli(dataset_path, num_traces, start_point, end_point, plot, save_images, wai
     apply to all attacks; see the individual attacks' documentation for
     attack-specific options.
     """
-    global SAVE_IMAGES, PLOT, GWAIT, NUM_KEY_BYTES, BRUTEFORCE, BIT_BOUND_END, NUM_TRACES, START_POINT, END_POINT, NORM, NORM2, DATASET_PATH, COMPTYPE
+    global SAVE_IMAGES, PLOT, GWAIT, NUM_KEY_BYTES, BRUTEFORCE, BIT_BOUND_END, NUM_TRACES, START_POINT, END_POINT, NORM, NORM2, DATASET_PATH, COMPTYPE, CUSTOM_DTYPE
     l.configure(log, loglevel)
     SAVE_IMAGES = save_images
     PLOT = plot
