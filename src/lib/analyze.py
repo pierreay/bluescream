@@ -389,7 +389,12 @@ def extract(s, starts, length=0, end_offset=0):
             extracted[i] = np.copy(s[int(starts[i]):int(starts[i] + length)])
         return extracted
 
-def align(template, target, sr, ignore=True, log=False):
+def get_shift_corr(arr_1, arr_2):
+    """Get the shift maximizing cross-correlation between arr_1 and arr_2."""
+    corr = signal.correlate(arr_1, arr_2)
+    return np.argmax(corr) - (len(arr_2) - 1)
+
+def align(template, target, sr, ignore=True, log=False, get_shift_only=False, normalize=False):
     """Align a signal against a template.
 
     Return the TARGET signal aligned (1D np.array) using cross-correlation
@@ -414,8 +419,12 @@ def align(template, target, sr, ignore=True, log=False):
     lpf_freq     = sr / 4
     template_lpf = filters.butter_lowpass_filter(complex.get_amplitude(template), lpf_freq, sr)
     target_lpf   = filters.butter_lowpass_filter(complex.get_amplitude(target), lpf_freq, sr)
-    corr         = signal.correlate(target_lpf, template_lpf)
-    shift        = np.argmax(corr) - (len(template) - 1)
+    if normalize is True:
+        template_lpf = analyze.normalize(template_lpf)
+        target_lpf = analyze.normalize(target_lpf)
+    shift        = analyze.get_shift_corr(target_lpf, template_lpf)
+    if get_shift_only is True:
+        return shift
     # Log and check shift value.
     if log:
         l.LOGGER.debug("Shift to maximize cross correlation: {}".format(shift))
