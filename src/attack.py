@@ -1156,11 +1156,24 @@ def attack_recombined(variable, pois_algo, num_pois, poi_spacing,
         assert(PROFILE)
         PROFILE.load()
 
+        if PLOT:
+            # Plot the attack trace and its delimiters.
+            libplot.plot_time_spec_sync_axis(DATASET.attack_set.get_trace_from_disk(idx=0, nf=False, ff=True, custom_dtype=CUSTOM_DTYPE)[dataset.TraceType.FF.value],
+                                             peaks=[START_POINT, END_POINT], title="Attack trace #0 and delimiters", xtime=False, comp=COMPTYPE)
+        
+
         if align:
             l.LOGGER.info("Align attack traces with themselves...")
             TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=TRACES[0], tqdm_log=True)
             l.LOGGER.info("Align attack traces with the profile...")
             TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
+
+        if PLOT:
+            plt.plot(PROFILE.POIS[:,0], np.average(TRACES, axis=0)[PROFILE.POIS[:,0]], '*')
+            plt.plot(np.average(TRACES, axis=0), label="Average of attack traces")
+            plt.plot(PROFILE.MEAN_TRACE, 'r', label="Average of profile trace")
+            plt.legend()
+            plt.show()
 
         compute_variables(variable)
 
