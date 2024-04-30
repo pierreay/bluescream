@@ -968,7 +968,7 @@ def bruteforce(bit_bound_end):
               help="Minimum number of points between two points of interest.")
 @click.option("--pois-dir", default="", type=click.Path(file_okay=False, writable=True),
               help="Reduce the trace using the POIS in this folder")
-@click.option("--align/--no-align", default=False, show_default=True,
+@click.option("--align/--no-align", default=True, show_default=True,
              help="Align the traces using the first one as template before to profile.")
 @click.option("--poi-spacing", default=5, show_default=True,
               help="Minimum number of points between two points of interest.")
@@ -1050,11 +1050,15 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
 @click.option("--window", default=0, show_default=True,
               help="Average poi-window to poi+window samples.")
 @click.option("--align/--no-align", default=False, show_default=True,
+             help="Enable --align-attack and --align-profile options.")
+@click.option("--align-attack/--no-align-attack", default=True, show_default=True,
+             help="Align the attack traces between themselves before to attack.")
+@click.option("--align-profile/--no-align-profile", default=False, show_default=True,
              help="Align the attack traces with the profile before to attack.")
 @click.option("--profile", default="", type=click.Path(), show_default=True,
              help="If specified, use the profile from this directory.")
 def attack(variable, pois_algo, num_pois, poi_spacing,
-           attack_algo, k_fold, average_bytes, pooled_cov, window, align, profile):
+           attack_algo, k_fold, average_bytes, pooled_cov, window, align, align_attack, align_profile, profile):
     """
     Template attack or profiled correlation attack.
 
@@ -1076,9 +1080,10 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
     #     # Plot the profile and its delimiters.
     #     PROFILE.plot(delim=True)
 
-    if align:
+    if align is True or align_attack is True:
         l.LOGGER.info("Align attack traces with themselves...")
         TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=TRACES[0], tqdm_log=True)
+    if align is True or align_profile is True:
         l.LOGGER.info("Align attack traces with the profile...")
         TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
 
@@ -1132,13 +1137,17 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
 @click.option("--window", default=0, show_default=True,
               help="Average poi-window to poi+window samples.")
 @click.option("--align/--no-align", default=False, show_default=True,
+             help="Enable --align-attack and --align-profile options.")
+@click.option("--align-attack/--no-align-attack", default=True, show_default=True,
+             help="Align the attack traces between themselves before to attack.")
+@click.option("--align-profile/--no-align-profile", default=False, show_default=True,
              help="Align the attack traces with the profile before to attack.")
 @click.option("--profile", default="", type=click.Path(), show_default=True,
              help="If specified, use the profile from this directory.")
 @click.option("--comptype", default="RECOMBIN",
               help="Choose between amplitude [AMPLITUDE], phase rotation [PHASE_ROT], recombination [RECOMBIN].")
 def attack_recombined(variable, pois_algo, num_pois, poi_spacing,
-                      attack_algo, k_fold, average_bytes, pooled_cov, window, align, profile, comptype):
+                      attack_algo, k_fold, average_bytes, pooled_cov, window, align, align_attack, align_profile, profile, comptype):
     global PROFILE, TRACES, COMPTYPE
 
     maxcpa = {"AMPLITUDE": None, "PHASE_ROT": None, "RECOMBIN": None}
@@ -1162,9 +1171,10 @@ def attack_recombined(variable, pois_algo, num_pois, poi_spacing,
                                              peaks=[START_POINT, END_POINT], title="Attack trace #0 and delimiters", xtime=False, comp=COMPTYPE)
         
 
-        if align:
+        if align is True or align_attack is True:
             l.LOGGER.info("Align attack traces with themselves...")
             TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=TRACES[0], tqdm_log=True)
+        if align is True or align_profile is True:
             l.LOGGER.info("Align attack traces with the profile...")
             TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=PROFILE.MEAN_TRACE, tqdm_log=True)
 
