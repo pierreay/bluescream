@@ -1097,8 +1097,15 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
     if not FIXED_KEY and variable != "hw_p" and variable != "p":
         raise Exception("This set DOES NOT use a FIXED KEY")
     if PLOT:
+        plt.subplot(3, 1, 1)
         plt.plot(PROFILE.POIS[:,0], np.average(TRACES, axis=0)[PROFILE.POIS[:,0]], '*')
         plt.plot(np.average(TRACES, axis=0), label="Average of attack traces")
+        plt.plot(PROFILE.MEAN_TRACE, 'r', label="Average of profile trace")
+        plt.legend()
+        plt.subplot(3, 1, 2)
+        plt.plot(np.average(TRACES, axis=0), label="Average of attack traces")
+        plt.legend()
+        plt.subplot(3, 1, 3)
         plt.plot(PROFILE.MEAN_TRACE, 'r', label="Average of profile trace")
         plt.legend()
         plt.show()
@@ -1193,8 +1200,15 @@ def attack_recombined(variable, pois_algo, num_pois, poi_spacing,
                 TRACES[trace_idx] = analyze.shift(TRACES[trace_idx], shift)
 
         if PLOT:
+            plt.subplot(3, 1, 1)
             plt.plot(PROFILE.POIS[:,0], np.average(TRACES, axis=0)[PROFILE.POIS[:,0]], '*')
             plt.plot(np.average(TRACES, axis=0), label="Average of attack traces")
+            plt.plot(PROFILE.MEAN_TRACE, 'r', label="Average of profile trace")
+            plt.legend()
+            plt.subplot(3, 1, 2)
+            plt.plot(np.average(TRACES, axis=0), label="Average of attack traces")
+            plt.legend()
+            plt.subplot(3, 1, 3)
             plt.plot(PROFILE.MEAN_TRACE, 'r', label="Average of profile trace")
             plt.legend()
             plt.show()
