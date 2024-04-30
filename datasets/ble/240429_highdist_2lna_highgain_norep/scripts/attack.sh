@@ -27,11 +27,11 @@ readonly PROFILE_LENGTH=400
 # ** Attack configuration
 
 # Options.
-readonly PLOT=--plot
+readonly PLOT="--plot"
 
 # Number of traces for the attack.
 # readonly NUM_TRACES_ATTACK_LIST=(200 700 2500 4000 10000 16000)
-readonly NUM_TRACES_ATTACK_LIST=(9000)
+readonly NUM_TRACES_ATTACK_LIST=(200)
 
 # Paths.
 readonly METASET_LIST=(raw) # raw avg ext
@@ -39,6 +39,15 @@ readonly METASET_LIST=(raw) # raw avg ext
 # Delimiters.
 readonly START_POINT=1050
 readonly END_POINT=$((START_POINT + PROFILE_LENGTH))
+
+# ** Sweep-mode configuration
+
+# Toggle the sweep mode.
+readonly SWEEP_MODE_EN=0
+# Start/End/Step point for the sweep mode.
+readonly SWEEP_MODE_START=1040
+readonly SWEEP_MODE_STEP=1
+readonly SWEEP_MODE_END=1050
 
 # ** Internals
 
@@ -61,6 +70,7 @@ function attack() {
     local pois_nb="${5}"
     local num_traces_attack="${6}"
     # Set parameters.
+    local plot="${PLOT}"
     local metaset_path="${DATASET_PATH}/${metaset}"
     local profile_path="${PROFILE_PATH_BASE}/${comp}_${num_traces}_${pois_algo}_${pois_nb}"
     if [[ "${comp}" == "RECOMBIN" ]]; then
@@ -72,6 +82,10 @@ function attack() {
     if [[ "${metaset}" == "raw" ]]; then
         custom_dtype="--custom-dtype"
     fi
+    local start_point="${START_POINT}"
+    local end_point="${END_POINT}"
+    local align_attack="--align-attack"
+    local align_profile="--align-profile"
 
     # Safety-guard.
     if [[ -f "${log_path}" ]]; then
@@ -82,20 +96,34 @@ function attack() {
         return 0
     fi
 
-    # Initialize log.
-    mkdir -p "$LOG_PATH_BASE"
-    # Perform the attack.
-    "${SC_SRC}"/attack.py "${custom_dtype}" --log "${PLOT}" --norm --dataset-path "${metaset_path}" --start-point "${START_POINT}" --end-point "${END_POINT}" --num-traces "${num_traces_attack}" "${bruteforce}" \
-               attack-recombined --comptype "${comp}" --attack-algo pcc --profile "${profile_path}" --num-pois "${pois_nb}" --poi-spacing 1 --variable p_xor_k --align
-    # Finalize log.
-    tmux capture-pane -t "${TMUX_PANE_CAPTURE}" -pS - > "${log_path}"
-    clear
+    # Base command for the attack.sh
+    local attack_cmd='"${SC_SRC}"/attack.py "${custom_dtype}" --log "${plot}" --norm --dataset-path "${metaset_path}" --start-point "${start_point}" --end-point "${end_point}" --num-traces "${num_traces_attack}" "${bruteforce}" \
+              attack-recombined --comptype "${comp}" --attack-algo pcc --profile "${profile_path}" --num-pois "${pois_nb}" --poi-spacing 1 --variable p_xor_k "${align_attack}" "${align_profile}" --no-align-profile-avg'
+
+    # For logging multiple attacks:
+    if [[ "${SWEEP_MODE_EN}" -eq 0 ]]; then
+        # Initialize log.
+        mkdir -p "$LOG_PATH_BASE"
+        # Perform the attack.
+        eval "${attack_cmd}"
+        # Finalize log.
+        tmux capture-pane -t "${TMUX_PANE_CAPTURE}" -pS - > "${log_path}"
+        clear
+    # For running sweep mode attacks:
+    else
+        plot="--no-plot"
+        align_profile="--no-align-profile"
+        for start_point in $(seq "${SWEEP_MODE_START}" "${SWEEP_MODE_STEP}" "${SWEEP_MODE_END}"); do
+            local kr="$(eval "${attack_cmd}" 2>/dev/null | grep actual)"
+            printf "${start_point};${kr/actual rounded: /}\n"
+        done
+    fi
 }
 
 function git_checkout() {
     local branch="${1}"
     local path="${2}"
-    printf "INFO: Checkout ${branch} -> ${path}"
+    printf "INFO: Checkout ${branch} -> ${path}\n"
     (cd "${path}" && git checkout "${branch}")
 }
 
