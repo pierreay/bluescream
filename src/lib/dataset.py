@@ -305,7 +305,7 @@ class Subset():
     # NOTE: This function is a modified copy of the load_trace() function. It
     # should be worth to refactor the twos to use get_trace_from_disk() inside
     # load_trace().
-    def get_trace_from_disk(self, idx=-1, nf=True, ff=True, check=False, start_point=0, end_point=0):
+    def get_trace_from_disk(self, idx=-1, nf=True, ff=True, check=False, start_point=0, end_point=0, custom_dtype=True):
         """Get a trace from the disk without altering the Dataset object.
 
         Compared from the load_trace() function, which is used to load one or a
@@ -319,13 +319,13 @@ class Subset():
         """
         assert(path.exists(self.get_path()))
         if isinstance(idx, int) and idx == -1:
-            load_nf, load_ff = load.load_all_traces(self.get_path(), nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point)
+            load_nf, load_ff = load.load_all_traces(self.get_path(), nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point, custom_dtype=custom_dtype)
         elif isinstance(idx, int):
-            load_nf, load_ff = load.load_pair_trace(self.get_path(), idx, nf=nf, ff=ff)
-            load_nf = None if load_nf is None else load.truncate(load_nf, start_point, end_point)
-            load_ff = None if load_ff is None else load.truncate(load_ff, start_point, end_point)
+            load_nf, load_ff = load.load_pair_trace(self.get_path(), idx, nf=nf, ff=ff, custom_dtype=custom_dtype)
+            load_nf[0] = None if load_nf[0] is None else load.truncate(load_nf[0], start_point, end_point)
+            load_ff[0] = None if load_ff[0] is None else load.truncate(load_ff[0], start_point, end_point)
         elif isinstance(idx, range):
-            load_nf, load_ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point)
+            load_nf, load_ff = load.load_all_traces(self.get_path(), start=idx.start, stop=idx.stop, nf_wanted=nf, ff_wanted=ff, start_point=start_point, end_point=end_point, custom_dtype=custom_dtype)
         # NOTE: Always return 2D np.ndarray.
         load_nf = utils.list_array_to_2d_array(load_nf)
         load_ff = utils.list_array_to_2d_array(load_ff)
