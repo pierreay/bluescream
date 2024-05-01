@@ -31,13 +31,13 @@ readonly PLOT="--plot"
 
 # Number of traces for the attack.
 # readonly NUM_TRACES_ATTACK_LIST=(200 700 2500 4000 10000 16000)
-readonly NUM_TRACES_ATTACK_LIST=(200)
+readonly NUM_TRACES_ATTACK_LIST=(2000)
 
 # Paths.
 readonly METASET_LIST=(raw) # raw avg ext
 
 # Delimiters.
-readonly START_POINT=1050
+readonly START_POINT=1085
 readonly END_POINT=$((START_POINT + PROFILE_LENGTH))
 
 # ** Sweep-mode configuration
@@ -85,7 +85,8 @@ function attack() {
     local start_point="${START_POINT}"
     local end_point="${END_POINT}"
     local align_attack="--align-attack"
-    local align_profile="--align-profile"
+    local align_profile="--no-align-profile"
+    local align_profile_avg="--no-align-profile-avg"
 
     # Safety-guard.
     if [[ -f "${log_path}" ]]; then
@@ -98,7 +99,7 @@ function attack() {
 
     # Base command for the attack.sh
     local attack_cmd='"${SC_SRC}"/attack.py "${custom_dtype}" --log "${plot}" --norm --dataset-path "${metaset_path}" --start-point "${start_point}" --end-point "${end_point}" --num-traces "${num_traces_attack}" "${bruteforce}" \
-              attack-recombined --comptype "${comp}" --attack-algo pcc --profile "${profile_path}" --num-pois "${pois_nb}" --poi-spacing 1 --variable p_xor_k "${align_attack}" "${align_profile}" --no-align-profile-avg'
+              attack-recombined --comptype "${comp}" --attack-algo pcc --profile "${profile_path}" --num-pois "${pois_nb}" --poi-spacing 1 --variable p_xor_k "${align_attack}" "${align_profile}" "${align_profile_avg}"'
 
     # For logging multiple attacks:
     if [[ "${SWEEP_MODE_EN}" -eq 0 ]]; then
