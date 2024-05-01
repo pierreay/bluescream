@@ -1463,7 +1463,9 @@ def tra_attack(template_dir):
 # ** Correlation Radio Analysis (CRA)
 
 @cli.command()
-def cra():
+@click.option("--align-attack/--no-align-attack", default=True, show_default=True,
+             help="Align the attack traces between themselves before to attack.")
+def cra(align_attack):
     """
     Correlation Radio Analysis.
 
@@ -1474,8 +1476,12 @@ def cra():
     Hamming-weight model.
     """
     load_data(dataset.SubsetType.ATTACK)
-    global LOG_PROBA
+    global LOG_PROBA, TRACES
     LOG_PROBA = [[0 for r in range(256)] for bnum in range(NUM_KEY_BYTES)]
+
+    if align_attack is True:
+        l.LOGGER.info("Align attack traces with themselves...")
+        TRACES = analyze.align_all(TRACES, DATASET.samp_rate, template=TRACES[0], tqdm_log=True)
 
     if GWAIT:
         print("Loading complete")
