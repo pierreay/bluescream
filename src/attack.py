@@ -1558,6 +1558,10 @@ def cra(align_attack):
         stored_cpas.append(maxcpa)
 
     print_result(bestguess, knownkey, pge)
+
+    # Always rank if HEL is available.
+    rank()
+
     # if BRUTEFORCE:
         # brute_force(stored_cpas, knownkey)
     if BRUTEFORCE and not (bestguess == KEYS[0]).all():
