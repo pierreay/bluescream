@@ -21,10 +21,10 @@ AES_REPETITIONS=0
 
 export ENVRC_VICTIM_PORT="$(nrfjprog --com | cut - -d " " -f 5)"
 export ENVRC_SAMP_RATE=${FS}
-export ENVRC_DURATION=0.2
+export ENVRC_DURATION=0.1
 export ENVRC_GAIN=${GAIN}
-export ENVRC_WANTED_TRACE_TRAIN=0
-export ENVRC_WANTED_TRACE_ATTACK=65000
+export ENVRC_WANTED_TRACE_TRAIN=65000
+export ENVRC_WANTED_TRACE_ATTACK=41000
 export ENVRC_NF_FREQ=128000000 # 128e6
 export ENVRC_FF_FREQ=${FC}
 export ENVRC_RADIO_DIR="$HOME/storage/tmp"
@@ -39,7 +39,7 @@ export ENVRC_NF_ID=-1
 export ENVRC_FF_ID=0
 if [[ ${AES_REPETITIONS} -eq 0 ]]; then
     export ENVRC_EXTRACT_CONFIG="1_aes_ff_antenna_8msps"
-    export ENVRC_DEVICE_CONFIG="fast"
+    export ENVRC_DEVICE_CONFIG="fast" # [fast | slow]
     export ENVRC_DATASET_INPUT="PAIRING"
 else
     export ENVRC_EXTRACT_CONFIG="300_aes"
@@ -73,13 +73,15 @@ echo "INFO: Checkout main -> $SC_SRC"
 
 init_config
 
-config "$ENVRC_CONFIG_FILE" "accept_snr_min" "4.0"
+config "$ENVRC_CONFIG_FILE" "accept_snr_min" "3.0"
+config "$ENVRC_CONFIG_FILE" "accept_snr_max" "3.8"
 config "$ENVRC_CONFIG_FILE" "more_data_bit" "1"
-config "$ENVRC_CONFIG_FILE" "hop_interval" "15"
+config "$ENVRC_CONFIG_FILE" "hop_interval" "16"
 config "$ENVRC_CONFIG_FILE" "procedure_interleaving" "false"
 config "$ENVRC_CONFIG_FILE" "ll_enc_req_conn_event" "5"
-config "$ENVRC_CONFIG_FILE" "trg_bp_low" "[1.0e6]"
-config "$ENVRC_CONFIG_FILE" "trg_bp_high" "[1.9e6]"
+config "$ENVRC_CONFIG_FILE" "trg_bp_low" "[2.575e6]"
+config "$ENVRC_CONFIG_FILE" "trg_bp_high" "[2.750e6]"
+config "$ENVRC_CONFIG_FILE" "offset" "-0.00010"
 
 mkdir -p ${ENVRC_DATASET_RAW_PATH}
 if [[ -f ${ENVRC_DATASET_RAW_PATH}/.collect_done ]]; then

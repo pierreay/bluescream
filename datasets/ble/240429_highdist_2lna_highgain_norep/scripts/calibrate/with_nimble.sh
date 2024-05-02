@@ -117,7 +117,7 @@ function init_radio_if_needed() {
     fi
     pgrep radio
     if [[ $? == 1 ]]; then
-        (cd $SC_SRC && ./radio.py --dir /tmp --loglevel DEBUG listen 128e6 ${FC} ${FS} --nf-id -1 --ff-id 0 --duration=2 --gain $GAIN &)
+        (cd $SC_SRC && ./radio.py --dir /tmp --loglevel DEBUG listen 128e6 ${FC} ${FS} --nf-id -1 --ff-id 0 --duration=0.1 --gain $GAIN &)
         sleep 4
     fi
 }
@@ -183,13 +183,15 @@ function capture() {
 
     init_config
 
-    config "$CONFIG_PATH" "accept_snr_min" "4.0"
+    config "$CONFIG_PATH" "accept_snr_min" "3.0"
+    config "$CONFIG_PATH" "accept_snr_max" "3.8"
     config "$CONFIG_PATH" "more_data_bit" "1"
-    config "$CONFIG_PATH" "hop_interval" "15"
+    config "$CONFIG_PATH" "hop_interval" "16"
     config "$CONFIG_PATH" "procedure_interleaving" "false"
     config "$CONFIG_PATH" "ll_enc_req_conn_event" "5"
-    config "$CONFIG_PATH" "trg_bp_low" "[1.0e6]"
-    config "$CONFIG_PATH" "trg_bp_high" "[1.9e6]"
+    config "$CONFIG_PATH" "trg_bp_low" "[2.575e6]"
+    config "$CONFIG_PATH" "trg_bp_high" "[2.750e6]"
+    config "$CONFIG_PATH" "offset" "-0.00010"
 
     instrument
 }
