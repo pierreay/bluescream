@@ -314,10 +314,11 @@ List and manage datasets.
     repetitions with increased gain]]
   - Firmware : original without repetitions
   - Train set = XXX traces
-  - Attack set = 60k traces
+  - Attack set = 40k traces
 - Results ::
   - Using profile of [[id:0936568c-d3f9-4c18-841f-5dadecf0118a][[2024-04-23 mar.] Nimble at high distance using 2 LNAs and
-    repetitions with increased gain]], it cannot be reused on this dataset.
+    repetitions with increased gain]], it cannot be reused on this dataset
+    because the profile is slightly different than actual attacked traces.
   - Using internal profile, XXX.
 
 * Bibliography
