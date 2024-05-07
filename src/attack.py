@@ -1026,7 +1026,9 @@ def profile(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_di
     profile_exec(variable, lr_type, pois_algo, k_fold, num_pois, poi_spacing, pois_dir)
     PROFILE.POINT_START = START_POINT
     PROFILE.POINT_END   = END_POINT
-    DATASET.pickle_dump(force=True) # Include profile inside DATASET pickled file.
+    # XXX: Disable dataset saving because I only use "forced profile" now and it
+    # doesn't allow parallel profiling and collection.
+    # DATASET.pickle_dump(force=True) # Include profile inside DATASET pickled file.
 
 # ** Profiled correlation and template attacks
 
