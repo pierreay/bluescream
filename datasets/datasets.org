@@ -283,22 +283,44 @@ List and manage datasets.
 :DIR:      ble/240423_highdist_2lna_highgain
 :END:
 
-- Hardware setup ::
-  - Identical to [[id:c2b4dc98-bf62-4225-8dfe-da6e02967282][[2024-04-23 mar.] Custom firmware at high distance using 2 LNAs without repetitions with increased gain]].
-- Software setup ::
-  - Radio configuration ::
-    - Center frequency = 2.533 GHz
-    - Sampling rate = 8e6 Msps
-    - Gain = 70 dB
-  - Sets ::
-    - Training set = 16k traces using ~300 repetitions
-    - Attack set = 16k traces using ~300 repetitions =avg= and no repetition for
-      =ext=
-- Results ::
-  - Summary in [[attachment:plots/attack_all.pdf]].
-  - Using the [[attachment:avg/profiles/AMPLITUDE_16000_r_2/]] profile, we lower
-    the key rank down to 2^30 (key found).
-  - No correlations found on phase rotation.
+#+CAPTION: Hardware setup
+| SDR              | USRP B200mini               |
+| Target           | nRF52832 (PCA10040)         |
+| Distance         | 120 cm                      |
+| Antenna          | [[https://www.tp-link.com/fr/home-networking/antenna/tl-ant2424b/][TP-Link TL-ANT2424B]]         |
+| LNA 1            | [[https://www.minicircuits.com/pdfs/ZX60-272LN-S+.pdf][Mini-Circuits ZX60-272LN-S+]] |
+| LNA 2            | [[https://www.minicircuits.com/pdfs/TAMP-272LN+.pdf][Mini-Circuits TAMP-272LN+]]   |
+| LNA power supply | 5 V / 0.1 A                 |
+
+#+CAPTION: Software setup
+| AES implementation      | Software TinyCrypt  |
+| Firmware                | Instrumented Nimble |
+| Center frequency        | 2.533 GHz           |
+| Sample rate / Bandwidth | 8 Msps / 8 MHz      |
+| SDR gain                | 70 dB               |
+
+#+CAPTION: Profiles
+| Name | Component      | Nb. traces * Nb. AES | POI algorithm | POI number | \rho | \sigma     |
+|------+----------------+----------------------+---------------+------------+------+------------|
+| P0   | Amplitude      | 16000 * 300          | r             |          1 |  0.5 | 0.15       |
+| P1   | Amplitude      | 16000 * 300          | r             |          2 |  0.5 | 0.15 ; 0.2 |
+| P2   | Phase rotation | 16000 * 300          | r             |          1 |  XXX | XXX        |
+
+#+CAPTION: Attacks
+| Name | Profile | Nb. traces * Nb. AES | Key rank | Median(PGE) | Hamming dist. |
+|------+---------+----------------------+----------+-------------+---------------|
+| A0   | P0      | 10000 * 300          |     2^33 |           1 |            16 |
+| A1   | P1      | 10000 * 300          |     2^29 |           1 |            17 |
+| A2   | P1      | 4000 * 300           |     2^38 |           2 |            16 |
+| A3   | P0      | 10000 * 1            |     2^37 |           2 |            21 |
+| A4   | P1      | 10000 * 1            |     2^33 |           2 |            17 |
+| A5   | P0      | 16000 * 1            |     2^29 |           0 |            12 |
+| A6   | P1      | 16000 * 1            |     2^27 |           1 |            13 |
+
+- Based :: On [[id:c2b4dc98-bf62-4225-8dfe-da6e02967282][[2024-04-23 mar.]​]].
+- Comments ::
+  - Attack summary plot can be found in [[attachment:plots/attack_all.pdf]].
+  - For profile =P2=, no correlations were found.
 
 ** [2024-04-29 lun.] Nimble at high distance using 2 LNAs without repetitions with increased gain
 :PROPERTIES:
@@ -306,20 +328,41 @@ List and manage datasets.
 :ID:       8892d212-8c59-45a4-86e3-f87822f13264
 :END:
 
-- Hardware setup ::
-  - Identical to [[id:c2b4dc98-bf62-4225-8dfe-da6e02967282][[2024-04-23 mar.] Custom firmware at high distance using 2
-    LNAs without repetitions with increased gain]]
-- Software setup ::
-  - Identical to [[id:0936568c-d3f9-4c18-841f-5dadecf0118a][[2024-04-23 mar.] Nimble at high distance using 2 LNAs and
-    repetitions with increased gain]]
-  - Firmware : original without repetitions
-  - Train set = XXX traces
-  - Attack set = 40k traces
-- Results ::
-  - Using profile of [[id:0936568c-d3f9-4c18-841f-5dadecf0118a][[2024-04-23 mar.] Nimble at high distance using 2 LNAs and
-    repetitions with increased gain]], it cannot be reused on this dataset
-    because the profile is slightly different than actual attacked traces.
-  - Using internal profile, XXX.
+#+CAPTION: Hardware setup
+| SDR              | USRP B200mini               |
+| Target           | nRF52832 (PCA10040)         |
+| Distance         | 120 cm                      |
+| Antenna          | [[https://www.tp-link.com/fr/home-networking/antenna/tl-ant2424b/][TP-Link TL-ANT2424B]]         |
+| LNA 1            | [[https://www.minicircuits.com/pdfs/ZX60-272LN-S+.pdf][Mini-Circuits ZX60-272LN-S+]] |
+| LNA 2            | [[https://www.minicircuits.com/pdfs/TAMP-272LN+.pdf][Mini-Circuits TAMP-272LN+]]   |
+| LNA power supply | 5 V / 0.1 A                 |
+
+#+CAPTION: Software setup
+| AES implementation      | Software TinyCrypt |
+| Firmware                | Unmodified Nimble  |
+| Center frequency        | 2.533 GHz          |
+| Sample rate / Bandwidth | 8 Msps / 8 MHz     |
+| SDR gain                | 70 dB              |
+
+#+CAPTION: Profiles
+| Name | Component      | Nb. traces * Nb. AES | POI algorithm | POI number |  \rho | \sigma |
+|------+----------------+------------------+---------------+------------+-------+--------|
+| P0   | Amplitude      | 8000 * 1         | r             |          1 |   0.2 |      1 |
+| P1   | Phase rotation | 8000 * 1         | r             |          1 | 0.075 |    1.5 |
+
+#+CAPTION: Attacks
+| Name | Profile  | Nb. traces * Nb. AES | Key rank | Median(PGE) | Hamming dist. |
+|------+----------+----------------------+----------+-------------+---------------|
+| A0   | External | 16000 * 300          |    2^127 |         128 |            64 |
+| A1   | P0       | 30000 * 1            |     2^60 |           7 |            27 |
+
+- Based :: On [[id:c2b4dc98-bf62-4225-8dfe-da6e02967282][[2024-04-23 mar.]​]] for hardware and [[id:0936568c-d3f9-4c18-841f-5dadecf0118a][[2024-04-23 mar.]​]] for
+  software.
+- Comments ::
+  1. Attack =A0= is the attempt of profile re-usage from instrumented Nimble to
+     non-instrumented Nimble (=AMPLITUDE_16000_r_1= from [[id:0936568c-d3f9-4c18-841f-5dadecf0118a][[2024-04-23 mar.]​]]).
+     However, the profile is statistically slightly different than actual
+     attacked traces making the re-usage impossible.
 
 * Bibliography
 
