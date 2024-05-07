@@ -18,26 +18,25 @@ fi
 
 # List of parameters for the used profiles.
 readonly COMP_LIST=(AMPLITUDE) # AMPLITUDE PHASE_ROT RECOMBIN
-readonly NUM_TRACES_LIST=(16000)
+readonly NUM_TRACES_LIST=(8000)
 readonly POIS_ALGO_LIST=(r)
 readonly POIS_NB_LIST=(1)
 
-readonly PROFILE_LENGTH=400
+readonly PROFILE_LENGTH=550
 
 # ** Attack configuration
 
 # Options.
-readonly PLOT="--plot"
+readonly PLOT="--no-plot"
 
 # Number of traces for the attack.
-# readonly NUM_TRACES_ATTACK_LIST=(200 700 2500 4000 10000 16000)
-readonly NUM_TRACES_ATTACK_LIST=(2000)
+readonly NUM_TRACES_ATTACK_LIST=(250 500 1000 2000 4000 8000 16000 32000 40000)
 
 # Paths.
 readonly METASET_LIST=(raw) # raw avg ext
 
 # Delimiters.
-readonly START_POINT=1085
+readonly START_POINT=1020
 readonly END_POINT=$((START_POINT + PROFILE_LENGTH))
 
 # ** Sweep-mode configuration
@@ -53,9 +52,9 @@ readonly SWEEP_MODE_END=1050
 
 readonly LOG_PATH_BASE="${DATASET_PATH}/logs"
 # For an internal profile:
-# readonly PROFILE_PATH_BASE="${DATASET_PATH}/avg/profiles"
+readonly PROFILE_PATH_BASE="${DATASET_PATH}/raw/profiles"
 # For an external profile:
-readonly PROFILE_PATH_BASE="${REPO_DATASET_PATH}/ble/240423_highdist_2lna_highgain/avg/profiles"
+# readonly PROFILE_PATH_BASE="${REPO_DATASET_PATH}/ble/240423_highdist_2lna_highgain/avg/profiles"
 
 TMUX_PANE_CAPTURE=""
 
@@ -85,7 +84,7 @@ function attack() {
     local start_point="${START_POINT}"
     local end_point="${END_POINT}"
     local align_attack="--align-attack"
-    local align_profile="--no-align-profile"
+    local align_profile="--align-profile"
     local align_profile_avg="--no-align-profile-avg"
 
     # Safety-guard.
