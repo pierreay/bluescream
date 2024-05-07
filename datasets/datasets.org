@@ -300,11 +300,13 @@ List and manage datasets.
 | SDR gain                | 70 dB               |
 
 #+CAPTION: Profiles
-| Name | Component      | Nb. traces * Nb. AES | POI algorithm | POI number | \rho | \sigma     |
+| Name | Component      | Nb. traces * Nb. AES | POI algorithm | POI number | \rho |     \sigma |
 |------+----------------+----------------------+---------------+------------+------+------------|
-| P0   | Amplitude      | 16000 * 300          | r             |          1 |  0.5 | 0.15       |
+| P0   | Amplitude      | 16000 * 300          | r             |          1 |  0.5 |       0.15 |
 | P1   | Amplitude      | 16000 * 300          | r             |          2 |  0.5 | 0.15 ; 0.2 |
-| P2   | Phase rotation | 16000 * 300          | r             |          1 |  XXX | XXX        |
+| P2   | Phase rotation | 16000 * 300          | r             |          1 |  XXX |        XXX |
+| P3   | Amplitude      | 16000 * 1            | r             |          1 | 0.05 |        1.5 |
+| P4   | Phase rotation | 16000 * 1            | r             |          1 |  0.2 |        0.4 |
 
 #+CAPTION: Attacks
 | Name | Profile | Nb. traces * Nb. AES | Key rank | Median(PGE) | Hamming dist. |
