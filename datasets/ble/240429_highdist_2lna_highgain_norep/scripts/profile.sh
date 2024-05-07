@@ -21,13 +21,13 @@ NUM_TRACES_LIST=(4000 8000 12000 16000)
 POIS_ALGO_LIST=(r snr)
 POIS_NB_LIST=(1 2)
 
-PROFILE_LENGTH=400
-SP=300
+PROFILE_LENGTH=550
+SP=1100
 EP=$(( SP + PROFILE_LENGTH ))
 
 # ** Internals
 
-DATASET="${DATASET_PATH}/avg"
+DATASET="${DATASET_PATH}/raw"
 
 # * Functions
 
@@ -41,6 +41,10 @@ function profile() {
     profile="profiles/${comp}_${nt}_${pois_algo}_${pois_nb}"
     plot=--no-plot
     save_images=--save-images
+    custom_dtype="--no-custom-dtype"
+    if [[ "${DATASET}" =~ .*/raw ]]; then
+        custom_dtype="--custom-dtype"
+    fi
 
     # Safety-guard.
     if [[ -d "${DATASET}/${profile}" ]]; then
@@ -52,7 +56,7 @@ function profile() {
     fi
 
     # Create the profile and save it.
-    $SC_SRC/attack.py ${plot} ${save_images} --norm --dataset-path ${DATASET} --num-traces ${nt} --start-point ${SP} --end-point ${EP} --comptype ${comp} \
+    $SC_SRC/attack.py ${custom_dtype} ${plot} ${save_images} --norm --dataset-path ${DATASET} --num-traces ${nt} --start-point ${SP} --end-point ${EP} --comptype ${comp} \
                       profile --pois-algo ${pois_algo} --num-pois ${pois_nb} --poi-spacing 1 --variable p_xor_k --align
 
     echo "INFO: Save profile: $DATASET/${profile}"
