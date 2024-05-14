@@ -17,7 +17,7 @@ fi
 # ** Configuration
 
 readonly COMP_LIST=(AMPLITUDE PHASE_ROT)
-readonly NUM_TRACES_LIST=(4000 8000 12000 16000)
+readonly NUM_TRACES_LIST=(4000 8000 12000 16000 32000 65000)
 readonly POIS_ALGO_LIST=(r snr)
 readonly POIS_NB_LIST=(1 2)
 
