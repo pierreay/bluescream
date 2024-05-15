@@ -132,6 +132,18 @@ Those directories contains various signals used in experiments.
 
 Python demonstration of dataset loading and traces computation (sent to Karel).
 
+** [2024-05-15 mer.] Profiling with LDO regulator
+:PROPERTIES:
+:DIR:      2024-05-15_profile-reg-ldo
+:ID:       11b1c7e1-8793-41ca-9a5e-1db6d355692c
+:END:
+
+- Creation of a profile on amplitude with repetitions using custom firmware
+  with the LDO regulator (branch =expe/source-flash-reg-ldo=).
+- Script copied from [[id:c2b4dc98-bf62-4225-8dfe-da6e02967282][[2024-04-23 mar.]​]].
+- Result:
+  - XXX
+
 * Bibliography
 
 #+print_bibliography:
