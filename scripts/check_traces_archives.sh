@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# TODO: Handle datasets/ble/*/{raw,avg} layout.
-
 VERBOSE=0
 PRUNE=0
 
@@ -48,3 +46,4 @@ function check_datasets_under() {
 
 check_datasets_under "$REPO_DATASET_PATH/poc"
 check_datasets_under "$REPO_DATASET_PATH/ble"
+check_datasets_under "$REPO_EXPE_PATH"
