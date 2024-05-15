@@ -17,8 +17,8 @@ LOG_LEVEL=INFO
 NUM_TRACES=4000
 
 # If we are collecting a train set or an attack set.
-# MODE="train"
-MODE="attack"
+MODE="train"
+# MODE="attack"
 
 # Dataset path.
 if [[ -z $DATASET_PATH ]]; then
