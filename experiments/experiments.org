@@ -144,6 +144,42 @@ Python demonstration of dataset loading and traces computation (sent to Karel).
 - Result:
   - XXX
 
+** [2024-05-15 mer.] Profiling with DCDC regulator
+:PROPERTIES:
+:DIR:      2024-05-15_profile-reg-dcdc
+:ID:       3a8494da-5431-4882-ba1f-c644d64348d6
+:END:
+
+- Creation of a profile on amplitude with repetitions using custom firmware
+  with the DCDC regulator (branch =expe/source-flash-reg-dcdc=).
+- Script copied from [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.]​]].
+- Result:
+  - XXX
+
+** [2024-05-15 mer.] Profiling with ICACHE enabled
+:PROPERTIES:
+:DIR:      2024-05-15_profile-icache-on
+:ID:       be4d126d-5ac1-43cf-85b0-4af441196007
+:END:
+
+- Creation of a profile on amplitude with repetitions using custom firmware
+  with the instruction cache enabled (branch =expe/source-flash-icache-on=).
+- Script copied from [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.]​]].
+- Result:
+  - XXX
+
+** [2024-05-15 mer.] Profiling with ICACHE disabled
+:PROPERTIES:
+:DIR:      2024-05-15_profile-icache-off
+:ID:       bf6c33e0-99bc-4348-9ec1-50e9eb9bf2ed
+:END:
+
+- Creation of a profile on amplitude with repetitions using custom firmware
+  with the instruction cache disabled (branch =expe/source-flash-icache-off=).
+- Script copied from [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.]​]].
+- Result:
+  - XXX
+
 * Bibliography
 
 #+print_bibliography:
