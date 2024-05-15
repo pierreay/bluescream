@@ -141,8 +141,20 @@ Python demonstration of dataset loading and traces computation (sent to Karel).
 - Creation of a profile on amplitude with repetitions using custom firmware
   with the LDO regulator (branch =expe/source-flash-reg-ldo=).
 - Script copied from [[id:c2b4dc98-bf62-4225-8dfe-da6e02967282][[2024-04-23 mar.]​]].
-- Result:
-  - XXX
+
+*Results*
+
+#+NAME: Correlation for amplitude using 4000 * 300 traces
+[[attachment:profile/amp_4000_r_1/pois.pdf]]
+
+#+NAME: Template for amplitude using 4000 * 300 traces
+[[attachment:profile/amp_4000_r_1/profile_poi_0.pdf]]
+
+#+NAME: Correlation for phase rotation using 4000 * 300 traces
+[[attachment:profile/phr_4000_r_1/pois.pdf]]
+
+#+NAME: Template for phase rotation using 4000 * 300 traces
+[[attachment:profile/phr_4000_r_1/profile_poi_0.pdf]]
 
 ** [2024-05-15 mer.] Profiling with DCDC regulator
 :PROPERTIES:
