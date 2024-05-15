@@ -56,11 +56,11 @@ function flash_firmware_once() {
         return 0
     fi
     
-    echo "INFO: Checkout ${SC_POC_BRCH_CHCKOUT} -> $SC_POC"
+    echo "INFO: Checkout ${SC_POC_BRCH_CHCKOUT_FIRMWARE} -> $SC_POC"
     cd $SC_POC/firmware
 
     echo "INFO: Flash custom firmware..."
-    git checkout "${SC_POC_BRCH_CHCKOUT}"
+    git checkout "${SC_POC_BRCH_CHCKOUT_FIRMWARE}"
     make -C pca10040/blank/armgcc flash
     echo "INFO: Save firmware: ${firmware_src} -> ${firmware_dst}"
     mkdir -p "$(dirname "$firmware_dst")" && cp "${firmware_src}" "${firmware_dst}"
@@ -168,6 +168,10 @@ mkdir -p $TARGET_PATH
 if [[ ! -f "$CALIBRATION_FLAG_PATH" ]]; then
     # Flash custom firmware.
     flash_firmware_once
+
+    # Checkout the desired code version.
+    echo "INFO: Checkout ${SC_POC_BRCH_CHCKOUT_CODE} -> $SC_POC"
+    (cd "${SC_POC}" && git checkout "${SC_POC_BRCH_CHCKOUT_CODE}")
 
     # Set the JSON configuration file for one recording analysis.
     configure_json_plot
