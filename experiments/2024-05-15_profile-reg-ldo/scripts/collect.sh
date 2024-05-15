@@ -56,11 +56,11 @@ function flash_firmware_once() {
         return 0
     fi
     
-    echo "INFO: Checkout feat-recombination-corr -> $SC_POC"
+    echo "INFO: Checkout ${SC_POC_BRCH_CHCKOUT} -> $SC_POC"
     cd $SC_POC/firmware
 
     echo "INFO: Flash custom firmware..."
-    git checkout feat-recombination-corr
+    git checkout "${SC_POC_BRCH_CHCKOUT}"
     make -C pca10040/blank/armgcc flash
     echo "INFO: Save firmware: ${firmware_src} -> ${firmware_dst}"
     mkdir -p "$(dirname "$firmware_dst")" && cp "${firmware_src}" "${firmware_dst}"
