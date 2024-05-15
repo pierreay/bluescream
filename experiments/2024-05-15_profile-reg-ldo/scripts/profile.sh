@@ -17,9 +17,9 @@ if [[ -z $DATASET_PATH ]]; then
 fi
 
 # List of parameters for the created profiles.
-COMP_LIST=(amp phr)
-NUM_TRACES_LIST=(4000 8000 12000 16000)
-POIS_ALGO_LIST=(r snr)
+COMP_LIST=(amp phr) # [ "amp" | "phr" ]
+NUM_TRACES_LIST=(4000)
+POIS_ALGO_LIST=(r snr) # [ "r" | "snr" ]
 POIS_NB_LIST=(1 2)
 
 # Delimiters. Small window greatly increase profile computation speed.
