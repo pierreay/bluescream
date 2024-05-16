@@ -186,9 +186,10 @@ Python demonstration of dataset loading and traces computation (sent to Karel).
 
 *Results*
 
-- Compared to [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.] LDO]], profile is different (both correlation and
-  values). We expected to see a higher standard deviation in the values since
-  the MCU should consume less energy, but we observer the opposite.
+- Compared to [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.] LDO]], profile is slightly different (both
+  correlation and values). We expected to see a higher standard deviation in
+  the values since the MCU should consume less energy, but we observer the
+  opposite.
 
 ** [2024-05-15 mer.] Profiling with ICACHE disabled
 :PROPERTIES:
@@ -199,9 +200,14 @@ Python demonstration of dataset loading and traces computation (sent to Karel).
 - Creation of a profile on amplitude with repetitions using custom firmware
   with the instruction cache disabled (branch =expe/source-flash-icache-off=).
 - Script copied from [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.]​]].
-- Result:
-  - XXX
 
+*Result*
+
+- Profile is different enough from [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.] LDO]] while I expected to be
+  the same (only add one C line to set a register to 0 already set by default
+  to 0). This one cannot be used as baseline to compare with LDO directly, but
+  can be used to compare with [[id:be4d126d-5ac1-43cf-85b0-4af441196007][[2024-05-15 mer.] ICACHE enabled]].
+  
 ** [2024-05-15 mer.] Profiling with ICACHE enabled
 :PROPERTIES:
 :DIR:      2024-05-15_profile-icache-on
