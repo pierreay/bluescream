@@ -100,14 +100,14 @@ function configure_json_common() {
     configure_param_json $CONFIG_JSON_PATH_DST "trigger_threshold" "0e3"
     # Shift signal left  = Shift window right -> decrease offset.
     # Shift signal right = Shift window left  -> increase offset.
-    configure_param_json $CONFIG_JSON_PATH_DST "trigger_offset" "0e-6"
+    configure_param_json $CONFIG_JSON_PATH_DST "trigger_offset" "150e-6"
     configure_param_json $CONFIG_JSON_PATH_DST "trigger_rising" "true"
     configure_param_json $CONFIG_JSON_PATH_DST "signal_length" "200e-6"
     configure_param_json $CONFIG_JSON_PATH_DST "num_traces_per_point" 500
     configure_param_json $CONFIG_JSON_PATH_DST "num_traces_per_point_keep" 300
     configure_param_json $CONFIG_JSON_PATH_DST "modulate" "true"
     # May be set to 0 for no reject.
-    configure_param_json $CONFIG_JSON_PATH_DST "min_correlation" "1.45e20"
+    configure_param_json $CONFIG_JSON_PATH_DST "min_correlation" "5e18"
 }
 
 function configure_json_plot() {
