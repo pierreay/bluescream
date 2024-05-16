@@ -142,7 +142,7 @@ Python demonstration of dataset loading and traces computation (sent to Karel).
   with the LDO regulator (branch =expe/source-flash-reg-ldo=).
 - Script copied from [[id:c2b4dc98-bf62-4225-8dfe-da6e02967282][[2024-04-23 mar.]​]].
 
-*Results*
+*Plots*
 
 #+NAME: Correlation for amplitude using 4000 * 300 traces
 [[attachment:profile/amp_4000_r_1/pois.pdf]]
@@ -156,6 +156,10 @@ Python demonstration of dataset loading and traces computation (sent to Karel).
 #+NAME: Template for phase rotation using 4000 * 300 traces
 [[attachment:profile/phr_4000_r_1/profile_poi_0.pdf]]
 
+*Results*
+
+- Use as a baseline to compare with [[id:3a8494da-5431-4882-ba1f-c644d64348d6][[2024-05-15 mer.] DCDC]].
+
 ** [2024-05-15 mer.] Profiling with DCDC regulator
 :PROPERTIES:
 :DIR:      2024-05-15_profile-reg-dcdc
@@ -165,8 +169,26 @@ Python demonstration of dataset loading and traces computation (sent to Karel).
 - Creation of a profile on amplitude with repetitions using custom firmware
   with the DCDC regulator (branch =expe/source-flash-reg-dcdc=).
 - Script copied from [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.]​]].
-- Result:
-  - XXX
+
+*Plots*
+
+#+NAME: Correlation for amplitude using 4000 * 300 traces
+[[attachment:profile/amp_4000_r_1/pois.pdf]]
+
+#+NAME: Template for amplitude using 4000 * 300 traces
+[[attachment:profile/amp_4000_r_1/profile_poi_0.pdf]]
+
+#+NAME: Correlation for phase rotation using 4000 * 300 traces
+[[attachment:profile/phr_4000_r_1/pois.pdf]]
+
+#+NAME: Template for phase rotation using 4000 * 300 traces
+[[attachment:profile/phr_4000_r_1/profile_poi_0.pdf]]
+
+*Results*
+
+- Compared to [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.] LDO]], profile is different (both correlation and
+  values). We expected to see a higher standard deviation in the values since
+  the MCU should consume less energy, but we observer the opposite.
 
 ** [2024-05-15 mer.] Profiling with ICACHE enabled
 :PROPERTIES:
