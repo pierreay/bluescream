@@ -190,18 +190,6 @@ Python demonstration of dataset loading and traces computation (sent to Karel).
   values). We expected to see a higher standard deviation in the values since
   the MCU should consume less energy, but we observer the opposite.
 
-** [2024-05-15 mer.] Profiling with ICACHE enabled
-:PROPERTIES:
-:DIR:      2024-05-15_profile-icache-on
-:ID:       be4d126d-5ac1-43cf-85b0-4af441196007
-:END:
-
-- Creation of a profile on amplitude with repetitions using custom firmware
-  with the instruction cache enabled (branch =expe/source-flash-icache-on=).
-- Script copied from [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.]​]].
-- Result:
-  - XXX
-
 ** [2024-05-15 mer.] Profiling with ICACHE disabled
 :PROPERTIES:
 :DIR:      2024-05-15_profile-icache-off
@@ -210,6 +198,18 @@ Python demonstration of dataset loading and traces computation (sent to Karel).
 
 - Creation of a profile on amplitude with repetitions using custom firmware
   with the instruction cache disabled (branch =expe/source-flash-icache-off=).
+- Script copied from [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.]​]].
+- Result:
+  - XXX
+
+** [2024-05-15 mer.] Profiling with ICACHE enabled
+:PROPERTIES:
+:DIR:      2024-05-15_profile-icache-on
+:ID:       be4d126d-5ac1-43cf-85b0-4af441196007
+:END:
+
+- Creation of a profile on amplitude with repetitions using custom firmware
+  with the instruction cache enabled (branch =expe/source-flash-icache-on=).
 - Script copied from [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.]​]].
 - Result:
   - XXX
