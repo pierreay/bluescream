@@ -1098,7 +1098,7 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
 
     if not FIXED_KEY and variable != "hw_p" and variable != "p":
         raise Exception("This set DOES NOT use a FIXED KEY")
-    if PLOT:
+    if PLOT or SAVE_IMAGES:
         plt.subplot(3, 1, 1)
         plt.plot(np.average(TRACES, axis=0), 'r', label="Average of attack traces")
         plt.plot(PROFILE.MEAN_TRACE, 'g', label="Average of profile trace")
@@ -1110,7 +1110,13 @@ def attack(variable, pois_algo, num_pois, poi_spacing,
         plt.subplot(3, 1, 3)
         plt.plot(np.average(TRACES, axis=0), 'r', label="Average of attack traces")
         plt.legend()
-        plt.show()
+        if SAVE_IMAGES:
+            # NOTE: Fix savefig() layout.
+            figure = plt.gcf() # Get current figure
+            figure.set_size_inches(32, 18) # Set figure's size manually to your full screen (32x18).
+            plt.savefig('attack_alignment.pdf', bbox_inches='tight', dpi=100)
+        if PLOT:
+            plt.show()
 
     compute_variables(variable)
     
@@ -1201,7 +1207,7 @@ def attack_recombined(variable, pois_algo, num_pois, poi_spacing,
             for trace_idx in range(len(TRACES)):
                 TRACES[trace_idx] = analyze.shift(TRACES[trace_idx], shift)
 
-        if PLOT:
+        if PLOT or SAVE_IMAGES:
             plt.subplot(3, 1, 1)
             plt.plot(np.average(TRACES, axis=0), 'r', label="Average of attack traces")
             plt.plot(PROFILE.MEAN_TRACE, 'g', label="Average of profile trace")
@@ -1213,7 +1219,13 @@ def attack_recombined(variable, pois_algo, num_pois, poi_spacing,
             plt.subplot(3, 1, 3)
             plt.plot(np.average(TRACES, axis=0), 'r', label="Average of attack traces")
             plt.legend()
-            plt.show()
+            if SAVE_IMAGES:
+                # NOTE: Fix savefig() layout.
+                figure = plt.gcf() # Get current figure
+                figure.set_size_inches(32, 18) # Set figure's size manually to your full screen (32x18).
+                plt.savefig('attack_alignment.pdf', bbox_inches='tight', dpi=100)
+            if PLOT:
+                plt.show()
 
         compute_variables(variable)
 
