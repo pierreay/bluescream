@@ -220,6 +220,40 @@ Python demonstration of dataset loading and traces computation (sent to Karel).
 - Result:
   - XXX
 
+** FAIL [2024-05-17 ven.] Profile re-usage 1
+CLOSED: [2024-05-17 ven. 11:40]
+:PROPERTIES:
+:DIR:      2024-05-17_profile-reuse-1
+:ID:       f83c8536-bb96-4968-b2dc-a8bd5145ad82
+:END:
+
+*Goal*
+
+- Reuse profile from =240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw= on
+  =240429_highdist_2lna_highgain_norep=.
+
+*Result*
+
+- [[attachment:logs/attack_raw_AMPLITUDE_65536_r_1_2000.log][Log]] :: 2^127
+- [[attachment:plots/attack_raw_AMPLITUDE_65536_r_1_2000.pdf][Plot]] :: Alignment is possible but normalization seems to be different.
+
+** FAIL [2024-05-17 ven.] Profile re-usage 2
+CLOSED: [2024-05-17 ven. 14:51]
+:PROPERTIES:
+:DIR:      2024-05-17_profile-reuse-2
+:ID:       d0dd7bdf-995f-4603-b7c6-6dc1592a20cd
+:END:
+
+*Goal*
+
+- Try to use smaller profile to see if there is a difference in normalization,
+  following [[id:f83c8536-bb96-4968-b2dc-a8bd5145ad82][[2024-05-17 ven.]​]].
+
+*Result*
+
+- [[attachment:logs/attack_raw_AMPLITUDE_65536_r_1_6000.log][Log]] :: 2^127
+- [[attachment:plots/attack_raw_AMPLITUDE_65536_r_1_6000.pdf][Plot]] :: Don't know why it doesn't work.
+
 * Bibliography
 
 #+print_bibliography:
