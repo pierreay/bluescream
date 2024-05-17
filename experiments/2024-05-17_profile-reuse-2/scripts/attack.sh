@@ -2,7 +2,7 @@
 
 # * Environment
 
-env="$(realpath $(dirname $0))/env.sh"
+env="$(realpath $(dirname $0))/attack_env.sh"
 echo "INFO: Source file: $env"
 source "$env"
 
@@ -22,21 +22,21 @@ readonly NUM_TRACES_LIST=(65536)
 readonly POIS_ALGO_LIST=(r)
 readonly POIS_NB_LIST=(1)
 
-readonly PROFILE_LENGTH=500
+readonly PROFILE_LENGTH=80
 
 # ** Attack configuration
 
 # Options.
-readonly PLOT="--no-plot"
+readonly PLOT="--plot"
 
 # Number of traces for the attack.
-readonly NUM_TRACES_ATTACK_LIST=(2000)
+readonly NUM_TRACES_ATTACK_LIST=(6000)
 
 # Paths.
 readonly METASET_LIST=(raw) # raw avg ext
 
 # Delimiters.
-readonly START_POINT=1072
+readonly START_POINT=1261
 readonly END_POINT=$((START_POINT + PROFILE_LENGTH))
 
 # ** Sweep-mode configuration
@@ -55,7 +55,7 @@ readonly LOG_PATH_BASE="$(realpath $(dirname $0))/../logs"
 # For an internal profile:
 # readonly PROFILE_PATH_BASE="${DATASET_PATH}/raw/profiles"
 # For an external profile:
-readonly PROFILE_PATH_BASE="${REPO_DATASET_PATH}/ble/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw"
+readonly PROFILE_PATH_BASE="$(realpath $(dirname $0))/../profiles"
 
 TMUX_PANE_CAPTURE=""
 
@@ -72,7 +72,7 @@ function attack() {
     # Set parameters.
     local plot="${PLOT}"
     local metaset_path="${DATASET_PATH}/${metaset}"
-    local profile_path="${PROFILE_PATH_BASE}/profile_${comp}_${num_traces}"
+    local profile_path="${PROFILE_PATH_BASE}/${comp}_${num_traces}"
     if [[ "${comp}" == "RECOMBIN" ]]; then
         profile_path="${PROFILE_PATH_BASE}/"'{}'"_${num_traces}_${pois_algo}_${pois_nb}"
     fi
