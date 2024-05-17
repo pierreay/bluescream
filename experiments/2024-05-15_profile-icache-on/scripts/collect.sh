@@ -14,7 +14,7 @@ source "$env"
 LOG_LEVEL=INFO
 
 # Number of traces.
-NUM_TRACES=4000
+NUM_TRACES=16000
 
 # If we are collecting a train set or an attack set.
 MODE="train"
