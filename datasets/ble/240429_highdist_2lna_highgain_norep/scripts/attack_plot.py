@@ -7,6 +7,7 @@ import os
 import numpy as np
 import matplotlib.pyplot as plt
 import csv
+import re
 from scipy.interpolate import make_interp_spline, BSpline
 
 import lib.plot as libplot
@@ -31,6 +32,9 @@ x_y = {}
 
 for file in os.listdir(DIR):
     file_path = os.path.realpath(os.path.join(DIR, file))
+    # Ignore files not being a CSV.
+    if re.match(".*.csv$", file_path) is None:
+        continue
     print("INFO: Open file: {}".format(file_path))
     # X-axis, number of traces.
     x_nb = []
