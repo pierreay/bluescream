@@ -61,7 +61,7 @@ class ProfileComparator():
         global SAVE_IMAGES, PLOT
         libplot.enable_latex_fonts()
         num_plots = 4
-        plt.subplots_adjust(hspace = 1)
+        #plt.subplots_adjust(hspace = 1)
         for idx, profile in enumerate(self.profile_list):
             informative = profile.PROFILE_RS
             plt.subplot(num_plots, 1, 1 + idx * 2)
