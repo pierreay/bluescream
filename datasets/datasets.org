@@ -170,13 +170,12 @@ List and manage datasets.
   - No repetitions.
   - Attacked using profile from =231222_single-cable-balanced_raw=, no better
     than key rank of 2^123.
-- [[file:ble/240112_multi-leak-insub-1m-lna_raw/][ble/240112_multi-leak-insub-1m-lna_raw]] ::
-  - 64k FF traces for train/profile with 100 AES repetitions.
-  - 16k FF traces for attack with 300 AES repetitions.
-  - Simple Wi-Fi antenna at 1m of real distance with 1 LNA.
-  - Input generated using random from serial port using instrumented firmware.
 - [[file:ble/240112_multi-leak-insub-1m-lna_avg/][ble/240112_multi-leak-insub-1m-lna_avg]] ::
-  - Average of its RAW dataset (=train= and =attack=).
+  - Average of its RAW dataset (=train= and =attack=):
+    - 64k FF traces for train/profile with 100 AES repetitions.
+    - 16k FF traces for attack with 300 AES repetitions.
+    - Simple Wi-Fi antenna at 1m of real distance with 1 LNA.
+    - Input generated using random from serial port using instrumented firmware.
   - Contains 3 profiles with correlation around 0.25 using different number of POIs.
   - Attacked using different number of traces, different number of POIS, different
     algo (PCC & PDF).
@@ -190,14 +189,13 @@ List and manage datasets.
     100 at 1m profile.
   - Tried to attack using the profile of =240126_300-leak-insub-10cm-lna_avg=,
     but no better than 2^114.
-- [[file:ble/240126_300-leak-insub-10cm-lna_raw][ble/240126_300-leak-insub-10cm-lna_raw]] ::
-  - 64k FF traces for train/profile with 300 AES repetitions.
-  - 8k FF traces for attack with 300 AES repetitions (configured for 16k but
-    not terminated because of lack of space).
-  - Wi-Fi antenna at 10 cm of distance with LNA.
-  - Input generated using random from serial port using instrumented firmware.
 - [[file:ble/240126_300-leak-insub-10cm-lna_avg/][ble/240126_300-leak-insub-10cm-lna_avg]] ::
-  - Average of its corresponding RAW dataset.
+  - Average of its corresponding RAW dataset:
+    - 64k FF traces for train/profile with 300 AES repetitions.
+    - 8k FF traces for attack with 300 AES repetitions (configured for 16k but
+      not terminated because of lack of space).
+    - Wi-Fi antenna at 10 cm of distance with LNA.
+    - Input generated using random from serial port using instrumented firmware.    
   - Profiles with 1, 2, 3 POIs.
   - Best attack and bruteforce with key rank = 2^27 and PGE median = 1 for 2k
     traces.
