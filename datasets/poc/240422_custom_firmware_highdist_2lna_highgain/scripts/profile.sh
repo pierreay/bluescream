@@ -17,7 +17,7 @@ if [[ -z $DATASET_PATH ]]; then
 fi
 
 # List of parameters for the created profiles.
-COMP_LIST=(amp phr)
+COMP_LIST=(amp)
 NUM_TRACES_LIST=(4000 8000 12000 16000)
 POIS_ALGO_LIST=(r snr)
 POIS_NB_LIST=(1 2)

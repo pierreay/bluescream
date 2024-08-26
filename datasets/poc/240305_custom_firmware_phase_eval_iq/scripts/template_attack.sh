@@ -91,8 +91,6 @@ function attack() {
 # DONE:
 # attack_comp amp
 # DONE:
-# attack_comp phr
-# DONE:
 # attack_comp i
 # DONE:
 # attack_comp q

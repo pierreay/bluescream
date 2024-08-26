@@ -8,7 +8,7 @@
 DATASET_PATH="${REPO_DATASET_PATH}/poc/240415_custom_firmware_highdist"
 
 # List of parameters for the created profiles.
-COMP_LIST=(amp phr)
+COMP_LIST=(amp)
 NUM_TRACES_LIST=(4000 8000 12000 16000)
 POIS_ALGO_LIST=(r snr)
 POIS_NB_LIST=(1 2)

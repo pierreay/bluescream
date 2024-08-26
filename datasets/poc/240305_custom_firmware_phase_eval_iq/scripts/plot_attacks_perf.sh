@@ -121,7 +121,6 @@ function attack_given_profile() {
 
 # DONE:
 # attack_given_profile amp_3200 amp
-# attack_given_profile phr_3200 phr
 # attack_given_profile i_3200 i
 # attack_given_profile q_3200 q
 # attack_given_profile i_augmented_3200 i_augmented

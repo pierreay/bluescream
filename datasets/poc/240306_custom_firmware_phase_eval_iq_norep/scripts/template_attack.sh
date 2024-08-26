@@ -86,7 +86,6 @@ function attack() {
 
 # DONE: Profile all available components:
 # profile_comp amp
-# profile_comp phr
 # profile_comp i_augmented
 # profile_comp q_augmented
 
@@ -94,6 +93,5 @@ function attack() {
 
 # DONE: Attack using previously created templates.
 # attack_comp amp
-# attack_comp phr
 # attack_comp i_augmented
 # attack_comp q_augmented
