@@ -1,7 +1,9 @@
 * About
 
-Repository using Git and Git-Annex containing datasets and experiments related
-to the Screaming Channels on BLE project.
+Data of the Screaming Channels on BLE project.
+
+This repository using Git and Git-Annex containing datasets and experiments
+related to the Screaming Channels on BLE project.
 
 * Organization
 
