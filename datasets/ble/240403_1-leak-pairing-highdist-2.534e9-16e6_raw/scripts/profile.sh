@@ -21,7 +21,7 @@ function profile_comp() {
     mv $DATASET/profile $DATASET/$profile
 }
 
-for comp in AMPLITUDE PHASE_ROT; do
+for comp in AMPLITUDE; do
     for num_traces in 5000 10000 19000 30000; do
         for pois_algo in r snr corr; do
             for pois_nb in 1 2 3; do

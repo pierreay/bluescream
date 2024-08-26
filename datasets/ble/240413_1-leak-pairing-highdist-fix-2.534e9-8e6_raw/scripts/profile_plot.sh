@@ -26,5 +26,3 @@ function plot_profile_config() {
 # DONE: Plot all available profiles:
 # plot_profile_config AMPLITUDE_10000_r
 # plot_profile_config AMPLITUDE_19000_r
-# plot_profile_config PHASE_ROT_10000_r
-# plot_profile_config PHASE_ROT_19000_r

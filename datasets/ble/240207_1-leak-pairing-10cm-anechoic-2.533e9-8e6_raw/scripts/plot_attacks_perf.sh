@@ -120,6 +120,3 @@ function attack_given_profile() {
 
 # DONE:
 # attack_given_profile AMPLITUDE_65536 AMPLITUDE
-
-# DONE:
-# attack_given_profile PHASE_ROT_65536 PHASE_ROT

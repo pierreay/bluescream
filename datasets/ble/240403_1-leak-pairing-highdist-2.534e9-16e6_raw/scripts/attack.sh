@@ -79,7 +79,7 @@ fi
 
 # Compare components results (including recombination):
 if [[ $COMPARE_COMP == 1 ]]; then
-    for comp in AMPLITUDE PHASE_ROT RECOMBIN; do
+    for comp in AMPLITUDE; do
         attack 3000 --no-bruteforce '{}_10000_corr' ${comp} 1
     done
 fi

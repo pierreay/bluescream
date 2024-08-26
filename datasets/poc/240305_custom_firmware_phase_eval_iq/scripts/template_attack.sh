@@ -72,9 +72,6 @@ function attack() {
 # DONE: Profile the amplitude:
 # profile_comp amp
 
-# DONE: Profile the phase rotation:
-# profile_comp phr
-
 # DONE: Profile the I component:
 # profile_comp i
 

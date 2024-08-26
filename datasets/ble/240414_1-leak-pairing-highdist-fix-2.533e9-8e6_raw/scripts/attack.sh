@@ -88,7 +88,7 @@ fi
 
 # Compare components results (including recombination):
 if [[ $COMPARE_COMP == 1 ]]; then
-    comp_list=(AMPLITUDE PHASE_ROT RECOMBIN)
+    comp_list=(AMPLITUDE)
     for comp in "${comp_list[@]}"; do
         attack ${num_traces_attack_default} --no-bruteforce '{}'"_${num_traces_train_default}_${pois_algo_default}" ${comp} ${pois_nb}
     done
