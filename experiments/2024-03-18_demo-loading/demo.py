@@ -12,26 +12,6 @@ def dtype_to_complex64(arr):
     """Convert our custom dtype to standard Numpy format."""
     return arr.view(np.int16).astype(np.float32).view(np.complex64)
 
-def get_phase_rot(trace):
-    """Get the phase rotation of one or mulitple traces"""
-    dtype_out = np.float32
-    if trace.ndim == 1:
-        # Compute unwraped (remove modulos) instantaneous phase.
-        trace = np.unwrap(np.angle(trace))
-        # Set the signal relative to 0.
-        trace = [trace[i] - trace[0] for i in range(len(trace))]
-        # Compute the phase rotation of instantenous phase.
-        # NOTE: Manually add first [0] sample.
-        trace = [0] + [trace[i] - trace[i - 1] for i in range(1, len(trace), 1)]
-        # Convert back to np.ndarray.
-        trace = np.array(trace, dtype=dtype_out)
-        return trace
-    elif trace.ndim == 2:
-        trace_rot = np.empty_like(trace, dtype=dtype_out)
-        for ti, tv in enumerate(trace):
-            trace_rot[ti] = get_phase_rot(tv)
-        return trace_rot
-
 def load_traces(fmt):
     traces_iq = []
     i = 0
@@ -82,9 +62,6 @@ print(np.shape(attack_plaintexts))
 # Amplitude
 train_traces_amp = np.abs(train_traces_iq)
 attack_traces_amp = np.abs(attack_traces_iq)
-# Phase rotation
-train_traces_phr = get_phase_rot(train_traces_iq)
-attack_traces_phr = get_phase_rot(attack_traces_iq)
 # I
 train_traces_i = np.real(train_traces_iq)
 attack_traces_i = np.real(attack_traces_iq)
@@ -96,10 +73,6 @@ attack_traces_q = np.imag(attack_traces_iq)
 
 plt.plot(train_traces_amp[0])
 plt.title("Amplitude trace of signal 0 from training set")
-plt.show()
-
-plt.plot(train_traces_phr[0])
-plt.title("Phase rotation trace of signal 0 from training set")
 plt.show()
 
 plt.plot(train_traces_i[0])

@@ -16,13 +16,10 @@ import lib.complex as complex
 sig = np.load("$file")
 
 libplot.enable_latex_fonts()
-fig, (ax_ampl, ax_phase) = plt.subplots(nrows=1, ncols=2)
+fig, (ax_ampl, _) = plt.subplots(nrows=1, ncols=2)
 ax_ampl.plot(complex.get_amplitude(sig))
 ax_ampl.set_xlabel("Sample [\#]")
 ax_ampl.set_ylabel("Amplitude [ADC Value]")
-ax_phase.plot(complex.get_phase_rot(sig))
-ax_phase.set_xlabel("Sample [\#]")
-ax_phase.set_ylabel("Phase rotation [Radian]")
 
 plt.subplots_adjust(top=0.35)
 plt.show()

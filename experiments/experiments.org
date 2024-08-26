@@ -51,29 +51,17 @@ Those directories contains various signals used in experiments.
 
 * Testing
 
-** [2024-01-30 mar.] Instantaneous phase visualization
+** [2024-02-06 mar.] Instrument a firmware and compare leakage among frequencies for subclocks intermodulation and DCDC regulator
 :PROPERTIES:
-:DIR:      2024-01-30_instant_phase_viz
+:DIR:      2024-02-06_firmware-instrumentation-for-subblocks-dcdc
 :END:
 
-- Goals ::
-  - Compare the instantaneous phase of signals recorded during TX on (carrier only), AES software, AES hardware.
-- Results ::
-  - Significant deviations between signals.
-
-** [2024-02-06 mar.] Instrument a firmware and compare leakage among frequencies in amplitude and phase
-:PROPERTIES:
-:DIR:      2024-02-06_firmware-instrumentation-for-phase-rot-leak
-:END:
-
-- Goals ::
-  1. Compare the leakage in amplitude and phase rotation to see if we can see the signal.
 - Methods ::
   1. Instrument the firmware with a recognizable pattern (TX Off, TX Carrier,
      AES Soft ECB, AES Hard ECB without counter, AES Hard ECB with interrupts,
      AES Hard CCM).
   2. Record at multiple frequencies and sampling rates. Analyze the received
-     signal in bot amplitude and phase rotation.
+     signal.
 - Results ::
   1. The DC/DC regulator enabled by the DCDCEN register seems to influence a
      bit the leakage at the carrier, but it is not strongly different. We
@@ -89,24 +77,12 @@ Those directories contains various signals used in experiments.
      have the more stronger leak. It needs to be evaluated for each setup
      before launching a Screaming Channel, but it is not as trivial as using
      the 2nd harmonic (2.528 GHz).
-  4. The leakage in the phase is already present in the baseband signal
-     modulated around the clocks of the CPU. Hence, it may invalidate the
-     theory that the SC phase leakage is produced by voltage variations of the
-     VCO of the carrier.
 - Files ::
   - When nothing is specified in filenames, the DCDCEN is set to 0.
   - FF is collected using an antenna in an anechoic box.
   - NF is collected using a NF probe out of the anechoic box.
   - [[attachment:firmware_loop.c]] is an extract of the firmware to see the
     pattern, see firmware repo and tag for code.
-
-** [2024-02-07 mer.] Comparison between leakage in amplitude and phase
-:PROPERTIES:
-:DIR:      2024-02-07_leakage_comparison_amplitude_phase_rot
-:END:
-
-- Random plot without scripts of SC leakage in amplitude and in phase rotation
-  at 2.530 GHz during a BLE communication (with GFSK).
 
 ** [2024-02-07 mer.] Find the best frequency before a dataset collection using BLE
 :PROPERTIES:
@@ -118,12 +94,9 @@ Those directories contains various signals used in experiments.
 - Methods ::
   1. Find candidates frequency using wide-band recording looking at the
      spectrum.
-  2. Compare the SNR and visually both amplitude and phase rotation signal for
-     each frequency.
+  2. Compare the SNR and visually for amplitude signal for each frequency.
 - Results ::
   1. Find that 2.533 GHz seems to be the best.
-  2. Plot a comparison and good match between amplitude and phase rotation
-     signal.
 
 ** [2024-03-18 lun.] Dataset loading Python demonstration
 :PROPERTIES:
@@ -150,12 +123,6 @@ Python demonstration of dataset loading and traces computation (sent to Karel).
 #+NAME: Template for amplitude using 4000 * 300 traces
 [[attachment:profile/amp_4000_r_1/profile_poi_0.pdf]]
 
-#+NAME: Correlation for phase rotation using 4000 * 300 traces
-[[attachment:profile/phr_4000_r_1/pois.pdf]]
-
-#+NAME: Template for phase rotation using 4000 * 300 traces
-[[attachment:profile/phr_4000_r_1/profile_poi_0.pdf]]
-
 *Results*
 
 - Use as a baseline to compare with [[id:3a8494da-5431-4882-ba1f-c644d64348d6][[2024-05-15 mer.] DCDC]].
@@ -177,12 +144,6 @@ Python demonstration of dataset loading and traces computation (sent to Karel).
 
 #+NAME: Template for amplitude using 4000 * 300 traces
 [[attachment:profile/amp_4000_r_1/profile_poi_0.pdf]]
-
-#+NAME: Correlation for phase rotation using 4000 * 300 traces
-[[attachment:profile/phr_4000_r_1/pois.pdf]]
-
-#+NAME: Template for phase rotation using 4000 * 300 traces
-[[attachment:profile/phr_4000_r_1/profile_poi_0.pdf]]
 
 *Results*
 
@@ -232,7 +193,6 @@ CLOSED: [2024-05-17 ven. 15:16]
   RAM. "Hopefully", we are still able to construct profiles since we only
   receive the =SubBytes= leak but not the other functions.
 - [[attachment:profile/amp_4000_r_1/]] :: OK
-- [[attachment:profile/phr_16000_r_1/]] :: OK
 
 ** FAIL [2024-05-17 ven.] Profile re-usage 1
 CLOSED: [2024-05-17 ven. 11:40]
