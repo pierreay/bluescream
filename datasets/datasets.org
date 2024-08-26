@@ -14,12 +14,12 @@ List and manage datasets.
 :END:
 
 - [[file:poc/240222_custom_firmware_phase_eval]] ::
-  - ~11k * 300 (rep) profile traces (amplitude + phase rotation, no IQ).
-  - ~16k * 300 (rep) attack traces. (amplitude + phase rotation, no IQ).
+  - ~11k * 300 (rep) profile traces (amplitude, no IQ).
+  - ~16k * 300 (rep) attack traces. (amplitude, no IQ).
   - Anechoic box, no LNA, small Wi-Fi antenna.
   - 2.512 GHz of center frequency, 8 MHz of bandwidth.
   - Custom firmware from Giovanni, only carrier (without modulation) and AES software.
-  - Correlation of about ~0.9 for amplitude profile and about ~1 for phase profile.
+  - Correlation of about ~0.9 for amplitude profile.
   - Both attacks are very effective, lowering the key rank to 2^30 using 30 to
     300 attack traces.
 - [[file:poc/240305_custom_firmware_phase_eval_iq]] ::
@@ -28,7 +28,7 @@ List and manage datasets.
     - Compute I and Q augmented (new concept).
   - Good profiles of ~3k traces with r = 1 for correlation.
   - Attacks up to 200 traces.
-  - Attacks successful with amp, phr, i_augmented, q_augmented.
+  - Attacks successful with amp, i_augmented, q_augmented.
   - Attacks failed with i and q.
 - [[file:poc/240306_custom_firmware_phase_eval_iq_norep]] ::
   - 16k traces for training set.
@@ -40,14 +40,13 @@ List and manage datasets.
     unknown reasons), =snr= gives best results.
   - See that no repetitions has a high influence on the attack results even if
     the traces looks good.
-  - =phr= is not better than =amp=.
   - =i_augmented= is nearly as powerful than =amp= but not better.
 - [[file:poc/240308_custom_firmware_phase_eval_iq_norep_2sr]] ::
   - Same configuration as previous dataset but with double sampling rate (from
     8e6 to 16e6).
   - Results are that it leads to worse key rank for all profiles.
 
-** [2023-03-09 jeu.] Phase leakage evaluation storing IQ without repetitions and using GFSK
+** [2023-03-09 jeu.] Leakage evaluation storing IQ without repetitions and using GFSK
 :PROPERTIES:
 :DIR:      poc/240309_custom_firmware_phase_eval_iq_norep_modgfsk
 :ID:       73a81721-2fb4-42df-a572-19646c29ca81
@@ -62,8 +61,6 @@ List and manage datasets.
       (even amplitude).
     - More factor are present than the GFSK modulation, like the deep fades
       between packets boundaries.
-    - The less impacted attack is the phase rotation (only 2^3 of difference of
-      keyrank) compared to the others.
   - On this dataset, i_augmented is the better performance attack.
 
 ** [2024-04-15 lun.] Custom firmware at high distance
@@ -72,13 +69,11 @@ List and manage datasets.
 :ID:       e9b9f217-5250-44b6-80f8-4dec77ff381c
 :END:
 
-- Software setup :: Based on [[id:73a81721-2fb4-42df-a572-19646c29ca81][[2023-03-09 jeu.] Phase leakage evaluation storing
+- Software setup :: Based on [[id:73a81721-2fb4-42df-a572-19646c29ca81][[2023-03-09 jeu.] Leakage evaluation storing
   IQ without repetitions and using GFSK]].
 - Hardware setup :: Based on [[id:59710f64-44d0-472a-899f-7ec999241f0b][[2024-04-12 ven.] ... fix RF setup]].
 - Expectation ::
-  - 1. Reproduce the phenomenon observed in [[id:59710f64-44d0-472a-899f-7ec999241f0b][[2024-04-12 ven.] ... fix
-   RF setup]] where we cannot compute profile on phase rotation.
-  - 2. Evaluate the hardware setup performance before to record a new dataset
+  - 1. Evaluate the hardware setup performance before to record a new dataset
     using Nimble.
 
 ** [2024-04-17 mer.] Custom firmware at high distance using 2 LNAs and repetitions
@@ -119,8 +114,8 @@ List and manage datasets.
   - Add another LNA, ending up with: antenna -> [[https://www.minicircuits.com/pdfs/TAMP-272LN+.pdf][Mini-Circuits TAMP-272LN+]] ->
     [[https://www.minicircuits.com/pdfs/ZX60-272LN-S+.pdf][MiniCircuits ZX60-272LN-S+]]
 - Results ::
-  - Good profiles for amplitude and phase rotation.
-  - Key rank of ~2^30 (key found) for both amplitude and phase rotation.
+  - Good profiles for amplitude.
+  - Key rank of ~2^30 (key found) for amplitude.
 
 ** [2024-04-23 mar.] Custom firmware at high distance using 2 LNAs without repetitions with increased gain
 :PROPERTIES:
@@ -134,7 +129,6 @@ List and manage datasets.
 - Results ::
   - Use the profiles of [[id:db7ed3e7-db7f-42c0-bf7d-ee1151448f74][[2024-04-22 lun.] Custom firmware at high distance using 2 LNAs and repetitions with increased gain]].
   - Key rank of ~2^30 (key found) for amplitude.
-  - Key rank of ~2^90 for phase rotation.
 
 * BLE
 :PROPERTIES:
@@ -208,12 +202,9 @@ List and manage datasets.
   - No repetitions nor for profile or attack.
   - Profiled using amplitude, correct profile with clear correlation around 0.1
     to 0.2.
-  - Profiled using phase, unusable profile but with a half of the subkeys
-    having a correlation peak.
   - Attack using =AMPLITUDE_16384= profile and 16k attack traces succeed with 2^34 key rank.
   - Attack using =AMPLITUDE_32768= profile and 16k attack traces succeed with 2^31 key rank.
   - Attack using =AMPLITUDE_65536= profile and 16k attack traces succeed with 2^30 key rank.
-  - Attack using =PHASE_ROT_65536= profile and 16k attack traces lowered the key rank to 2^93.
 
 ** [2024-04-03 mer.] Unique leakage using pairing at high distance using 2.534e9 SR and 16e6 FC
 :PROPERTIES:
@@ -224,7 +215,7 @@ List and manage datasets.
 - Summary ::
   - 30k profile traces.
   - 20k attack traces.
-  - Profiles on amplitude and phase rotation.
+  - Profiles on amplitude.
   - Office environment, 120 cm.
   - [[https://www.minicircuits.com/pdfs/ZX60-272LN-S+.pdf][MiniCircuits ZX60-272LN-S+]] LNA + USRP B210 mini + [[https://www.tp-link.com/fr/home-networking/antenna/tl-ant2424b/][TP-Link TL-ANT2424B]] antenna.
   - 2.534 GHz of center frequency, 16 MHz of bandwidth.
@@ -248,8 +239,6 @@ List and manage datasets.
 - Results ::
   - No better than 2^60 just like [[id:951929f6-7c55-47e8-8c21-79a660d90f48][[2024-04-03 mer.] BLE -- Unique leakage using
     pairing at high distance using 2.534e9 SR and 16e6 FC]].
-  - From this dataset with this setup, impossible to compute profiles from
-    phase rotation.
 
 ** [2024-04-13 sam.] ... change sampling rate
 :PROPERTIES:
@@ -262,8 +251,6 @@ List and manage datasets.
   - But change sampling rate from 16e6 to 8e6.
 - Results ::
   - No better than 2^67, worse than [[id:59710f64-44d0-472a-899f-7ec999241f0b][[2024-04-12 ven.] BLE -- Fix RF setup]].
-  - From this dataset with this setup, impossible to compute profiles from
-    phase rotation.
 
 ** [2024-04-14 dim.] ... change center frequency
 :PROPERTIES:
@@ -302,9 +289,7 @@ List and manage datasets.
 |------+----------------+----------------------+---------------+------------+------+------------|
 | P0   | Amplitude      | 16000 * 300          | r             |          1 |  0.5 |       0.15 |
 | P1   | Amplitude      | 16000 * 300          | r             |          2 |  0.5 | 0.15 ; 0.2 |
-| P2   | Phase rotation | 16000 * 300          | r             |          1 |  XXX |        XXX |
 | P3   | Amplitude      | 16000 * 1            | r             |          1 | 0.05 |        1.5 |
-| P4   | Phase rotation | 16000 * 1            | r             |          1 |  0.2 |        0.4 |
 
 #+CAPTION: Attacks
 | Name | Profile | Nb. traces * Nb. AES | Key rank | Median(PGE) | Hamming dist. |
@@ -353,8 +338,6 @@ List and manage datasets.
 | P0   | Amplitude      | 8000 * 1             | r             |          1 |   0.2 |          1 |
 | P2   | Amplitude      | 65000 * 1            | r             |          1 | 0.275 |        0.8 |
 | P4   | Amplitude      | 65000 * 1            | r             |          2 | 0.275 | 0.8 ; 1.25 |
-| P1   | Phase rotation | 8000 * 1             | r             |          1 | 0.075 |        1.5 |
-| P3   | Phase rotation | 65000 * 1            | r             |          1 | 0.075 |          1 |
 
 #+CAPTION: Attacks
 | Name | Profile  | Nb. traces * Nb. AES | Key rank (min / round) | Median(PGE) | Hamming dist. |
