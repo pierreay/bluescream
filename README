@@ -1,0 +1,16 @@
+:PROPERTIES:
+:ID:       5294e8b0-b57f-41d8-8783-4539f6c901ff
+:END:
+#+TITLE: Screaming Channels on BLE
+#+SETUPFILE: https://raw.githubusercontent.com/pierreay/orgcss/master/orgcss.setup
+
+* About
+
+Screaming Channels on BLE project.
+
+* Files
+
+- [[file:docs]] :: Documents related to the project.
+- [[file:expe]] :: Isolated experiments.
+- [[file:org]] :: Emacs Org-mode linked files.
+- [[file:src]] :: Source code.
