@@ -1,17 +1,19 @@
+:PROPERTIES:
+:DIR:      imgs
+:END:
 #+TITLE: Demonstration of [2023-10-14 sam.]
 #+SETUPFILE: https://raw.githubusercontent.com/pierreay/orgcss/master/orgcss.setup
 
-Attached to this mail are a few screenshots of the traces. They are
-recorded using an RF coaxial cable, at 2.548 GHz, using a 10 MHz
-bandwidth and 10 Msps sample rate. The traces stores the IQ without any
-processing, normalization, or averaging. Here is the description of the
-screenshots, where we plot the amplitude of traces :
+Here are a few screenshots of the traces. They are recorded using an RF coaxial
+cable, at 2.548 GHz, using a 10 MHz bandwidth and 10 Msps sample rate. The
+traces stores the IQ without any processing, normalization, or averaging. Here
+is the description of the screenshots, where we plot the amplitude of traces :
 
-- 1_300_aes.png :: This is the full RAW trace (show only amplitude for
+- [[attachment:1_300_aes.png][1_300_aes.png]] :: This is the full RAW trace (show only amplitude for
   the plot but IQ are stored on disk). We can see a short burst at the
   beginning (see later) and 300 AES executions patterns.
   
-- 2_dozens_aes.png :: We zoom on the start of the signal activity. The
+- [[attachment:2_dozens_aes.drawio.png][2_dozens_aes.png]] :: We zoom on the start of the signal activity. The
   signal contained in "Original BLE transmission" box is the system's
   activity noise emitted at 2.548 GHz (hence, the name I wrote on the
   screenshot can be misleading as it not a GFSK modulated BLE packet,
@@ -25,7 +27,7 @@ screenshots, where we plot the amplitude of traces :
   attack. Each single AES execution is composed of a key scheduling + 10
   rounds.
   
-- 3_single_aes.png :: We zoom on a single AES execution. Despite this is
+- [[attachment:3_single_aes.drawio.png][3_single_aes.png]] :: We zoom on a single AES execution. Despite this is
   a non-averaged signal, we can identify each AES steps, i.e. the key
   scheduling and the different rounds.
 
@@ -34,19 +36,21 @@ from the BLE transmission, I propose for now to attack the AES of the
 instrumented repetition. To do so, we can do it without averaging, hence
 extracting only one of the AES from the 300 repetitions and using it, or
 with averaging, by extracting all the 300 AES, aligning them and
-averaging them (thus reducing noise). I will additionally send my own
-averaged dataset, feel free to use it.
+averaging them (thus reducing noise).
 
 Note that I use an optimized code to store the traces, such that they
 take less disk space using 16 bits integers instead of 32 bits
 floats. Here is how to load one trace using Numpy:
 
-> import numpy as np
-> # Trace index
-> i = 0                                                         
-> # Custom dtype representing complex as two 16-bits integers.
-> DTYPE = np.dtype([('real', np.int16), ('imag', np.int16)])    
-> # Load the trace file.
-> trace_i = np.fromfile("{}_trace_ff.npy".format(i), dtype=DTYPE)
-> # Convert our custom dtype to standard complex64 (composed of 2 float32)
-> trace_i = trace_i.view(np.int16).astype(np.float32).view(np.complex64)
+#+begin_src python :eval never
+import numpy as np
+# Trace index
+i = 0                                                         
+# Custom dtype representing complex as two 16-bits integers.
+DTYPE = np.dtype([('real', np.int16), ('imag', np.int16)])    
+# Load the trace file.
+trace_i = np.fromfile("{}_trace_ff.npy".format(i), dtype=DTYPE)
+# Convert our custom dtype to standard complex64 (composed of 2 float32)
+trace_i = trace_i.view(np.int16).astype(np.float32).view(np.complex64)
+#+end_src
+
