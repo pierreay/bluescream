@@ -1,0 +1,26 @@
+# duration=4 [s]
+mar. 23 janv. 2024 11:06:05 CET
+conn_event=6
+[32m[2024-01-23 11:06:38,001] [2225455] [MainThread] [radio] INFO  - Peak: Position=11.64% ; SNR=2.3 ; Avg=1488[0m
+[32m[2024-01-23 11:07:11,392] [2225759] [MainThread] [radio] INFO  - Peak: Position=11.77% ; SNR=2.3 ; Avg=1496[0m
+[32m[2024-01-23 11:07:44,491] [2226062] [MainThread] [radio] INFO  - Peak: Position=11.77% ; SNR=2.3 ; Avg=1490[0m
+[32m[2024-01-23 11:08:18,062] [2226365] [MainThread] [radio] INFO  - Peak: Position=11.64% ; SNR=2.3 ; Avg=1493[0m
+[32m[2024-01-23 11:08:51,289] [2226668] [MainThread] [radio] INFO  - Peak: Position=11.77% ; SNR=2.3 ; Avg=1472[0m
+conn_event=9
+[32m[2024-01-23 11:09:24,478] [2227005] [MainThread] [radio] INFO  - Peak: Position=17.01% ; SNR=2.3 ; Avg=1482[0m
+[32m[2024-01-23 11:10:22,408] [2227432] [MainThread] [radio] INFO  - Peak: Position=17.01% ; SNR=2.3 ; Avg=1482[0m
+[32m[2024-01-23 11:10:55,492] [2227727] [MainThread] [radio] INFO  - Peak: Position=16.89% ; SNR=2.3 ; Avg=1466[0m
+[32m[2024-01-23 11:11:28,705] [2228026] [MainThread] [radio] INFO  - Peak: Position=16.83% ; SNR=2.3 ; Avg=1485[0m
+[32m[2024-01-23 11:12:01,665] [2228334] [MainThread] [radio] INFO  - Peak: Position=17.00% ; SNR=2.3 ; Avg=1487[0m
+conn_event=12
+[32m[2024-01-23 11:12:35,267] [2228676] [MainThread] [radio] INFO  - Peak: Position=22.16% ; SNR=2.3 ; Avg=1478[0m
+[32m[2024-01-23 11:13:08,440] [2228976] [MainThread] [radio] INFO  - Peak: Position=22.14% ; SNR=2.3 ; Avg=1496[0m
+[32m[2024-01-23 11:13:41,650] [2229280] [MainThread] [radio] INFO  - Peak: Position=22.15% ; SNR=2.3 ; Avg=1488[0m
+[32m[2024-01-23 11:14:14,789] [2229579] [MainThread] [radio] INFO  - Peak: Position=22.27% ; SNR=2.3 ; Avg=1496[0m
+[32m[2024-01-23 11:14:48,182] [2229883] [MainThread] [radio] INFO  - Peak: Position=22.09% ; SNR=2.3 ; Avg=1499[0m
+conn_event=16
+[32m[2024-01-23 11:15:21,295] [2230223] [MainThread] [radio] INFO  - Peak: Position=29.15% ; SNR=2.3 ; Avg=1475[0m
+[32m[2024-01-23 11:15:54,543] [2230530] [MainThread] [radio] INFO  - Peak: Position=28.96% ; SNR=2.3 ; Avg=1471[0m
+[32m[2024-01-23 11:16:27,692] [2230847] [MainThread] [radio] INFO  - Peak: Position=29.27% ; SNR=2.3 ; Avg=1474[0m
+[32m[2024-01-23 11:17:01,247] [2231155] [MainThread] [radio] INFO  - Peak: Position=29.05% ; SNR=2.3 ; Avg=1493[0m
+[32m[2024-01-23 11:17:34,209] [2231455] [MainThread] [radio] INFO  - Peak: Position=29.16% ; SNR=2.3 ; Avg=1488[0m

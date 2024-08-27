@@ -1,0 +1,16 @@
+# duration=4 [s]
+mar. 23 janv. 2024 11:35:52 CET
+start_radio_conn_event=1
+ll_enc_req_conn_event=16
+hop_interval=40
+[2024-01-23 11:36:50,600] [2238925] [MainThread] [radio] INFO  - Peak: Position=20.74% ; SNR=2.3 ; Avg=1488
+[2024-01-23 11:37:23,735] [2239226] [MainThread] [radio] INFO  - Peak: Position=20.84% ; SNR=2.3 ; Avg=1512
+[2024-01-23 11:37:56,958] [2239522] [MainThread] [radio] INFO  - Peak: Position=20.94% ; SNR=2.3 ; Avg=1499
+hop_interval=56
+[2024-01-23 11:38:29,863] [2240026] [MainThread] [radio] INFO  - Peak: Position=29.27% ; SNR=2.3 ; Avg=1511
+[2024-01-23 11:39:03,436] [2240408] [MainThread] [radio] INFO  - Peak: Position=29.09% ; SNR=2.3 ; Avg=1510
+[2024-01-23 11:39:36,757] [2240711] [MainThread] [radio] INFO  - Peak: Position=29.26% ; SNR=2.3 ; Avg=1506
+hop_interval=72
+[2024-01-23 11:40:09,863] [2241050] [MainThread] [radio] INFO  - Peak: Position=37.73% ; SNR=2.3 ; Avg=1504
+[2024-01-23 11:40:43,257] [2241351] [MainThread] [radio] INFO  - Peak: Position=37.74% ; SNR=2.3 ; Avg=1503
+[2024-01-23 11:41:16,317] [2241653] [MainThread] [radio] INFO  - Peak: Position=37.76% ; SNR=2.3 ; Avg=1513

@@ -1,0 +1,73 @@
+:PROPERTIES:
+:ID:       6eadeb14-64c5-4c29-94c5-bb577a8cd4fd
+:END:
+#+TITLE: Screaming Channels Experiments
+#+SUBTITLE: Near-field (NF) Leak Timing Observation
+#+HTML_HEAD: <link rel="stylesheet" type="text/css" href="https://gongzhitaao.org/orgcss/org.css"/>
+
+* Introduction
+
+While looking at [[id:6eadeb14-64c5-4c29-94c5-bb577a8cd4fd][Screaming Channels Experiments - RF Leak of AES on BLE Device]],
+we start using [[id:c533badd-a4e3-4d2f-8f3e-6014d65a7fd7][SoapySDR]] instead of GNU Radio. We end up with a more reliable
+recording, in which we were able to identify BLE timing communication looking
+at 127.0 MHz.
+
+* Analysis
+
+We use the [[file:record/rx_signal_recorded.npy][=record/rx_signal_recorded.npy=]] file recorded in the aforementioned
+experiment.
+
+Execute our analysis script:
+
+#+begin_src bash :eval never
+python3 ./src/analysis.py
+#+end_src
+
+First, it will plot the entire signal:
+
+[[file:plot/2023-06-01_14-44-53.png]]
+
+Then, it will shrink the signal to two subsequent interesting signal:
+
+[[file:plot/2023-06-01_14-55-28.png]]
+
+We see that the distance between two emissions is about 0.07 seconds, /i.e./
+$7e^{-2}$. Let's compute what would be inter-connection event interval, /i.e./
+the time between two subsequent master-slave exchanges in our setup.
+
+Let $t_n$ the /Anchor Point/ of /Connection Event/ $n$, then the duration of a
+master packet will be: $$ d_m = 1 µs * 8 * (1+4+2+s_m+3) $$ With $s_m$ being
+payload size in byte. Let $d_s$ the slave packet duration, which would be the
+same. Let $ifs=150 µs$ the inter-trame time and $h$ the hop interval, the
+master packet will be transmitted at $t_n$ and the end of the transmission will
+be $t_n + d_m$. The slave will start transmitting at $t_n + d_m + ifs$ and end
+transmission at $tm + d_m + ifs + d_s$. The cycle will be repeated if there is
+a /More Data Bit/ set in the header, with the same $ifs$. Overhaul, every
+transmission must be comprised in the following window: $$ [t_n ; t_{n+1} =
+t_n + h * 1250 µs] $$ At connection time or parameter changing time, during
+update instant $t_i$, the transmission window will be $[t_i +
+\text{windowOffset} * 1250 µs ; \text{windowOffset} * 1250 µs +
+\text{windowSize} * 1250 µs]$. The master should transmit during the window,
+and his transmission's starting time will define $t_i$. For a 2 MBPS link, we
+will have a $0.5 µs$ factor instead of $1 µs$ and the preamble size will be of
+$2$ (hence adding 1 to the sum).
+
+In our setup, we used a hop interval of 56:
+
+#+begin_src bash :results output :exports both
+grep hop.interval= ../../src/screamingchannels/devices/nrf52_whad.py 
+#+end_src
+
+#+RESULTS:
+:             l.LOGGER.debug("nRF52_WHAD.central.connect(address={}, random=False, hop_interval=56, channel_map=0x00000300)".format(self.address))
+:             device = self.central.connect(self.address, random=False, hop_interval=56, channel_map=0x00000300)
+
+Hence, inter-connection event interval would be: $$ 56 * 1250e^{-6} = 0.07 = 7e{-2} s$$
+
+* Results
+
+We conclude that the emission pattern we see on our recording corresponds to
+every cycle of reception (from master to slave) and emission (from slave to
+master). We can accurately observe when a packet is received or transmitted by
+correlating this with *firmware instrumentation* (/e.g./ running a long AES is
+visible on the spectrum) or *sniffing* (with WHAD).
