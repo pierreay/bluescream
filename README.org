@@ -24,3 +24,14 @@ devices (=garrus=, =novigrad=).
 - [[file:profiles/][profiles]] :: Contains good [[id:71833b59-2215-482f-ba78-49a153b607ad][profiles]] for template attacks.
 - [[file:signals/][signals]] :: Contains good [[id:108f8a72-7097-46ce-9457-191988296c92][signals]] for autocorrelation matching.
 - [[file:pictures/][pictures]] :: Contains various pictures.
+
+* Git
+
+In this repository, several scripts are =git checkout= some tags or commits
+hashes from other repositories. Concerning the =screaming_channels_ble=
+repository pointed by the =$SC= variable of the [[file:.envrc][.envrc]] file, the history had to
+be rewritten at some point to delete some large binary blobs from the =.git=
+packed objects. This has for consequence that commit hashes had to be computed
+again. Hence, in the [[file:screaming_channels_ble.log][screaming_channels_ble.log]] file, you will find a list of
+the previous tags and commits hashes of this repository, to manually patch the
+scripts on case-by-case needs.
