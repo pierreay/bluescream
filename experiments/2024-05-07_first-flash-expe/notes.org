@@ -1,0 +1,106 @@
+:PROPERTIES:
+:ID:       b6901d33-c13d-4441-ad86-2c482e4fd77d
+:END:
+#+TITLE: Leakage source in Screaming Channels
+#+SETUPFILE: https://raw.githubusercontent.com/pierreay/orgcss/master/orgcss.setup
+
+* About
+
+Finding parameters that influence the leakage, notably the statistical
+correlations.
+
+* Related work
+
+* Ideas
+
+*Various experiments*
+
+- Lancer une expérience avec le code du firmware en RAM ::
+  - Étapes :
+    - Mapper le code en RAM avec le linker statiquement, OU ;
+    - Charger le code en RAM dynamiquement au boot.
+    - Possibilité de la faire pour tout le code ou pour tout l'AES.
+  - Objectif :
+    - Observer que la fuite n'est pas présente confirmant que la source vient
+      bien du contrôleur de flash.
+- Expérience de mise en évidence de l'interaction cache d'instruction/contrôleur de flash ::
+  - Sur un firmware custom, run l'AES en boucle avec TX ON tout en monitorant
+    les compteurs de cache hits et miss et en enregistrant avec la SDR.
+  - Reporter le nombre de cache hits/miss en fonction du temps sur le port
+    série.
+  - Reporter le nombre de "trous" dans le signal enregistré en fonction du
+    temps.
+  - Si corrélation entre les deux courbes, cela prouve que le cache
+    d'instruction influe sur la fuite / que la fuite permet d'inférer les cache
+    miss et cache hits.
+- Placement de la fonction d'AES avec un linker script ::
+  - Étapes :
+    - [ ] Modifier le linker script du PoC ([[file:~/pro_src/screaming_channels_poc/firmware/pca10040/blank/armgcc/radio_test_gcc_nrf52.ld][radio_test_gcc_nrf52.ld]]) et vérifier
+      la modification sur =expe/source-flash-ld-1=.
+    - [ ] Créer une expérience permettant d'observer l'impact sur le profile en
+      modifiant le layout du firmware.
+    - [ ] Créer un profile sur un firmware instrumenté avec moyennage tout en
+      plaçant le code et les données de l'AES au même endroit que l'AES
+      non-instrumenté pour permettre la réutilisation.
+  - Méthodes :
+    - Utiliser le flag =-ffunction-sections= de GCC pour créer une section par
+      fonction et =-fdata-sections= pour créer une section par données et placer
+      précisément la fonction / les données de l'AES en utilisant un linker
+      script.
+
+* Methods
+
+** Flash impact
+
+- Why :: Nordic said to Aurélien during first paper disclosure that the
+  flash's controller may be at the origin of the Screaming Channels leakage.
+  The flash contains the code executed by the CPU and a cache exists between
+  the CPU and the flash.
+- How :: Use a custom linker script with a minimal firmware to observe the
+  influence of the code position's inside the flash onto the measured leakage.
+- External ressources ::
+  - [[https://devzone.nordicsemi.com/f/nordic-q-a/68934/instruction-cache-i-cache-using-and-user-guide][Enabling cache and reading performance counters]]
+- Miscellaneous ::
+  - Instruction cache (=I-Cache=) exists and can be enabled or disabled
+    ([[pdf:~/git/biblio-info/files/semiconductor21nrf52832.pdf::31++0.00][semiconductor21nrf52832.pdf: Page 31]]) for the =ICODE= bus.
+  - Cache profiling is enabled using the =ICACHECNF= register and counters are
+    read using the =IHIT= and =IMISS= registers ([[pdf:~/git/biblio-info/files/semiconductor21nrf52832.pdf::31++0.00][semiconductor21nrf52832.pdf: Page 31]]).
+  - The block diagram ([[pdf:~/git/biblio-info/files/semiconductor21nrf52832.pdf::13++0.29][semiconductor21nrf52832.pdf: Page 13]]) indicates that
+    interconnections are:
+    1. CPU -> AHB -> RAM
+    2. CPU -> AHB -> APB -> NVMC -> Flash [I-Cache]
+  - The memory layout ([[pdf:~/git/biblio-info/files/semiconductor21nrf52832.pdf::24++2.79][semiconductor21nrf52832.pdf: Page 24]]) indicates that:
+    1. Physical RAM is divided by mapping in =Data RAM System= and =Code RAM
+       (ICODE/DCODE)=.
+    2. Flash address mapping is called =Flash ICODE/DCODE=.
+  - The relevant buses are =ICODE= to access instructions and =DCODE= to access
+    data ([[pdf:~/git/biblio-info/files/semiconductor21nrf52832.pdf::25++2.94][semiconductor21nrf52832.pdf: Page 25]]).
+
+* Experiments
+
+** [2024-05-07 mar.] First flash experiment
+:PROPERTIES:
+:ID:       37849122-7323-4232-9914-d7cfef995ac4
+:END:
+
+Print instruction cache =I-CACHE= state in custom firmware.
+
+- Script ::
+  #+begin_src bash :eval never
+  export NORDIC_SEMI_SDK=/opt/nRF5_SDK_14.2.0_17b948a
+  cd /home/drac/pro_src/screaming_channels_poc/firmware
+  git checkout expe/source-flash-1
+  make -C pca10040/blank/armgcc flash
+  minicom -D /dev/ttyACM0
+  #+end_src
+
+- Results :: Instruction cache is disabled.
+  #+begin_example
+  00000000000000000000000000000000
+  #+end_example
+
+* Bibliography
+
+#+print_bibliography:
+
+* Footnotes
