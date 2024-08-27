@@ -1,0 +1,8 @@
+:PROPERTIES:
+:ID:       3e01566b-6905-492e-bafe-7f3f45b6920f
+:END:
+* Scripts
+
+- [[file:check_traces_archives.sh][check_traces_archives.sh]] :: Check that archives (commited using =git-annex=)
+  are consistent with current trace directories (ignored by =git=).
+- [[file:git-annex-init.sh][git-annex-init.sh]] :: Initialize the repository using =git-annex=.

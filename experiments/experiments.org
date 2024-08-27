@@ -1,3 +1,6 @@
+:PROPERTIES:
+:ID:       f2d6b918-20f8-4410-ab60-1bb5707868bf
+:END:
 #+TITLE: Experiments
 #+SETUPFILE: https://raw.githubusercontent.com/pierreay/orgcss/master/orgcss.setup
 
@@ -227,8 +230,4 @@ CLOSED: [2024-05-17 ven. 14:51]
 
 - [[attachment:logs/attack_raw_AMPLITUDE_65536_r_1_6000.log][Log]] :: 2^127
 - [[attachment:plots/attack_raw_AMPLITUDE_65536_r_1_6000.pdf][Plot]] :: Don't know why it doesn't work.
-
-* Bibliography
-
-#+print_bibliography:
 

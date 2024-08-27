@@ -1,0 +1,9 @@
+:PROPERTIES:
+:ID:       108f8a72-7097-46ce-9457-191988296c92
+:END:
+* Signals
+
+- [[attachment:2.548GHz_30Msps_AES_BLE_clean_leak_single.npy][2.548GHz_30Msps_AES_BLE_clean_leak_single.npy]] :: Template of a single
+  (non-averaged) key scheduling with 2 first rounds of an AES executed during a
+  BLE transmission, collected at 2.548 GHz using 30 Msps, using an USRP
+  B200mini and an RF coax cable inside an anechoic box.

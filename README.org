@@ -1,47 +1,25 @@
+#+TITLE: Screaming Channels on Bluetooth Low Energy -- Annex
+#+SETUPFILE: https://raw.githubusercontent.com/pierreay/orgcss/master/orgcss.setup
+
 * About
 
-Data of the Screaming Channels on BLE project.
+Companion repository of the "Screaming Channels on Bluetooth Low Energy" project.
 
-This repository using Git and Git-Annex containing datasets and experiments
-related to the Screaming Channels on BLE project.
+See the [[https://github.com/pierreay/screaming_channels_data][screaming_channels_ble]] repository for a complete overview of the
+project.
 
-* Organization
+* Usage
 
-- [[file:datasets]] :: Contains full datasets recorded using the Nimble stack (=ble=)
+This repository is managed using [[https://git-annex.branchable.com/][git-annex]]. The data is currently spread across
+3 computers (=reaper=, =saren=, =wrex=, =citadel=) and 2 external mass storage
+devices (=garrus=, =novigrad=).
+
+* Structure
+
+- [[file:datasets][datasets]] :: Contains full [[id:98437a5b-5d86-4097-96b1-9a069fd30a79][datasets]] -- recorded using the Nimble stack (=ble=)
   or the custom firmware (=poc=).
-- [[file:experiments]] :: Contains experiments scripts and small recordings.
-- [[file:scripts/check_traces_archives.sh]] :: Check that archives (commited using
-  =git-annex=) are consistent with current trace directories (ignored by
-  =git=).
-- [[file:profiles/][profiles]] :: Contains some good [[id:71833b59-2215-482f-ba78-49a153b607ad][profiles]] for template attacks.
-- [[file:signals/][signals]] :: Contains some good [[id:108f8a72-7097-46ce-9457-191988296c92][signals]] for autocorrelation matching.
-
-* Contents
-
-** Profiles
-:PROPERTIES:
-:DIR:      profiles
-:ID:       71833b59-2215-482f-ba78-49a153b607ad
-:END:
-
-- [[attachment:231213_single-cable_raw/][231213_single-cable_raw]] :: Profile of 2 POIs constructed using a single
-  non-averaged AES with 44700 traces. It comes from the
-  =231213_single-cable_raw= dataset.
-- [[attachment:231222_single-cable-balanced_raw/][231222_single-cable-balanced_raw]] ::
-  - 2 POIs with 1 point spacing
-  - Single non-averaged AES
-  - 64k traces
-  - Balanced generator
-  - Coax cable
-  - Copied from the =231222_single-cable-balanced_raw= dataset
-
-** Signals
-:PROPERTIES:
-:DIR:      signals
-:ID:       108f8a72-7097-46ce-9457-191988296c92
-:END:
-
-- [[attachment:2.548GHz_30Msps_AES_BLE_clean_leak_single.npy][2.548GHz_30Msps_AES_BLE_clean_leak_single.npy]] :: Template of a single
-  (non-averaged) key scheduling with 2 first rounds of an AES executed during a
-  BLE transmission, collected at 2.548 GHz using 30 Msps, using an USRP
-  B200mini and an RF coax cable inside an anechoic box.
+- [[file:experiments][experiments]] :: Contains full [[id:f2d6b918-20f8-4410-ab60-1bb5707868bf][experiments]] data -- code, input and output data.
+- [[file:scripts/][scripts]] :: Contains [[id:3e01566b-6905-492e-bafe-7f3f45b6920f][scripts]] to work with the repository.
+- [[file:profiles/][profiles]] :: Contains good [[id:71833b59-2215-482f-ba78-49a153b607ad][profiles]] for template attacks.
+- [[file:signals/][signals]] :: Contains good [[id:108f8a72-7097-46ce-9457-191988296c92][signals]] for autocorrelation matching.
+- [[file:pictures/][pictures]] :: Contains various pictures.
