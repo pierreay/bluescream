@@ -1,16 +1,95 @@
 :PROPERTIES:
 :ID:       5294e8b0-b57f-41d8-8783-4539f6c901ff
 :END:
-#+TITLE: Screaming Channels on BLE
+#+TITLE: Screaming Channels on Bluetooth Low Energy
 #+SETUPFILE: https://raw.githubusercontent.com/pierreay/orgcss/master/orgcss.setup
 
 * About
 
-Screaming Channels on BLE project.
+Main repository of the "Screaming Channels on Bluetooth Low Energy" project.
 
-* Files
+*Publication*
 
-- [[file:docs]] :: Documents related to the project.
-- [[file:expe]] :: Isolated experiments.
-- [[file:org]] :: Emacs Org-mode linked files.
-- [[file:src]] :: Source code.
+This project led to the following [[https://www.acsac.org/][ACSAC]] publication:
+
+#+begin_quote
+[1] Pierre Ayoub, Romain Cayre, Aurélien Francillon, and Clémentine Maurice.
+“Screaming Channels on Bluetooth Low Energy.” Accepted at: Proceedings of the
+40th Annual Computer Security Applications Conference. ACSAC ’24. New York, NY,
+USA: Association for Computing Machinery, 2024.
+#+end_quote
+
+*Ph.D. Thesis*
+
+This project is also part of my Ph.D. Thesis, not yet published.
+
+*Repositories*
+
+This repository mainly contains source code and small demos. However, the full
+project is composed of:
+- [[https://github.com/pierreay/screaming_channels_data][screaming_channels_data]] :: Holds datasets and experiments -- signals,
+  profiles, scripts.
+- [[https://github.com/pierreay/screaming_channels_paper][screaming_channels_paper]] :: Holds the aforementioned paper source code.
+- [[https://github.com/pierreay/screaming_channels_poc][screaming_channels_poc]] :: Holds custom version of the Screaming Channels
+  project, on which this one is based on. All credits goes to [[https://github.com/eurecom-s3/screaming_channels][EURECOM]].
+
+* Reproducing
+
+Here are some hints about reproducing our results. More precise instructions
+can be found in the documentation (see =docs=). More precise demonstrations can
+be found in the experiments (see =screaming_channels_data=).
+
+** Dependencies for Recording
+
+*Software*
+
+Libraries:
+- [[https://github.com/pothosware/SoapySDR][SoapySDR]] :: The library for recording I/Q samples with an SDR.
+- [[https://github.com/pierreay/whad][WHAD]] :: A custom version of the framework for wireless hacking. All credits
+  goes to the [[https://github.com/whad-team/whad-client][WHAD team]].
+
+Firmware:
+- [[https://github.com/pierreay/butterfly][ButteRFly]] :: The attacker firmware. A custom version of the WHAD-enabled for
+  low-level traffic injection. All credits goes to the [[https://github.com/whad-team/butterfly][WHAD team]].
+- [[https://github.com/pierreay/screaming_channels_nimble.git][NimBLE]] :: The victim firmware. A custom version of the [[https://mynewt.apache.org/][Apache MyNewt BLE]]
+  firmware.
+
+*Hardware*
+
+- [[https://www.nordicsemi.com/Products/Development-hardware/nrf52840-dongle][nRF52840]] :: The attacker dongle.
+- [[https://www.nordicsemi.com/Products/Development-hardware/nRF52-DK][nRF52832 (PCA10040)]] :: The victim board.
+- SDR (/e.g./, [[https://greatscottgadgets.com/hackrf/one/][HackRF]], [[https://www.ettus.com/product-categories/usrp-bus-series/][USRP]]) :: The radio to record the leakage.
+
+** Dependencies for Attacking
+
+*Software*
+
+- [[https://github.com/pierreay/python_hel][Histogram-Enumeration Library (HEL)]] :: Key enumeration and estimation
+  library. All credits goes to [[https://github.com/giocamurati/python_hel][Giovanni Camurati]].
+- [[https://numpy.org/][Numpy]] :: Well-known Python scientific computation library.
+
+* Source code
+
+The source code is composed of utilities, libraries and individuals scripts.
+
+Most important files:
+- [[file:src/collect.sh][src/collect.sh]] :: Collect a complete dataset, leveraging =src/radio.py=.
+- [[file:src/dataset.py][src/dataset.py]] :: Perform multiprocessor dataset processing.
+- [[file:src/radio.py][src/radio.py]] :: Instrument the victim to make it scream and record the
+  leakage for one trace. Leverage =src/lib/soapysdr.py= for I/Q recording and
+  =src/lib/device.py= for victim instrumentation.
+- [[file:src/attack.py][src/attack.py]] :: Perform side-channel attacks on a dataset (/e.g./, CRA or
+  Template Attack).
+- [[file:src/lib/device.py][src/lib/device.py]] :: Victim instrumentation leveraging WHAD to manipulate BLE
+  parameters.
+- [[file:src/lib/soapysdr.py][src/lib/soapysdr.py]] :: Radio instrumentation leveraging SoapySDR to record
+  I/Q at the right time.
+- [[file:src/lib/analyze.py][src/lib/analyze.py]] :: Digital signal processing and statistics helpers.
+
+* Structure
+
+** Files
+
+- [[file:docs][docs]] :: Text documents and images.
+- [[file:src][src]] :: Source code.
+
