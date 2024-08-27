@@ -36,8 +36,9 @@ project is composed of:
 * Reproducing
 
 Here are some hints about reproducing our results. More precise instructions
-can be found in the documentation (see =docs=). More precise demonstrations can
-be found in the experiments (see =screaming_channels_data=).
+can be found in the Ph.D. manuscript and in the documentation (see =docs=).
+More precise demonstrations can be found in the experiments (see
+=screaming_channels_data=).
 
 ** Dependencies for Recording
 
@@ -71,6 +72,9 @@ Firmware:
 * Source code
 
 The source code is composed of utilities, libraries and individuals scripts.
+While the initial intention was to build a modular framework, the source code
+may be messy -- it is a research project. For more up-to-date tooling, see my
+other projects [[https://github.com/pierreay/soapyrx][SoapyRX]] and [[https://github.com/pierreay/scaff][SCAFF]].
 
 Most important files:
 - [[file:src/collect.sh][src/collect.sh]] :: Collect a complete dataset, leveraging =src/radio.py=.
