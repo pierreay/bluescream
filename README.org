@@ -46,11 +46,11 @@ More precise demonstrations can be found in the experiments (see
 
 Libraries:
 - [[https://github.com/pothosware/SoapySDR][SoapySDR]] :: The library for recording I/Q samples with an SDR.
-- [[https://github.com/pierreay/whad][WHAD]] :: A custom version of the framework for wireless hacking. All credits
+- [[https://github.com/pierreay/screaming_channels_whad][WHAD]] :: A custom version of the framework for wireless hacking. All credits
   goes to the [[https://github.com/whad-team/whad-client][WHAD team]].
 
 Firmware:
-- [[https://github.com/pierreay/butterfly][ButteRFly]] :: The attacker firmware. A custom version of the WHAD-enabled for
+- [[https://github.com/pierreay/screaming_channels_butterfly][ButteRFly]] :: The attacker firmware. A custom version of the WHAD-enabled for
   low-level traffic injection. All credits goes to the [[https://github.com/whad-team/butterfly][WHAD team]].
 - [[https://github.com/pierreay/screaming_channels_nimble.git][NimBLE]] :: The victim firmware. A custom version of the [[https://mynewt.apache.org/][Apache MyNewt BLE]]
   firmware.
