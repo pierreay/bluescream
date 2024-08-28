@@ -24,3 +24,68 @@ For both datasets, we will execute the following steps:
 1. Create a profile / template from a training subset to learn the leakage
    model.
 2. Leveraging the profile, attack using a Template Attack on an attack subset.
+
+* Setup
+
+First, we will setup necessary tools, downloading the code and the data.
+
+** Download
+
+Clone the "Screaming Channels on Bluetooth Low Energy" repository (10 MB):
+
+#+begin_src bash :eval never
+git clone https://github.com/pierreay/screaming_channels_ble/
+#+end_src
+
+** Installation
+
+Leveraging the =Dockerfile=, we will setup a temporary Docker container for
+reproducing the attacks. We will clean up the container at the end and no files
+will be left on your system.
+
+* Reproducing the attacks
+
+In the following, we assume that the reader is connected to the Docker
+container through SSH:
+
+#+begin_src bash
+XXX
+#+end_src
+
+The =$SC_SRC= variable is set to the path of the =screaming_channels_ble/src=
+directory, while the =$DATASET= variable will be set to the path of the
+currently analyzed dataset.
+
+** $A_{7}$
+
+** $A_{9}$
+
+Set the path to the dataset:
+
+#+begin_src bash :eval never
+export DATASET="${HOME}/git/screaming_channels_data/datasets/ble/240429_highdist_2lna_highgain_norep/raw"
+#+end_src
+
+Create the profile:
+
+#+begin_src bash :eval never
+"${SC_SRC}/attack.py" --dataset-path "${DATASET}" --custom-dtype --plot --no-save-images --norm --comptype AMPLITUDE \
+                      --num-traces 65000 --start-point 1100 --end-point 1650 \
+                      profile --pois-algo r --num-pois 1 --poi-spacing 1 --variable p_xor_k --align
+#+end_src
+
+Set the path to the created profile:
+
+#+begin_src bash :eval never
+export PROFILE=""
+#+end_src
+
+Attack using the created profile:
+
+#+begin_src bash :eval never
+"${SC_SRC}"/attack.py --dataset-path "${DATASET}" --custom-dtype --log --plot --norm --no-bruteforce --comptype AMPLITUDE \
+           --start-point 1020 --end-point 1570 --num-traces 40000 \
+           attack --attack-algo pcc --profile "${PROFILE}" --num-pois 1 --poi-spacing 1 --variable p_xor_k --align-attack --align-profile --no-align-profile-avg
+#+end_src
+
+* Clean
