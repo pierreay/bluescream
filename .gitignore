@@ -5,3 +5,6 @@ README.html
 __pycache__
 # Private files containing secrets.
 .envrc.private
+# Sentinel files.
+.dockerinit
+.datasetinit
