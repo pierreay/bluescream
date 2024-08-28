@@ -1,0 +1,685 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2024-08-28 mer. 21:35 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Screaming Channels on Bluetooth Low Energy &#x2013; ACSAC Artifact Evaluation</title>
+<meta name="author" content="Pierre AYOUB" />
+<meta name="generator" content="Org Mode" />
+<style type="text/css">
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+<link rel="stylesheet" type="text/css" href="/home/drac/git/org-css/docs/org.css"/>
+<script>
+  window.MathJax = {
+    tex: {
+      ams: {
+        multlineWidth: '85%'
+      },
+      tags: 'ams',
+      tagSide: 'right',
+      tagIndent: '.8em'
+    },
+    chtml: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    svg: {
+      scale: 1.0,
+      displayAlign: 'center',
+      displayIndent: '0em'
+    },
+    output: {
+      font: 'mathjax-modern',
+      displayOverflow: 'overflow'
+    }
+  };
+</script>
+
+<script
+  id="MathJax-script"
+  async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js">
+</script>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">Screaming Channels on Bluetooth Low Energy &#x2013; ACSAC Artifact Evaluation</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orge414029">1. Introduction</a></li>
+<li><a href="#org10d458b">2. Setup</a>
+<ul>
+<li><a href="#orgd963c5a">2.1. Download</a></li>
+<li><a href="#orgdfe51ad">2.2. Installation</a></li>
+</ul>
+</li>
+<li><a href="#org93be060">3. Reproducing the attacks</a>
+<ul>
+<li><a href="#ID-e2c5de9d-1706-4b0f-8934-adc82876756d">3.1. Attacking \(A_{7}\)</a></li>
+<li><a href="#orgc0fbcbc">3.2. Attacking \(A_{9}\)</a></li>
+</ul>
+</li>
+<li><a href="#org3788d1e">4. Clean</a></li>
+<li><a href="#org6d1e4d5">5. Conclusion</a></li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orge414029" class="outline-2">
+<h2 id="orge414029"><span class="section-number-2">1.</span> Introduction</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+This guide will help you reproduce the main results of our paper. Note that
+this is a small part of our project. The full project can be found on GitHub at
+<a href="https://github.com/pierreay/screaming_channels_ble/"><code>pierreay/screaming_channel_ble</code></a>. A web version of this guide can also be found
+at <a href="https://github.com/pierreay/screaming_channels_ble/tree/main/docs/demo_20240828_acsac/README.org"><code>screaming_channels_ble/docs/demo_20240828_acsac/README.org</code></a>. We have
+published in open-access all of our data in the repository located at
+<a href="https://github.com/pierreay/screaming_channels_data/"><code>pierreay/screaming_channels_data</code></a>.
+</p>
+
+<p>
+To fully reproduce this attack, one would have to first acquire a dataset by:
+</p>
+<ol class="org-ol">
+<li>Flashing two firmware (the attacker dongle and the victim board) and
+installing the radio tooling.</li>
+<li>Setup the experimental setup, including the attacker host computer, the
+radio, the antenna and amplifiers, the dongle, the victim dongle.</li>
+<li>Performing a dataset collection (up to several days).</li>
+<li>Post-processing the dataset to extract the small AES leak amplitude trace
+from the large RAW I/Q signal.</li>
+</ol>
+
+<p>
+As you imagine, this is fairly complex and long without prior experience.
+Hence, in this guide, we provides two representative pre-processed datasets on
+which we can complete the second part of the attack. The \(A_x\) refer to the
+paper notation, while the long name refer to our data repository notation:
+</p>
+<dl class="org-dl">
+<dt>\(A_{7}\)</dt><dd><code>240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw</code></dd>
+<dt>\(A_{9}\)</dt><dd><code>240429_highdist_2lna_highgain_norep</code></dd>
+</dl>
+
+<p>
+Hence, we uploaded two representative and small datasets on Zenodo:
+</p>
+<blockquote>
+<p>
+Ayoub (2024) Screaming Channels on Bluetooth Low Energy, Zenodo. DOI:
+10.5281/zenodo.13384278. URL: <a href="https://zenodo.org/records/13384278">https://zenodo.org/records/13384278</a>
+</p>
+</blockquote>
+
+<p>
+For both datasets, we will execute the following steps:
+</p>
+<ol class="org-ol">
+<li>Create a profile (<i>i.e.</i>, a template) from a training subset to learn the
+leakage model.</li>
+<li>Leveraging the profile, attack using a Template Attack on an attack subset.</li>
+</ol>
+
+<p>
+While it is not mandatory, the <a href="https://github.com/pierreay/screaming_channels_ble/blob/main/docs/demo_20231014/README.org"><code>docs/demo_20231014/README.org</code></a> demo give a look
+at visualizing how traces and the AES leakage looks like.
+</p>
+</div>
+</div>
+<div id="outline-container-org10d458b" class="outline-2">
+<h2 id="org10d458b"><span class="section-number-2">2.</span> Setup</h2>
+<div class="outline-text-2" id="text-2">
+<p>
+First, we will setup necessary tools, downloading the code and the data.
+</p>
+</div>
+<div id="outline-container-orgd963c5a" class="outline-3">
+<h3 id="orgd963c5a"><span class="section-number-3">2.1.</span> Download</h3>
+<div class="outline-text-3" id="text-2-1">
+<p>
+Clone the "Screaming Channels on Bluetooth Low Energy" repository (~ 10 MB) in
+the directory of your choice:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">git clone https://github.com/pierreay/screaming_channels_ble/
+</pre>
+</div>
+
+<p>
+Moreover, manually download the two aforementioned datasets located at
+<a href="https://zenodo.org/records/13384278"><code>zenodo.org/records/13384278</code></a> which have been publicly uploaded on Zenodo (less
+than 2 GB).
+</p>
+</div>
+</div>
+<div id="outline-container-orgdfe51ad" class="outline-3">
+<h3 id="orgdfe51ad"><span class="section-number-3">2.2.</span> Installation</h3>
+<div class="outline-text-3" id="text-2-2">
+<p>
+We will setup a temporary Docker container for reproducing the attacks. Ensure
+that both <a href="https://www.docker.com/">Docker</a> and its <a href="https://docs.docker.com/build/concepts/overview/">buildx</a> builder are installed.
+</p>
+
+<p>
+First, move the downloaded datasets inside the Docker folder:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #91b9c7;">cd</span> screaming_channels_ble/docs/demo_20240828_acsac
+mv -t . /PATH/TO/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw.tar.bz2
+mv -t . /PATH/TO/240429_highdist_2lna_highgain_norep.tar.bz2
+</pre>
+</div>
+
+<p>
+Second, download and initialize the Docker image leveraging the <code>Dockerfile</code>:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">make build
+</pre>
+</div>
+
+<p>
+It will download around 2 GB and decompress the datasets that have been
+downloaded previously inside the container. The image and containers will be
+cleaned up at the end, no files will be left or modified on the host system.
+</p>
+
+<p>
+If you get an error like the following one:
+</p>
+
+<pre class="example" id="org2408f54">
+cp: cannot stat '/host/*.tar.bz2': No such file or directory
+</pre>
+
+<p>
+It means that the two datasets archives were not moved correctly to the
+Dockerfile directory and that the Docker container cannot access them.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org93be060" class="outline-2">
+<h2 id="org93be060"><span class="section-number-2">3.</span> Reproducing the attacks</h2>
+<div class="outline-text-2" id="text-3">
+<p>
+The Docker is now ready to be use. In the following, we assume that the reader
+is connected to the Docker container through SSH:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">make shell
+</pre>
+</div>
+
+<p>
+For the following command, the <code>$SC_SRC</code> variable is set to the path of the
+<code>screaming_channels_ble/src</code> directory, while the <code>$DATASET</code> variable will be
+set to the path of the currently analyzed dataset.
+</p>
+</div>
+<div id="outline-container-ID-e2c5de9d-1706-4b0f-8934-adc82876756d" class="outline-3">
+<h3 id="ID-e2c5de9d-1706-4b0f-8934-adc82876756d"><span class="section-number-3">3.1.</span> Attacking \(A_{7}\)</h3>
+<div class="outline-text-3" id="text-3-1">
+<p>
+This dataset correspond to the scenario with the non-instrumented firmware in
+the anechoic box.
+</p>
+
+<p>
+Set the path to the dataset:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #91b9c7;">export</span> <span style="color: #47ba99;">DATASET</span>=<span style="color: #fbaed2;">"/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw"</span>
+</pre>
+</div>
+
+<p>
+First, create the profile:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #fbaed2;">"${SC_SRC}/attack.py"</span> --dataset-path <span style="color: #fbaed2;">"${DATASET}"</span> --custom-dtype --plot <span style="color: #fbaed2;">\</span>
+                      --save-images --norm --comptype AMPLITUDE <span style="color: #fbaed2;">\</span>
+                      --num-traces 16384 --start-point 1000 --end-point 1500 <span style="color: #fbaed2;">\</span>
+                      profile --pois-algo r --num-pois 1 --poi-spacing 1 <span style="color: #fbaed2;">\</span>
+                      --variable p_xor_k --align
+</pre>
+</div>
+
+<p>
+Where non-obvious options means:
+</p>
+<dl class="org-dl">
+<dt>&#x2013;custom-dtype</dt><dd>Use a custom <code>dtype</code> instead of the default Numpy complex
+<code>dtype</code>, allowing to save disk space.</dd>
+<dt>&#x2013;norm</dt><dd>Normalize the traces after loading.</dd>
+<dt>&#x2013;start-point / &#x2013;end-point</dt><dd>Truncate the traces between those points.</dd>
+<dt>&#x2013;pois-algo</dt><dd>Use the \(k-\text{fold}\) \(\rho-\text{test}\) to find informative
+point of interests (PoIs).</dd>
+<dt>&#x2013;num-pois</dt><dd>Use only 1 PoI per subbytes.</dd>
+<dt>&#x2013;variable p<sub>xor</sub><sub>k</sub></dt><dd>Use the \(l = p \oplus k\) leakage variable, with \(p\) the
+plaintext and \(k\) the key.</dd>
+</dl>
+
+<p>
+At that point, a plot should open (if X11 forwarding is correctly configured
+with Docker) and the profile will be stored under <code>${DATASET}/profile</code>. If no
+plot appears, check that the profile has correctly been created by running:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">evince $<span style="color: #4EB8CA;">{</span><span style="color: #47ba99;">DATASET</span><span style="color: #4EB8CA;">}</span>/profile/*.pdf
+</pre>
+</div>
+
+<p>
+You should obtains plots similar to the following ones:
+</p>
+
+
+<div id="orgbceaab5" class="figure">
+<p><img src="gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png" alt="240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png" />
+</p>
+</div>
+
+<div id="orgdb96330" class="figure">
+<p><img src="gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png" alt="240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png" />
+</p>
+</div>
+<p>
+We will now attack using the created profile:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #fbaed2;">"${SC_SRC}"</span>/attack.py --dataset-path <span style="color: #fbaed2;">"${DATASET}"</span> --custom-dtype --log <span style="color: #fbaed2;">\</span>
+           --plot --norm --bruteforce --comptype AMPLITUDE <span style="color: #fbaed2;">\</span>
+           --start-point 1000 --end-point 1500 --num-traces 14900 <span style="color: #fbaed2;">\</span>
+           attack --attack-algo pcc --profile <span style="color: #fbaed2;">"${DATASET}/profile"</span> --num-pois 1 <span style="color: #fbaed2;">\</span>
+           --poi-spacing 1 --variable p_xor_k --align-attack --align-profile <span style="color: #fbaed2;">\</span>
+           --no-align-profile-avg
+</pre>
+</div>
+
+<p>
+The options are fairly similar to the previous command, except that we also
+specify to bruteforce the key at the end, and to re-perform a step of trace
+alignment. You should see this output:
+</p>
+
+<pre class="example" id="orgca15eb3">
+Best Key Guess:   7c   19   67   e4   41   65   da   6d   f5   18   32   f7   c5   f1   13   3e
+Known Key:        7f   18   67   e6   42   65   da   6f   f5   1b   32   f4   c6   f3   10   3e
+PGE:             002  001  000  003  001  000  000  003  000  003  000  003  002  002  001  000
+HD:              002  001  000  001  002  000  000  001  000  002  000  002  002  001  002  000
+SUCCESS:           0    0    1    0    0    1    1    0    1    0    1    0    0    0    0    1
+CORRECT BYTES: 6
+PGE MEAN:      1
+PGE MEDIAN:    1
+PGE MAX:       3
+HD SUM:        16
+
+Starting key ranking using HEL
+results rank estimation
+nb_bins = 512
+merge = 2
+Starting preprocessing
+Clearing memory
+min: 2^33.79125918
+actual rounded: 2^34.59872304
+max: 2^35.23080812
+time enum: 0.343729 seconds
+</pre>
+
+<p>
+Which means that this attack leads to an estimated key rank of \(2^{34}\), just
+as \(A_{7}\) in the paper.
+</p>
+
+<p>
+With the additional bruteforce, which took 1,5 hours running natively on my
+desktop computer but a little more inside the Docker container, you should
+obtain:
+</p>
+
+<pre class="example" id="orgfe9e925">
+Starting key enumeration using HEL
+Assuming that we know two plaintext/ciphertext pairs
+[...]
+Starting preprocessing
+current rank : 2^2.584962501
+current rank : 2^4.459431619
+[...]
+current rank : 2^33.13069245
+current rank : 2^34.11663176
+
+KEY FOUND!!!
+7f 18 67 e6 42 65 da 6f f5 1b 32 f4 c6 f3 10 3e
+</pre>
+
+<p>
+Which means we break the entire key!
+</p>
+</div>
+</div>
+<div id="outline-container-orgc0fbcbc" class="outline-3">
+<h3 id="orgc0fbcbc"><span class="section-number-3">3.2.</span> Attacking \(A_{9}\)</h3>
+<div class="outline-text-3" id="text-3-2">
+<p>
+This dataset correspond to the scenario with the non-instrumented firmware at a
+distance of 1.2 meter in an office environment. Since the steps are similar to
+the <a href="#ID-e2c5de9d-1706-4b0f-8934-adc82876756d">previous attack</a>, we will not detail the commands and options.
+</p>
+
+<p>
+First, create the profile:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #91b9c7;">export</span> <span style="color: #47ba99;">DATASET</span>=<span style="color: #fbaed2;">"/240429_highdist_2lna_highgain_norep/raw"</span>
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #fbaed2;">"${SC_SRC}/attack.py"</span> --dataset-path <span style="color: #fbaed2;">"${DATASET}"</span> --custom-dtype --plot <span style="color: #fbaed2;">\</span>
+                      --save-images --norm --comptype AMPLITUDE <span style="color: #fbaed2;">\</span>
+                      --num-traces 12000 --start-point 1100 --end-point 1650 <span style="color: #fbaed2;">\</span>
+                      profile --pois-algo r --num-pois 1 --poi-spacing 1 <span style="color: #fbaed2;">\</span>
+                      --variable p_xor_k --align
+</pre>
+</div>
+
+<div class="org-src-container">
+<pre class="src src-bash">evince $<span style="color: #4EB8CA;">{</span><span style="color: #47ba99;">DATASET</span><span style="color: #4EB8CA;">}</span>/profile/*.pdf
+</pre>
+</div>
+
+<p>
+You should obtains plots similar to the following ones:
+</p>
+
+
+<div id="org5498fc2" class="figure">
+<p><img src="gfx/240429_highdist_2lna_highgain_norep-pois.png" alt="240429_highdist_2lna_highgain_norep-pois.png" />
+</p>
+</div>
+
+<div id="org4b44804" class="figure">
+<p><img src="gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png" alt="240429_highdist_2lna_highgain_norep-profile-pois-0.png" />
+</p>
+</div>
+<p>
+Then, attack using the created profile:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash"><span style="color: #fbaed2;">"${SC_SRC}"</span>/attack.py --dataset-path <span style="color: #fbaed2;">"${DATASET}"</span> --custom-dtype --log <span style="color: #fbaed2;">\</span>
+           --plot --norm --no-bruteforce --comptype AMPLITUDE <span style="color: #fbaed2;">\</span>
+           --start-point 1020 --end-point 1570 --num-traces 40000 <span style="color: #fbaed2;">\</span>
+           attack --attack-algo pcc --profile <span style="color: #fbaed2;">"${DATASET}/profile"</span> --num-pois 1 <span style="color: #fbaed2;">\</span>
+           --poi-spacing 1 --variable p_xor_k --align-attack --align-profile <span style="color: #fbaed2;">\</span>
+           --no-align-profile-avg
+</pre>
+</div>
+
+<p>
+You should see this output:
+</p>
+
+<pre class="example" id="org00e5062">
+Best Key Guess:   a3   e3   69   9c   a9   2a   3f   46   f4   5f   11   5c   78   80   a6   4f
+Known Key:        ad   ef   6d   92   a8   29   32   40   f4   56   17   52   79   8d   a6   46
+PGE:             006  001  014  005  002  005  008  010  000  007  011  003  006  004  000  010
+HD:              003  002  001  003  001  002  003  002  000  002  002  003  001  003  000  002
+SUCCESS:           0    0    0    0    0    0    0    0    1    0    0    0    0    0    1    0
+CORRECT BYTES: 2
+PGE MEAN:      5
+PGE MEDIAN:    5
+PGE MAX:       14
+HD SUM:        30
+
+Starting key ranking using HEL
+results rank estimation
+nb_bins = 512
+merge = 2
+Starting preprocessing
+Clearing memory
+min: 2^55.02283544
+actual rounded: 2^60.13102936
+max: 2^62.56824053
+time enum: 0.196843 seconds
+</pre>
+
+<p>
+Which means that this attack leads to an estimated key rank of \(2^{60}\), just
+as \(A_{9}\) in the paper.
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org3788d1e" class="outline-2">
+<h2 id="org3788d1e"><span class="section-number-2">4.</span> Clean</h2>
+<div class="outline-text-2" id="text-4">
+<p>
+Finally, once the Docker container is exited, one may run the following to
+clean the image:
+</p>
+
+<div class="org-src-container">
+<pre class="src src-bash">make clean
+</pre>
+</div>
+</div>
+</div>
+<div id="outline-container-org6d1e4d5" class="outline-2">
+<h2 id="org6d1e4d5"><span class="section-number-2">5.</span> Conclusion</h2>
+<div class="outline-text-2" id="text-5">
+<p>
+In this demonstration, we reproduced the two most important results of the
+paper regarding attack performances. All other claims can also be reproduced by
+leveraging our full dataset repository, including scripts and data. Regarding
+the protocol manipulation part of the attack, a better solution would be to
+have an online platform allowing to replicate and extend such attacks. We are
+looking into this as future work.
+</p>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Pierre AYOUB</p>
+<p class="date">Created: 2024-08-28 mer. 21:35</p>
+<p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
+</div>
+</body>
+</html>
