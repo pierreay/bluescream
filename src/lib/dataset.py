@@ -73,25 +73,25 @@ class Dataset():
         return path.exists(Dataset.get_path_static(dir))
 
     @staticmethod
-    def pickle_load(dir, log=True, quit_on_error=False):
-        if not Dataset.is_pickable(dir):
+    def pickle_load(dir_path, log=True, quit_on_error=False):
+        if not Dataset.is_pickable(dir_path):
             if quit_on_error is True:
                 l.LOGGER.error("dataset doesn't exists!")
                 exit(-1)
             else:
                 return None
-        with open(Dataset.get_path_static(dir), "rb") as f:
+        with open(Dataset.get_path_static(dir_path), "rb") as f:
             pickled = pickle.load(f)
             assert(type(pickled) == Dataset)
-            pickled.dir = dir     # Update Dataset.dir (self.dir) when pickling.
-            pickled.dirsave = dir # Update Dataset.dirsave (self.dirsave) when pickling.
+            pickled.dir = dir_path     # Update Dataset.dir (self.dir) when pickling.
+            pickled.dirsave = dir_path # Update Dataset.dirsave (self.dirsave) when pickling.
         if pickled.train_set is not None:
             pickled.train_set.load_input()
         if pickled.attack_set is not None:
             pickled.attack_set.load_input()
         pickled.run_resumed = False
         if log is True:
-            l.LOGGER.info("Dataset loaded from '{}'".format(Dataset.get_path_static(dir)))
+            l.LOGGER.info("Dataset loaded from '{}'".format(Dataset.get_path_static(dir_path)))
         return pickled
 
     def get_path(self, save=False):
