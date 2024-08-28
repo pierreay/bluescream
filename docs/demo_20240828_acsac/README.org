@@ -23,16 +23,17 @@ To fully reproduce this attack, one would have to first acquire a dataset by:
    from the large RAW I/Q signal.
 
 As you imagine, this is fairly complex and long without prior experience.
-Hence, in this guide, we provides two already-processed datasets on which we
-can complete the second part of the attack:
+Hence, in this guide, we provides two representative pre-processed datasets on
+which we can complete the second part of the attack. The $A_x$ refer to the
+paper notation, while the long name refer to our data repository notation:
 - $A_{7}$ :: =240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw=
-- $A_{9}$ :: =240429_highdist_2lna_highgain_norep= (the $A2$ attack)
+- $A_{9}$ :: =240429_highdist_2lna_highgain_norep=
 
 # TODO: Add Zenodo submission.
 
 For both datasets, we will execute the following steps:
-1. Create a profile / template from a training subset to learn the leakage
-   model.
+1. Create a profile (/i.e./, a template) from a training subset to learn the
+   leakage model.
 2. Leveraging the profile, attack using a Template Attack on an attack subset.
 
 * Setup
