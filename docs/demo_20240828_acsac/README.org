@@ -170,7 +170,10 @@ The options are fairly similar to the previous command, except that we also
 specify to bruteforce the key at the end, and to re-perform a step of trace
 alignment. You should see this output:
 
+#+begin_export latex
 \scriptsize
+#+end_export
+
 #+begin_example
 Best Key Guess:   7c   19   67   e4   41   65   da   6d   f5   18   32   f7   c5   f1   13   3e
 Known Key:        7f   18   67   e6   42   65   da   6f   f5   1b   32   f4   c6   f3   10   3e
@@ -194,7 +197,10 @@ actual rounded: 2^34.59872304
 max: 2^35.23080812
 time enum: 0.343729 seconds
 #+end_example
+
+#+begin_export latex
 \normalsize
+#+end_export
 
 Which means that this attack leads to an estimated key rank of $2^{34}$, just
 as $A_{7}$ in the paper.
@@ -267,7 +273,10 @@ Then, attack using the created profile:
 
 You should see this output:
 
+#+begin_export latex
 \scriptsize
+#+end_export
+
 #+begin_example
 Best Key Guess:   a3   e3   69   9c   a9   2a   3f   46   f4   5f   11   5c   78   80   a6   4f
 Known Key:        ad   ef   6d   92   a8   29   32   40   f4   56   17   52   79   8d   a6   46
@@ -291,7 +300,10 @@ actual rounded: 2^60.13102936
 max: 2^62.56824053
 time enum: 0.196843 seconds
 #+end_example
+
+#+begin_export latex
 \normalsize
+#+end_export
 
 Which means that this attack leads to an estimated key rank of $2^{60}$, just
 as $A_{9}$ in the paper.
