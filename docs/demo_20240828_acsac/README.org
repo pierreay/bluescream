@@ -50,7 +50,8 @@ git clone https://github.com/pierreay/screaming_channels_ble/
 #+end_src
 
 Moreover, manually download the two aforementioned datasets which have been
-publicly uploaded on Zenodo, by following [[https://zenodo.org/records/13384278][this link]] (less than 2 GB).
+publicly uploaded on Zenodo (less than 2 GB), available at:
+[[https://zenodo.org/records/13384278]]
 
 ** Installation
 
