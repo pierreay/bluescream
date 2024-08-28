@@ -13,5 +13,5 @@ shell:
 
 # Clean our Docker images and containers.
 clean:
-	docker rmi -f ubuntu-screaming_channels_ble
+	docker rmi -f ubuntu-screaming_channels_ble:latest
 	rm .dockerinit
