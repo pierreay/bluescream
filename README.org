@@ -15,6 +15,12 @@ This repository is managed using [[https://git-annex.branchable.com/][git-annex]
 deduplicated and spread across 4 computers (=reaper=, =saren=, =wrex=,
 =citadel=) and 2 external mass storage devices (=garrus=, =novigrad=).
 
+A vary small part of this repository is uploaded on Zenodo. See:
+#+begin_quote
+Ayoub (2024) Screaming Channels on Bluetooth Low Energy, Zenodo. DOI:
+10.5281/zenodo.13384278. URL: https://zenodo.org/records/13384278
+#+end_quote
+
 * Structure
 
 - [[file:datasets][datasets]] :: Contains full [[id:98437a5b-5d86-4097-96b1-9a069fd30a79][datasets]] -- recorded using the Nimble stack (=ble=)
