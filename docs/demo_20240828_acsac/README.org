@@ -97,13 +97,21 @@ set to the path of the currently analyzed dataset.
 Set the path to the dataset:
 
 #+begin_src bash :eval never
-export DATASET="${HOME}/git/screaming_channels_data/datasets/ble/240429_highdist_2lna_highgain_norep/raw"
+export DATASET="/240429_highdist_2lna_highgain_norep/raw"
 #+end_src
 
-Create the profile:
+Create the profile, where the options means:
+- --custom-dtype :: Use a custom =dtype= instead of the default Numpy complex
+  =dtype=, allowing to save disk space.
+- --norm :: Normalize the traces after loading.
+- --start-point / --end-point :: Truncate the traces between those points.
+- --pois-algo :: Use the XXX test to find informative point of interests (PoIs).
+- --num-pois :: Use only 1 PoI per subbytes.
+- --variable p_xor_k :: Use the $l = p \oplus k$ leakage variable, with $p$ the
+  plaintext and $k$ the key.
 
 #+begin_src bash :eval never
-"${SC_SRC}/attack.py" --dataset-path "${DATASET}" --custom-dtype --plot --no-save-images --norm --comptype AMPLITUDE \
+"${SC_SRC}/attack.py" --dataset-path "${DATASET}" --custom-dtype --plot --save-images --norm --comptype AMPLITUDE \
                       --num-traces 65000 --start-point 1100 --end-point 1650 \
                       profile --pois-algo r --num-pois 1 --poi-spacing 1 --variable p_xor_k --align
 #+end_src
