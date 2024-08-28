@@ -20,6 +20,8 @@ can complete the second part of the attack:
 - $A_{7}$ :: =240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw=
 - $A_{9}$ :: =240429_highdist_2lna_highgain_norep= (the $A2$ attack)
 
+# TODO: Add Zenodo submission.
+
 For both datasets, we will execute the following steps:
 1. Create a profile / template from a training subset to learn the leakage
    model.
