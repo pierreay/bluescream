@@ -63,6 +63,15 @@ make build
 It will download around 2 GB. The image and containers will be cleaned up at
 the end, no files will be left or modified on the host system.
 
+If you get an error like the following one:
+
+#+begin_example
+cp: cannot stat '/host/*.tar.bz2': No such file or directory
+#+end_example
+
+It means that the two datasets archives were not moved correctly to the
+Dockerfile directory and that the Docker container cannot access them.
+
 * Reproducing the attacks
 
 The Docker is now ready to be use. In the following, we assume that the reader
