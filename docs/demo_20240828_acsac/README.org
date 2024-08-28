@@ -7,6 +7,12 @@ This guide will help you reproduce the main results of our paper. A web version
 can found at the following URL:
 https://github.com/pierreay/screaming_channels_ble/tree/main/docs/demo_20240828_acsac/README.org
 
+Note that this is a small part of our project. The full project can be found at:
+https://github.com/pierreay/screaming_channels_ble/
+
+We have published in open-access all of our data in the following repository:
+https://github.com/pierreay/screaming_channels_data/
+
 To fully reproduce this attack, one would have to first acquire a dataset by:
 1. Flashing two firmware (the attacker dongle and the victim board) and
    installing the radio tooling.
