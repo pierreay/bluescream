@@ -17,7 +17,10 @@ build: .datasetinit .dockerinit
 
 # Get a shell into the Docker container.
 shell:
-	docker run -it ubuntu-screaming_channels_ble /bin/bash
+	docker run -it \
+		--env=DISPLAY \
+		--net=host    \
+		ubuntu-screaming_channels_ble /bin/bash
 
 # Clean our Docker images and containers.
 clean:
