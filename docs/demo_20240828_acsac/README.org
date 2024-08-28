@@ -29,11 +29,7 @@ paper notation, while the long name refer to our data repository notation:
 - $A_{7}$ :: =240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw=
 - $A_{9}$ :: =240429_highdist_2lna_highgain_norep=
 
-Hence, we uploaded two representative and small datasets on Zenodo, available
-at the following:
-https://zenodo.org/records/13384278
-
-To cite this dataset:
+Hence, we uploaded two representative and small datasets on Zenodo:
 #+begin_quote
 Ayoub (2024) Screaming Channels on Bluetooth Low Energy, Zenodo. DOI:
 10.5281/zenodo.13384278. URL: https://zenodo.org/records/13384278
@@ -64,7 +60,7 @@ publicly uploaded on Zenodo (less than 2 GB), available at:
 ** Installation
 
 We will setup a temporary Docker container for reproducing the attacks. Ensure
-that both [[https://www.docker.com/][Docker]] and its [[https://docs.docker.com/build/concepts/overview/][buildx]] components are installed.
+that both [[https://www.docker.com/][Docker]] and its [[https://docs.docker.com/build/concepts/overview/][buildx]] builder are installed.
 
 First, move the downloaded datasets inside the Docker folder:
 
@@ -80,9 +76,9 @@ Second, download and initialize the Docker image leveraging the =Dockerfile=:
 make build
 #+end_src
 
-It will download around 2 GB and decompress the datasets that have downloaded
-previously inside the container. The image and containers will be cleaned up at
-the end, no files will be left or modified on the host system.
+It will download around 2 GB and decompress the datasets that have been
+downloaded previously inside the container. The image and containers will be
+cleaned up at the end, no files will be left or modified on the host system.
 
 If you get an error like the following one:
 
