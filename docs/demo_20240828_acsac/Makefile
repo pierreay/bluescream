@@ -8,4 +8,4 @@ shell:
 
 # Clean our Docker images and containers.
 clean:
-	docker rmi -f ubuntu:latest
+	docker rmi -f ubuntu:22.04
