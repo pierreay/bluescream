@@ -3,15 +3,12 @@
 
 * Introduction
 
-This guide will help you reproduce the main results of our paper. A web version
-can found at the following URL:
-https://github.com/pierreay/screaming_channels_ble/tree/main/docs/demo_20240828_acsac/README.org
-
-Note that this is a small part of our project. The full project can be found at:
-https://github.com/pierreay/screaming_channels_ble/
-
-We have published in open-access all of our data in the following repository:
-https://github.com/pierreay/screaming_channels_data/
+This guide will help you reproduce the main results of our paper. Note that
+this is a small part of our project. The full project can be found on GitHub at
+[[https://github.com/pierreay/screaming_channels_ble/][=pierreay/screaming_channel_ble=]]. A web version of this guide can also be found
+at [[https://github.com/pierreay/screaming_channels_ble/tree/main/docs/demo_20240828_acsac/README.org][=screaming_channels_ble/docs/demo_20240828_acsac/README.org=]]. We have
+published in open-access all of our data in the repository located at
+[[https://github.com/pierreay/screaming_channels_data/][=pierreay/screaming_channels_data=]].
 
 To fully reproduce this attack, one would have to first acquire a dataset by:
 1. Flashing two firmware (the attacker dongle and the victim board) and
@@ -105,7 +102,7 @@ For the following command, the =$SC_SRC= variable is set to the path of the
 =screaming_channels_ble/src= directory, while the =$DATASET= variable will be
 set to the path of the currently analyzed dataset.
 
-** $A_{7}$
+** Attacking $A_{7}$
 :PROPERTIES:
 :ID:       e2c5de9d-1706-4b0f-8934-adc82876756d
 :END:
@@ -210,7 +207,7 @@ KEY FOUND!!!
 
 Which means we break the entire key!
 
-** $A_{9}$
+** Attacking $A_{9}$
 
 This dataset correspond to the scenario with the non-instrumented firmware at a
 distance of 1.2 meter in an office environment. Since the steps are similar to
