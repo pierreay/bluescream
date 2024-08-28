@@ -20,7 +20,8 @@ RUN python3 setup.py install
 ENV PYTHONPATH=/screaming_channels_whad
 
 # Install the HEL project.
-RUN ${SC_SRC}/utils/install-hel.sh
+RUN chmod +x "$SC_SRC/utils/install-hel.sh"
+RUN "$SC_SRC/utils/install-hel.sh"
 
 # Get the datasets.
 WORKDIR /
