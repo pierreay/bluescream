@@ -118,7 +118,7 @@ Create the profile, where the options means:
 
 #+begin_src bash :eval never
 "${SC_SRC}/attack.py" --dataset-path "${DATASET}" --custom-dtype --plot --save-images --norm --comptype AMPLITUDE \
-                      --num-traces 65000 --start-point 1100 --end-point 1650 \
+                      --num-traces 12000 --start-point 1100 --end-point 1650 \
                       profile --pois-algo r --num-pois 1 --poi-spacing 1 --variable p_xor_k --align
 #+end_src
 
@@ -145,8 +145,31 @@ We will now attack using the created profile:
 You should see this output:
 
 #+begin_src bash :eval never
-XXX
+Best Key Guess:   a3   e3   69   9c   a9   2a   3f   46   f4   5f   11   5c   78   80   a6   4f
+Known Key:        ad   ef   6d   92   a8   29   32   40   f4   56   17   52   79   8d   a6   46
+PGE:             006  001  014  005  002  005  008  010  000  007  011  003  006  004  000  010
+HD:              003  002  001  003  001  002  003  002  000  002  002  003  001  003  000  002
+SUCCESS:           0    0    0    0    0    0    0    0    1    0    0    0    0    0    1    0
+CORRECT BYTES: 2
+PGE MEAN:      5
+PGE MEDIAN:    5
+PGE MAX:       14
+HD SUM:        30
+
+Starting key ranking using HEL
+results rank estimation
+nb_bins = 512
+merge = 2
+Starting preprocessing
+Clearing memory
+min: 2^55.02283544
+actual rounded: 2^60.13102936
+max: 2^62.56824053
+time enum: 0.196843 seconds
 #+end_src
+
+Which means that this attack leads to an estimated key rank of $2^{60}$, just
+as $A_{9}$ in the paper.
 
 * Clean
 
