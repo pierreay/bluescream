@@ -1,11 +1,17 @@
 # Create the Docker container from the image.
-build: .dockerinit
+build: .datasetinit .dockerinit
 
+# NOTE: When debugging this command, set progress to "plain" instead of "tty".
 .dockerinit:
-	docker build -t ubuntu-screaming_channels_ble .
-	docker run -v ${PWD}:/host ubuntu-screaming_channels_ble /bin/bash -c 'cd /host && cp -t $$SC_DOCKER /host/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw.tar.bz2'
-	docker run -v ${PWD}:/host ubuntu-screaming_channels_ble /bin/bash -c 'cd /host && cp -t $$SC_DOCKER /host/240429_highdist_2lna_highgain_norep.tar.bz2'
+	docker buildx build . -t ubuntu-screaming_channels_ble --progress tty
 	touch .dockerinit
+
+# Check that datasets have been downloaded in current directory.
+.datasetinit:
+	if [[ ! -f 240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw.tar.bz2 || ! -f 240429_highdist_2lna_highgain_norep.tar.bz2 ]]; then \
+		echo [ERROR] Missing datasets! && exit 1; \
+	fi	
+	touch .datasetinit
 
 # Get a shell into the Docker container.
 shell:
