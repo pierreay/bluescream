@@ -147,7 +147,7 @@ evince ${DATASET}/profile/*.pdf
 #+end_src
 
 You should obtains plots similar to the following ones:
-[[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png][gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois]]
+[[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png][gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png]]
 [[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png][gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png]]
 
 We will now attack using the created profile:
