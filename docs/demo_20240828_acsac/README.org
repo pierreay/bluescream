@@ -40,6 +40,9 @@ For both datasets, we will execute the following steps:
    leakage model.
 2. Leveraging the profile, attack using a Template Attack on an attack subset.
 
+While it is not mandatory, the reader may give a look at the [[https://github.com/pierreay/screaming_channels_ble/blob/main/docs/demo_20231014/README.org][20231014]] demo to
+visualize how traces and the AES leakage looks like.
+
 * Setup
 
 First, we will setup necessary tools, downloading the code and the data.
