@@ -3,10 +3,10 @@
 
 * Abstract
 
-This artifact consist of software and data, to reproduce the main results of
-the section 8.5 of our paper. The software is composed of Python source code
+This artifact consists of software and data to reproduce the main results of
+section 8.5 of our paper. The software is composed of Python source code
 and a C library. Everything is automated inside a Docker container, and
-dependencies as well as manual installation are referenced under the main
+dependencies and manual installation are referenced under the main
 project web page. The data mainly consists of Numpy arrays containing complex
 numbers representing I/Q data.
 
