@@ -10,18 +10,16 @@ RUN pip3 install setuptools numpy==2.0.0 click==8.1.7 matplotlib==3.9.2 colorlog
 ENV SC=/screaming_channels_ble
 ENV SC_SRC=/screaming_channels_ble/src
 ENV SC_DOCKER=/screaming_channels_ble/docs/demo_20240828_acsac
+WORKDIR /
 RUN test -d screaming_channels_ble && : || git clone https://github.com/pierreay/screaming_channels_ble.git
 
-# Get the datasets.
-RUN --mount=type=bind,source=.,target=/host /bin/bash -c 'cd /host && cp -t $SC_DOCKER /host/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw.tar.bz2'
-RUN /bin/bash -c 'cd $SC_DOCKER && tar xvf 240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw.tar.bz2'
-RUN --mount=type=bind,source=.,target=/host /bin/bash -c 'cd /host && cp -t $SC_DOCKER /host/240429_highdist_2lna_highgain_norep.tar.bz2'
-RUN /bin/bash -c 'cd $SC_DOCKER && tar xvf 240429_highdist_2lna_highgain_norep.tar.bz2'
 # Install the WHAD project.
 RUN test -d screaming_channels_whad && : || git clone https://github.com/pierreay/screaming_channels_whad.git
 WORKDIR /screaming_channels_whad
 RUN python3 setup.py install
 ENV PYTHONPATH=/screaming_channels_whad
 
-# Move into it.
-# WORKDIR "${SC}"
+# Get the datasets.
+WORKDIR /
+RUN --mount=type=bind,source=.,target=/host /bin/bash -c 'tar xjvf /host/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw.tar.bz2 -C /'
+RUN --mount=type=bind,source=.,target=/host /bin/bash -c 'tar xjvf /host/240429_highdist_2lna_highgain_norep.tar.bz2 -C /'
