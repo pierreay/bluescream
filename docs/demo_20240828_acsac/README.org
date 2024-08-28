@@ -29,7 +29,15 @@ paper notation, while the long name refer to our data repository notation:
 - $A_{7}$ :: =240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw=
 - $A_{9}$ :: =240429_highdist_2lna_highgain_norep=
 
-# TODO: Add Zenodo submission.
+Hence, we uploaded two representative and small datasets on Zenodo, available
+at the following:
+https://zenodo.org/records/13384278
+
+To cite this dataset:
+#+begin_quote
+Ayoub (2024) Screaming Channels on Bluetooth Low Energy, Zenodo. DOI:
+10.5281/zenodo.13384278. URL: https://zenodo.org/records/13384278
+#+end_quote
 
 For both datasets, we will execute the following steps:
 1. Create a profile (/i.e./, a template) from a training subset to learn the
