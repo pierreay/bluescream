@@ -100,7 +100,84 @@ set to the path of the currently analyzed dataset.
 
 ** $A_{7}$
 
+This dataset correspond to the scenario with the non-instrumented firmware in
+the anechoic box.
+
+#+begin_src bash :eval never
+export DATASET="/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw"
+#+end_src
+
+#+begin_src bash :eval never
+"${SC_SRC}/attack.py" --dataset-path "${DATASET}" --custom-dtype --plot --save-images --norm --comptype AMPLITUDE \
+                      --num-traces 16384 --start-point 1000 --end-point 1500 \
+                      profile --pois-algo r --num-pois 1 --poi-spacing 1 --variable p_xor_k --align
+#+end_src
+
+#+begin_src bash :eval never
+evince ${DATASET}/profile/*.pdf
+#+end_src
+
+[[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png][240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois]]
+[[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png][240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png]]
+
+#+begin_src bash :eval never
+"${SC_SRC}"/attack.py --dataset-path "${DATASET}" --custom-dtype --log --plot --norm --bruteforce --comptype AMPLITUDE \
+           --start-point 1000 --end-point 1500 --num-traces 14900 \
+           attack --attack-algo pcc --profile "${DATASET}/profile" --num-pois 1 --poi-spacing 1 --variable p_xor_k --align-attack --align-profile --no-align-profile-avg
+#+end_src
+
+#+begin_example
+Best Key Guess:   7c   19   67   e4   41   65   da   6d   f5   18   32   f7   c5   f1   13   3e
+Known Key:        7f   18   67   e6   42   65   da   6f   f5   1b   32   f4   c6   f3   10   3e
+PGE:             002  001  000  003  001  000  000  003  000  003  000  003  002  002  001  000
+HD:              002  001  000  001  002  000  000  001  000  002  000  002  002  001  002  000
+SUCCESS:           0    0    1    0    0    1    1    0    1    0    1    0    0    0    0    1
+CORRECT BYTES: 6
+PGE MEAN:      1
+PGE MEDIAN:    1
+PGE MAX:       3
+HD SUM:        16
+
+Starting key ranking using HEL
+results rank estimation
+nb_bins = 512
+merge = 2
+Starting preprocessing
+Clearing memory
+min: 2^33.79125918
+actual rounded: 2^34.59872304
+max: 2^35.23080812
+time enum: 0.343729 seconds
+#+end_example
+
+Which means that this attack leads to an estimated key rank of $2^{34}$, just
+as $A_{7}$ in the paper.
+
+With the additional bruteforce, which took 1,5 hours running natively on my
+desktop computer but several hours inside the Docker container, you should
+obtain:
+
+#+begin_example
+Starting key enumeration using HEL
+Assuming that we know two plaintext/ciphertext pairs
+[...]
+Starting preprocessing
+current rank : 2^2.584962501
+current rank : 2^4.459431619
+[...]
+current rank : 2^33.13069245
+current rank : 2^34.11663176
+
+KEY FOUND!!!
+7f 18 67 e6 42 65 da 6f f5 1b 32 f4 c6 f3 10 3e
+#+end_example
+
+Which means we break the entire key!
+
 ** $A_{9}$
+
+This dataset correspond to the scenario with the non-instrumented firmware at a
+distance of 1.2 meter in an office environment.
 
 Set the path to the dataset:
 
@@ -146,7 +223,7 @@ We will now attack using the created profile:
 
 You should see this output:
 
-#+begin_src bash :eval never
+#+begin_example
 Best Key Guess:   a3   e3   69   9c   a9   2a   3f   46   f4   5f   11   5c   78   80   a6   4f
 Known Key:        ad   ef   6d   92   a8   29   32   40   f4   56   17   52   79   8d   a6   46
 PGE:             006  001  014  005  002  005  008  010  000  007  011  003  006  004  000  010
@@ -168,7 +245,7 @@ min: 2^55.02283544
 actual rounded: 2^60.13102936
 max: 2^62.56824053
 time enum: 0.196843 seconds
-#+end_src
+#+end_example
 
 Which means that this attack leads to an estimated key rank of $2^{60}$, just
 as $A_{9}$ in the paper.
