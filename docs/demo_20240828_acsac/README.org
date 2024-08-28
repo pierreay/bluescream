@@ -130,22 +130,22 @@ plot appears, check that the profile has correctly been created by running:
 evince ${DATASET}/profile/*.pdf
 #+end_src
 
-You should obtains plots similar to
-[[file:gfx/240429_highdist_2lna_highgain_norep-pois.png][gfx/240429_highdist_2lna_highgain_norep-pois.png]] and
-[[file:gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png][gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png]].
+You should obtains plots similar to the following ones:
+[[file:gfx/240429_highdist_2lna_highgain_norep-pois.png][gfx/240429_highdist_2lna_highgain_norep-pois.png]]
+[[file:gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png][gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png]]
 
-Set the path to the created profile:
-
-#+begin_src bash :eval never
-export PROFILE=""
-#+end_src
-
-Attack using the created profile:
+We will now attack using the created profile:
 
 #+begin_src bash :eval never
 "${SC_SRC}"/attack.py --dataset-path "${DATASET}" --custom-dtype --log --plot --norm --no-bruteforce --comptype AMPLITUDE \
            --start-point 1020 --end-point 1570 --num-traces 40000 \
-           attack --attack-algo pcc --profile "${PROFILE}" --num-pois 1 --poi-spacing 1 --variable p_xor_k --align-attack --align-profile --no-align-profile-avg
+           attack --attack-algo pcc --profile "${DATASET}/profile" --num-pois 1 --poi-spacing 1 --variable p_xor_k --align-attack --align-profile --no-align-profile-avg
+#+end_src
+
+You should see this output:
+
+#+begin_src bash :eval never
+XXX
 #+end_src
 
 * Clean
