@@ -3,7 +3,7 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
-<!-- 2024-08-28 mer. 21:35 -->
+<!-- 2024-08-28 mer. 21:47 -->
 <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Screaming Channels on Bluetooth Low Energy &#x2013; ACSAC Artifact Evaluation</title>
@@ -234,27 +234,41 @@
 <h2>Table of Contents</h2>
 <div id="text-table-of-contents" role="doc-toc">
 <ul>
-<li><a href="#orge414029">1. Introduction</a></li>
-<li><a href="#org10d458b">2. Setup</a>
+<li><a href="#org680a8bf">1. Abstract</a></li>
+<li><a href="#org44d8de1">2. Overview</a></li>
+<li><a href="#orgc52f509">3. Setup</a>
 <ul>
-<li><a href="#orgd963c5a">2.1. Download</a></li>
-<li><a href="#orgdfe51ad">2.2. Installation</a></li>
+<li><a href="#org2909db0">3.1. Download</a></li>
+<li><a href="#orgc65796b">3.2. Installation</a></li>
 </ul>
 </li>
-<li><a href="#org93be060">3. Reproducing the attacks</a>
+<li><a href="#orge86cb60">4. Reproducing the attacks</a>
 <ul>
-<li><a href="#ID-e2c5de9d-1706-4b0f-8934-adc82876756d">3.1. Attacking \(A_{7}\)</a></li>
-<li><a href="#orgc0fbcbc">3.2. Attacking \(A_{9}\)</a></li>
+<li><a href="#ID-e2c5de9d-1706-4b0f-8934-adc82876756d">4.1. Attacking \(A_{7}\)</a></li>
+<li><a href="#org59f986f">4.2. Attacking \(A_{9}\)</a></li>
 </ul>
 </li>
-<li><a href="#org3788d1e">4. Clean</a></li>
-<li><a href="#org6d1e4d5">5. Conclusion</a></li>
+<li><a href="#orge826b12">5. Clean</a></li>
+<li><a href="#org7c322c2">6. Conclusion</a></li>
 </ul>
 </div>
 </div>
-<div id="outline-container-orge414029" class="outline-2">
-<h2 id="orge414029"><span class="section-number-2">1.</span> Introduction</h2>
+<div id="outline-container-org680a8bf" class="outline-2">
+<h2 id="org680a8bf"><span class="section-number-2">1.</span> Abstract</h2>
 <div class="outline-text-2" id="text-1">
+<p>
+This artifact consist of software and data, to reproduce the main results of
+the section 8.5 of our paper. The software is composed of Python source code
+and a C library. Everything is automated inside a Docker container, and
+dependencies as well as manual installation are referenced under the main
+project web page. The data mainly consists of Numpy arrays containing complex
+numbers representing I/Q data.
+</p>
+</div>
+</div>
+<div id="outline-container-org44d8de1" class="outline-2">
+<h2 id="org44d8de1"><span class="section-number-2">2.</span> Overview</h2>
+<div class="outline-text-2" id="text-2">
 <p>
 This guide will help you reproduce the main results of our paper. Note that
 this is a small part of our project. The full project can be found on GitHub at
@@ -313,16 +327,16 @@ at visualizing how traces and the AES leakage looks like.
 </p>
 </div>
 </div>
-<div id="outline-container-org10d458b" class="outline-2">
-<h2 id="org10d458b"><span class="section-number-2">2.</span> Setup</h2>
-<div class="outline-text-2" id="text-2">
+<div id="outline-container-orgc52f509" class="outline-2">
+<h2 id="orgc52f509"><span class="section-number-2">3.</span> Setup</h2>
+<div class="outline-text-2" id="text-3">
 <p>
 First, we will setup necessary tools, downloading the code and the data.
 </p>
 </div>
-<div id="outline-container-orgd963c5a" class="outline-3">
-<h3 id="orgd963c5a"><span class="section-number-3">2.1.</span> Download</h3>
-<div class="outline-text-3" id="text-2-1">
+<div id="outline-container-org2909db0" class="outline-3">
+<h3 id="org2909db0"><span class="section-number-3">3.1.</span> Download</h3>
+<div class="outline-text-3" id="text-3-1">
 <p>
 Clone the "Screaming Channels on Bluetooth Low Energy" repository (~ 10 MB) in
 the directory of your choice:
@@ -340,9 +354,9 @@ than 2 GB).
 </p>
 </div>
 </div>
-<div id="outline-container-orgdfe51ad" class="outline-3">
-<h3 id="orgdfe51ad"><span class="section-number-3">2.2.</span> Installation</h3>
-<div class="outline-text-3" id="text-2-2">
+<div id="outline-container-orgc65796b" class="outline-3">
+<h3 id="orgc65796b"><span class="section-number-3">3.2.</span> Installation</h3>
+<div class="outline-text-3" id="text-3-2">
 <p>
 We will setup a temporary Docker container for reproducing the attacks. Ensure
 that both <a href="https://www.docker.com/">Docker</a> and its <a href="https://docs.docker.com/build/concepts/overview/">buildx</a> builder are installed.
@@ -378,7 +392,7 @@ cleaned up at the end, no files will be left or modified on the host system.
 If you get an error like the following one:
 </p>
 
-<pre class="example" id="org2408f54">
+<pre class="example" id="orgb587c12">
 cp: cannot stat '/host/*.tar.bz2': No such file or directory
 </pre>
 
@@ -389,9 +403,9 @@ Dockerfile directory and that the Docker container cannot access them.
 </div>
 </div>
 </div>
-<div id="outline-container-org93be060" class="outline-2">
-<h2 id="org93be060"><span class="section-number-2">3.</span> Reproducing the attacks</h2>
-<div class="outline-text-2" id="text-3">
+<div id="outline-container-orge86cb60" class="outline-2">
+<h2 id="orge86cb60"><span class="section-number-2">4.</span> Reproducing the attacks</h2>
+<div class="outline-text-2" id="text-4">
 <p>
 The Docker is now ready to be use. In the following, we assume that the reader
 is connected to the Docker container through SSH:
@@ -409,8 +423,8 @@ set to the path of the currently analyzed dataset.
 </p>
 </div>
 <div id="outline-container-ID-e2c5de9d-1706-4b0f-8934-adc82876756d" class="outline-3">
-<h3 id="ID-e2c5de9d-1706-4b0f-8934-adc82876756d"><span class="section-number-3">3.1.</span> Attacking \(A_{7}\)</h3>
-<div class="outline-text-3" id="text-3-1">
+<h3 id="ID-e2c5de9d-1706-4b0f-8934-adc82876756d"><span class="section-number-3">4.1.</span> Attacking \(A_{7}\)</h3>
+<div class="outline-text-3" id="text-4-1">
 <p>
 This dataset correspond to the scenario with the non-instrumented firmware in
 the anechoic box.
@@ -469,12 +483,12 @@ You should obtains plots similar to the following ones:
 </p>
 
 
-<div id="orgbceaab5" class="figure">
+<div id="orgb310442" class="figure">
 <p><img src="gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png" alt="240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png" />
 </p>
 </div>
 
-<div id="orgdb96330" class="figure">
+<div id="org754ebf9" class="figure">
 <p><img src="gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png" alt="240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png" />
 </p>
 </div>
@@ -498,7 +512,7 @@ specify to bruteforce the key at the end, and to re-perform a step of trace
 alignment. You should see this output:
 </p>
 
-<pre class="example" id="orgca15eb3">
+<pre class="example" id="org95bc48a">
 Best Key Guess:   7c   19   67   e4   41   65   da   6d   f5   18   32   f7   c5   f1   13   3e
 Known Key:        7f   18   67   e6   42   65   da   6f   f5   1b   32   f4   c6   f3   10   3e
 PGE:             002  001  000  003  001  000  000  003  000  003  000  003  002  002  001  000
@@ -533,7 +547,7 @@ desktop computer but a little more inside the Docker container, you should
 obtain:
 </p>
 
-<pre class="example" id="orgfe9e925">
+<pre class="example" id="org771d5f2">
 Starting key enumeration using HEL
 Assuming that we know two plaintext/ciphertext pairs
 [...]
@@ -553,9 +567,9 @@ Which means we break the entire key!
 </p>
 </div>
 </div>
-<div id="outline-container-orgc0fbcbc" class="outline-3">
-<h3 id="orgc0fbcbc"><span class="section-number-3">3.2.</span> Attacking \(A_{9}\)</h3>
-<div class="outline-text-3" id="text-3-2">
+<div id="outline-container-org59f986f" class="outline-3">
+<h3 id="org59f986f"><span class="section-number-3">4.2.</span> Attacking \(A_{9}\)</h3>
+<div class="outline-text-3" id="text-4-2">
 <p>
 This dataset correspond to the scenario with the non-instrumented firmware at a
 distance of 1.2 meter in an office environment. Since the steps are similar to
@@ -590,12 +604,12 @@ You should obtains plots similar to the following ones:
 </p>
 
 
-<div id="org5498fc2" class="figure">
+<div id="org2254dcd" class="figure">
 <p><img src="gfx/240429_highdist_2lna_highgain_norep-pois.png" alt="240429_highdist_2lna_highgain_norep-pois.png" />
 </p>
 </div>
 
-<div id="org4b44804" class="figure">
+<div id="orge1e0c79" class="figure">
 <p><img src="gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png" alt="240429_highdist_2lna_highgain_norep-profile-pois-0.png" />
 </p>
 </div>
@@ -617,7 +631,7 @@ Then, attack using the created profile:
 You should see this output:
 </p>
 
-<pre class="example" id="org00e5062">
+<pre class="example" id="org6e4d7ae">
 Best Key Guess:   a3   e3   69   9c   a9   2a   3f   46   f4   5f   11   5c   78   80   a6   4f
 Known Key:        ad   ef   6d   92   a8   29   32   40   f4   56   17   52   79   8d   a6   46
 PGE:             006  001  014  005  002  005  008  010  000  007  011  003  006  004  000  010
@@ -648,9 +662,9 @@ as \(A_{9}\) in the paper.
 </div>
 </div>
 </div>
-<div id="outline-container-org3788d1e" class="outline-2">
-<h2 id="org3788d1e"><span class="section-number-2">4.</span> Clean</h2>
-<div class="outline-text-2" id="text-4">
+<div id="outline-container-orge826b12" class="outline-2">
+<h2 id="orge826b12"><span class="section-number-2">5.</span> Clean</h2>
+<div class="outline-text-2" id="text-5">
 <p>
 Finally, once the Docker container is exited, one may run the following to
 clean the image:
@@ -662,9 +676,9 @@ clean the image:
 </div>
 </div>
 </div>
-<div id="outline-container-org6d1e4d5" class="outline-2">
-<h2 id="org6d1e4d5"><span class="section-number-2">5.</span> Conclusion</h2>
-<div class="outline-text-2" id="text-5">
+<div id="outline-container-org7c322c2" class="outline-2">
+<h2 id="org7c322c2"><span class="section-number-2">6.</span> Conclusion</h2>
+<div class="outline-text-2" id="text-6">
 <p>
 In this demonstration, we reproduced the two most important results of the
 paper regarding attack performances. All other claims can also be reproduced by
@@ -678,7 +692,7 @@ looking into this as future work.
 </div>
 <div id="postamble" class="status">
 <p class="author">Author: Pierre AYOUB</p>
-<p class="date">Created: 2024-08-28 mer. 21:35</p>
+<p class="date">Created: 2024-08-28 mer. 21:47</p>
 <p class="validation"><a href="https://validator.w3.org/check?uri=referer">Validate</a></p>
 </div>
 </body>
