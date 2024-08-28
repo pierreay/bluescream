@@ -11,9 +11,9 @@ project.
 
 * Usage
 
-This repository is managed using [[https://git-annex.branchable.com/][git-annex]]. The data is currently spread across
-4 computers (=reaper=, =saren=, =wrex=, =citadel=) and 2 external mass storage
-devices (=garrus=, =novigrad=).
+This repository is managed using [[https://git-annex.branchable.com/][git-annex]]. Around 400 GB of data is currently
+deduplicated and spread across 4 computers (=reaper=, =saren=, =wrex=,
+=citadel=) and 2 external mass storage devices (=garrus=, =novigrad=).
 
 * Structure
 
