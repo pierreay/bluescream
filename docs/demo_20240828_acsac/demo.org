@@ -31,17 +31,26 @@ First, we will setup necessary tools, downloading the code and the data.
 
 ** Download
 
-Clone the "Screaming Channels on Bluetooth Low Energy" repository (10 MB):
+Clone the "Screaming Channels on Bluetooth Low Energy" repository (~ 10 MB) in
+the directory of your choice and setup a environment variable to its path:
 
 #+begin_src bash :eval never
 git clone https://github.com/pierreay/screaming_channels_ble/
+export SC="$(realpath ./screaming_channels_ble)"
 #+end_src
 
 ** Installation
 
-Leveraging the =Dockerfile=, we will setup a temporary Docker container for
-reproducing the attacks. We will clean up the container at the end and no files
-will be left on your system.
+We will setup a temporary Docker container for reproducing the attacks. The
+image and containers will be cleaned up at the end, no files will be left or
+modified on the host system.
+
+Download and initialize the Docker image from the directory containing the
+=Dockerfile=:
+
+#+begin_src bash :eval never
+cd "${SC}/docs/demo_20240828_acsac" && make build
+#+end_src
 
 * Reproducing the attacks
 
