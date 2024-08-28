@@ -3,7 +3,9 @@
 
 * Introduction
 
-This guide will help you reproduce the main results of our paper.
+This guide will help you reproduce the main results of our paper. A web version
+can found at the following URL:
+https://github.com/pierreay/screaming_channels_ble/tree/main/docs/demo_20240828_acsac/README.org
 
 To fully reproduce this attack, one would have to first acquire a dataset by:
 1. Flashing two firmware (the attacker dongle and the victim board) and
