@@ -8,6 +8,19 @@
 
 List and manage datasets.
 
+#+CAPTION: Table of paper dataset
+| Paper dataset | Repository dataset (Attack number)                  |
+|---------------+-----------------------------------------------------|
+| A_1           | 240112_multi-leak-insub-1m-lna_avg                  |
+| A_2           | 240126_300-leak-insub-10cm-lna_avg                  |
+| A_3           | 240423_highdist_2lna_highgain (A0)                  |
+| A_4           | 240423_highdist_2lna_highgain (A5)                  |
+| A_5           | 240423_highdist_2lna_highgain (A7)                  |
+| A_6           | 240423_highdist_2lna_highgain (A9)                  |
+| A_7           | 240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw |
+| A_8           | 240403_1-leak-pairing-highdist-2.534e9-16e6_raw     |
+| A_9           | 240429_highdist_2lna_highgain_norep (A2)            |
+
 * PoC
 :PROPERTIES:
 :DIR:      poc
