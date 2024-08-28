@@ -37,8 +37,8 @@ For both datasets, we will execute the following steps:
    leakage model.
 2. Leveraging the profile, attack using a Template Attack on an attack subset.
 
-While it is not mandatory, the reader may give a look at the [[https://github.com/pierreay/screaming_channels_ble/blob/main/docs/demo_20231014/README.org][20231014]] demo to
-visualize how traces and the AES leakage looks like.
+While it is not mandatory, the [[https://github.com/pierreay/screaming_channels_ble/blob/main/docs/demo_20231014/README.org][=docs/demo_20231014/README.org=]] demo give a look
+at visualizing how traces and the AES leakage looks like.
 
 * Setup
 
@@ -53,9 +53,9 @@ the directory of your choice:
 git clone https://github.com/pierreay/screaming_channels_ble/
 #+end_src
 
-Moreover, manually download the two aforementioned datasets which have been
-publicly uploaded on Zenodo (less than 2 GB), available at:
-[[https://zenodo.org/records/13384278]]
+Moreover, manually download the two aforementioned datasets located at
+[[https://zenodo.org/records/13384278][=zenodo.org/records/13384278=]] which have been publicly uploaded on Zenodo (less
+than 2 GB).
 
 ** Installation
 
@@ -119,9 +119,11 @@ export DATASET="/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw"
 First, create the profile:
 
 #+begin_src bash :eval never
-"${SC_SRC}/attack.py" --dataset-path "${DATASET}" --custom-dtype --plot --save-images --norm --comptype AMPLITUDE \
+"${SC_SRC}/attack.py" --dataset-path "${DATASET}" --custom-dtype --plot \
+                      --save-images --norm --comptype AMPLITUDE \
                       --num-traces 16384 --start-point 1000 --end-point 1500 \
-                      profile --pois-algo r --num-pois 1 --poi-spacing 1 --variable p_xor_k --align
+                      profile --pois-algo r --num-pois 1 --poi-spacing 1 \
+                      --variable p_xor_k --align
 #+end_src
 
 Where non-obvious options means:
@@ -129,13 +131,13 @@ Where non-obvious options means:
   =dtype=, allowing to save disk space.
 - --norm :: Normalize the traces after loading.
 - --start-point / --end-point :: Truncate the traces between those points.
-- --pois-algo :: Use the $k$-fold $\rho$-test test to find informative point of
-  interests (PoIs).
+- --pois-algo :: Use the $k-\text{fold}$ $\rho-\text{test}$ to find informative
+  point of interests (PoIs).
 - --num-pois :: Use only 1 PoI per subbytes.
 - --variable p_xor_k :: Use the $l = p \oplus k$ leakage variable, with $p$ the
   plaintext and $k$ the key.
 
-At the point, a plot should open (if X11 forwarding is correctly configured
+At that point, a plot should open (if X11 forwarding is correctly configured
 with Docker) and the profile will be stored under =${DATASET}/profile=. If no
 plot appears, check that the profile has correctly been created by running:
 
@@ -144,21 +146,31 @@ evince ${DATASET}/profile/*.pdf
 #+end_src
 
 You should obtains plots similar to the following ones:
-[[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png][gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png]]
-[[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png][gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png]]
+
+# [[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png][gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png]]
+[[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png]]
+#+CAPTION: PoI detection
+
+# [[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png][gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png]]
+[[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png]]
+#+CAPTION: Leakage model for each subbytes
 
 We will now attack using the created profile:
 
 #+begin_src bash :eval never
-"${SC_SRC}"/attack.py --dataset-path "${DATASET}" --custom-dtype --log --plot --norm --bruteforce --comptype AMPLITUDE \
+"${SC_SRC}"/attack.py --dataset-path "${DATASET}" --custom-dtype --log \
+           --plot --norm --bruteforce --comptype AMPLITUDE \
            --start-point 1000 --end-point 1500 --num-traces 14900 \
-           attack --attack-algo pcc --profile "${DATASET}/profile" --num-pois 1 --poi-spacing 1 --variable p_xor_k --align-attack --align-profile --no-align-profile-avg
+           attack --attack-algo pcc --profile "${DATASET}/profile" --num-pois 1 \
+           --poi-spacing 1 --variable p_xor_k --align-attack --align-profile \
+           --no-align-profile-avg
 #+end_src
 
 The options are fairly similar to the previous command, except that we also
 specify to bruteforce the key at the end, and to re-perform a step of trace
 alignment. You should see this output:
 
+\scriptsize
 #+begin_example
 Best Key Guess:   7c   19   67   e4   41   65   da   6d   f5   18   32   f7   c5   f1   13   3e
 Known Key:        7f   18   67   e6   42   65   da   6f   f5   1b   32   f4   c6   f3   10   3e
@@ -182,6 +194,7 @@ actual rounded: 2^34.59872304
 max: 2^35.23080812
 time enum: 0.343729 seconds
 #+end_example
+\normalsize
 
 Which means that this attack leads to an estimated key rank of $2^{34}$, just
 as $A_{7}$ in the paper.
@@ -220,9 +233,11 @@ export DATASET="/240429_highdist_2lna_highgain_norep/raw"
 #+end_src
 
 #+begin_src bash :eval never
-"${SC_SRC}/attack.py" --dataset-path "${DATASET}" --custom-dtype --plot --save-images --norm --comptype AMPLITUDE \
+"${SC_SRC}/attack.py" --dataset-path "${DATASET}" --custom-dtype --plot \
+                      --save-images --norm --comptype AMPLITUDE \
                       --num-traces 12000 --start-point 1100 --end-point 1650 \
-                      profile --pois-algo r --num-pois 1 --poi-spacing 1 --variable p_xor_k --align
+                      profile --pois-algo r --num-pois 1 --poi-spacing 1 \
+                      --variable p_xor_k --align
 #+end_src
 
 #+begin_src bash :eval never
@@ -230,19 +245,29 @@ evince ${DATASET}/profile/*.pdf
 #+end_src
 
 You should obtains plots similar to the following ones:
-[[file:gfx/240429_highdist_2lna_highgain_norep-pois.png][gfx/240429_highdist_2lna_highgain_norep-pois.png]]
-[[file:gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png][gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png]]
+
+# [[file:gfx/240429_highdist_2lna_highgain_norep-pois.png][gfx/240429_highdist_2lna_highgain_norep-pois.png]]
+[[file:gfx/240429_highdist_2lna_highgain_norep-pois.png]]
+#+CAPTION: PoI detection
+
+# [[file:gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png][gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png]]
+[[file:gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png]]
+#+CAPTION: Leakage model for each subbytes
 
 Then, attack using the created profile:
 
 #+begin_src bash :eval never
-"${SC_SRC}"/attack.py --dataset-path "${DATASET}" --custom-dtype --log --plot --norm --no-bruteforce --comptype AMPLITUDE \
+"${SC_SRC}"/attack.py --dataset-path "${DATASET}" --custom-dtype --log \
+           --plot --norm --no-bruteforce --comptype AMPLITUDE \
            --start-point 1020 --end-point 1570 --num-traces 40000 \
-           attack --attack-algo pcc --profile "${DATASET}/profile" --num-pois 1 --poi-spacing 1 --variable p_xor_k --align-attack --align-profile --no-align-profile-avg
+           attack --attack-algo pcc --profile "${DATASET}/profile" --num-pois 1 \
+           --poi-spacing 1 --variable p_xor_k --align-attack --align-profile \
+           --no-align-profile-avg
 #+end_src
 
 You should see this output:
 
+\scriptsize
 #+begin_example
 Best Key Guess:   a3   e3   69   9c   a9   2a   3f   46   f4   5f   11   5c   78   80   a6   4f
 Known Key:        ad   ef   6d   92   a8   29   32   40   f4   56   17   52   79   8d   a6   46
@@ -266,6 +291,7 @@ actual rounded: 2^60.13102936
 max: 2^62.56824053
 time enum: 0.196843 seconds
 #+end_example
+\normalsize
 
 Which means that this attack leads to an estimated key rank of $2^{60}$, just
 as $A_{9}$ in the paper.
@@ -278,3 +304,12 @@ clean the image:
 #+begin_src bash :eval never
 make clean
 #+end_src
+
+* Conclusion
+
+In this demonstration, we reproduced the two most important results of the
+paper regarding attack performances. All other claims can also be reproduced by
+leveraging our full dataset repository, including scripts and data. Regarding
+the protocol manipulation part of the attack, a better solution would be to
+have an online platform allowing to replicate and extend such attacks. We are
+looking into this as future work.
