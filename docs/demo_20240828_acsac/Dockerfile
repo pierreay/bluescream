@@ -17,6 +17,11 @@ RUN --mount=type=bind,source=.,target=/host /bin/bash -c 'cd /host && cp -t $SC_
 RUN /bin/bash -c 'cd $SC_DOCKER && tar xvf 240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw.tar.bz2'
 RUN --mount=type=bind,source=.,target=/host /bin/bash -c 'cd /host && cp -t $SC_DOCKER /host/240429_highdist_2lna_highgain_norep.tar.bz2'
 RUN /bin/bash -c 'cd $SC_DOCKER && tar xvf 240429_highdist_2lna_highgain_norep.tar.bz2'
+# Install the WHAD project.
+RUN test -d screaming_channels_whad && : || git clone https://github.com/pierreay/screaming_channels_whad.git
+WORKDIR /screaming_channels_whad
+RUN python3 setup.py install
+ENV PYTHONPATH=/screaming_channels_whad
 
 # Move into it.
 # WORKDIR "${SC}"
