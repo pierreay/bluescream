@@ -162,7 +162,7 @@ Which means that this attack leads to an estimated key rank of $2^{34}$, just
 as $A_{7}$ in the paper.
 
 With the additional bruteforce, which took 1,5 hours running natively on my
-desktop computer but several hours inside the Docker container, you should
+desktop computer but a little more inside the Docker container, you should
 obtain:
 
 #+begin_example
