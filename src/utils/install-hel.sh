@@ -3,7 +3,7 @@
 # Install the Histogram Enumeration Library (HEL) used for bruteforcing the key.
 
 # Install the dependencies.
-sudo apt-get install libntl-dev libgmp-dev
+sudo apt-get install -yq libntl-dev libgmp-dev
 # Clone the library.
 git clone https://github.com/pierreay/python_hel.git
 # Compile and install the C++ library using Intel's AES-NI instructions.
