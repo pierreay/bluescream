@@ -29,7 +29,6 @@ This repository mainly contains source code and small demos. However, the full
 project is composed of:
 - [[https://github.com/pierreay/screaming_channels_data][screaming_channels_data]] :: Holds datasets and experiments -- signals,
   profiles, scripts.
-- [[https://github.com/pierreay/screaming_channels_paper][screaming_channels_paper]] :: Holds the aforementioned paper source code.
 - [[https://github.com/pierreay/screaming_channels_poc][screaming_channels_poc]] :: Holds custom version of the Screaming Channels
   project, on which this one is based on. All credits goes to [[https://github.com/eurecom-s3/screaming_channels][EURECOM]].
 
