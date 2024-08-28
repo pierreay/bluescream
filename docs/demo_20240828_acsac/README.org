@@ -106,13 +106,20 @@ For the following command, the =$SC_SRC= variable is set to the path of the
 set to the path of the currently analyzed dataset.
 
 ** $A_{7}$
+:PROPERTIES:
+:ID:       e2c5de9d-1706-4b0f-8934-adc82876756d
+:END:
 
 This dataset correspond to the scenario with the non-instrumented firmware in
 the anechoic box.
 
+Set the path to the dataset:
+
 #+begin_src bash :eval never
 export DATASET="/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw"
 #+end_src
+
+First, create the profile:
 
 #+begin_src bash :eval never
 "${SC_SRC}/attack.py" --dataset-path "${DATASET}" --custom-dtype --plot --save-images --norm --comptype AMPLITUDE \
@@ -120,18 +127,40 @@ export DATASET="/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw"
                       profile --pois-algo r --num-pois 1 --poi-spacing 1 --variable p_xor_k --align
 #+end_src
 
+Where non-obvious options means:
+- --custom-dtype :: Use a custom =dtype= instead of the default Numpy complex
+  =dtype=, allowing to save disk space.
+- --norm :: Normalize the traces after loading.
+- --start-point / --end-point :: Truncate the traces between those points.
+- --pois-algo :: Use the $k$-fold $\rho$-test test to find informative point of
+  interests (PoIs).
+- --num-pois :: Use only 1 PoI per subbytes.
+- --variable p_xor_k :: Use the $l = p \oplus k$ leakage variable, with $p$ the
+  plaintext and $k$ the key.
+
+At the point, a plot should open (if X11 forwarding is correctly configured
+with Docker) and the profile will be stored under =${DATASET}/profile=. If no
+plot appears, check that the profile has correctly been created by running:
+
 #+begin_src bash :eval never
 evince ${DATASET}/profile/*.pdf
 #+end_src
 
-[[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png][240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois]]
-[[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png][240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png]]
+You should obtains plots similar to the following ones:
+[[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois.png][gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-pois]]
+[[file:gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png][gfx/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw-profile-pois-0.png]]
+
+We will now attack using the created profile:
 
 #+begin_src bash :eval never
 "${SC_SRC}"/attack.py --dataset-path "${DATASET}" --custom-dtype --log --plot --norm --bruteforce --comptype AMPLITUDE \
            --start-point 1000 --end-point 1500 --num-traces 14900 \
            attack --attack-algo pcc --profile "${DATASET}/profile" --num-pois 1 --poi-spacing 1 --variable p_xor_k --align-attack --align-profile --no-align-profile-avg
 #+end_src
+
+The options are fairly similar to the previous command, except that we also
+specify to bruteforce the key at the end, and to re-perform a step of trace
+alignment. You should see this output:
 
 #+begin_example
 Best Key Guess:   7c   19   67   e4   41   65   da   6d   f5   18   32   f7   c5   f1   13   3e
@@ -184,33 +213,20 @@ Which means we break the entire key!
 ** $A_{9}$
 
 This dataset correspond to the scenario with the non-instrumented firmware at a
-distance of 1.2 meter in an office environment.
+distance of 1.2 meter in an office environment. Since the steps are similar to
+the [[id:e2c5de9d-1706-4b0f-8934-adc82876756d][previous attack]], we will not detail the commands and options.
 
-Set the path to the dataset:
+First, create the profile:
 
 #+begin_src bash :eval never
 export DATASET="/240429_highdist_2lna_highgain_norep/raw"
 #+end_src
-
-Create the profile, where the options means:
-- --custom-dtype :: Use a custom =dtype= instead of the default Numpy complex
-  =dtype=, allowing to save disk space.
-- --norm :: Normalize the traces after loading.
-- --start-point / --end-point :: Truncate the traces between those points.
-- --pois-algo :: Use the XXX test to find informative point of interests (PoIs).
-- --num-pois :: Use only 1 PoI per subbytes.
-- --variable p_xor_k :: Use the $l = p \oplus k$ leakage variable, with $p$ the
-  plaintext and $k$ the key.
 
 #+begin_src bash :eval never
 "${SC_SRC}/attack.py" --dataset-path "${DATASET}" --custom-dtype --plot --save-images --norm --comptype AMPLITUDE \
                       --num-traces 12000 --start-point 1100 --end-point 1650 \
                       profile --pois-algo r --num-pois 1 --poi-spacing 1 --variable p_xor_k --align
 #+end_src
-
-At the point, a plot should open (if X11 forwarding is correctly configured
-with Docker) and the profile will be stored under =${DATASET}/profile=. If no
-plot appears, check that the profile has correctly been created by running:
 
 #+begin_src bash :eval never
 evince ${DATASET}/profile/*.pdf
@@ -220,7 +236,7 @@ You should obtains plots similar to the following ones:
 [[file:gfx/240429_highdist_2lna_highgain_norep-pois.png][gfx/240429_highdist_2lna_highgain_norep-pois.png]]
 [[file:gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png][gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png]]
 
-We will now attack using the created profile:
+Then, attack using the created profile:
 
 #+begin_src bash :eval never
 "${SC_SRC}"/attack.py --dataset-path "${DATASET}" --custom-dtype --log --plot --norm --no-bruteforce --comptype AMPLITUDE \
@@ -259,8 +275,8 @@ as $A_{9}$ in the paper.
 
 * Clean
 
-Once the Docker container is exited, one may run the following to clean the
-image:
+Finally, once the Docker container is exited, one may run the following to
+clean the image:
 
 #+begin_src bash :eval never
 make clean
