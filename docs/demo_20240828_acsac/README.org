@@ -111,7 +111,7 @@ Attack using the created profile:
 * Clean
 
 Once the Docker container is exited, one may run the following to clean the
-=ubuntu:22.04= image:
+image:
 
 #+begin_src bash :eval never
 make clean
