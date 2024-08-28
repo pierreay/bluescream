@@ -116,6 +116,18 @@ Create the profile, where the options means:
                       profile --pois-algo r --num-pois 1 --poi-spacing 1 --variable p_xor_k --align
 #+end_src
 
+At the point, a plot should open (if X11 forwarding is correctly configured
+with Docker) and the profile will be stored under =${DATASET}/profile=. If no
+plot appears, check that the profile has correctly been created by running:
+
+#+begin_src bash :eval never
+evince ${DATASET}/profile/*.pdf
+#+end_src
+
+You should obtains plots similar to
+[[file:gfx/240429_highdist_2lna_highgain_norep-pois.png][gfx/240429_highdist_2lna_highgain_norep-pois.png]] and
+[[file:gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png][gfx/240429_highdist_2lna_highgain_norep-profile-pois-0.png]].
+
 Set the path to the created profile:
 
 #+begin_src bash :eval never
