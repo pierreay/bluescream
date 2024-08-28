@@ -62,7 +62,8 @@ Second, download and initialize the Docker image leveraging the =Dockerfile=:
 make build
 #+end_src
 
-It will download around 2 GB. The image and containers will be cleaned up at
+It will download around 2 GB and decompress the datasets that have downloaded
+previously inside the container. The image and containers will be cleaned up at
 the end, no files will be left or modified on the host system.
 
 If you get an error like the following one:

@@ -14,7 +14,9 @@ RUN test -d screaming_channels_ble && : || git clone https://github.com/pierreay
 
 # Get the datasets.
 RUN --mount=type=bind,source=.,target=/host /bin/bash -c 'cd /host && cp -t $SC_DOCKER /host/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw.tar.bz2'
+RUN /bin/bash -c 'cd $SC_DOCKER && tar xvf 240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw.tar.bz2'
 RUN --mount=type=bind,source=.,target=/host /bin/bash -c 'cd /host && cp -t $SC_DOCKER /host/240429_highdist_2lna_highgain_norep.tar.bz2'
+RUN /bin/bash -c 'cd $SC_DOCKER && tar xvf 240429_highdist_2lna_highgain_norep.tar.bz2'
 
 # Move into it.
 # WORKDIR "${SC}"
