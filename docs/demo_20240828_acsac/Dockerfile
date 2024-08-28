@@ -19,6 +19,9 @@ WORKDIR /screaming_channels_whad
 RUN python3 setup.py install
 ENV PYTHONPATH=/screaming_channels_whad
 
+# Install the HEL project.
+RUN ${SC_SRC}/utils/install-hel.sh
+
 # Get the datasets.
 WORKDIR /
 RUN --mount=type=bind,source=.,target=/host /bin/bash -c 'tar xjvf /host/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw.tar.bz2 -C /'
