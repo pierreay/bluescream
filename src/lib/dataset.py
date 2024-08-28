@@ -12,6 +12,9 @@ import sys
 from tqdm import tqdm
 from tqdm.contrib.logging import logging_redirect_tqdm
 
+# Necessary because WHAD classes are dynamically stored in Subset object from device.py.
+import whad
+
 import lib.input_generators as input_generators
 import lib.load as load
 import lib.log as l
