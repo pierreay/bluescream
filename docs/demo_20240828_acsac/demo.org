@@ -1,0 +1,26 @@
+#+TITLE: Screaming Channels on Bluetooth Low Energy -- ACSAC Artifact Evaluation
+#+SETUPFILE: https://raw.githubusercontent.com/pierreay/orgcss/master/orgcss.setup
+
+* Introduction
+
+This guide will help you reproduce the main results of our paper.
+
+To fully reproduce this attack, one would have to first acquire a dataset by:
+1. Flashing two firmware (the attacker dongle and the victim board) and
+   installing the radio tooling.
+2. Setup the experimental setup, including the attacker host computer, the
+   radio, the antenna and amplifiers, the dongle, the victim dongle.
+3. Performing a dataset collection (up to several days).
+4. Post-processing the dataset to extract the small AES leak amplitude trace
+   from the large RAW I/Q signal.
+
+As you imagine, this is fairly complex and long without prior experience.
+Hence, in this guide, we provides two already-processed datasets on which we
+can complete the second part of the attack:
+- $A_{7}$ :: =240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw=
+- $A_{9}$ :: =240429_highdist_2lna_highgain_norep= (the $A2$ attack)
+
+For both datasets, we will execute the following steps:
+1. Create a profile / template from a training subset to learn the leakage
+   model.
+2. Leveraging the profile, attack using a Template Attack on an attack subset.
