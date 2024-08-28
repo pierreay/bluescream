@@ -2,9 +2,9 @@ FROM ubuntu:22.04 AS ubuntu-screaming_channels_ble
 # Automatically answer Yes for APT questions.
 ENV DEBIAN_FRONTEND=noninteractive
 
-# Update the system and install basic tools.
-RUN apt-get update && apt-get install -yq git vim python3-pip sudo wget unzip
-RUN pip3 install setuptools numpy==2.0.0
+# Update the system, install basic tools and required dependencies.
+RUN apt-get update && apt-get install -yq git vim python3-pip sudo wget unzip mupdf tmux soapysdr-tools python3-soapysdr
+RUN pip3 install setuptools numpy==2.0.0 click==8.1.7 matplotlib==3.9.2 colorlog==6.8.2 tqdm==4.66.5 scipy==1.14.1 statsmodels==0.14.2
 
 # Clone our project and create environment variables for it.
 ENV SC=/screaming_channels_ble
