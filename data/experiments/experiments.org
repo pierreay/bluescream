@@ -1,0 +1,233 @@
+:PROPERTIES:
+:ID:       f2d6b918-20f8-4410-ab60-1bb5707868bf
+:END:
+#+TITLE: Experiments
+#+SETUPFILE: https://raw.githubusercontent.com/pierreay/orgcss/master/orgcss.setup
+
+* About
+
+List and manage experiments.
+
+* Recordings
+
+Those directories contains various signals used in experiments.
+
+- [[file:240108_advertisement][240108_advertisement]] :: BLE advertisement recorded on channel 37 at 2.402 GHz
+  using a coaxial cable in anechoic box. Used to demodulate data from the
+  recording and compare with the reported data from the sniffer. Results:
+  demodulation successful with GR, partially successful with custom Python
+  script.
+- [[file:240109_leakage_for_demod/][240109_leakage_for_demod]] :: Recording of BLE channel + AES leak to try
+  demodulating it. Same hardware setup as =240108_advertisement=. Provides
+  =whadsniff= logs as well.
+- [[file:240111_leakage_for_demod_low_sr][240111_leakage_for_demod_low_sr]] :: Same as =240109_leakage_for_demod= but with
+  lower sample rate.
+- [[file:240111_gio_firmware_leak][240111_gio_firmware_leak]] :: Recording using Giovanni's firmware. Modified
+  version to only output fixed payload in the modulated packet (BUT with random
+  address and whitening enabled). The TX is ON sending modulated fixed packets
+  with a bunch of AES, then no CPU activity, and another bunch of AES.
+- [[file:240116_gio_firmware_leak_2][240116_gio_firmware_leak_2]] ::
+  - Modified version of Giovanni firmware output the following pattern on the
+    radio with constant time : TX OFF, TX ON, TX ON + AES.
+  - Address and payloads are constants =0x0f=.
+  - In =whiten_on=, whitening is enabled =RADIO_PCNF1_WHITEEN_Enabled=.
+  - In =whiten_off=, whitening is disabled =RADIO_PCNF1_WHITEEN_Disabled=.
+  - Multiples sample rates are tried.
+  - Multiples frequencies should be tried but not recorded yet.
+- [[file:240130_carrier_or_mod_soft_or_hard/][240130_carrier_or_mod_soft_or_hard]] ::
+  - Built upon =240116_gio_firmware_leak_2=, but with following pattern: TX OFF,
+    TX ON, Software AES, Hardware AES.
+  - =tx-mod= indicate TX ON corresponds to modulated carrier with constant packets.
+  - =tx-carrier= indicate TX ON corresponds to non-modulated constant carrier.
+  - Two sample rates: $8e6$ and $20e6$.
+- [[file:240131_with_aes_ecb_hard/][240131_with_aes_ecb_hard]] ::
+  - Build upon =240130_carrier_or_mod_soft_or_hard=, but with following pattern:
+    1) TX OFF
+    2) TX ON with carrier only
+    3) AES-ECB software implemented by TinyAES from the NordicSDK
+    4) AES-ECB hardware by the ECB periph of the nRF52
+    5) AES-CCM hardware by the CCM periph of the nRF52
+  - Use 3 sampling rates:
+    1) 8 Msps
+    2) 20 Msps
+    3) 56 Msps
+
+* Testing
+
+** [2024-02-06 mar.] Instrument a firmware and compare leakage among frequencies for subclocks intermodulation and DCDC regulator
+:PROPERTIES:
+:DIR:      2024-02-06_firmware-instrumentation-for-subblocks-dcdc
+:END:
+
+- Methods ::
+  1. Instrument the firmware with a recognizable pattern (TX Off, TX Carrier,
+     AES Soft ECB, AES Hard ECB without counter, AES Hard ECB with interrupts,
+     AES Hard CCM).
+  2. Record at multiple frequencies and sampling rates. Analyze the received
+     signal.
+- Results ::
+  1. The DC/DC regulator enabled by the DCDCEN register seems to influence a
+     bit the leakage at the carrier, but it is not strongly different. We
+     compared the spectrums to see a difference.
+  2. With its [nRF52] clock at 64 MHz and its sub-clocks at 32, 16 and 1 MHz,
+     we can see that they are all inter-modulated with the carrier and that the
+     AES signal its itself modulated around each clock and sub-clock. Hence, we
+     find the signal in a very wide-band spectrum. However, attenuation is not
+     equal across the spectrum, hence, it is important to select the right
+     frequency. Good example is by looking at 2.496e9 for the 3rd harmonic of
+     the 32 MHz sub-clock.
+  3. The best frequency found was 2.510 and 2.512 with 8 MHz of bandwidth to
+     have the more stronger leak. It needs to be evaluated for each setup
+     before launching a Screaming Channel, but it is not as trivial as using
+     the 2nd harmonic (2.528 GHz).
+- Files ::
+  - When nothing is specified in filenames, the DCDCEN is set to 0.
+  - FF is collected using an antenna in an anechoic box.
+  - NF is collected using a NF probe out of the anechoic box.
+  - [[attachment:firmware_loop.c]] is an extract of the firmware to see the
+    pattern, see firmware repo and tag for code.
+
+** [2024-02-07 mer.] Find the best frequency before a dataset collection using BLE
+:PROPERTIES:
+:DIR:      2024-02-07_find-best-ble-freq
+:END:
+
+- Goals :: Find the best frequency where the leakage is more present before
+  launching a new collection.
+- Methods ::
+  1. Find candidates frequency using wide-band recording looking at the
+     spectrum.
+  2. Compare the SNR and visually for amplitude signal for each frequency.
+- Results ::
+  1. Find that 2.533 GHz seems to be the best.
+
+** [2024-03-18 lun.] Dataset loading Python demonstration
+:PROPERTIES:
+:DIR:      2024-03-18_demo-loading
+:END:
+
+Python demonstration of dataset loading and traces computation (sent to Karel).
+
+** [2024-05-15 mer.] Profiling with LDO regulator
+:PROPERTIES:
+:DIR:      2024-05-15_profile-reg-ldo
+:ID:       11b1c7e1-8793-41ca-9a5e-1db6d355692c
+:END:
+
+- Creation of a profile on amplitude with repetitions using custom firmware
+  with the LDO regulator (branch =expe/source-flash-reg-ldo=).
+- Script copied from [[id:c2b4dc98-bf62-4225-8dfe-da6e02967282][[2024-04-23 mar.]​]].
+
+*Plots*
+
+#+NAME: Correlation for amplitude using 4000 * 300 traces
+[[attachment:profile/amp_4000_r_1/pois.pdf]]
+
+#+NAME: Template for amplitude using 4000 * 300 traces
+[[attachment:profile/amp_4000_r_1/profile_poi_0.pdf]]
+
+*Results*
+
+- Use as a baseline to compare with [[id:3a8494da-5431-4882-ba1f-c644d64348d6][[2024-05-15 mer.] DCDC]].
+
+** [2024-05-15 mer.] Profiling with DCDC regulator
+:PROPERTIES:
+:DIR:      2024-05-15_profile-reg-dcdc
+:ID:       3a8494da-5431-4882-ba1f-c644d64348d6
+:END:
+
+- Creation of a profile on amplitude with repetitions using custom firmware
+  with the DCDC regulator (branch =expe/source-flash-reg-dcdc=).
+- Script copied from [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.]​]].
+
+*Plots*
+
+#+NAME: Correlation for amplitude using 4000 * 300 traces
+[[attachment:profile/amp_4000_r_1/pois.pdf]]
+
+#+NAME: Template for amplitude using 4000 * 300 traces
+[[attachment:profile/amp_4000_r_1/profile_poi_0.pdf]]
+
+*Results*
+
+- Compared to [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.] LDO]], profile is slightly different (both
+  correlation and values). We expected to see a higher standard deviation in
+  the values since the MCU should consume less energy, but we observer the
+  opposite.
+
+** [2024-05-15 mer.] Profiling with ICACHE disabled
+:PROPERTIES:
+:DIR:      2024-05-15_profile-icache-off
+:ID:       bf6c33e0-99bc-4348-9ec1-50e9eb9bf2ed
+:END:
+
+- Creation of a profile on amplitude with repetitions using custom firmware
+  with the instruction cache disabled (branch =expe/source-flash-icache-off=).
+- Script copied from [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.]​]].
+
+*Result*
+
+- Profile is different enough from [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.] LDO]] while I expected to be
+  the same (only add one C line to set a register to 0 already set by default
+  to 0). This one cannot be used as baseline to compare with LDO directly, but
+  can be used to compare with [[id:be4d126d-5ac1-43cf-85b0-4af441196007][[2024-05-15 mer.] ICACHE enabled]].
+  
+** DONE [2024-05-15 mer.] Profiling with ICACHE enabled
+CLOSED: [2024-05-17 ven. 15:16]
+:PROPERTIES:
+:DIR:      2024-05-15_profile-icache-on
+:ID:       be4d126d-5ac1-43cf-85b0-4af441196007
+:END:
+
+*Goal*
+
+- Creation of a profile on amplitude with repetitions using custom firmware
+  with the instruction cache enabled (branch =expe/source-flash-icache-on=).
+
+*Base*
+
+- Script copied from [[id:11b1c7e1-8793-41ca-9a5e-1db6d355692c][[2024-05-15 mer.]​]].
+
+*Result*
+
+- Observation :: Radio capture contains "holes" due to TX switching OFF and ON
+  between packets (as usual) but also new holes. Assumption is that those holes
+  are when the CPU is fetching instructions from the cache and not from the
+  RAM. "Hopefully", we are still able to construct profiles since we only
+  receive the =SubBytes= leak but not the other functions.
+- [[attachment:profile/amp_4000_r_1/]] :: OK
+
+** FAIL [2024-05-17 ven.] Profile re-usage 1
+CLOSED: [2024-05-17 ven. 11:40]
+:PROPERTIES:
+:DIR:      2024-05-17_profile-reuse-1
+:ID:       f83c8536-bb96-4968-b2dc-a8bd5145ad82
+:END:
+
+*Goal*
+
+- Reuse profile from =240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw= on
+  =240429_highdist_2lna_highgain_norep=.
+
+*Result*
+
+- [[attachment:logs/attack_raw_AMPLITUDE_65536_r_1_2000.log][Log]] :: 2^127
+- [[attachment:plots/attack_raw_AMPLITUDE_65536_r_1_2000.pdf][Plot]] :: Alignment is possible but normalization seems to be different.
+
+** FAIL [2024-05-17 ven.] Profile re-usage 2
+CLOSED: [2024-05-17 ven. 14:51]
+:PROPERTIES:
+:DIR:      2024-05-17_profile-reuse-2
+:ID:       d0dd7bdf-995f-4603-b7c6-6dc1592a20cd
+:END:
+
+*Goal*
+
+- Try to use smaller profile to see if there is a difference in normalization,
+  following [[id:f83c8536-bb96-4968-b2dc-a8bd5145ad82][[2024-05-17 ven.]​]].
+
+*Result*
+
+- [[attachment:logs/attack_raw_AMPLITUDE_65536_r_1_6000.log][Log]] :: 2^127
+- [[attachment:plots/attack_raw_AMPLITUDE_65536_r_1_6000.pdf][Plot]] :: Don't know why it doesn't work.
+

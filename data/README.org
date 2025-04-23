@@ -1,0 +1,43 @@
+#+TITLE: Screaming Channels on Bluetooth Low Energy -- Annex
+#+SETUPFILE: https://raw.githubusercontent.com/pierreay/orgcss/master/orgcss.setup
+
+* About
+
+Companion repository of the "Screaming Channels on Bluetooth Low Energy"
+project.
+
+See the [[https://github.com/pierreay/screaming_channels_ble][screaming_channels_ble]] repository for a complete overview of the
+project.
+
+* Usage
+
+This repository is managed using [[https://git-annex.branchable.com/][git-annex]]. Around 400 GB of data is currently
+deduplicated and spread across 4 computers (=reaper=, =saren=, =wrex=,
+=citadel=) and 2 external mass storage devices (=garrus=, =novigrad=).
+
+A vary small part of this repository is uploaded on Zenodo. See:
+#+begin_quote
+Ayoub (2024) Screaming Channels on Bluetooth Low Energy, Zenodo. DOI:
+10.5281/zenodo.13384278. URL: https://zenodo.org/records/13384278
+#+end_quote
+
+* Structure
+
+- [[file:datasets][datasets]] :: Contains full [[id:98437a5b-5d86-4097-96b1-9a069fd30a79][datasets]] -- recorded using the Nimble stack (=ble=)
+  or the custom firmware (=poc=).
+- [[file:experiments][experiments]] :: Contains full [[id:f2d6b918-20f8-4410-ab60-1bb5707868bf][experiments]] data -- code, input and output data.
+- [[file:scripts/][scripts]] :: Contains [[id:3e01566b-6905-492e-bafe-7f3f45b6920f][scripts]] to work with the repository.
+- [[file:profiles/][profiles]] :: Contains good [[id:71833b59-2215-482f-ba78-49a153b607ad][profiles]] for template attacks.
+- [[file:signals/][signals]] :: Contains good [[id:108f8a72-7097-46ce-9457-191988296c92][signals]] for autocorrelation matching.
+- [[file:pictures/][pictures]] :: Contains various pictures.
+
+* Git
+
+In this repository, several scripts are =git checkout= some tags or commits
+hashes from other repositories. Concerning the =screaming_channels_ble=
+repository pointed by the =$SC= variable of the [[file:.envrc][.envrc]] file, the history had to
+be rewritten at some point to delete some large binary blobs from the =.git=
+packed objects. This has for consequence that commit hashes had to be computed
+again. Hence, in the [[file:screaming_channels_ble.log][screaming_channels_ble.log]] file, you will find a list of
+the previous tags and commits hashes of this repository, to manually patch the
+scripts on case-by-case needs.

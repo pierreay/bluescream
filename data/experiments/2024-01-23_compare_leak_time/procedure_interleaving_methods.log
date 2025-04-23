@@ -1,0 +1,218 @@
+mar. 23 janv. 2024 21:30:31 CET
+=======
+start_radio_conn_event=1
+ll_enc_req_conn_event=16
+hop_interval=56
+
+
+=======
+more_data_bit=0
+procedure_interleaving=false
+-------
+nsample=3400
+%=0.0028
+µs=113.3333
+[2024-01-23 21:31:19,779] [2456687] [MainThread] [radio] INFO  - Number of detected peaks=1
+[2024-01-23 21:31:19,787] [2456687] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=535;median=151;mean=153
+-------
+INSTRUMENTATION ERROR
+-------
+nsample=3200
+%=0.0027
+µs=106.6667
+[2024-01-23 21:33:11,334] [2457592] [MainThread] [radio] INFO  - Number of detected peaks=1
+[2024-01-23 21:33:11,342] [2457592] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=595;median=153;mean=156
+-------
+nsample=3200
+%=0.0027
+µs=106.6667
+[2024-01-23 21:34:01,476] [2458030] [MainThread] [radio] INFO  - Number of detected peaks=1
+[2024-01-23 21:34:01,485] [2458030] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=530;median=149;mean=152
+-------
+nsample=200
+%=0.0002
+µs=6.6667
+[2024-01-23 21:34:53,585] [2458448] [MainThread] [radio] INFO  - Number of detected peaks=0
+
+
+=======
+more_data_bit=1
+procedure_interleaving=true
+procedure_interleaving_method="att_read_request"
+-------
+nsample=200
+%=0.0002
+µs=6.6667
+[2024-01-23 21:35:48,030] [2458885] [MainThread] [radio] INFO  - Number of detected peaks=0
+-------
+nsample=6600
+%=0.0055
+µs=220.0000
+[2024-01-23 21:36:38,392] [2459297] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:36:38,400] [2459297] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=487;median=147;mean=150
+[2024-01-23 21:36:38,408] [2459297] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=596;median=153;mean=156
+-------
+nsample=7000
+%=0.0058
+µs=233.3333
+[2024-01-23 21:37:28,546] [2459710] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:37:28,555] [2459710] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=505;median=153;mean=156
+[2024-01-23 21:37:28,562] [2459710] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=566;median=153;mean=156
+-------
+nsample=7000
+%=0.0058
+µs=233.3333
+[2024-01-23 21:38:18,815] [2460116] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:38:18,823] [2460116] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=487;median=146;mean=149
+[2024-01-23 21:38:18,831] [2460116] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=578;median=146;mean=149
+-------
+nsample=6400
+%=0.0053
+µs=213.3333
+[2024-01-23 21:39:09,184] [2460529] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:39:09,192] [2460529] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=453;median=136;mean=139
+[2024-01-23 21:39:09,199] [2460529] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=568;median=154;mean=157
+
+
+=======
+more_data_bit=1
+procedure_interleaving=true
+procedure_interleaving_method="att_read_multiple_request_2"
+-------
+nsample=400
+%=0.0003
+µs=13.3333
+[2024-01-23 21:40:02,278] [2460963] [MainThread] [radio] INFO  - Number of detected peaks=0
+-------
+nsample=7000
+%=0.0058
+µs=233.3333
+[2024-01-23 21:40:52,736] [2461371] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:40:52,744] [2461371] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=517;median=158;mean=161
+[2024-01-23 21:40:52,752] [2461371] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=559;median=148;mean=152
+-------
+nsample=7000
+%=0.0058
+µs=233.3333
+[2024-01-23 21:41:43,151] [2461794] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:41:43,159] [2461794] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=501;median=153;mean=156
+[2024-01-23 21:41:43,167] [2461794] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=556;median=149;mean=152
+-------
+nsample=7200
+%=0.0060
+µs=240.0000
+[2024-01-23 21:42:33,131] [2462203] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:42:33,139] [2462203] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=440;median=137;mean=139
+[2024-01-23 21:42:33,146] [2462203] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=552;median=150;mean=153
+-------
+nsample=7000
+%=0.0058
+µs=233.3333
+[2024-01-23 21:43:23,330] [2462610] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:43:23,338] [2462610] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=490;median=153;mean=156
+[2024-01-23 21:43:23,345] [2462610] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=522;median=142;mean=145
+
+
+=======
+more_data_bit=1
+procedure_interleaving=true
+procedure_interleaving_method="att_read_multiple_request_3"
+-------
+INSTRUMENTATION ERROR
+-------
+nsample=7000
+%=0.0058
+µs=233.3333
+[2024-01-23 21:45:11,155] [2463442] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:45:11,164] [2463442] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=484;median=152;mean=155
+[2024-01-23 21:45:11,171] [2463442] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=519;median=143;mean=146
+-------
+nsample=200
+%=0.0002
+µs=6.6667
+[2024-01-23 21:46:04,384] [2463871] [MainThread] [radio] INFO  - Number of detected peaks=0
+-------
+nsample=200
+%=0.0002
+µs=6.6667
+[2024-01-23 21:46:56,584] [2464382] [MainThread] [radio] INFO  - Number of detected peaks=0
+-------
+nsample=7200
+%=0.0060
+µs=240.0000
+[2024-01-23 21:47:46,661] [2464794] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:47:46,669] [2464794] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=477;median=151;mean=153
+[2024-01-23 21:47:46,676] [2464794] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=561;median=150;mean=153
+
+
+=======
+more_data_bit=1
+procedure_interleaving=true
+procedure_interleaving_method="att_read_multiple_request_4"
+-------
+nsample=200
+%=0.0002
+µs=6.6667
+[2024-01-23 21:48:39,036] [2465471] [MainThread] [radio] INFO  - Number of detected peaks=0
+-------
+nsample=200
+%=0.0002
+µs=6.6667
+[2024-01-23 21:49:34,141] [2466798] [MainThread] [radio] INFO  - Number of detected peaks=0
+-------
+nsample=6000
+%=0.0050
+µs=200.0000
+[2024-01-23 21:50:24,319] [2467255] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:50:24,327] [2467255] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=479;median=150;mean=153
+[2024-01-23 21:50:24,334] [2467255] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=545;median=152;mean=155
+-------
+nsample=7000
+%=0.0058
+µs=233.3333
+[2024-01-23 21:51:14,431] [2467696] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:51:14,439] [2467696] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=501;median=157;mean=160
+[2024-01-23 21:51:14,446] [2467696] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=530;median=145;mean=148
+-------
+nsample=7800
+%=0.0065
+µs=260.0000
+[2024-01-23 21:52:07,468] [2468592] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:52:07,477] [2468592] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=471;median=149;mean=152
+[2024-01-23 21:52:07,484] [2468592] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=567;median=157;mean=161
+
+
+=======
+more_data_bit=1
+procedure_interleaving=true
+procedure_interleaving_method="att_find_information_request"
+-------
+nsample=6200
+%=0.0052
+µs=206.6667
+[2024-01-23 21:53:00,896] [2469418] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:53:00,904] [2469418] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=478;median=148;mean=151
+[2024-01-23 21:53:00,911] [2469418] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=519;median=147;mean=149
+-------
+nsample=6200
+%=0.0052
+µs=206.6667
+[2024-01-23 21:53:55,010] [2470183] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:53:55,018] [2470183] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=489;median=152;mean=154
+[2024-01-23 21:53:55,025] [2470183] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=574;median=156;mean=159
+-------
+nsample=6200
+%=0.0052
+µs=206.6667
+[2024-01-23 21:54:48,711] [2470666] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:54:48,719] [2470666] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=473;median=147;mean=150
+[2024-01-23 21:54:48,726] [2470666] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=547;median=141;mean=144
+-------
+nsample=6200
+%=0.0052
+µs=206.6667
+[2024-01-23 21:55:42,798] [2471190] [MainThread] [radio] INFO  - Number of detected peaks=2
+[2024-01-23 21:55:42,806] [2471190] [MainThread] [radio] INFO  - Correlation for peak #0: min=0;max=491;median=151;mean=154
+[2024-01-23 21:55:42,813] [2471190] [MainThread] [radio] INFO  - Correlation for peak #1: min=0;max=508;median=145;mean=148
+-------
+INSTRUMENTATION ERROR

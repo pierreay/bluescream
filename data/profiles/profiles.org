@@ -1,0 +1,16 @@
+:PROPERTIES:
+:ID:       71833b59-2215-482f-ba78-49a153b607ad
+:END:
+* Profiles
+
+- [[attachment:231213_single-cable_raw/][231213_single-cable_raw]] :: Profile of 2 POIs constructed using a single
+  non-averaged AES with 44700 traces. It comes from the
+  =231213_single-cable_raw= dataset.
+- [[attachment:231222_single-cable-balanced_raw/][231222_single-cable-balanced_raw]] ::
+  - 2 POIs with 1 point spacing
+  - Single non-averaged AES
+  - 64k traces
+  - Balanced generator
+  - Coax cable
+  - Copied from the =231222_single-cable-balanced_raw= dataset
+

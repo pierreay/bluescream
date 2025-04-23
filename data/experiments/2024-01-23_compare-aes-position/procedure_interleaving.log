@@ -1,0 +1,16 @@
+# duration=4 [s]
+mar. 23 janv. 2024 11:50:55 CET
+start_radio_conn_event=1
+ll_enc_req_conn_event=16
+hop_interval=56
+procedure_interleaving=false
+[2024-01-23 11:51:28,615] [2245696] [MainThread] [radio] ERROR - Signal localization confusion because no or multiple peaks are detected!
+[2024-01-23 11:52:02,026] [2246191] [MainThread] [radio] INFO  - Peak: Position=29.15% ; SNR=2.3 ; Avg=1507
+[2024-01-23 11:52:35,086] [2246495] [MainThread] [radio] INFO  - Peak: Position=29.27% ; SNR=2.3 ; Avg=1501
+[2024-01-23 11:53:08,371] [2246795] [MainThread] [radio] INFO  - Peak: Position=29.14% ; SNR=2.3 ; Avg=1502
+[2024-01-23 11:53:41,444] [2247092] [MainThread] [radio] INFO  - Peak: Position=29.20% ; SNR=2.3 ; Avg=1509
+procedure_interleaving=true
+[2024-01-23 11:55:07,445] [2247805] [MainThread] [radio] ERROR - Signal localization confusion because no or multiple peaks are detected!
+[2024-01-23 11:55:40,683] [2248104] [MainThread] [radio] ERROR - Signal localization confusion because no or multiple peaks are detected!
+[2024-01-23 11:56:13,626] [2248401] [MainThread] [radio] ERROR - Signal localization confusion because no or multiple peaks are detected!
+[2024-01-23 11:56:46,607] [2248695] [MainThread] [radio] ERROR - Signal localization confusion because no or multiple peaks are detected!

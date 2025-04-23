@@ -1,0 +1,788 @@
+:PROPERTIES:
+:ID:       6eadeb14-64c5-4c29-94c5-bb577a8cd4fd
+:END:
+#+TITLE: Screaming Channels Experiments
+#+SUBTITLE: RF Leak of AES on BLE Device
+#+SETUPFILE: https://raw.githubusercontent.com/pierreay/orgcss/master/orgcss.setup
+
+* Introduction
+
+This experiment tries to record RF traces (either via an RF cable or via an
+antenna) of:
+- A BLE legit communication (i.e. following the BLE standard) between a victim
+  device (stock) and an attacker device (custom firmware).
+- A Screaming Channels leak of a software AES operation.
+
+* Impact
+
+If the aforementioned leak is observed, then Screaming Channels would be an
+attack usable in real-world scenario as long as a software encryption is used.
+
+* Setup
+
+- Victim device: nRF52832 DK (using [[file:~/work/info/projects/screaming_channels/mynewt-screamingchannels][Nimble]]).
+- Attacker device: nRF52832 Dongle (using [[file:~/work/info/projects/screaming_channels/butterfly][Butterfly]]).
+
+* Trials
+
+** DONE [2022-09-22 jeu.] Observe BLE communication and SC leak with GQRX using channel map
+
+To verify to which channels corresponds which channel map, one can use Mirage
+with the following parameter:
+
+#+BEGIN_SRC python :eval never
+"CHANNEL_MAP":"0x0000000300"
+#+END_SRC
+
+Then, monitoring HCI traffic using =btmon=, it will be reported =Channel 8-9=.
+Using Mirage, one can use the following instrumentation code:
+
+#+BEGIN_SRC python :eval never
+for _ in range(5):
+    self.module.read("0x01")
+#+END_SRC
+
+By tuning at 2.421 GHz with 4 MHz of bandwidth, we see the BLE communication
+hopping between the two channels.
+
+#+CAPTION: Regular BLE communication
+[[file:2022-09-22/2022-09-22 13-43-52.png]]
+
+By tuning at 2.420 GHz + 2*64 MHz = 2.548 GHz for the first channel or 2.422
+GHz + 2*64 MHz = 2.550 GHz for the second one, we can see burst with a lower
+amplitude, corresponding to each BLE communication. At this frequency, this
+correspond to harmonics of CPU processing leaking through the radio.
+
+#+CAPTION: Screaming Channel leak
+[[file:2022-09-22/2022-09-22 13-45-49.png]]
+
+** DONE [2023-05-24 mer.] Record near-field EM traces before RF traces
+:PROPERTIES:
+:ID:       4512fac5-2e12-401d-9de2-dedf85a453ed
+:END:
+
+The goal of this trial is to setup an experiment where we can record EM traces
+and identify AES rounds, before to look at the RF traces. It will be useful to
+locate in time domain where the AES is, and then synchronize RF and near-field
+EM traces to precisely locate AES leak in RF domain.
+
+*Experiment resources*:
+- Code:
+  - [[file:~/work/info/projects/screaming_channels/screaming_channels_utils][=screaming_channels_utils=]].
+- Files:
+  - Victim firmware: Nimble
+    - Source: [[file:~/work/info/projects/screaming_channels/mynewt-screamingchannels/][=mynewt-screamingchannels=]]
+      # from the [[orgit-rev:~/work/info/projs/screaming_channels_nimble::aes_instru_without_log][=aes_instru_without_log=]] tagged commit (commented because no
+      # public remote yet for export)
+    - Binary: [[file:2023-05-24/firmware-nimble.hex][=firmware-nimble.hex=]]
+
+*Experiment setup*:
+
+#+ATTR_HTML: :width 500px
+#+CAPTION: Setup with the USRP and the probe on the nRF52832 DK
+[[file:2023-05-24/setup_large.jpg]]
+
+#+ATTR_HTML: :width 500px
+#+CAPTION: Zoom on the near-field EM probe placement
+[[file:2023-05-24/setup_zoom.jpg]]
+
+*Steps*:
+1. Configure the needed variables in [[file:2023-05-24/.envrc][=.envrc=]].
+
+2. Generate and flash the Nimble firmware:
+   #+begin_src bash :eval never
+   ./2023-05-24/01_compile_flash_firmware.sh
+   #+end_src
+
+   It will generate the [[file:2023-05-24/firmware-nimble.hex][=firmware-nimble.hex=]] file.
+
+3. Generate and flash the Butterfly firmware:
+   TODO
+
+4. Pair victim and attacker devices, storing pairing information:
+   #+begin_src bash :eval never
+   ./2023-05-24/02a_pair_remote.sh
+   #+end_src
+
+   It will execute the [[file:2023-05-24/02b_pair_local.sh][=02b_pair_local.sh=]] script and generate the
+   =/tmp/mirage_output_{ltk,rand,ediv,addr}= files on the working machine.
+
+5. Capture traces:
+   #+begin_src bash :eval never
+   ./2023-05-24/03_record.sh
+   #+end_src
+
+   It will execute the [[file:2023-05-24/record.py][=record.py=]] script and generate the
+   =/tmp/gr_sink_concat_0.npy= trace on the remote working machine.
+
+6. Post-process the traces:
+   #+begin_src bash :eval never
+   ./2023-05-24/04_process.sh
+   #+end_src
+
+   It will execute the [[file:2023-05-24/process.py][=process.py=]] script and generate the [[file:2023-05-24/process.npy][=process.npy=]] trace
+   and the [[file:2023-05-24/process.png][=process.png=]] plot (the latter have to be manually captured from
+   Matplotlib interface after zooming in), resulting of the post-processing.
+
+7. Visualize the final extracted trace:
+   #+begin_src bash :eval never
+   ./2023-05-24/05_plot.sh
+   #+end_src
+
+   It will execute the [[file:2023-05-24/plot.py][=plot.py=]] script and generate the [[file:2023-05-24/plot.png][=plot.png=]] file.
+
+*Results*:
+- With this set of scripts, we are able to conduct a full experiment to record
+  AES traces leak in classical EM using a near-field probe with an instrumented
+  firmware.
+- We can identify AES executions and rounds, see Figure [[aes_leak]].
+
+#+NAME: aes_leak
+#+CAPTION: AES leak
+#+ATTR_HTML: :width 1000px
+[[file:2023-05-24/res/aes_leak.drawio.png]]
+
+** DONE [2023-05-25 jeu.] Use SoapySDR instead of GNU Radio to then add another USRP
+:PROPERTIES:
+:ID:       c533badd-a4e3-4d2f-8f3e-6014d65a7fd7
+:END:
+
+This experiment is built on [[id:4512fac5-2e12-401d-9de2-dedf85a453ed][[2023-05-24 mer.] Record near-field EM traces
+before RF traces]]. The goal here is to switch from GNU Radio (used in
+[[file:~/work/info/projects/screaming_channels/screaming_channels_utils/src/screamingchannels/radio.py][=src/screamingchannels/radio.py=]] from repo root) to SoapySDR (used directly in
+the [[file:2023-05-25/src/record.py][=src/record.py=]] from expe root). With Soapy, we expect to then easily add
+another SDR to our setup and be able to synchronize traces.
+
+*Experiment resources*:
+- Code:
+  - [[file:~/work/info/projects/screaming_channels/screaming_channels_utils][=screaming_channels_utils=]]: We modified the =nrf52_whad.py= file to be able
+    to use SoapySDR.
+
+*Steps*:
+1. Configure the needed variables in [[file:2023-05-25/.envrc][=.envrc=]].
+
+2. Generate and flash the Nimble firmware:
+   #+begin_src bash :eval never
+   ./2023-05-25/01_compile_flash_firmware.sh
+   #+end_src
+
+   It will generate the [[file:2023-05-25/build/firmware-nimble.hex][=firmware-nimble.hex=]] file.
+
+3. Generate and flash the Butterfly firmware:
+   TODO
+
+4. Pair victim and attacker devices, storing pairing information:
+   #+begin_src bash :eval never
+   ./2023-05-25/02a_pair_remote.sh
+   #+end_src
+
+   It will execute the [[file:2023-05-25/02b_pair_local.sh][=02b_pair_local.sh=]] script, graphically ask for sudo
+   password, and generate the =/tmp/mirage_output_{ltk,rand,ediv,addr}= files
+   on the working machine.
+
+4. In this experiment, we use SoapySDR instead of GNURadio to perform the
+   recording, comparing to the previous one. Make sure the two USRPs are
+   detectable with =SoapySDRUtil= on the working machine:
+
+   #+begin_src bash :results output :exports both :prologue exec 2>&1
+   source ./2023-05-25/.envrc && ssh $REMOTE "SoapySDRUtil --find"
+   #+end_src
+
+   #+RESULTS:
+   #+begin_example
+   ######################################################
+   ##     Soapy SDR -- the SDR abstraction library     ##
+   ######################################################
+
+   [INFO] [UHD] linux; GNU C++ version 11.2.0; Boost_107400; UHD_4.1.0.5-3
+   Found device 0
+     driver = uhd
+     label = B210 3189F57
+     name = MyB210
+     product = B210
+     serial = 3189F57
+     type = b200
+
+   Found device 1
+     driver = uhd
+     label = B210 3189F81
+     name = MyB210
+     product = B210
+     serial = 3189F81
+     type = b200
+
+
+   #+end_example
+
+5. Capture traces:
+   #+begin_src bash :eval never
+   ./2023-05-25/03_record.sh
+   #+end_src
+
+   It will execute the [[file:2023-05-25/src/record.py][=record.py=]] script, generate the =/tmp/rx_signal.npy=
+   trace on the remote working machine, and download a compressed trace to
+   [[file:2023-05-25/record/rx_signal_recorded.npy.tar.bz2][=record/rx_signal_recorded.npy.tar.bz2=]]
+
+6. Post-process the traces:
+   #+begin_src bash :eval never
+   ./2023-05-25/04_process.sh
+   #+end_src
+
+   It will execute the [[file:2023-05-25/src/process.py][=process.py=]] script. Manually, we will have to save the
+   raw plot (to =Figure_1.png=) and the zoomed plot (to =Figure_2.png=) inside
+   the working machine's home directory. They will be downloaded to
+   [[file:2023-05-25/plot/rx_signal_processed.png][=plot/rx_signal_processed.png=]] and [[file:2023-05-25/plot/rx_signal_processed_zoomed.png][=plot/rx_signal_processed_zoomed.png=]]
+   plots, respectively.
+
+7. Plot the recorded trace without the analyze's extraction code:
+   #+begin_src bash :eval never
+   ./2023-05-25/05_plot.sh
+   #+end_src
+
+   It will execute the [[file:2023-05-25/src/plot.py][=plot.py=]] script and generate the [[file:2023-05-25/plot/rx_signal_plot.png][=rx_signal_plot.png=]]
+   file.
+
+*Results*:
+- We used *SoapySDR* instead of GNU Radio to record the same classical EM trace as before, but ...
+- No more overflow! Leads to:
+  - Better recording without *any loss*
+  - Allows to *identify cyclic patterns*
+  - Allows to have a *deterministic* recording
+- Better control to then use 2 SDRs!
+
+#+CAPTION: Recording with SoapySDR
+[[file:2023-05-25/plot/rx_signal_processed.png]]
+
+#+CAPTION: Recording with SoapySDR (zoomed)
+[[file:2023-05-25/plot/rx_signal_processed_zoomed.png]]
+
+** DONE [2023-05-31 mer.] Record RF traces with one USRP
+
+Use the code of [[id:c533badd-a4e3-4d2f-8f3e-6014d65a7fd7][[2023-05-25 jeu.]
+Use SoapySDR instead of GNU Radio to then add another USRP]] as base and modify
+[[file:2023-05-31/src/record.py][=src/record.py=]] to record at the potential RF leakage of system activity.
+
+*Method*
+
+Looking at the channel map used by WHAD:
+
+#+begin_src bash :results output :exports both :var SC=(file-name-directory (get-closest-pathname ".git"))
+cat $SC/src/screamingchannels/devices/nrf52_whad.py | grep channel_map
+#+end_src
+
+#+RESULTS:
+:             l.LOGGER.debug("nRF52_WHAD.central.connect(address={}, random=False, hop_interval=56, channel_map=0x00000300)".format(self.address))
+:             device = self.central.connect(self.address, random=False, hop_interval=56, channel_map=0x00000300)
+
+We have the =0x300= channel map, which corresponds to channel indexes 8 and 9
+(/i.e./ src_elisp[:exports both]{(+ 2.404 (* 8 0.002))} {{{results(=2.42=)}}}
+GHz and src_python[:exports both]{return "{:.4}".format(2.404 + 9 * 0.002)}
+{{{results(=2.422=)}}} GHz). The communication will hop on these two channels,
+hence, potential RF leaks will be at src_python[:exports both]{return (2.42e9 +
+2*64e6) / 1e9} {{{results(=2.548=)}}} GHz and src_python[:exports both]{return
+(2.422e9 + 2*64e6) / 1e9} {{{results(=2.55=)}}} GHz.
+
+First, let's identify the BLE communication (not the BLE communication's
+leak). Tuning at 2.419 GHz with 10 MHz of bandwidth and USRP gain to 60:
+
+#+begin_src bash :results output :exports results
+cat ./2023-05-31/src/record.py | awk '/radio_config =/ {for (i=0; i<=2; i++) {print; getline}}'
+#+end_src
+
+#+RESULTS:
+:     radio_config = config.RadioConfig(target_freq=2.419e9,
+:                                       sampling_rate=10e6,
+:                                       usrp_gain=60)
+
+*Results*
+
+We can identify every connection events on the entire recording. Here are the
+RX patterns (small ones) and TX patterns (big ones) of a BLE communication on
+channel 8 and 9:
+
+#+CAPTION: BLE communication on channel 8
+[[file:2023-05-31/plot/20230606_160234.png]]
+
+#+CAPTION: BLE communication on channel 9 (a bit ouf of band, hence, we see holes inside amplitude)
+[[file:2023-05-31/plot/20230606_160308.png]]
+
+Zooming on the first communication, we can even distinguish frequencies of the
+GFSK:
+
+#+CAPTION: BLE communication on channel 8 (zoomed)
+[[file:2023-05-31/plot/20230606_160207.png]]
+
+*Future work*
+
+Next step will be to tune at $2.546e^9$ Hz with, for example, $15e^6$ Hz of
+bandwidth that should allows to record until $2.561e^9$, and hence, capturing
+any Screaming Channels leak on the two channels.
+
+** DONE [2023-06-06 mar.] Use two USRPs to record near-field EM and RF
+:PROPERTIES:
+:header-args:bash+: :shebang #!/bin/bash
+:header-args:bash+: :eval never
+:ID:       fe90a215-0baf-4170-8efc-07954cae6d49
+:END:
+
+This experiment is based on [[id:c533badd-a4e3-4d2f-8f3e-6014d65a7fd7][[2023-05-25 jeu.] Use SoapySDR instead of GNU Radio
+to then add another USRP]]. The goal is to add a USRP to the current setup, and
+making scripts recording near-field EMR and RF BLE transmission at the same
+time. Then, being able to locate the AES leak on the classical EM traces in
+time-domain, reporting those location onto the RF traces.
+
+*Steps to reproduce* (you can use ={01,02,xx}_xx.sh= scripts instead)
+
+1. Configure the needed variables in [[file:2023-06-06/.envrc][=.envrc=]] and source it (or use [[https://direnv.net/][DirEnv]]):
+
+   #+begin_src bash :tangle ./2023-06-06/01_configure_and_source.sh
+   vim .envrc
+   source .envrc
+   #+end_src
+
+2. Generate and flash the Nimble firmware of the victim:
+   
+   #+begin_src bash :tangle ./2023-06-06/02_compile_flash_firmware_victim.sh
+   ssh $REMOTE "cd $REMOTE_NIMBLE && make all"
+   rsync -avz --progress $REMOTE:/tmp/mynewt-firmware.hex build/firmware-nimble.hex
+   #+end_src
+
+   It will generate the [[file:2023-06-06/build/firmware-nimble.hex][=build/firmware-nimble.hex=]] file.
+
+3. Generate and flash the Butterfly firmware of the attacker:
+
+   #+begin_src bash :tangle ./2023-06-06/03_compile_flash_firmware_attacker.sh
+   # TODO
+   #+end_src
+
+4. Pair victim and attacker devices, storing pairing information:
+
+   #+begin_src bash :tangle ./2023-06-06/04_pair.sh
+   ssh $REMOTE "cd $REMOTE_WD && bash -s" < ./src/pair.sh
+   #+end_src
+
+   It will execute the [[file:2023-06-06/src/pair.sh][=src/pair.sh=]] script, graphically ask for sudo password,
+   and generate the =/tmp/mirage_output_{ltk,rand,ediv,addr}= files on the
+   working machine.
+
+5. Make sure the two USRPs are detectable with =SoapySDRUtil= on the working
+   machine:
+
+   #+begin_src bash :tangle ./2023-06-06/05_check_usrps.sh
+   ssh $REMOTE "SoapySDRUtil --find"
+   #+end_src
+
+6. Record the traces. The novelty here is to use 2 USRPs, one recording
+   conventional EM with near-field probe, and the other recording RF BLE
+   transmission though a cable, at the same time:
+
+   #+begin_src bash :tangle ./2023-06-06/06_record.sh
+   ssh $REMOTE "cd $REMOTE_WD && source .envrc && python3 ./src/record.py"
+   #+end_src
+
+   It will execute the [[file:2023-06-06/src/record.py][=src/record.py=]] script, which will generate the
+   =/tmp/rx_signal_1.npy= and the =/tmp/rx_signal_2.npy= traces on the remote
+   working machine.
+
+   The challenge at this step was that I realized that we need asynchronous
+   Python calls for recording with 2 USRPs at the same time, otherwise the
+   Soapy's =readStream()= function is blocking. I tried:
+   1. Using =threading= with a derived class from =Thread= but it gives weird
+      errors with WHAD.
+   2. Using the =asyncio= API from Python to perform concurrent recordings with
+      the two USRPs without using processes and threads, but the API was
+      complicated to use conjointly with SoapySDR.
+   3. Using =multiprocessing= but when recording from a USRP using SoapySDR
+      after process fork, the USRP was crashing.
+   4. Using =threading= with an external =Thread= class with only the =record=
+      function as target. This is the working solution.
+
+** DONE [2023-06-13 Tue] Analyze the two USRPs recordings
+:PROPERTIES:
+:header-args:bash+: :shebang #!/bin/bash
+:header-args:bash+: :eval never
+:ID:       49f8981f-94ca-46bb-bbe4-b225090ab9c8
+:END:
+
+Based on [[id:fe90a215-0baf-4170-8efc-07954cae6d49][[2023-06-06 mar.] Use two USRPs to record near-field EM and RF]]. The
+goal here is to use the previous recording system and plot/analyze the results,
+to know if the USRP are synchronized enough with the =threading= APIs or if
+another system is needed.
+
+*Steps to reproduce* (you can use ={01,02,xx}_xx.sh= scripts instead)
+
+1. Configure the needed variables in [[file:2023-06-13/.envrc][=.envrc=]] and source it (or use [[https://direnv.net/][DirEnv]]):
+
+   #+begin_src bash :tangle ./2023-06-13/01_configure_and_source.sh
+   vim .envrc
+   source .envrc
+   #+end_src
+
+2. Generate and flash the Nimble firmware of the victim:
+   
+   #+begin_src bash :tangle ./2023-06-13/02_compile_flash_firmware_victim.sh
+   ssh $REMOTE "cd $REMOTE_NIMBLE && make all"
+   rsync -avz --progress $REMOTE:/tmp/mynewt-firmware.hex build/firmware-nimble.hex
+   #+end_src
+
+   It will generate the [[file:2023-06-13/build/firmware-nimble.hex][=build/firmware-nimble.hex=]] file.
+
+3. Generate and flash the Butterfly firmware of the attacker:
+
+   #+begin_src bash :tangle ./2023-06-13/03_compile_flash_firmware_attacker.sh
+   # TODO
+   #+end_src
+
+4. Pair victim and attacker devices, storing pairing information:
+
+   #+begin_src bash :tangle ./2023-06-13/04_pair.sh
+   ssh $REMOTE "cd $REMOTE_WD && bash -s" < ./src/pair.sh
+   #+end_src
+
+   It will execute the [[file:2023-06-13/src/pair.sh][=src/pair.sh=]] script, graphically ask for sudo password,
+   and generate the =/tmp/mirage_output_{ltk,rand,ediv,addr}= files on the
+   working machine.
+
+5. Make sure the two USRPs are detectable with =SoapySDRUtil= on the working
+   machine:
+
+   #+begin_src bash :tangle ./2023-06-13/05_check_usrps.sh
+   ssh $REMOTE "SoapySDRUtil --find"
+   #+end_src
+
+6. Record the traces. 
+
+   #+begin_src bash :tangle ./2023-06-13/06_record.sh
+   ssh $REMOTE "cd $REMOTE_WD && source .envrc && python3 ./src/record.py"
+   mkdir -p record/
+   rsync -avz --progress $REMOTE:/tmp/USRP_0-127.0MHz-30.0Msps_raw_abs.npy record/
+   rsync -avz --progress $REMOTE:/tmp/USRP_1-2.419MHz-30.0Msps_raw_abs.npy record/
+   #+end_src
+
+   It will execute the [[file:2023-06-13/src/record.py][=src/record.py=]] script, which will generate the
+   =/tmp/USRP-127.0MHz-30.0Msps_rx_signal_{0,1}.npy= traces on the remote
+   working machine, and download them in the [[file:2023-06-13/record][=record/=]] directory.
+
+7. Display an x-axis synchronized plot of the both traces:
+
+   #+begin_src bash :tangle ./2023-06-13/07_plot.sh
+   mkdir -p plot/
+   ./src/plot.py
+   #+end_src
+
+8. Save and clean experiment folder:
+
+   #+begin_src bash :tangle ./2023-06-13/08_save_clean.sh
+   file="record/USRP_0-127.0MHz-30.0Msps_raw_abs.npy"
+   tar cjvf $file.tar.bz2 $file
+   rm -rf $file
+   file="record/USRP_1-2.419MHz-30.0Msps_raw_abs.npy"
+   tar cjvf $file.tar.bz2 $file
+   rm -rf $file
+   #+end_src
+
+*Thread synchronization*
+
+- Observation :: From the log below, it seems to have a difference of
+  src_python[:exports results :results output
+  :wrap]{print("{:.3e}".format(51.642 - 51.079))} {{{results(5.630e-01)}}}s
+  between the two recordings.
+  #+begin_example
+  [2023-06-27 13:05:50,910] [MainThread] DEBUG - nrf52_whad - nRF52_WHAD.central.prepare(LL_ENC_REQ[rand=0x34e7aacb640db441, ediv=0x38aa, skdm=0xdeadbeefdeadbeef, ivm=0xdeadbeef])
+  [2023-06-27 13:05:50,931] [MainThread] DEBUG - nrf52_whad - nRF52_WHAD.central.connect(address=F4:9E:F2:6D:37:85, random=False, hop_interval=56, channel_map=0x00000300)
+  [2023-06-27 13:05:51,079] [MainThread] DEBUG - record     - MySoapySDRs.record(N=15000000.0).enter
+  [2023-06-27 13:05:51,079] [Thread-3 (record)] DEBUG - record     - MySoapySDR.record(N=1.500000e+07).enter
+  [2023-06-27 13:05:51,642] [Thread-4 (record)] DEBUG - record     - MySoapySDR.record(N=1.500000e+07).enter
+  [2023-06-27 13:05:52,792] [Thread-3 (record)] DEBUG - record     - MySoapySDR.record().leave
+  [2023-06-27 13:05:52,792] [Thread-4 (record)] DEBUG - record     - MySoapySDR.record().leave
+  [2023-06-27 13:05:52,793] [MainThread] DEBUG - record     - MySoapySDRs.record(N=15000000.0).exit
+  [2023-06-27 13:05:52,793] [MainThread] DEBUG - record     - MySoapySDRs.accept()
+  [2023-06-27 13:05:52,793] [MainThread] DEBUG - record     - MySoapySDR.accept()
+  [2023-06-27 13:05:52,811] [MainThread] DEBUG - record     - MySoapySDR.accept()
+  [2023-06-27 13:05:52,829] [MainThread] DEBUG - nrf52_whad - nRF52_WHAD.device.disconnect()
+  #+end_example
+- Problem :: If the difference of 0.5 s is real, it should be enough to screw up
+  the synchronization for RF leak research.
+- Trials :: So I tried to:
+  - 1. Inverse the two threads functions (hence a delay of 0.5 s should be
+    added on the NF traces).
+  - 2. Add delays with =time.sleep()=.
+- Results :: For 1), the AES leak is stilled captured on NF traces. For 2), it
+  doesn't have any impact until we add more than 0.5 in =sleep=.
+- Conclusion :: I think that the thread are synchronized enough to continue
+  with traces capture. Maybe the 0.5 s delay in the log are due to something
+  else (/e.g./ logging system itself). To have a better explanation, we would
+  have to use more accurate timing measurement method.
+- Solution if synchronization problem arise :: Try to add a constant hard-coded
+  delay (/e.g./ order of 0.5 s) for the second thread. If needed, create a
+  little function that measure this constant at the beginning of the
+  program. If the non-predictable little desynchronization (/e.g./ order of
+  1/100th second) is too high enough, we will need to find another
+  synchronization technique.
+
+** DONE [2023-06-28 mer.] Develop NF leak and RF signal detection + Observe NF and RF side-by-side
+:PROPERTIES:
+:header-args:bash+: :shebang #!/bin/bash
+:header-args:bash+: :eval never
+:ID:       45b1a3ad-2b72-4027-9974-d207647fbaaf
+:END:
+
+Based on [[id:49f8981f-94ca-46bb-bbe4-b225090ab9c8][[2023-06-13 Tue] Analyze the two USRPs recordings]], we have two
+recordings that are synchronized enough so that, if we have the AES leak on the
+NF recording, then it should be on the RF recording if there is any radio
+transmission at that time.
+
+In this experiment, we will try to automatize the AES leak detection (using the
+old work on =screaming_channels_utils= based on filters and triggers) and the
+RF signal detection (using something like the median of the PSD should be
+sufficient).
+
+If we succeed to automatize the two steps, we will be able to bruteforce WHAD
+parameters until an RF signal is detected.
+
+*Steps to reproduce* (you can use ={01,02,xx}_xx.sh= scripts instead)
+
+1. Configure the needed variables in [[file:2023-06-28/.envrc][=.envrc=]] and source it (or use [[https://direnv.net/][DirEnv]]):
+
+   #+begin_src bash :tangle ./2023-06-28/01_configure_and_source.sh
+   vim .envrc
+   source .envrc
+   #+end_src
+
+2. Generate and flash the Nimble firmware of the victim:
+   
+   #+begin_src bash :tangle ./2023-06-28/02_compile_flash_firmware_victim.sh
+   ssh $REMOTE "cd $REMOTE_NIMBLE && make all"
+   rsync -avz --progress $REMOTE:/tmp/mynewt-firmware.hex build/firmware-nimble.hex
+   #+end_src
+
+   It will generate the [[file:2023-06-28/build/firmware-nimble.hex][=build/firmware-nimble.hex=]] file.
+
+3. Generate and flash the Butterfly firmware of the attacker:
+
+   #+begin_src bash :tangle ./2023-06-28/03_compile_flash_firmware_attacker.sh
+   # TODO
+   #+end_src
+
+4. Pair victim and attacker devices, storing pairing information:
+
+   #+begin_src bash :tangle ./2023-06-28/04_pair.sh
+   ssh $REMOTE "cd $REMOTE_WD && bash -s" < ./src/pair.sh
+   #+end_src
+
+   It will execute the [[file:2023-06-28/src/pair.sh][=src/pair.sh=]] script, graphically ask for sudo password,
+   and generate the =/tmp/mirage_output_{ltk,rand,ediv,addr}= files on the
+   working machine.
+
+5. Make sure the two USRPs are detectable with =SoapySDRUtil= on the working
+   machine:
+
+   #+begin_src bash :tangle ./2023-06-28/05_check_usrps.sh
+   ssh $REMOTE "SoapySDRUtil --find"
+   #+end_src
+
+6. Record the traces. 
+
+   #+begin_src bash :tangle ./2023-06-28/06_record.sh
+   ssh $REMOTE "cd $REMOTE_WD && source .envrc && python3 ./src/record.py"
+   mkdir -p record/
+   rsync -avz --progress $REMOTE:/tmp/USRP_0-127.0MHz-30.0Msps_raw_abs.npy record/
+   rsync -avz --progress $REMOTE:/tmp/USRP_1-2.419MHz-30.0Msps_raw_abs.npy record/
+   #+end_src
+
+   It will execute the [[file:2023-06-28/src/record.py][=src/record.py=]] script, which will generate the
+   =/tmp/USRP-127.0MHz-30.0Msps_rx_signal_{0,1}.npy= traces on the remote
+   working machine, and download them in the [[file:2023-06-28/record][=record/=]] directory. Those traces
+   corresponds to the amplitude/magnitude of the IQ samples (absolute values of
+   the complex numbers). Hence, we will only see a positive range on the
+   time-domain y-axis and only one side of the carrier modulated band on the
+   frequency-domain y-axis.
+
+7. Post-process the traces to identify and locate the NF's AES leak and
+   identify the RF's signal.
+
+   #+begin_src bash :tangle ./2023-06-28/07_post-process.sh
+   mkdir -p $DIR_CSV
+   ./src/post-process.py
+   #+end_src
+
+8. Display an x-axis synchronized plot of the both traces:
+
+   #+begin_src bash :tangle ./2023-06-28/08_plot.sh
+   mkdir -p $DIR_PLOT
+   ./src/plot.py
+   #+end_src
+
+9. Save and clean experiment folder:
+
+   #+begin_src bash :tangle ./2023-06-28/09_save_clean.sh
+   tar cjvf $DIR_RECORD/$SIG_NF.tar.bz2 $DIR_RECORD/$SIG_NF
+   rm -rf $DIR_RECORD/$SIG_NF
+   tar cjvf $DIR_RECORD/$SIG_RF.tar.bz2 $DIR_RECORD/$SIG_RF
+   rm -rf $DIR_RECORD/$SIG_RF
+   #+end_src
+
+   Or rotate currently recorded files:
+
+   #+begin_src bash :tangle ./2023-06-28/09_rotate.sh
+   mv $DIR_RECORD/$SIG_NF $DIR_RECORD/${SIG_NF/.npy/_$(date "+%Y-%m-%d_%H-%M-%S").npy}
+   mv $DIR_RECORD/$SIG_RF $DIR_RECORD/${SIG_RF/.npy/_$(date "+%Y-%m-%d_%H-%M-%S").npy}
+   #+end_src
+
+The post-processing of the NF traces was done with triggers signals (multiple
+definitions with different filters and a reduction to one) and peak finding,
+leading to this result:
+
+#+CAPTION: Near-field trace post-processing (overview)
+[[file:2023-06-28/plot/nf_trace_post-process.png]]
+
+#+CAPTION: Near-field trace post-processing (zoom)
+[[file:2023-06-28/plot/nf_trace_post-process_zoom.png]]
+
+Looking at NF and FF side-by-side on the next plot, we can make hypothesis for
+the steps that are happening. On this plot, the boxes 1 (NF, system activity)
+and 3 (FF, coax RF cable activity) are the RX part of the slave, while boxes 2
+and 4 are the TX part. Both have a duration of approximately 100 µs (1e^{-4}s),
+which is coherent for an empty packet which should have a duration like
+80e^{-4}s. In box 5, we have a first complete AES (composed of 10 rounds) which
+is repeated 5 times in total. The beginning of the AES in the system activity
+is in fact shaded in the noise of the TX part. Which potentially means that the
+first round (an attack point) of AES is leaking...
+
+#+CAPTION: NF and FF comparison
+[[file:2023-06-28/screens/nf_ff_correspondance.drawio.png]]
+
+** DONE [2023-07-10 lun.] Generate and observe FF leakage of BLE communication
+:PROPERTIES:
+:header-args:bash+: :shebang #!/bin/bash
+:header-args:bash+: :eval never
+:ID:       a4b39a14-8f44-4ef9-a5e2-21503c3dbec1
+:END:
+
+Based on [[id:45b1a3ad-2b72-4027-9974-d207647fbaaf][[2023-06-28 mer.] Develop NF leak and RF signal detection + Observe NF
+and RF side-by-side]], we want to observe the AES leak during a BLE
+communication.
+
+**** Reproduce
+
+You can use ={01,02,xx}_xx.sh= scripts instead.
+
+1. Configure the needed variables in [[file:2023-07-10/.envrc][=.envrc=]] and source it (or use [[https://direnv.net/][DirEnv]]):
+
+   #+begin_src bash :tangle ./2023-07-10/01_configure_and_source.sh
+   vim .envrc
+   source .envrc
+   #+end_src
+
+2. Generate and flash the Nimble firmware of the victim:
+
+   #+begin_src bash :tangle ./2023-07-10/02_compile_flash_firmware_victim.sh
+   ssh $REMOTE "cd $REMOTE_NIMBLE && make all"
+   rsync -avz --progress $REMOTE:/tmp/mynewt-firmware.hex build/firmware-nimble.hex
+   #+end_src
+
+3. Generate and flash the Butterfly firmware of the attacker:
+
+   #+begin_src bash :tangle ./2023-07-10/03_compile_flash_firmware_attacker.sh
+   # TODO
+   #+end_src
+
+4. Pair victim and attacker devices, storing pairing information:
+
+   #+begin_src bash :tangle ./2023-07-10/04_pair.sh
+   ssh $REMOTE "cd $REMOTE_WD && bash -s" < ./src/pair.sh
+   #+end_src
+
+5. Make sure the two USRPs are detectable with =SoapySDRUtil= on the working
+   machine:
+
+   #+begin_src bash :tangle ./2023-07-10/05_check_usrps.sh
+   ssh $REMOTE "SoapySDRUtil --find"
+   #+end_src
+
+6. Record and download the traces:
+
+   #+begin_src bash :tangle ./2023-07-10/06_record.sh
+   ssh $REMOTE "cd $REMOTE_WD && source .envrc && python3 ./src/record.py"
+   # For local analysis:
+   # rsync -avz --progress $REMOTE:/tmp/$SIG_NF /tmp
+   # rsync -avz --progress $REMOTE:/tmp/$SIG_RF /tmp
+   #+end_src
+
+7. Post-process the traces to identify and locate the NF's AES leak and
+   identify the RF's signal.
+
+   #+begin_src bash :tangle ./2023-07-10/07_post-process.sh
+   mkdir -p $DIR_CSV
+   # Local analysis:
+   # ./src/post-process.py
+   # Remote analysis:
+   ssh reaper "cd $REMOTE_WD && source .envrc && python3" < ./src/post-process.py
+   #+end_src
+
+8. Display an x-axis synchronized plot of the both traces:
+
+   #+begin_src bash :tangle ./2023-07-10/08_plot.sh
+   mkdir -p $DIR_PLOT
+   # Local analysis:
+   # ./src/plot.py
+   # Remote analysis:
+   ssh reaper "cd $REMOTE_WD && source .envrc && python3" < ./src/plot.py
+   #+end_src
+
+9. Save and clean experiment folder:
+
+   #+begin_src bash :tangle ./2023-07-10/09_save_clean.sh :var key="a4b39a14-8f44-4ef9-a5e2-21503c3dbec1"
+   ssh $REMOTE "mkdir $REMOTE_ANNEX/$key"
+   ssh $REMOTE "cd $REMOTE_ANNEX/$key && mv /tmp/$SIG_NF ./${SIG_NF/.npy/_$(date "+%Y-%m-%d_%H-%M-%S").npy}"
+   ssh $REMOTE "cd $REMOTE_ANNEX/$key && mv /tmp/$SIG_RF ./${SIG_RF/.npy/_$(date "+%Y-%m-%d_%H-%M-%S").npy}"
+   ssh $REMOTE "cd $REMOTE_ANNEX/$key && git add ."
+   ssh $REMOTE "cd $REMOTE_ANNEX/$key && git annex sync"
+   #+end_src
+
+Optionally, to verify that a setup is correctly working for numerous measure,
+one can use the =all.sh= script:
+
+#+begin_src bash :tangle ./2023-07-10/all.sh
+function record_process() {
+    ./06_record.sh >/dev/null 2>&1
+    ./07_post-process.sh | grep position
+}
+i=0; while (( $i < 50 )); do record_process && let i++; done
+#+end_src
+
+**** Updates
+
+- For the lib, I used commit [[orgit-rev:~/work/info/projs/screaming_channels_lib/::6a547734d8cecfd9330af9e91fabb262a108a6cf][~/work/info/projs/screaming_channels_lib/ (magit-rev 6a54773)]].
+- Improved scripts to quickly record & inspect if there is an AES or not.
+- Turn WHAD parameters easily configurable with global variables.
+- Find a configuration where recording is stable and leak is observable.
+
+**** Results
+
+I've found an AES leak (key scheduling and first rounds) at the $2420+2*64 =
+2548$ GHz.
+
+#+CAPTION: Overview of signal
+[[file:2023-07-10/screens/Figure_1.drawio.png]]
+
+From the above plot, we can observe than we have a leak at the same time of the
+AES computation.
+
+#+CAPTION: Zoom on the presumed leak
+[[file:2023-07-10/screens/Figure_2.drawio.png]]
+
+From the plot above, we can observe than the leak have the same duration than
+the "noise" on the NF recording, which is hiding the first AES key scheduling
+and 2 first rounds out of 10.
+
+#+CAPTION: Correlation between NF and FF leaks
+[[file:2023-07-10/screens/Figure_3.drawio.png]]
+
+From the plot above, we can sort of recognize the 2 first AES rounds inside the
+leak using the distinctive frequency components.
+
+Highlights:
+- NF & FF sync :: Using NF to locate AES leak in FF is very useful, since there
+  is sometimes more leaks (which do not looks like an AES) at the same
+  frequency.

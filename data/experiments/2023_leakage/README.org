@@ -1,0 +1,55 @@
+#+TITLE: Side-channel leakage inside FF trace
+#+SETUPFILE: https://raw.githubusercontent.com/pierreay/orgcss/master/orgcss.setup
+
+* About
+
+The goal of this experiment is to use side-channels techniques (/e.g./
+Variance, SNR) to analyze our traces and find any leakage.
+
+This experiment takes place after the end of the [[id:f47bfbf0-da0a-424e-9b0e-97410072398a][FF AES during BLE Leak
+Collection]] experiment, using the [[orgit-rev:~/work/info/projs/screaming_channels_annex/::77b49b5d9c65287f87c7f4feeb39d7ead53d8824][~/work/info/projs/screaming_channels_annex/
+(magit-rev 77b49b5d9)]] dataset from the =67059239-5b11-49b2-86ba-6c6ed84c3f28=
+key.
+
+WARNING: In this dataset, the SKD of the attacker was not saved properly
+(fail). But, it was constantly set to =0xdeadbeefdeadbeef=, so it can be fixed
+while loading the plaintext.
+
+* Experiments
+
+** DONE Variance across same subbyte
+:PROPERTIES:
+:ID:       e3a38bc9-a5cd-428a-8407-f2f599592156
+:END:
+
+First, I wanted to plot the signal and the variance over a large transmissions
+(4 messages in NF and 1 leak in FF):
+
+#+CAPTION: Variance of NF (1)
+[[file:imgs/Figure_1.png]]
+
+#+CAPTION: Variance of NF (2)
+[[file:imgs/Figure_2.png]]
+
+#+CAPTION: Variance of NF (3)
+[[file:imgs/Figure_3.png]]
+
+We can notice that:
+- We have variance for all messages.
+- When the AES happened is not an evidence using the variance. Maybe the 1st
+  round variance is the level up before the last peak?
+- The absolute value of the variance is pretty low.
+
+Conclusion: Maybe we should use averaging and alignment or SNR...
+
+#+CAPTION: Variance of FF
+[[file:imgs/Figure_4.png]]
+
+We can notice that we see variance after the message in FF... would it means
+that the AES leak after the radio transmissions? Is there plot shifted?
+
+For a fixed subbyte number, computing the variance accross traces having the
+same subbyte value should lead to a lower variance at this subbyte position in
+the time-domain of the trace. It will allows to identify where is interesting
+part is, confirming that there is a value-dependent leakage, and allows us to
+align & average traces with the same subbyte value to increase trace quality.

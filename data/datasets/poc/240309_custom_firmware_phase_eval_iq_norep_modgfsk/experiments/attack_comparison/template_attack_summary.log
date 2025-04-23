@@ -1,0 +1,37 @@
+amp_snr:
+
+Best Key Guess:   7f   29   d9   ba   f9   b8   0c   bd   17   84   b3   1e   3c   e4   e2   4d
+Known Key:        7f   28   da   bb   fa   b9   0e   be   17   86   b0   1c   3d   e4   df   4d
+PGE:             000  003  002  001  002  001  001  006  000  002  003  001  001  000  004  000
+SUCCESS:           1    0    0    0    0    0    0    0    1    0    0    0    0    1    0    1
+actual rounded: 2^41.98932236
+
+--------------------------------------------------------------------------------
+
+phr_snr:
+
+Best Key Guess:   7c   2b   d7   b8   fb   b8   0d   bf   17   86   b3   1e   36   e4   df   4e
+Known Key:        7f   28   da   bb   fa   b9   0e   be   17   86   b0   1c   3d   e4   df   4d
+PGE:             003  002  039  002  006  003  002  003  000  000  004  004  003  000  000  003
+SUCCESS:           0    0    0    0    0    0    0    0    1    1    0    0    0    1    1    0
+actual rounded: 2^56.21461739
+
+--------------------------------------------------------------------------------
+
+i_augmented_snr:
+
+Best Key Guess:   7f   2b   d8   b8   f8   b8   0d   bf   17   86   ea   1d   3d   e4   df   4e
+Known Key:        7f   28   da   bb   fa   b9   0e   be   17   86   b0   1c   3d   e4   df   4d
+PGE:             000  001  001  002  005  003  025  003  000  000  044  003  000  000  000  002
+SUCCESS:           1    0    0    0    0    0    0    0    1    1    0    0    1    1    1    0
+actual rounded: 2^49.89780507
+
+--------------------------------------------------------------------------------
+
+q_augmented_snr:
+
+Best Key Guess:   7d   2b   d9   ba   f9   bb   0c   be   14   84   ea   1e   10   e7   df   4f
+Known Key:        7f   28   da   bb   fa   b9   0e   be   17   86   b0   1c   3d   e4   df   4d
+PGE:             024  004  002  001  012  004  002  000  001  003  002  003  002  001  000  001
+SUCCESS:           0    0    0    0    0    0    0    1    0    0    0    0    0    0    1    0
+actual rounded: 2^53.19453294

@@ -1,0 +1,135 @@
+Saren in screaming_channels_ble/src on  main [$!⇡] via 🐍 v3.11.6
+at 17:32:38 ❯ radio_init
+[2] 489169
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:471: CryptographyDeprecationWarning: Blowfish has been deprecated
+  cipher=algorithms.Blowfish,
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:485: CryptographyDeprecationWarning: CAST5 has been deprecated
+  cipher=algorithms.CAST5,
+[2024-01-09 17:33:06,449] [489169] [MainThread] [soapysdr] DEBUG - MySoapySDRs.__init__()
+[2024-01-09 17:33:06,449] [489169] [MainThread] [soapysdr] DEBUG - MySoapySDR.__init__(fs=30000000,freq=2548000000,idx=0,enabled=True,duration=0.1,dir=/home/drac/storage/tmp,gain=76)
+[INFO] [UHD] linux; GNU C++ version 13.2.1 20230801; Boost_108300; UHD_4.6.0.0-0-unknown
+[INFO] [b200_impl.cpp:421] [B200] Detected Device: B200mini
+[INFO] [B200] Detected Device: B200mini
+[INFO] [b200_impl.cpp:468] [B200] Operating over USB 3.
+[INFO] [B200] Operating over USB 3.
+[INFO] [b200_impl.cpp:619] [B200] Initialize CODEC control...
+[INFO] [B200] Initialize CODEC control...
+[INFO] [b200_impl.cpp:688] [B200] Initialize Radio control...
+[INFO] [B200] Initialize Radio control...
+[INFO] [b200_impl.cpp:1099] [B200] Performing register loopback test...
+[INFO] [B200] Performing register loopback test...
+[INFO] [b200_impl.cpp:1108] [B200] Register loopback test passed
+[INFO] [B200] Register loopback test passed
+[INFO] [b200_impl.cpp:814] [B200] Setting master clock rate selection to 'automatic'.
+[INFO] [B200] Setting master clock rate selection to 'automatic'.
+[INFO] [b200_impl.cpp:1149] [B200] Asking for clock rate 16.000000 MHz...
+[INFO] [B200] Asking for clock rate 16.000000 MHz...
+[INFO] [b200_impl.cpp:1162] [B200] Actually got clock rate 16.000000 MHz.
+[INFO] [B200] Actually got clock rate 16.000000 MHz.
+[INFO] [b200_impl.cpp:1149] [B200] Asking for clock rate 30.000000 MHz...
+[INFO] [B200] Asking for clock rate 30.000000 MHz...
+[INFO] [b200_impl.cpp:1162] [B200] Actually got clock rate 30.000000 MHz.
+[INFO] [B200] Actually got clock rate 30.000000 MHz.
+[2024-01-09 17:33:08,411] [489169] [MainThread] [soapysdr] DEBUG - MySoapySDRs.register(idx=0)
+[2024-01-09 17:33:08,412] [489169] [MainThread] [soapysdr] DEBUG - MySoapySDRs.open()
+[2024-01-09 17:33:08,412] [489169] [MainThread] [soapysdr] INFO  - initialize streams for radio #0
+[2024-01-09 17:33:08,414] [489169] [MainThread] [soapysdr] DEBUG - re-initialization
+[2024-01-09 17:33:08,415] [489169] [MainThread] [soapysdr] INFO  - process #489169 ready for listening!
+^C%
+
+Saren in screaming_channels_ble/src on  main [$!⇡] via 🐍 v3.11.6 took 4s
+✦ at 17:33:12 ❌130 ❯ radio_instrument
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:471: CryptographyDeprecationWarning: Blowfish has been deprecated
+  cipher=algorithms.Blowfish,
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:485: CryptographyDeprecationWarning: CAST5 has been deprecated
+  cipher=algorithms.CAST5,
+[2024-01-09 17:33:14,506] [489324] [MainThread] [dataset] INFO  - Dataset loaded from '/home/drac/storage/dataset/231222_single-cable-balanced_raw/dataset.pyc'
+[2024-01-09 17:33:14,506] [489324] [MainThread] [soapysdr] INFO  - Initialize a SoapySDR client... (enabled=True)
+[2024-01-09 17:33:14,506] [489324] [MainThread] [device] INFO  - Instantiate Central using dongle on UART0
+[2024-01-09 17:33:14,544] [489324] [MainThread] [device] INFO  - Instantiate Central using dongle on HCI0
+[2024-01-09 17:33:14,544] [489324] [MainThread] [device] INFO  - Spoof bluetooth address: CA:FE:CA:FE:CA:FE
+[2024-01-09 17:33:14,549] [489324] [MainThread] [device] INFO  - Configure device for recording index #0
+[2024-01-09 17:33:14,550] [489324] [MainThread] [device] INFO  - Send p and k on serial port...
+[2024-01-09 17:33:14,550] [489324] [MainThread] [device] INFO  - Send k=3d6b522ec259659d9254d15fcd222c4a
+[2024-01-09 17:33:14,550] [489324] [MainThread] [device] DEBUG - ser <- k:3d6b522ec259659d9254d15fcd222c4a
+[2024-01-09 17:33:14,651] [489324] [MainThread] [device] INFO  - Send p=1e530425215ea03298f50d246257b3c3
+[2024-01-09 17:33:14,651] [489324] [MainThread] [device] DEBUG - ser <- p:1e530425215ea03298f50d246257b3c3
+[2024-01-09 17:33:14,752] [489324] [MainThread] [device] DEBUG - ser <- input_sub
+[2024-01-09 17:33:14,852] [489324] [MainThread] [device] DEBUG - ser <- input_dump
+[2024-01-09 17:33:14,955] [489324] [MainThread] [device] DEBUG - Start preparing WHAD's sequences...
+[2024-01-09 17:33:14,956] [489324] [MainThread] [device] INFO  - Connection event for starting the recording: 6
+[2024-01-09 17:33:14,967] [489324] [MainThread] [device] INFO  - Connection event for sending the LL_ENC_REQ request: 6
+[2024-01-09 17:33:14,967] [489324] [MainThread] [device] INFO  - Procedure interleaving enabled: False
+[2024-01-09 17:33:14,967] [489324] [MainThread] [device] DEBUG - More Data Bit=0
+[2024-01-09 17:33:14,977] [489324] [MainThread] [device] DEBUG - central.prepare(LL_ENC_REQ[rand=0xdeadbeefdeadbeef, ediv=0xdead, skdm=0x0, ivm=0x0])
+[2024-01-09 17:33:14,992] [489324] [MainThread] [device] INFO  - Connect to target device...
+[2024-01-09 17:33:14,993] [489324] [MainThread] [device] DEBUG - Connection parameters: address=C2:3E:54:84:5C:4C, random=False, hop_interval=56, channel_map=0x300, timeout=30
+[2024-01-09 17:33:15,103] [489324] [MainThread] [device] DEBUG - WHAD's central is connected to target device!
+[2024-01-09 17:33:15,484] [489324] [MainThread] [soapysdr] DEBUG - fifo <- record
+[2024-01-09 17:33:15,485] [489169] [MainThread] [soapysdr] DEBUG - opened FIFO at /tmp/soapysdr.fifo
+[2024-01-09 17:33:15,485] [489169] [MainThread] [soapysdr] DEBUG - fifo -> record
+[2024-01-09 17:33:15,485] [489169] [MainThread] [soapysdr] DEBUG - MySoapySDRs.record(duration=None).enter
+[2024-01-09 17:33:15,485] [489169] [Thread-1 (record)] [soapysdr] INFO  - start record for radio #0 during 0.1s
+[2024-01-09 17:33:15,540] [489324] [Thread-2] [device] DEBUG - Save the received LL_ENC_RSP packet!
+[2024-01-09 17:33:15,585] [489324] [MainThread] [soapysdr] DEBUG - waiting...
+OOO[2024-01-09 17:33:15,739] [489169] [Thread-1 (record)] [soapysdr] DEBUG - MySoapySDR(idx=0).record().leave
+[2024-01-09 17:33:15,739] [489169] [MainThread] [soapysdr] DEBUG - MySoapySDRs.record(duration=None).exit
+[2024-01-09 17:33:15,739] [489324] [MainThread] [soapysdr] DEBUG - wait completed
+[2024-01-09 17:33:15,739] [489324] [MainThread] [soapysdr] DEBUG - fifo <- accept
+[2024-01-09 17:33:15,739] [489169] [MainThread] [soapysdr] DEBUG - fifo -> accept
+[2024-01-09 17:33:15,740] [489169] [MainThread] [soapysdr] DEBUG - MySoapySDRs.accept()
+[2024-01-09 17:33:15,740] [489169] [MainThread] [soapysdr] DEBUG - MySoapySDR(idx=0).accept()
+[2024-01-09 17:33:15,840] [489324] [MainThread] [device] INFO  - Disconnect from the target device
+[2024-01-09 17:33:15,846] [489324] [MainThread] [device] DEBUG - Stop and close UART0 dongle...
+[2024-01-09 17:33:16,870] [489324] [MainThread] [device] DEBUG - Stop and close HCI dongle...
+[2024-01-09 17:33:16,871] [489324] [MainThread] [soapysdr] DEBUG - fifo <- save
+[2024-01-09 17:33:16,871] [489169] [MainThread] [soapysdr] DEBUG - fifo -> save
+[2024-01-09 17:33:16,871] [489169] [MainThread] [soapysdr] DEBUG - MySoapySDRs.save(dir=None)
+[2024-01-09 17:33:16,871] [489169] [MainThread] [soapysdr] INFO  - save recording of radio #0 into directory /home/drac/storage/tmp
+[2024-01-09 17:33:16,893] [489169] [MainThread] [soapysdr] DEBUG - re-initialization
+[2024-01-09 17:33:16,974] [489324] [MainThread] [dataset] INFO  - Dataset saved to '/home/drac/storage/dataset/231222_single-cable-balanced_raw/dataset.pyc'
+
+Saren in screaming_channels_ble/src on  main [$!⇡] via 🐍 v3.11.6
+✦ at 17:34:14 ❌2 ❯ radio_extract DEBUG --plot --overwrite --no-exit-on-error $ENVRC_EXTRACT_CONFIG
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:471: CryptographyDeprecationWarning: Blowfish has been deprecated
+  cipher=algorithms.Blowfish,
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:485: CryptographyDeprecationWarning: CAST5 has been deprecated
+  cipher=algorithms.CAST5,
+[2024-01-09 17:34:43,832] [489862] [MainThread] [radio] INFO  - Extract RAW trace using ID #0
+[2024-01-09 17:34:43,833] [489862] [MainThread] [radio] INFO  - Select extraction config for clean 1 AES
+[2024-01-09 17:34:43,833] [489862] [MainThread] [radio] DEBUG - peak search prominence=0.75
+[2024-01-09 17:34:43,833] [489862] [MainThread] [load] INFO  - Load RAW trace from /home/drac/storage/tmp/raw_0_0.npy
+[2024-01-09 17:34:43,922] [489862] [MainThread] [radio] DEBUG - name=trigger
+- bandpass_low=7.50e+06
+- bandpass_high=1.15e+07
+- lowpass=1.00e+04
+[2024-01-09 17:34:43,941] [489862] [MainThread] [radio] INFO  - number of detected peaks=1
+[2024-01-09 17:35:05,801] [489862] [MainThread] [radio] INFO  - peak position=20.96%
+[2024-01-09 17:35:05,801] [489862] [MainThread] [radio] WARNING - maybe increase recording time to center the aes on the recording
+[2024-01-09 17:35:05,802] [489862] [MainThread] [radio] INFO  - SNR=3.5
+[2024-01-09 17:35:05,803] [489862] [MainThread] [load] INFO  - Load RAW trace from /home/drac/storage/tmp/raw_0_0.npy
+[2024-01-09 17:35:05,809] [489862] [MainThread] [radio] INFO  - overwrite extracted signal #0 in /home/drac/storage/tmp
+
+Saren in screaming_channels_ble/src on  main [$!⇡] via 🐍 v3.11.6 took 23s
+✦ at 17:35:17 ❯ ./radio.py --dir $ENVRC_RADIO_DIR to-numpy ~/downloads/leak.npy
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:471: CryptographyDeprecationWarning: Blowfish has been deprecated
+  cipher=algorithms.Blowfish,
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:485: CryptographyDeprecationWarning: CAST5 has been deprecated
+  cipher=algorithms.CAST5,
+[2024-01-09 17:35:27,427] [490133] [MainThread] [load] INFO  - Load RAW trace from /home/drac/storage/tmp/raw_0_0.npy
+[2024-01-09 17:35:27,429] [490133] [MainThread] [radio] INFO  - Signal saved in /home/drac/downloads/leak.npy
+
+Saren in screaming_channels_ble/src on  main [$!⇡] via 🐍 v3.11.6
+✦ at 17:35:27 ❯ radio_quit
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:471: CryptographyDeprecationWarning: Blowfish has been deprecated
+  cipher=algorithms.Blowfish,
+/usr/lib/python3.11/site-packages/scapy/layers/ipsec.py:485: CryptographyDeprecationWarning: CAST5 has been deprecated
+  cipher=algorithms.CAST5,
+[2024-01-09 17:36:29,540] [490730] [MainThread] [soapysdr] INFO  - Initialize a SoapySDR client... (enabled=True)
+[2024-01-09 17:36:29,540] [490730] [MainThread] [soapysdr] DEBUG - fifo <- quit
+[2024-01-09 17:36:29,541] [489169] [MainThread] [soapysdr] DEBUG - fifo -> quit
+[2024-01-09 17:36:29,541] [489169] [MainThread] [soapysdr] INFO  - quit the listening mode
+[2024-01-09 17:36:29,541] [489169] [MainThread] [soapysdr] DEBUG - MySoapySDRs.close()
+[2024-01-09 17:36:29,541] [489169] [MainThread] [soapysdr] DEBUG - MySoapySDR(idx=0).close().enter
+[2024-01-09 17:36:29,541] [489169] [MainThread] [soapysdr] DEBUG - MySoapySDR(idx=0).close().leave
+[2]  + 489169 done       ./radio.py --dir $ENVRC_RADIO_DIR --loglevel ${2-DEBUG} listen $ENVRC_NF_FREQ
