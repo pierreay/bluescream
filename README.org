@@ -41,12 +41,14 @@ This project is also part of my Ph.D. Thesis, not yet published.
 
 *Repositories*
 
-This repository mainly contains source code and small demos. However, the full
-project is composed of:
-- [[https://github.com/pierreay/screaming_channels_data][screaming_channels_data]] :: Holds datasets and experiments -- signals,
-  profiles, scripts.
+This repository contains:
+- =src= :: Source code for libraries and command-line utilities.
+- =docs= :: Demos for reproducing the main results of the paper.
+- =data= :: Datasets, experiments, signals, profiles, scripts.
+
+The project is also composed of:
 - [[https://github.com/pierreay/screaming_channels_poc][screaming_channels_poc]] :: Holds custom version of the Screaming Channels
-  project, on which this one is based on. All credits goes to [[https://github.com/eurecom-s3/screaming_channels][EURECOM]].
+  project, on which this one is based on. All credits goes to [[https://github.com/eurecom-s3/screaming_channels][EURECOM]] for this first previous work.
 
 * Reproducing
 
@@ -54,8 +56,8 @@ Here are some hints about reproducing our results. More precise instructions
 can be found in the Ph.D. manuscript, or in the documentation. For instance,
 see [[file:docs/demo_20231014][docs/demo_20231014]] to learn how to visually analyze a trace. Another
 example is [[file:docs/demo_20240828_acsac][docs/demo_20240828_acsac]] to learn how to reproduce attacks on two
-selected datasets. More precise demonstrations can be found in the repository
-of the experiments, see [[https://github.com/pierreay/screaming_channels_data][screaming_channels_data]].
+selected datasets. More precise demonstrations can be found in the directory of
+the experiments, see =data=.
 
 ** Dependencies for Recording
 

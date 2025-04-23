@@ -34,8 +34,9 @@ This guide will help you reproduce the main results of our paper. Note that
 this is a small part of our project. The full project can be found on GitHub at
 [`pierreay/screaming_channel_ble`](https://github.com/pierreay/screaming_channels_ble/). A web version of this guide can also be found
 at [`screaming_channels_ble/docs/demo_20240828_acsac/README.org`](https://github.com/pierreay/screaming_channels_ble/tree/main/docs/demo_20240828_acsac/README.org). We have
-published in open-access all of our data in the repository located at
-[`pierreay/screaming_channels_data`](https://github.com/pierreay/screaming_channels_data/).
+published in open-access all our experiments in the `data` subdirectory of the
+project main repository. Our full datasets are stored offline, but the most
+important ones are uploaded online (see below).
 
 To fully reproduce this attack, one would have to first acquire a dataset by:
 
