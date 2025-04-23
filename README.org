@@ -23,18 +23,31 @@ This project is also part of my Ph.D. Thesis, not yet published.
 # biblio-info@06cb76e
 #+begin_quote
 @InProceedings{	  ayoub24bluescream,
+
   title               = {{BlueScream: Screaming Channels on Bluetooth Low Energy}},
+
   author              = {Ayoub, Pierre and Cayre, Romain and Francillon, Aur{\'e}lien and Maurice, Cl{\'e}mentine},
+
   booktitle           = {{40th Annual Computer Security Applications Conference (ACSAC '24)}},
+
   address             = {Waikiki, Honolulu, Hawaii, United States},
+
   hal_local_reference = {Rapport LAAS n{\textdegree} 24326},
+
   year                = {2024},
+
   month               = dec,
+
   keywords            = {Screaming Channels ; Side-channel attacks ; Bluetooth Low Energy ; BLE ; Distant side-channels ; Mixed-signal chips},
+
   url                 = {https://hal.science/hal-04725668},
+
   pdf                 = {https://hal.science/hal-04725668v2/file/bluescream.pdf},
+
   hal_id              = {hal-04725668},
+
   hal_version         = {v2},
+
   affiliations        = {Eurecom, Univ Lille, CNRS, Inria},
 }
 #+end_quote
