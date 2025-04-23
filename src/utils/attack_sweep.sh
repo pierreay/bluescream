@@ -6,7 +6,7 @@
 source ./lib/log.sh
 
 dataset_dir=~/storage/dataset/240110_single-leak-pairing-1m-lna_raw
-profile_dir=~/git/screaming_channels_ble/data/profiles/231222_single-cable-balanced_raw/ 
+profile_dir=~/git/bluescream/data/profiles/231222_single-cable-balanced_raw/ 
 poi_num=2
 poi_spacing=1
 variable=p_xor_k

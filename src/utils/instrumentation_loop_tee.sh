@@ -9,6 +9,6 @@ while test 1; do
     echo "======="
     ./radio.py --dir "$ENVRC_RADIO_DIR" instrument "$ENVRC_DATASET_RAW_PATH" train "$ENVRC_ATTACKER_ADDR" "$ENVRC_VICTIM_ADDR" "$ENVRC_VICTIM_PORT" --idx 0 --config example
     ./radio.py --dir "$ENVRC_RADIO_DIR" extract "$ENVRC_SAMP_RATE" "$ENVRC_FF_ID" --no-plot --no-overwrite --no-exit-on-error --config 1_aes_weak --corr \
-               ~/git/screaming_channels_ble/data/signals/2.548GHz_30Msps_AES_BLE_clean_leak_single.npy 2>&1 \
+               ~/git/bluescream/data/signals/2.548GHz_30Msps_AES_BLE_clean_leak_single.npy 2>&1 \
         | tee -a /tmp/radio_extract_output
 done

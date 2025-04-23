@@ -1,4 +1,4 @@
-INFO: Checkout main -> /home/drac/git/screaming_channels_ble
+INFO: Checkout main -> /home/drac/git/bluescream
 Déjà sur 'main'
 Votre branche est à jour avec 'origin/main'.
 [2024-05-17 11:37:13,124] [1688082] [MainThread] [dataset] INFO  - Dataset loaded from '/home/drac/mnt/sc_nvme_ssd/dataset/datasets/ble/240429_highdist_2lna_highgain_norep/raw/dataset.pyc'

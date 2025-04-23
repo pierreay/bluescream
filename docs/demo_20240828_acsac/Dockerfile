@@ -7,11 +7,11 @@ RUN apt-get update && apt-get install -yq git vim python3-pip sudo wget unzip ev
 RUN pip3 install setuptools numpy==2.0.0 click==8.1.7 matplotlib==3.9.2 colorlog==6.8.2 tqdm==4.66.5 scipy==1.14.1 statsmodels==0.14.2 pycryptodome==3.20.0
 
 # Clone our project and create environment variables for it.
-ENV SC=/screaming_channels_ble
-ENV SC_SRC=/screaming_channels_ble/src
-ENV SC_DOCKER=/screaming_channels_ble/docs/demo_20240828_acsac
+ENV SC=/bluescream
+ENV SC_SRC=/bluescream/src
+ENV SC_DOCKER=/bluescream/docs/demo_20240828_acsac
 WORKDIR /
-RUN test -d screaming_channels_ble && : || git clone https://github.com/pierreay/screaming_channels_ble.git
+RUN test -d bluescream && : || git clone https://github.com/pierreay/bluescream.git
 
 # Install the WHAD project.
 RUN test -d screaming_channels_whad && : || git clone https://github.com/pierreay/screaming_channels_whad.git

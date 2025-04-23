@@ -1,6 +1,6 @@
-[submodule "231213_single-cable_raw/submodules/screaming_channels_ble"]
-	path = datasets/ble/231213_single-cable_raw/submodules/screaming_channels_ble
-	url = git@github.com:pierreay/screaming_channels_ble.git
+[submodule "231213_single-cable_raw/submodules/bluescream"]
+	path = datasets/ble/231213_single-cable_raw/submodules/bluescream
+	url = git@github.com:pierreay/bluescream.git
 [submodule "231213_single-cable_raw/submodules/screaming_channels_nimble"]
 	path = datasets/ble/231213_single-cable_raw/submodules/screaming_channels_nimble
 	url = git@github.com:pierreay/screaming_channels_nimble.git

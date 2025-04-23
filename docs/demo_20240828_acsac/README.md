@@ -32,8 +32,8 @@ numbers representing I/Q data.
 
 This guide will help you reproduce the main results of our paper. Note that
 this is a small part of our project. The full project can be found on GitHub at
-[`pierreay/screaming_channel_ble`](https://github.com/pierreay/screaming_channels_ble/). A web version of this guide can also be found
-at [`screaming_channels_ble/docs/demo_20240828_acsac/README.org`](https://github.com/pierreay/screaming_channels_ble/tree/main/docs/demo_20240828_acsac/README.org). We have
+[`pierreay/screaming_channel_ble`](https://github.com/pierreay/bluescream/). A web version of this guide can also be found
+at [`bluescream/docs/demo_20240828_acsac/README.org`](https://github.com/pierreay/bluescream/tree/main/docs/demo_20240828_acsac/README.org). We have
 published in open-access all our experiments in the `data` subdirectory of the
 project main repository. Our full datasets are stored offline, but the most
 important ones are uploaded online (see below).
@@ -67,7 +67,7 @@ For both datasets, we will execute the following steps:
     leakage model.
 2.  Leveraging the profile, attack using a Template Attack on an attack subset.
 
-While it is not mandatory, the [`docs/demo_20231014/README.org`](https://github.com/pierreay/screaming_channels_ble/blob/main/docs/demo_20231014/README.org) demo give a look
+While it is not mandatory, the [`docs/demo_20231014/README.org`](https://github.com/pierreay/bluescream/blob/main/docs/demo_20231014/README.org) demo give a look
 at visualizing how traces and the AES leakage looks like.
 
 
@@ -85,7 +85,7 @@ First, we will setup necessary tools, downloading the code and the data.
 Clone the "Screaming Channels on Bluetooth Low Energy" repository (~ 10 MB) in
 the directory of your choice:
 
-    git clone https://github.com/pierreay/screaming_channels_ble/
+    git clone https://github.com/pierreay/bluescream/
 
 Moreover, manually download the two aforementioned datasets located at
 [`zenodo.org/records/13384278`](https://zenodo.org/records/13384278) which have been publicly uploaded on Zenodo (less
@@ -101,7 +101,7 @@ that both [Docker](https://www.docker.com/) and its [buildx](https://docs.docker
 
 First, move the downloaded datasets inside the Docker folder:
 
-    cd screaming_channels_ble/docs/demo_20240828_acsac
+    cd bluescream/docs/demo_20240828_acsac
     mv -t . /PATH/TO/240207_1-leak-pairing-10cm-anechoic-2.533e9-8e6_raw.tar.bz2
     mv -t . /PATH/TO/240429_highdist_2lna_highgain_norep.tar.bz2
 
@@ -131,7 +131,7 @@ is connected to the Docker container through SSH:
     make shell
 
 For the following command, the `$SC_SRC` variable is set to the path of the
-`screaming_channels_ble/src` directory, while the `$DATASET` variable will be
+`bluescream/src` directory, while the `$DATASET` variable will be
 set to the path of the currently analyzed dataset.
 
 
