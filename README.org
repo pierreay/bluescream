@@ -1,7 +1,7 @@
 :PROPERTIES:
 :ID:       5294e8b0-b57f-41d8-8783-4539f6c901ff
 :END:
-#+TITLE: Screaming Channels on Bluetooth Low Energy
+#+TITLE: BlueScream: Screaming Channels on Bluetooth Low Energy
 #+SETUPFILE: https://raw.githubusercontent.com/pierreay/orgcss/master/orgcss.setup
 
 * About
