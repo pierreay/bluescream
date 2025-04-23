@@ -16,7 +16,7 @@ This project led to the following [[https://www.acsac.org/][ACSAC]] publication:
 Pierre Ayoub, Romain Cayre, Aurélien Francillon and Clémentine Maurice. “BlueScream : Screaming Channels on Bluetooth Low Energy”. In: 40th Annual Computer Security Applications Conference (ACSAC ’24). Waikiki, Honolulu, Hawaii, United States, Dec. 2024. URL : https://hal.science/hal-04725668. DOI : 
 #+end_quote
 
-This project is also part of my Ph.D. Thesis, not yet published.
+This project is also part of my PhD thesis: /Pierre Ayoub (2024). Compromising Electromagnetic Emanations: Side-Channel Leakages in Embedded Devices. Sorbonne Université. https://theses.fr/2024SORUS558 https://theses.hal.science/tel-05008752/
 
 *How to cite*
 
