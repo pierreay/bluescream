@@ -3,7 +3,7 @@ build: .datasetinit .dockerinit
 
 # NOTE: When debugging this command, set progress to "plain" instead of "tty".
 .dockerinit:
-	docker buildx build . -t ubuntu-screaming_channels_ble --progress tty
+	docker buildx build . -t ubuntu-bluescream --progress tty
 	touch .dockerinit
 
 # Check that datasets have been downloaded in current directory.
@@ -18,9 +18,9 @@ build: .datasetinit .dockerinit
 # Get a shell into the Docker container.
 shell:
 	docker run -it --env=DISPLAY --net=host \
-		ubuntu-screaming_channels_ble /bin/bash
+		ubuntu-bluescream /bin/bash
 
 # Clean our Docker images and containers.
 clean:
-	docker rmi -f ubuntu-screaming_channels_ble:latest
+	docker rmi -f ubuntu-bluescream:latest
 	rm .dockerinit

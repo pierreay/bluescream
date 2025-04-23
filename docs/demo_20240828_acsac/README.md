@@ -32,7 +32,7 @@ numbers representing I/Q data.
 
 This guide will help you reproduce the main results of our paper. Note that
 this is a small part of our project. The full project can be found on GitHub at
-[`pierreay/screaming_channel_ble`](https://github.com/pierreay/bluescream/). A web version of this guide can also be found
+[`pierreay/bluescream`](https://github.com/pierreay/bluescream/). A web version of this guide can also be found
 at [`bluescream/docs/demo_20240828_acsac/README.org`](https://github.com/pierreay/bluescream/tree/main/docs/demo_20240828_acsac/README.org). We have
 published in open-access all our experiments in the `data` subdirectory of the
 project main repository. Our full datasets are stored offline, but the most
