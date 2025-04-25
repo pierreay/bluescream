@@ -84,8 +84,8 @@ Firmware:
 
 *Software*
 
-- [[https://github.com/pierreay/python_hel][Histogram-Enumeration Library (HEL)]] :: Key enumeration and estimation
-  library. All credits goes to [[https://github.com/giocamurati/python_hel][Giovanni Camurati]].
+- [[https://github.com/giocamurati/python_hel][Histogram-Enumeration Library (HEL)]] :: Key enumeration and estimation
+  library. All credits goes to [[https://github.com/giocamurati][Giovanni Camurati]].
 - [[https://numpy.org/][Numpy]] :: Well-known Python scientific computation library.
 
 * Source code
