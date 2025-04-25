@@ -71,8 +71,7 @@ Libraries:
 Firmware:
 - [[https://github.com/whad-team/butterfly][ButteRFly]] :: The attacker firmware. A custom version of the WHAD-enabled for
   low-level traffic injection. All credits goes to the [[https://github.com/whad-team][WHAD team]]. It is
-  registered as a submodule in =ext/butterfly= and can be initialized using =git
-  submodule update --init --recursive ext/butterfly=.
+  registered as a submodule in =ext/butterfly= and can be initialized using =git submodule update --init --recursive ext/butterfly=.
 - [[https://github.com/pierreay/screaming_channels_nimble.git][NimBLE]] :: The victim firmware. A custom version of the [[https://mynewt.apache.org/][Apache MyNewt BLE]]
   firmware.
 
