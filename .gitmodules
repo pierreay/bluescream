@@ -1,3 +1,6 @@
 [submodule "ext/butterfly"]
 	path = ext/butterfly
 	url = https://github.com/whad-team/butterfly
+[submodule "ext/screaming_channels"]
+	path = ext/screaming_channels
+	url = https://github.com/pierreay/screaming_channels
