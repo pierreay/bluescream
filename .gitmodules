@@ -1,12 +1,23 @@
-[submodule "ext/butterfly"]
-	path = ext/butterfly
-	url = https://github.com/whad-team/butterfly
+# Owns
+
 [submodule "ext/screaming_channels"]
 	path = ext/screaming_channels
 	url = https://github.com/pierreay/screaming_channels
+[submodule "ext/mynewt"]
+	path = ext/mynewt
+	url = https://github.com/pierreay/bluescream-mynewt
+
+# Upstream
+
+[submodule "ext/butterfly"]
+	path = ext/butterfly
+	url = https://github.com/whad-team/butterfly
 [submodule "ext/whad"]
 	path = ext/whad
 	url = https://github.com/whad-team/whad-client
+
+# Experiments
+
 [submodule "data/datasets/ble/231213_single-cable_raw/submodules/bluescream"]
 	path = data/datasets/ble/231213_single-cable_raw/submodules/bluescream
 	url = https://github.com/pierreay/bluescream.git
