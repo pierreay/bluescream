@@ -69,13 +69,13 @@ the experiments, see =data=.
 Libraries:
 - [[https://github.com/pothosware/SoapySDR][SoapySDR]] :: The library for recording I/Q samples with an SDR.
 - [[https://github.com/whad-team/whad-client][WHAD]] :: A framework for wireless hacking.
+  It is registered as a submodule in =ext/whad= and can be initialized using =git submodule update --init --recursive ext/whad=.
 
 Firmware:
-- [[https://github.com/whad-team/butterfly][ButteRFly]] :: The attacker firmware. A custom version of the WHAD-enabled for
-  low-level traffic injection. All credits goes to the [[https://github.com/whad-team][WHAD team]]. It is
-  registered as a submodule in =ext/butterfly= and can be initialized using =git submodule update --init --recursive ext/butterfly=.
-- [[https://github.com/pierreay/screaming_channels_nimble.git][NimBLE]] :: The victim firmware. A custom version of the [[https://mynewt.apache.org/][Apache MyNewt BLE]]
-  firmware.
+- [[https://github.com/whad-team/butterfly][ButteRFly]] :: The attacker firmware, WHAD-enabled for low-level traffic injection. 
+  It is registered as a submodule in =ext/butterfly= and can be initialized using =git submodule update --init --recursive ext/butterfly=.
+- [[https://github.com/pierreay/bluescream-mynewt.git][MyNewt]] :: The victim firmware running the [[https://mynewt.apache.org/][NimBLE from Apache MyNewt]] Bluetooth Low Energy stack with a software AES (TinyAES) instead of using the hardware cryptoaccelerator.
+  It is registered as a submodule in =ext/mynewt= and can be initialized using =git submodule update --init --recursive ext/mynewt=.
 
 *Hardware*
 
