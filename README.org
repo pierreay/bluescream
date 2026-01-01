@@ -85,7 +85,7 @@ Firmware:
   All credits for the initial project goes to [[https://github.com/eurecom-s3/screaming_channels][EURECOM]].
   It is registered as a submodule in =ext/screaming_channels= and can be initialized using =git submodule update --init --recursive ext/screaming_channels=.
 - [[https://github.com/giocamurati/python_hel][Histogram-Enumeration Library (HEL)]] :: Key enumeration and estimation library.
-All credits goes to [[https://github.com/giocamurati][Giovanni Camurati]].
+  All credits goes to [[https://github.com/giocamurati][Giovanni Camurati]].
 - [[https://numpy.org/][Numpy]] :: Well-known Python scientific computation library.
 
 * Source code
