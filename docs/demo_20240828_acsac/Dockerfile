@@ -14,10 +14,10 @@ WORKDIR /
 RUN test -d bluescream && : || git clone https://github.com/pierreay/bluescream.git
 
 # Install the WHAD project.
-RUN test -d screaming_channels_whad && : || git clone https://github.com/pierreay/screaming_channels_whad.git
-WORKDIR /screaming_channels_whad
+RUN test -d whad-client && : || (git clone https://github.com/whad-team/whad-client && cd whad-client && git checkout c44c464)
+WORKDIR /whad-client
 RUN python3 setup.py install
-ENV PYTHONPATH=/screaming_channels_whad
+ENV PYTHONPATH=/whad-client
 
 # Install the HEL project.
 RUN chmod +x "$SC_SRC/utils/install-hel.sh"

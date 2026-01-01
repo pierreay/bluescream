@@ -68,8 +68,7 @@ the experiments, see =data=.
 
 Libraries:
 - [[https://github.com/pothosware/SoapySDR][SoapySDR]] :: The library for recording I/Q samples with an SDR.
-- [[https://github.com/pierreay/screaming_channels_whad][WHAD]] :: A custom version of the framework for wireless hacking. All credits
-  goes to the [[https://github.com/whad-team/whad-client][WHAD team]].
+- [[https://github.com/whad-team/whad-client][WHAD]] :: A framework for wireless hacking.
 
 Firmware:
 - [[https://github.com/whad-team/butterfly][ButteRFly]] :: The attacker firmware. A custom version of the WHAD-enabled for
