@@ -46,12 +46,6 @@ This repository contains:
 - =docs= :: Demos for reproducing the main results of the paper.
 - =data= :: Datasets, experiments, signals, profiles, scripts.
 
-The project is also composed of:
-- [[https://github.com/pierreay/screaming_channels][screaming_channels]] :: Holds custom version of the Screaming Channels
-  project, on which this one is based on. All credits goes to [[https://github.com/eurecom-s3/screaming_channels][EURECOM]]
-  for this first previous work. It is registered as a submodule in =ext/screaming_channels= and can be initialized
-  using =git submodule update --init --recursive ext/screaming_channels=.
-
 
 * Reproducing
 
@@ -87,8 +81,11 @@ Firmware:
 
 *Software*
 
-- [[https://github.com/giocamurati/python_hel][Histogram-Enumeration Library (HEL)]] :: Key enumeration and estimation
-  library. All credits goes to [[https://github.com/giocamurati][Giovanni Camurati]].
+- [[https://github.com/pierreay/screaming_channels][screaming_channels]] :: Holds custom version of the Screaming Channels project, on which this one is based on.
+  All credits for the initial project goes to [[https://github.com/eurecom-s3/screaming_channels][EURECOM]].
+  It is registered as a submodule in =ext/screaming_channels= and can be initialized using =git submodule update --init --recursive ext/screaming_channels=.
+- [[https://github.com/giocamurati/python_hel][Histogram-Enumeration Library (HEL)]] :: Key enumeration and estimation library.
+All credits goes to [[https://github.com/giocamurati][Giovanni Camurati]].
 - [[https://numpy.org/][Numpy]] :: Well-known Python scientific computation library.
 
 * Source code
