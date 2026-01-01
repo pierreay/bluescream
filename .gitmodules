@@ -7,3 +7,27 @@
 [submodule "ext/whad"]
 	path = ext/whad
 	url = https://github.com/whad-team/whad-client
+[submodule "data/datasets/ble/231213_single-cable_raw/submodules/bluescream"]
+	path = data/datasets/ble/231213_single-cable_raw/submodules/bluescream
+	url = https://github.com/pierreay/bluescream.git
+[submodule "data/datasets/ble/231213_single-cable_raw/submodules/screaming_channels_nimble"]
+	path = data/datasets/ble/231213_single-cable_raw/submodules/screaming_channels_nimble
+	url = https://github.com/pierreay/screaming_channels_nimble.git
+[submodule "data/datasets/ble/231213_single-cable_raw/submodules/butterfly"]
+	path = data/datasets/ble/231213_single-cable_raw/submodules/butterfly
+	url = https://github.com/pierreay/butterfly.git
+[submodule "data/datasets/ble/231213_single-cable_raw/submodules/whad"]
+	path = data/datasets/ble/231213_single-cable_raw/submodules/whad
+	url = https://github.com/pierreay/whad.git
+[submodule "data/datasets/ble/231222_single-cable-balanced_raw/submodules/screaming_channels_nimble"]
+	path = data/datasets/ble/231222_single-cable-balanced_raw/submodules/screaming_channels_nimble
+	url = https://github.com/pierreay/screaming_channels_nimble.git
+[submodule "data/datasets/ble/231223_single-1m-pair_raw/submodules/screaming_channels_nimble"]
+	path = data/datasets/ble/231223_single-1m-pair_raw/submodules/screaming_channels_nimble
+	url = https://github.com/pierreay/screaming_channels_nimble.git
+[submodule "data/datasets/ble/240110_single-leak-pairing-1m-lna_raw/submodules/screaming_channels_nimble"]
+	path = data/datasets/ble/240110_single-leak-pairing-1m-lna_raw/submodules/screaming_channels_nimble
+	url = https://github.com/pierreay/screaming_channels_nimble.git
+[submodule "data/datasets/ble/240112_multi-leak-insub-1m-lna_raw/submodules/screaming_channels_nimble"]
+	path = data/datasets/ble/240112_multi-leak-insub-1m-lna_raw/submodules/screaming_channels_nimble
+	url = https://github.com/pierreay/screaming_channels_nimble.git
