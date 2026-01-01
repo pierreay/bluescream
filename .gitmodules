@@ -4,3 +4,6 @@
 [submodule "ext/screaming_channels"]
 	path = ext/screaming_channels
 	url = https://github.com/pierreay/screaming_channels
+[submodule "ext/whad"]
+	path = ext/whad
+	url = https://github.com/whad-team/whad-client
